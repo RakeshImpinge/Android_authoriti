@@ -66,4 +66,17 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.8.0@aar') {
         transitive = true;
     }
+
+    compile 'uk.co.chrisjenx:calligraphy:2.3.0'
+
+    compile('com.mikepenz:fastadapter:2.5.0@aar') {
+        transitive = true
+    }
+    compile 'com.mikepenz:fastadapter-commons:2.1.0@aar'
+    compile 'com.mikepenz:fastadapter-extensions:2.1.0@aar'
+    compile 'com.mikepenz:materialize:1.0.1@aar'
+    compile('com.mikepenz:materialdrawer:5.9.0@aar') {
+        transitive = true
+    }
+
 }
