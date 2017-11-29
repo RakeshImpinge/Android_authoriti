@@ -3,12 +3,16 @@ package com.curtisdigital.authoriti;
 import android.app.Application;
 import android.content.Context;
 import com.crashlytics.android.Crashlytics;
+
+import org.androidannotations.annotations.EApplication;
+
 import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by mac on 11/25/17.
  */
 
+@EApplication
 public class AuthoritiApplication extends Application {
 
     private Context context;
