@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Authoriti</string>
+
+    <string name="menu_code_generate">Generate Permission Code</string>
+    <string name="menu_account">Account Identifiers</string>
+    <string name="menu_wipe">Wipe</string>
+    <string name="menu_logOut">Logout</string>
+
 </resources>

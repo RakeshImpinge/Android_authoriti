@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.curtisdigital.authoriti">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".AuthoritiApplication_"
         android:allowBackup="true"
@@ -9,7 +11,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme.NoActionBar">
 
         <activity android:name=".SplashActivity"
             android:theme="@style/SplashTheme">
@@ -20,12 +22,11 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".MainActivity"/>
+        <activity android:name=".MainActivity_"/>
 
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="a2bac8382233b9fab9a9b00a0a2d2ad3a17022a2" />
     </application>
 
-    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>
