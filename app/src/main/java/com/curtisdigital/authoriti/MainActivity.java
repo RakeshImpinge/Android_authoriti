@@ -1,11 +1,12 @@
 package com.curtisdigital.authoriti;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 
 import com.curtisdigital.authoriti.core.BaseActivity;
 import com.curtisdigital.authoriti.ui.menu.AccountFragment_;
@@ -19,6 +20,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
@@ -41,7 +43,7 @@ public class MainActivity extends BaseActivity {
     Toolbar toolbar;
 
     @ViewById(R.id.ivAdd)
-    ImageView ivAdd;
+    ImageButton ivAdd;
 
     @AfterViews
     void callAfterViewInjection(){
@@ -52,15 +54,16 @@ public class MainActivity extends BaseActivity {
                 .withHeaderBackground(android.R.color.white)
                 .build();
 
+        Typeface typeface = Typeface.createFromAsset(getAssets(), getResources().getString(R.string.font_oswaldo_regular));
+
         drawer = new DrawerBuilder()
                 .withActivity(this)
-                .withToolbar(toolbar)
                 .withAccountHeader(header)
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withName(R.string.menu_code_generate).withIdentifier(MENU_CODE).withSelectable(true),
-                        new PrimaryDrawerItem().withName(R.string.menu_account).withIdentifier(MENU_ACCOUNT).withSelectable(true),
-                        new PrimaryDrawerItem().withName(R.string.menu_wipe).withIdentifier(MENU_WIPE).withSelectable(true),
-                        new PrimaryDrawerItem().withName(R.string.menu_logOut).withIdentifier(MENU_LOGOUT).withSelectable(true)
+                        new PrimaryDrawerItem().withName(R.string.menu_code_generate).withIdentifier(MENU_CODE).withSelectable(true).withTypeface(typeface),
+                        new PrimaryDrawerItem().withName(R.string.menu_account).withIdentifier(MENU_ACCOUNT).withSelectable(true).withTypeface(typeface),
+                        new PrimaryDrawerItem().withName(R.string.menu_wipe).withIdentifier(MENU_WIPE).withSelectable(true).withTypeface(typeface),
+                        new PrimaryDrawerItem().withName(R.string.menu_logOut).withIdentifier(MENU_LOGOUT).withSelectable(true).withTypeface(typeface)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -120,6 +123,20 @@ public class MainActivity extends BaseActivity {
 
     private void logOut(){
 
+    }
+
+    @Click(R.id.ivAdd)
+    void addButtonClicked(){
+
+    }
+
+    @Click(R.id.ivMenu)
+    void menuButtonClicked(){
+        if (drawer.isDrawerOpen()){
+            drawer.closeDrawer();
+        } else {
+            drawer.openDrawer();
+        }
     }
 
     @Override

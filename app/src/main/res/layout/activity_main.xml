@@ -19,6 +19,16 @@
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
+            <ImageButton
+                android:id="@+id/ivMenu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:layout_marginStart="-8dp"
+                android:tint="@android:color/white"
+                android:src="@drawable/ic_menu"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
+
             <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/tvTitle"
                 android:layout_width="0dp"
@@ -26,19 +36,21 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:maxLines="1"
-                android:layout_marginStart="-16dp"
+                android:layout_marginStart="-8dp"
                 android:text="@string/app_name"
                 android:textColor="@android:color/white"
                 android:textAllCaps="true"
-                android:textSize="20sp"/>
+                fontPath="@string/font_oswaldo_light"
+                android:textSize="18sp"/>
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/ivAdd"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="4dp"
                 android:layout_marginEnd="16dp"
                 android:src="@drawable/ic_add"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:visibility="invisible"/>
 
 

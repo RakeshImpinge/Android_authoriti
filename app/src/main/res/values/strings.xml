@@ -6,4 +6,14 @@
     <string name="menu_wipe">Wipe</string>
     <string name="menu_logOut">Logout</string>
 
+    <!-- Fonts -->
+    <string name="font_iA_bold">fonts/iAWriterDuospace_Bold.ttf</string>
+    <string name="font_iA_bold_italic">fonts/iAWriterDuospace_BoldItalic.ttf</string>
+    <string name="font_iA_regular">fonts/iAWriterDuospace_Regular.ttf</string>
+    <string name="font_iA_regular_italic">fonts/iAWriterDuospace_RegularItalic.ttf</string>
+    <string name="font_oswaldo_bold">fonts/Oswald_Bold.ttf</string>
+    <string name="font_oswaldo_light">fonts/Oswald_Light.ttf</string>
+    <string name="font_oswaldo_medium">fonts/Oswald_Medium.ttf</string>
+    <string name="font_oswaldo_regular">fonts/Oswald_Regular.ttf</string>
+
 </resources>
