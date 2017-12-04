@@ -17,6 +17,11 @@ public class Value {
     @SerializedName("title")
     private String title;
 
+    public Value(String value, String title){
+        this.value = value;
+        this.title = title;
+    }
+
     public String getValue() {
         return value;
     }

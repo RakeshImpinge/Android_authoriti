@@ -1,17 +1,27 @@
 package com.curtisdigital.authoriti;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
+import com.curtisdigital.authoriti.api.model.Value;
 import com.curtisdigital.authoriti.core.BaseActivity;
+import com.curtisdigital.authoriti.ui.dialog.AccountAddDialog;
+import com.curtisdigital.authoriti.ui.dialog.AccountAddDialogListener;
 import com.curtisdigital.authoriti.ui.menu.AccountFragment_;
 import com.curtisdigital.authoriti.ui.menu.CodeGenerateFragment_;
 import com.curtisdigital.authoriti.ui.menu.WipeFragment_;
+import com.curtisdigital.authoriti.utils.AuthoritiUtils_;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -25,12 +35,9 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_main)
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements AccountAddDialogListener{
 
-    public static final long MENU_CODE              = 1001;
-    public static final long MENU_ACCOUNT           = 1002;
-    public static final long MENU_WIPE              = 1003;
-    public static final long MENU_LOGOUT            = 1004;
+    private static String TAG = "Authoriti/" + MainActivity.class.getName();
 
     private AccountHeader header = null;
     private Drawer drawer = null;
@@ -38,6 +45,11 @@ public class MainActivity extends BaseActivity {
     private Fragment codeGenerateFragment;
     private Fragment accountFragment;
     private Fragment wipeFragment;
+
+    BroadcastReceiver broadcastReceiver;
+
+    private AccountAddDialog accountAddDialog;
+
 
     @ViewById(R.id.toolbar)
     Toolbar toolbar;
@@ -80,6 +92,19 @@ public class MainActivity extends BaseActivity {
                         return false;
                     }
                 }).build();
+
+
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(BROADCAST_CHANGE_MENU)){
+                    long menuId = intent.getLongExtra(MENU_ID, 0);
+                    drawer.setSelection(menuId);
+                }
+            }
+        };
+
+        LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastReceiver, new IntentFilter(BROADCAST_CHANGE_MENU));
 
         menuSelected(MENU_CODE);
     }
@@ -127,7 +152,24 @@ public class MainActivity extends BaseActivity {
 
     @Click(R.id.ivAdd)
     void addButtonClicked(){
+        showAccountAddDialog();
+    }
 
+    private void showAccountAddDialog(){
+        if (accountAddDialog == null){
+            accountAddDialog = new AccountAddDialog(mContext);
+            accountAddDialog.setListener(this);
+        }
+        if (!isFinishing()){
+            accountAddDialog.show();
+        }
+    }
+
+    private void hideAccountAddDialog(){
+        if (accountAddDialog != null){
+            accountAddDialog.dismiss();
+            accountAddDialog = null;
+        }
     }
 
     @Click(R.id.ivMenu)
@@ -147,5 +189,20 @@ public class MainActivity extends BaseActivity {
             super.onBackPressed();
         }
 
+    }
+
+
+    // AccountAddDialogListener
+    @Override
+    public void accountDialogCancelButtonClicked() {
+       hideAccountAddDialog();
+    }
+
+    @Override
+    public void accountDialogOKButtonClicked(String name, String value) {
+        hideAccountAddDialog();
+
+        AuthoritiUtils_.getInstance_(mContext).addValueToAccountPicker(mContext, new Value(value, name));
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(BROADCAST_ACCOUNT_ADDED));
     }
 }

@@ -4,8 +4,27 @@ package com.curtisdigital.authoriti.utils;
  * Created by mac on 11/30/17.
  */
 
-public class Constants {
+public interface Constants {
 
-    public static final String API_BASE_URL = "https://ccx8as6c61.execute-api.us-east-1.amazonaws.com";
+    // Server Url
+    String API_BASE_URL = "https://ccx8as6c61.execute-api.us-east-1.amazonaws.com";
+
+    // BroadCast Id
+    String BROADCAST_CHANGE_MENU        = "BROADCAST_CHANGE_MENU";
+    String BROADCAST_ACCOUNT_ADDED      = "BROADCAST_ACCOUNT_ADDED";
+
+    // Menu Id
+    long MENU_CODE                      = 1001;
+    long MENU_ACCOUNT                   = 1002;
+    long MENU_WIPE                      = 1003;
+    long MENU_LOGOUT                    = 1004;
+
+    String MENU_ID                      = "menu_id";
+
+    // Picker Identification
+    String PICKER_ACCOUNT               = "accountId";
+    String PICKER_INDUSTRY              = "industry";
+    String PICKER_LOCATION_STATE        = "location_state";
+    String PICKER_TIME                  = "time";
 
 }

@@ -8,12 +8,15 @@ import com.curtisdigital.authoriti.api.AuthoritiAPI;
 import com.curtisdigital.authoriti.api.model.Picker;
 import com.curtisdigital.authoriti.api.model.Scheme;
 import com.curtisdigital.authoriti.core.BaseFragment;
+import com.curtisdigital.authoriti.ui.code.CodeGenerateActivity_;
 import com.curtisdigital.authoriti.ui.items.CodeItem;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
+import com.curtisdigital.authoriti.utils.AuthoritiUtils_;
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 
@@ -28,7 +31,7 @@ import retrofit2.Response;
 @EFragment(R.layout.fragment_code_generate)
 public class CodeGenerateFragment extends BaseFragment {
 
-    FastItemAdapter adapter;
+    FastItemAdapter<CodeItem> adapter;
 
     @Bean
     AuthoritiData dataManager;
@@ -39,14 +42,14 @@ public class CodeGenerateFragment extends BaseFragment {
     @AfterViews
     void callAfterViewInjection(){
 
-        adapter = new FastItemAdapter();
+        adapter = new FastItemAdapter<CodeItem>();
         rvPermission.setLayoutManager(new LinearLayoutManager(mContext));
         rvPermission.setAdapter(adapter);
 
-        if (dataManager.getPickers() == null){
+        if (dataManager.getScheme() == null){
             loadScheme();
         } else {
-            showPermissions();
+            showPickers();
         }
 
     }
@@ -58,11 +61,8 @@ public class CodeGenerateFragment extends BaseFragment {
             public void onResponse(Call<Scheme> call, Response<Scheme> response) {
                 dismissProgressDialog();
                 if (response.code() == 200 && response.body() != null){
-                    Scheme scheme = response.body();
-                    if (scheme.getPickers() != null){
-                        dataManager.setPickers(scheme.getPickers());
-                        showPermissions();
-                    }
+                    dataManager.setScheme(response.body());
+                    updatePickers();
                 }
             }
 
@@ -73,19 +73,59 @@ public class CodeGenerateFragment extends BaseFragment {
         });
     }
 
-    private void showPermissions(){
+    private void updatePickers(){
+
+        if (dataManager.getScheme() != null && dataManager.getScheme().getPickers() != null) {
+            for (Picker picker : dataManager.getScheme().getPickers()) {
+                switch (picker.getPicker()) {
+                    case PICKER_ACCOUNT:
+                        dataManager.setAccountPicker(picker);
+                        break;
+                    case PICKER_INDUSTRY:
+                        dataManager.setIndustryPicker(picker);
+                        break;
+                    case PICKER_LOCATION_STATE:
+                        dataManager.setLocationPicker(picker);
+                        break;
+                    case PICKER_TIME:
+                        dataManager.setTimePicker(AuthoritiUtils_.getInstance_(mContext).getDefaultTimePicker(picker));
+                        break;
+                }
+            }
+
+            showPickers();
+        }
+    }
+
+    private void showPickers(){
 
         if (adapter == null){
-            adapter = new FastItemAdapter();
+            adapter = new FastItemAdapter<CodeItem>();
         } else {
             adapter.clear();
         }
 
-        for (Picker picker : dataManager.getPickers()){
-            adapter.add(new CodeItem(picker));
+        if (dataManager.getAccountPicker() != null){
+            adapter.add(new CodeItem(dataManager.getAccountPicker()));
         }
 
+        if (dataManager.getIndustryPicker() != null){
+            adapter.add(new CodeItem(dataManager.getIndustryPicker()));
+        }
 
+        if (dataManager.getLocationPicker() != null){
+            adapter.add(new CodeItem(dataManager.getLocationPicker()));
+        }
+
+        if (dataManager.getTimePicker() != null){
+            adapter.add(new CodeItem(dataManager.getTimePicker()));
+        }
+
+    }
+
+    @Click(R.id.cvGenerate)
+    void generateButtonClicked(){
+        CodeGenerateActivity_.intent(mContext).start();
     }
 
 }

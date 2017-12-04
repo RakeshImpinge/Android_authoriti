@@ -17,7 +17,7 @@
 <LinearLayout
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="50dp"
+    android:layout_height="60dp"
     android:gravity="center">
 
     <TextView
@@ -41,7 +41,7 @@
         android:text=""
         android:textSize="18sp"
         android:textColor="@color/colorTextPrimary"
-        fontPath="@string/font_oswaldo_light"
+        fontPath="@string/font_oswaldo_regular"
         tools:ignore="MissingPrefix" />
 
     <ImageView

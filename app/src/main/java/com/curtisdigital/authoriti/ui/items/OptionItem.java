@@ -1,0 +1,71 @@
+package com.curtisdigital.authoriti.ui.items;
+
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.curtisdigital.authoriti.R;
+import com.curtisdigital.authoriti.api.model.Value;
+import com.mikepenz.fastadapter.items.AbstractItem;
+
+import java.util.List;
+
+
+/**
+ * Created by mac on 12/1/17.
+ */
+
+public class OptionItem extends AbstractItem<OptionItem, OptionItem.ViewHolder>{
+
+    private Value value;
+    private boolean checked;
+
+    public OptionItem(Value value, boolean checked){
+        this.value = value;
+        this.checked = checked;
+    }
+
+    @Override
+    public ViewHolder getViewHolder(View v) {
+        return new ViewHolder(v);
+    }
+
+    @Override
+    public int getType() {
+        return R.id.item_option_id;
+    }
+
+    @Override
+    public int getLayoutRes() {
+        return R.layout.item_option;
+    }
+
+    @Override
+    public void bindView(ViewHolder holder, List<Object> payloads) {
+        super.bindView(holder, payloads);
+
+        holder.tvOption.setText(value.getTitle());
+
+        if (checked){
+            holder.ivCheck.setVisibility(View.VISIBLE);
+        } else {
+            holder.ivCheck.setVisibility(View.INVISIBLE);
+        }
+
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder{
+
+        TextView tvOption;
+        ImageView ivCheck;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+
+            tvOption = (TextView) itemView.findViewById(R.id.tvOption);
+            ivCheck = (ImageView) itemView.findViewById(R.id.ivCheck);
+        }
+    }
+
+}

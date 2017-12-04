@@ -1,11 +1,16 @@
 package com.curtisdigital.authoriti.ui.items;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
 import com.curtisdigital.authoriti.R;
 import com.curtisdigital.authoriti.api.model.Picker;
+import com.curtisdigital.authoriti.api.model.Value;
+import com.curtisdigital.authoriti.ui.pick.PasscodePickActivity_;
+import com.curtisdigital.authoriti.utils.AuthoritiData_;
+import com.curtisdigital.authoriti.utils.AuthoritiUtils_;
 import com.mikepenz.fastadapter.items.AbstractItem;
 
 import java.util.List;
@@ -41,7 +46,24 @@ public class CodeItem extends AbstractItem<CodeItem, CodeItem.ViewHolder>{
     public void bindView(ViewHolder holder, List<Object> payloads) {
         super.bindView(holder, payloads);
 
-        holder.tvTitle.setText(picker.getPicker());
+        final Context context = holder.itemView.getContext();
+
+        holder.tvTitle.setText(AuthoritiUtils_.getInstance_(context).getPickerTitle(picker.getPicker()));
+        int selectedIndex = AuthoritiUtils_.getInstance_(context).getPickerSelectedIndex(context, picker.getPicker());
+        if (picker.getValues() != null && picker.getValues().size() != 0){
+            Value value = picker.getValues().get(selectedIndex);
+            if (value != null){
+                holder.tvSubTitle.setText(value.getTitle());
+            }
+        }
+
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PasscodePickActivity_.intent(context).pickerType(picker.getPicker()).start();
+            }
+        });
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder{

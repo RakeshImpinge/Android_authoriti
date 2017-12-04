@@ -8,11 +8,13 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.inputmethod.InputMethodManager;
 
+import com.curtisdigital.authoriti.utils.Constants;
+
 /**
  * Created by mac on 11/25/17.
  */
 
-public class BaseFragment extends Fragment {
+public class BaseFragment extends Fragment implements Constants{
 
     public AppCompatActivity mActivity;
     protected Context mContext;
