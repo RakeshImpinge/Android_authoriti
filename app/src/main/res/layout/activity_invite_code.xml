@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:focusableInTouchMode="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/ivBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:layout_centerVertical="true"
+            android:tint="@android:color/white"
+            android:src="@drawable/ic_back"
+            android:background="?attr/selectableItemBackgroundBorderless"/>
+
+        <android.support.v7.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="@string/app_name"
+            android:textColor="@android:color/white"
+            android:textAllCaps="true"
+            fontPath="@string/font_oswaldo_regular"
+            android:textSize="18sp"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <ImageView
+            android:layout_width="121dp"
+            android:layout_height="63dp"
+            android:layout_marginTop="70dp"
+            android:layout_marginBottom="24dp"
+            android:src="@drawable/logo_blue"/>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:cardCornerRadius="4dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/tvTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="Enter Invitation Code."
+                    android:textColor="@color/colorPrimary"
+                    fontPath="@string/font_oswaldo_regular"
+                    android:textSize="17sp"/>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/tiCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginBottom="16dp"
+                    app:errorEnabled="true"
+                    fontPath="@string/font_oswaldo_regular"
+                    app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+
+                    <android.support.v7.widget.AppCompatEditText
+                        android:id="@+id/etCode"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:inputType="text"
+                        android:imeOptions="actionGo"
+                        android:backgroundTint="@color/colorPrimary"
+                        android:textCursorDrawable="@color/colorPrimary"
+                        android:hint="INVITE CODE"
+                        android:textSize="15sp"
+                        fontPath="@string/font_oswaldo_regular"/>
+
+                </android.support.design.widget.TextInputLayout>
+
+            </LinearLayout>
+
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v4.widget.Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/cvNext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:foreground="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="@color/colorPrimary">
+
+            <android.support.v7.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:text="NEXT"
+                android:textColor="@android:color/white"
+                fontPath="@string/font_oswaldo_regular"
+                android:textSize="17sp"/>
+
+        </android.support.v7.widget.CardView>
+
+
+    </LinearLayout>
+
+</LinearLayout>

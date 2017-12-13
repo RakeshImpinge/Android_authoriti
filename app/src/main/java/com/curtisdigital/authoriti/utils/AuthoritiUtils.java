@@ -1,6 +1,9 @@
 package com.curtisdigital.authoriti.utils;
 
 import android.content.Context;
+import android.graphics.Typeface;
+import android.text.SpannableString;
+import android.text.style.TypefaceSpan;
 
 import com.curtisdigital.authoriti.api.model.Picker;
 import com.curtisdigital.authoriti.api.model.Value;
@@ -145,5 +148,13 @@ public class AuthoritiUtils implements Constants{
         picker.getValues().add(value);
 
         AuthoritiData_.getInstance_(context).setAccountPicker(picker);
+    }
+
+    public SpannableString getSpannableStringForEditTextError(String error, Context context){
+        Typeface typeface = Typeface.createFromAsset(context.getAssets(), "fonts/Oswald_Regular.ttf");
+        TypefaceSpan typefaceSpan = new CustomTypefaceSpan("", typeface);
+        SpannableString spannableString = new SpannableString(error);
+        spannableString.setSpan(typefaceSpan, 0, error.length(), 0);
+        return spannableString;
     }
 }

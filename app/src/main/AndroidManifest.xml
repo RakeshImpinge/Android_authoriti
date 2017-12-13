@@ -23,6 +23,13 @@
         </activity>
 
         <activity android:name=".MainActivity_"/>
+        <activity android:name=".ui.auth.LoginActivity_"
+            android:theme="@style/AppTheme.FullScreen"/>
+        <activity android:name=".ui.auth.InviteCodeActivity_"/>
+        <activity android:name=".ui.auth.ChaseActivity_"/>
+        <activity android:name=".ui.auth.StartupActivity_"/>
+        <activity android:name=".ui.auth.ScanActivity_"/>
+        <activity android:name=".ui.auth.AccountManagerActivity_"/>
         <activity android:name=".ui.pick.PasscodePickActivity_"/>
         <activity android:name=".ui.code.CodeGenerateActivity_"/>
 

@@ -54,9 +54,6 @@ public class MainActivity extends BaseActivity implements AccountAddDialogListen
     @ViewById(R.id.toolbar)
     Toolbar toolbar;
 
-    @ViewById(R.id.ivAdd)
-    ImageButton ivAdd;
-
     @AfterViews
     void callAfterViewInjection(){
 
@@ -80,8 +77,6 @@ public class MainActivity extends BaseActivity implements AccountAddDialogListen
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-
-                        showAddIcon(drawerItem.getIdentifier());
 
                         if (drawerItem.getIdentifier() == MENU_LOGOUT){
                             logOut();
@@ -138,21 +133,8 @@ public class MainActivity extends BaseActivity implements AccountAddDialogListen
         }
     }
 
-    private void showAddIcon(long menu_id){
-        if (menu_id == MENU_ACCOUNT){
-            ivAdd.setVisibility(View.VISIBLE);
-        } else {
-            ivAdd.setVisibility(View.INVISIBLE);
-        }
-    }
-
     private void logOut(){
 
-    }
-
-    @Click(R.id.ivAdd)
-    void addButtonClicked(){
-        showAccountAddDialog();
     }
 
     private void showAccountAddDialog(){

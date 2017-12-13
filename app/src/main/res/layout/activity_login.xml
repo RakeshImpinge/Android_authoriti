@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:focusableInTouchMode="true">
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="121dp"
+                android:layout_height="63dp"
+                android:layout_marginTop="70dp"
+                android:layout_marginBottom="24dp"
+                android:src="@drawable/logo_blue"/>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                app:cardCornerRadius="4dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <android.support.v7.widget.AppCompatTextView
+                        android:id="@+id/tvTitle"
+                        fontPath="@string/font_oswaldo_regular"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="Hello There, Welcome Back!"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="17sp" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp">
+
+                        <android.support.design.widget.TextInputLayout
+                            android:id="@+id/tiAccount"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:errorEnabled="true"
+                            app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+
+                            <android.support.v7.widget.AppCompatEditText
+                                android:id="@+id/etAccount"
+                                fontPath="@string/font_oswaldo_regular"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:backgroundTint="@color/colorPrimary"
+                                android:textCursorDrawable="@color/colorPrimary"
+                                android:hint="Select your account"
+                                android:imeOptions="actionNext"
+                                android:inputType="text"
+                                android:maxLines="1"
+                                android:maxLength="100"
+                                android:textSize="15sp" />
+
+                        </android.support.design.widget.TextInputLayout>
+
+                        <LinearLayout
+                            android:id="@+id/spinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginTop="8dp"
+                            android:gravity="end"
+                            android:clickable="true">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginEnd="8dp"
+                                android:tint="@android:color/black"
+                                android:src="@android:drawable/arrow_down_float"/>
+
+                        </LinearLayout>
+
+                    </RelativeLayout>
+
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_gravity="end"
+                        android:gravity="center">
+
+                        <android.support.v7.widget.AppCompatTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:text="MAKE DEFAULT"
+                            android:textSize="12sp"
+                            android:textColor="@color/colorPrimary"
+                            fontPath="@string/font_oswaldo_regular"/>
+
+                        <android.support.v7.widget.AppCompatCheckBox
+                            android:theme="@style/CheckBoxTheme"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"/>
+
+                    </LinearLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/tiPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        app:errorEnabled="true"
+                        app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+
+                        <android.support.v7.widget.AppCompatEditText
+                            android:id="@+id/etPassword"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:inputType="text"
+                            android:maxLines="1"
+                            android:maxLength="100"
+                            android:imeOptions="actionDone"
+                            android:hint="Enter your password"
+                            android:textSize="15sp"
+                            android:backgroundTint="@color/colorPrimary"
+                            android:textCursorDrawable="@color/colorPrimary"
+                            fontPath="@string/font_oswaldo_regular"/>
+
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.v7.widget.CardView
+                        android:id="@+id/cvSign"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="8dp"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:cardBackgroundColor="@color/colorPrimary"
+                        app:cardCornerRadius="4dp"
+                        app:cardElevation="4dp">
+
+                        <android.support.v7.widget.AppCompatTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:gravity="center"
+                            android:text="SIGN IN"
+                            android:textColor="@android:color/white"
+                            fontPath="@string/font_oswaldo_regular"
+                            android:textSize="17sp"/>
+
+                    </android.support.v7.widget.CardView>
+
+
+                </LinearLayout>
+
+
+            </android.support.v7.widget.CardView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="New to Authoriti or have a new device?"
+                    android:textColor="#555555"
+                    fontPath="@string/font_oswaldo_regular"
+                    android:textSize="12sp"/>
+
+                <android.support.v7.widget.CardView
+                    android:id="@+id/cvSet"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardBackgroundColor="@color/colorTextThird"
+                    app:cardCornerRadius="4dp"
+                    app:cardElevation="4dp">
+
+                    <android.support.v7.widget.AppCompatTextView
+                        android:layout_width="85dp"
+                        android:layout_height="35dp"
+                        android:gravity="center"
+                        android:text="Setup"
+                        android:textColor="@android:color/white"
+                        fontPath="@string/font_oswaldo_regular"
+                        android:textSize="15sp"/>
+
+                </android.support.v7.widget.CardView>
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+
+    </android.support.v4.widget.NestedScrollView>
+
+</LinearLayout>

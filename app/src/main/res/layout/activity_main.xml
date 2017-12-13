@@ -40,7 +40,7 @@
                 android:text="@string/app_name"
                 android:textColor="@android:color/white"
                 android:textAllCaps="true"
-                fontPath="@string/font_oswaldo_light"
+                fontPath="@string/font_oswaldo_regular"
                 android:textSize="18sp"/>
 
             <ImageButton
