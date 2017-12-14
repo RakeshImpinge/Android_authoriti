@@ -16,6 +16,7 @@ import android.widget.ImageButton;
 
 import com.curtisdigital.authoriti.api.model.Value;
 import com.curtisdigital.authoriti.core.BaseActivity;
+import com.curtisdigital.authoriti.ui.auth.LoginActivity_;
 import com.curtisdigital.authoriti.ui.dialog.AccountAddDialog;
 import com.curtisdigital.authoriti.ui.dialog.AccountAddDialogListener;
 import com.curtisdigital.authoriti.ui.menu.AccountFragment_;
@@ -33,6 +34,9 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
+
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 @EActivity(R.layout.activity_main)
 public class MainActivity extends BaseActivity implements AccountAddDialogListener{
@@ -111,17 +115,18 @@ public class MainActivity extends BaseActivity implements AccountAddDialogListen
                 codeGenerateFragment = CodeGenerateFragment_.builder().build();
             }
             fragment = codeGenerateFragment;
-        } else if (menu_id == MENU_ACCOUNT){
-            if (accountFragment == null){
-                accountFragment = AccountFragment_.builder().build();
-            }
-            fragment = accountFragment;
-        } else if (menu_id == MENU_WIPE){
-            if (wipeFragment == null){
-                wipeFragment = WipeFragment_.builder().build();
-            }
-            fragment = wipeFragment;
         }
+//        else if (menu_id == MENU_ACCOUNT){
+//            if (accountFragment == null){
+//                accountFragment = AccountFragment_.builder().build();
+//            }
+//            fragment = accountFragment;
+//        } else if (menu_id == MENU_WIPE){
+//            if (wipeFragment == null){
+//                wipeFragment = WipeFragment_.builder().build();
+//            }
+//            fragment = wipeFragment;
+//        }
 
         changeFragment(fragment);
     }
@@ -134,7 +139,9 @@ public class MainActivity extends BaseActivity implements AccountAddDialogListen
     }
 
     private void logOut(){
-
+        Intent intent = new Intent(this, LoginActivity_.class);
+        intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     private void showAccountAddDialog(){

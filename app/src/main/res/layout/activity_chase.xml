@@ -98,6 +98,7 @@
                             android:imeOptions="actionNext"
                             android:backgroundTint="@color/colorPrimary"
                             android:textCursorDrawable="@color/colorPrimary"
+                            android:text="114-64-6032"
                             android:hint="CHASE IDENTIFIER"
                             android:textSize="15sp"
                             fontPath="@string/font_oswaldo_regular"/>
@@ -122,6 +123,7 @@
                             android:imeOptions="actionDone"
                             android:backgroundTint="@color/colorPrimary"
                             android:textCursorDrawable="@color/colorPrimary"
+                            android:text="xaqmgjot"
                             android:hint="PASSWORD"
                             android:textSize="15sp"
                             fontPath="@string/font_oswaldo_regular"/>

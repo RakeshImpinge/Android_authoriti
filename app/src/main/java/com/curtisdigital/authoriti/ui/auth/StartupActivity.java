@@ -6,6 +6,7 @@ import android.widget.EditText;
 
 import com.curtisdigital.authoriti.R;
 import com.curtisdigital.authoriti.core.BaseActivity;
+import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.curtisdigital.authoriti.utils.AuthoritiUtils;
 
 import org.androidannotations.annotations.AfterTextChange;
@@ -22,9 +23,13 @@ import org.androidannotations.annotations.ViewById;
 @EActivity(R.layout.activity_startup)
 public class StartupActivity extends BaseActivity {
 
+    private boolean passwordMatched;
+
     @Bean
     AuthoritiUtils utils;
 
+    @Bean
+    AuthoritiData dataManager;
 
     @ViewById(R.id.tiPassword)
     TextInputLayout tiPassword;
@@ -45,19 +50,38 @@ public class StartupActivity extends BaseActivity {
 
     @AfterTextChange(R.id.etPassword)
     void passwordChanged(){
+
         if (!TextUtils.isEmpty(etPassword.getText())){
+
             tiPassword.setError(null);
+
         } else {
+
             tiPassword.setError(utils.getSpannableStringForEditTextError("This field is required", this));
+
         }
     }
 
     @AfterTextChange(R.id.etPasswordConfirm)
     void passwordConfirmChanged(){
-        if (!TextUtils.isEmpty(etPasswordConfirm.getText())){
-            tiPasswordConfirm.setError(null);
-        } else {
+
+        if (TextUtils.isEmpty(etPasswordConfirm.getText())){
+
             tiPasswordConfirm.setError(utils.getSpannableStringForEditTextError("This field is required", this));
+            passwordMatched = false;
+
+        } else {
+
+            if (!etPassword.getText().toString().equals(etPasswordConfirm.getText().toString())){
+
+                tiPasswordConfirm.setError(utils.getSpannableStringForEditTextError("This field does not match", this));
+                passwordMatched = false;
+
+            } else {
+
+                tiPasswordConfirm.setError(null);
+                passwordMatched = true;
+            }
         }
     }
 
@@ -70,15 +94,22 @@ public class StartupActivity extends BaseActivity {
     void nextButtonClicked(){
 
         if (TextUtils.isEmpty(etPassword.getText())){
+
             tiPassword.setError(utils.getSpannableStringForEditTextError("This field is required", this));
+
         }
 
         if (TextUtils.isEmpty(etPasswordConfirm.getText())){
+
             tiPasswordConfirm.setError(utils.getSpannableStringForEditTextError("This field is required", this));
+
         }
 
-        if (!TextUtils.isEmpty(etPassword.getText()) && !TextUtils.isEmpty(etPassword.getText())){
+        if (!TextUtils.isEmpty(etPassword.getText()) && !TextUtils.isEmpty(etPassword.getText()) && passwordMatched){
+
+            dataManager.password = etPassword.getText().toString();
             ScanActivity_.intent(mContext).start();
+
         }
 
     }

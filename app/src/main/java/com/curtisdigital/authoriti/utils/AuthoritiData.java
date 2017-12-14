@@ -1,7 +1,9 @@
 package com.curtisdigital.authoriti.utils;
 
+import com.curtisdigital.authoriti.api.model.AccountID;
 import com.curtisdigital.authoriti.api.model.Picker;
 import com.curtisdigital.authoriti.api.model.Scheme;
+import com.curtisdigital.authoriti.api.model.User;
 import com.google.gson.Gson;
 
 import org.androidannotations.annotations.EBean;
@@ -19,6 +21,15 @@ public class AuthoritiData {
     @Pref
     AuthoritiPref_ pref;
 
+    // Auth Processing Temp Data
+    public String inviteCode;
+    public String password;
+    public String key;
+    public String salt;
+    public List<AccountID> accountIDs;
+    public List<String> accountsChase;
+
+
     private int selectedAccountIndex;
     private int selectedIndustryIndex;
     private int selectedCountryIndex;
@@ -28,6 +39,21 @@ public class AuthoritiData {
     private int preSelectedIndustryIndex;
     private int preSelectedCountryIndex;
     private int preSelectedTimeIndex;
+
+    public void setUser(User user){
+        if (user != null){
+            Gson gson = new Gson();
+            pref.edit().userJson().put(gson.toJson(user)).apply();
+
+        } else {
+            pref.edit().userJson().remove().apply();
+        }
+    }
+
+    public User getUser(){
+        Gson gson = new Gson();
+        return gson.fromJson(pref.userJson().get(), User.class);
+    }
 
     public void setScheme(Scheme scheme){
         if (scheme != null){

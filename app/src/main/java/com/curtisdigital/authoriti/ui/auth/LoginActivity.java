@@ -1,5 +1,6 @@
 package com.curtisdigital.authoriti.ui.auth;
 
+import android.content.Intent;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
 import android.view.View;
@@ -9,9 +10,12 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 
+import com.curtisdigital.authoriti.MainActivity_;
 import com.curtisdigital.authoriti.R;
+import com.curtisdigital.authoriti.api.model.AccountID;
 import com.curtisdigital.authoriti.core.BaseActivity;
 import com.curtisdigital.authoriti.ui.items.SpinnerItem;
+import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.curtisdigital.authoriti.utils.AuthoritiUtils;
 import com.curtisdigital.authoriti.utils.ViewUtils;
 
@@ -25,6 +29,9 @@ import org.androidannotations.annotations.ViewById;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 /**
  * Created by mac on 12/12/17.
  */
@@ -34,6 +41,9 @@ public class LoginActivity extends BaseActivity implements PopupWindow.OnDismiss
 
     @Bean
     AuthoritiUtils utils;
+
+    @Bean
+    AuthoritiData dataManager;
 
     @ViewById(R.id.tiAccount)
     TextInputLayout tiAccount;
@@ -50,7 +60,7 @@ public class LoginActivity extends BaseActivity implements PopupWindow.OnDismiss
     @ViewById(R.id.spinner)
     View spinner;
 
-    List<String> list;
+    List<AccountID> list;
     private PopupWindow pw;
     private ListView lv;
     private boolean opened;
@@ -60,7 +70,10 @@ public class LoginActivity extends BaseActivity implements PopupWindow.OnDismiss
     @AfterViews
     void callAfterViewInjection(){
 
+        selectedPosition = 0;
+
         setSpinner();
+        setAccount();
 
         tiAccount.setError(null);
         tiPassword.setError(null);
@@ -69,14 +82,13 @@ public class LoginActivity extends BaseActivity implements PopupWindow.OnDismiss
 
     private void setSpinner(){
 
-        popupHeight = (int) ViewUtils.convertDpToPixel(150, this);
+        setPopupHeight();
         popupWidth = ViewUtils.getScreenWidth(this) - (int) ViewUtils.convertDpToPixel(64, this);
 
         list = new ArrayList<>();
-        list.add("One");
-        list.add("Two");
-        list.add("Three");
-        list.add("Four");
+        if (dataManager.getUser() != null && dataManager.getUser().getAccountIDs() != null && dataManager.getUser().getAccountIDs().size() > 0){
+            list = dataManager.getUser().getAccountIDs();
+        }
 
         SpinnerItem item = new SpinnerItem(this, list);
 
@@ -94,18 +106,64 @@ public class LoginActivity extends BaseActivity implements PopupWindow.OnDismiss
     }
 
     private void setAccount(){
-        if (list != null){
-            etAccount.setText(list.get(selectedPosition));
+        if (list != null && list.size() > 0){
+            etAccount.setText(list.get(selectedPosition).getType());
         }
+    }
+
+    private void setPopupHeight(){
+
+        if (dataManager.getUser() != null && dataManager.getUser().getAccountIDs() != null){
+
+            if (dataManager.getUser().getAccountIDs().size() > 2){
+
+                popupHeight = (int) ViewUtils.convertDpToPixel(150, this);
+
+            } else {
+
+                popupHeight = (int) ViewUtils.convertDpToPixel(50 * dataManager.getUser().getAccountIDs().size(), this);
+
+            }
+
+        } else {
+
+            popupHeight = 0;
+
+        }
+    }
+
+    private void goHome(){
+        Intent intent = new Intent(this, MainActivity_.class);
+        intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     @Click(R.id.cvSign)
     void signButtonClicked(){
+
         if (TextUtils.isEmpty(etAccount.getText())){
+
             tiAccount.setError(utils.getSpannableStringForEditTextError("Choose your account", this));
+
         }
+
         if (TextUtils.isEmpty(etPassword.getText())){
+
             tiPassword.setError(utils.getSpannableStringForEditTextError("This field is required", this));
+
+        }
+
+        if (!TextUtils.isEmpty(etAccount.getText()) && !TextUtils.isEmpty(etPassword.getText())){
+
+            if (dataManager.getUser() != null && dataManager.getUser().getAccountIDs() != null && dataManager.getUser().getAccountIDs().size() > 0){
+
+                for (AccountID accountID : dataManager.getUser().getAccountIDs()){
+
+                    if (accountID.getType().equals(etAccount.getText().toString()) && dataManager.getUser().getPassword().equals(etPassword.getText().toString())){
+                        goHome();
+                    }
+                }
+            }
         }
     }
 
@@ -124,18 +182,22 @@ public class LoginActivity extends BaseActivity implements PopupWindow.OnDismiss
     @Click(R.id.spinner)
     void spinnerClicked(){
         if (!opened){
-            if (pw == null || !pw.isShowing()) {
-                pw = new PopupWindow(spinner);
-                pw.setContentView(lv);
-                pw.setWidth(popupWidth);
-                pw.setHeight(popupHeight);
-                pw.setOutsideTouchable(true);
-                pw.setFocusable(true);
-                pw.setClippingEnabled(false);
-                pw.showAsDropDown(spinner, spinner.getLeft(),0);
-                pw.setBackgroundDrawable(getResources().getDrawable(R.drawable.bg_spinner_pop));
-                pw.setOnDismissListener(this);
-                opened = true;
+
+            if (dataManager.getUser() != null && dataManager.getUser().getAccountIDs() != null && dataManager.getUser().getAccountIDs().size() > 0){
+                if (pw == null || !pw.isShowing()) {
+                    pw = new PopupWindow(spinner);
+                    pw.setContentView(lv);
+                    pw.setWidth(popupWidth);
+                    pw.setHeight(popupHeight);
+                    pw.setOutsideTouchable(true);
+                    pw.setFocusable(true);
+                    pw.setClippingEnabled(false);
+                    pw.showAsDropDown(spinner, spinner.getLeft(),0);
+                    pw.setBackgroundDrawable(getResources().getDrawable(R.drawable.bg_spinner_pop));
+                    pw.setOnDismissListener(this);
+                    opened = true;
+                }
+
             }
 
         } else {
