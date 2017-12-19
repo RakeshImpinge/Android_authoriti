@@ -92,7 +92,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:inputType="text"
-                        android:imeOptions="actionGo"
+                        android:imeOptions="actionDone"
                         android:backgroundTint="@color/colorPrimary"
                         android:textCursorDrawable="@color/colorPrimary"
                         android:hint="INVITE CODE"

@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -13,6 +14,8 @@ import android.widget.PopupWindow;
 import com.curtisdigital.authoriti.MainActivity_;
 import com.curtisdigital.authoriti.R;
 import com.curtisdigital.authoriti.api.model.AccountID;
+import com.curtisdigital.authoriti.api.model.AuthLogIn;
+import com.curtisdigital.authoriti.api.model.Picker;
 import com.curtisdigital.authoriti.core.BaseActivity;
 import com.curtisdigital.authoriti.ui.items.SpinnerItem;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
@@ -22,12 +25,15 @@ import com.curtisdigital.authoriti.utils.ViewUtils;
 import org.androidannotations.annotations.AfterTextChange;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.CheckedChange;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import se.simbio.encryption.Encryption;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -60,23 +66,43 @@ public class LoginActivity extends BaseActivity implements PopupWindow.OnDismiss
     @ViewById(R.id.spinner)
     View spinner;
 
+    @ViewById(R.id.checkbox)
+    CheckBox checkBox;
+
     List<AccountID> list;
     private PopupWindow pw;
     private ListView lv;
     private boolean opened;
-    private int selectedPosition;
+    private int selectedPosition = 0;
     private int popupHeight, popupWidth;
+
+    Picker picker;
 
     @AfterViews
     void callAfterViewInjection(){
 
-        selectedPosition = 0;
+        checkDefault();
 
         setSpinner();
         setAccount();
 
         tiAccount.setError(null);
         tiPassword.setError(null);
+
+    }
+
+    private void checkDefault(){
+
+        if (dataManager.getUser() != null && dataManager.getAccountPicker() != null){
+
+            picker = dataManager.getAccountPicker();
+
+            if (picker.isEnableDefault()){
+
+                selectedPosition = picker.getDefaultIndex();
+
+            }
+        }
 
     }
 
@@ -102,12 +128,23 @@ public class LoginActivity extends BaseActivity implements PopupWindow.OnDismiss
         lv.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
         lv.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        selectedPosition = 0;
     }
 
     private void setAccount(){
+
         if (list != null && list.size() > 0){
+
             etAccount.setText(list.get(selectedPosition).getType());
+
+            if (picker != null && picker.isEnableDefault() && picker.getDefaultIndex() == selectedPosition){
+
+                checkBox.setChecked(true);
+
+            } else {
+
+                checkBox.setChecked(false);
+
+            }
         }
     }
 
@@ -157,14 +194,39 @@ public class LoginActivity extends BaseActivity implements PopupWindow.OnDismiss
 
             if (dataManager.getUser() != null && dataManager.getUser().getAccountIDs() != null && dataManager.getUser().getAccountIDs().size() > 0){
 
+                Encryption encryption = Encryption.getDefault(dataManager.key, dataManager.salt, dataManager.iv);
+                boolean matched = false;
+
                 for (AccountID accountID : dataManager.getUser().getAccountIDs()){
 
-                    if (accountID.getType().equals(etAccount.getText().toString()) && dataManager.getUser().getPassword().equals(etPassword.getText().toString())){
-                        goHome();
+                    if (accountID.getType().equals(etAccount.getText().toString()) && dataManager.getUser().getEncryptPassword().equals(encryption.encryptOrNull(etPassword.getText().toString()))){
+
+                        matched = true;
+                        break;
+
                     }
                 }
+
+                if (matched){
+
+                    updateLoginState();
+                    goHome();
+
+                } else {
+
+                    showAlert("", "Invalid username or password!");
+
+                }
+
             }
         }
+    }
+
+    private void updateLoginState(){
+
+        AuthLogIn logIn = new AuthLogIn();
+        logIn.setLogin(true);
+        dataManager.setAuthLogin(logIn);
     }
 
     @AfterTextChange(R.id.etPassword)
@@ -172,6 +234,36 @@ public class LoginActivity extends BaseActivity implements PopupWindow.OnDismiss
         if (!TextUtils.isEmpty(etPassword.getText())){
             tiPassword.setError(null);
         }
+    }
+
+    @CheckedChange(R.id.checkbox)
+    void setDefault(boolean checked){
+
+        if (dataManager.getUser() != null && picker != null){
+
+
+            if (checked){
+
+                picker.setEnableDefault(true);
+                picker.setDefaultIndex(selectedPosition);
+
+                dataManager.setAccountPicker(picker);
+
+
+            } else {
+
+                if (selectedPosition == picker.getDefaultIndex()){
+
+                    picker.setEnableDefault(false);
+
+                    dataManager.setAccountPicker(picker);
+
+                }
+
+            }
+
+        }
+
     }
 
     @Click(R.id.cvSet)

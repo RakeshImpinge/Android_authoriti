@@ -17,9 +17,10 @@ import com.curtisdigital.authoriti.MainActivity_;
 import com.curtisdigital.authoriti.R;
 import com.curtisdigital.authoriti.api.AuthoritiAPI;
 import com.curtisdigital.authoriti.api.model.AccountID;
+import com.curtisdigital.authoriti.api.model.AuthLogIn;
 import com.curtisdigital.authoriti.api.model.User;
 import com.curtisdigital.authoriti.core.BaseActivity;
-import com.curtisdigital.authoriti.ui.items.ChaseSpinnerItem;
+import com.curtisdigital.authoriti.ui.items.SpinnerItem;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.curtisdigital.authoriti.utils.AuthoritiUtils;
 import com.curtisdigital.authoriti.utils.ViewUtils;
@@ -32,7 +33,6 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -55,6 +55,7 @@ public class AccountConfirmActivity extends BaseActivity implements AdapterView.
     @Bean
     AuthoritiData dataManager;
 
+
     @ViewById(R.id.tiValue)
     TextInputLayout tiValue;
 
@@ -73,20 +74,24 @@ public class AccountConfirmActivity extends BaseActivity implements AdapterView.
     @ViewById(R.id.checkbox)
     CheckBox checkBox;
 
-    ChaseSpinnerItem adapter;
-    Boolean[] confirm;
+    List<AccountID> unconfirmedAccountIDs;
+    SpinnerItem adapter;
     private PopupWindow pw;
     private ListView lv;
     private boolean opened;
     private int selectedPosition;
     private int popupHeight, popupWidth;
-    private boolean markDefault;
 
     @AfterViews
     void callAfterViewInjection(){
 
+        unconfirmedAccountIDs = dataManager.getUser().getUnconfirmedAccountIDs();
+
+        if (unconfirmedAccountIDs == null)
+            return;
+
         selectedPosition = 0;
-        etAccount.setText(dataManager.accountsChase.get(selectedPosition));
+        etAccount.setText(unconfirmedAccountIDs.get(selectedPosition).getType());
 
         setSpinner();
 
@@ -94,15 +99,11 @@ public class AccountConfirmActivity extends BaseActivity implements AdapterView.
 
     private void setSpinner(){
 
-        popupHeight = (int) ViewUtils.convertDpToPixel(50 * dataManager.accountsChase.size(), this);
+        popupHeight = (int) ViewUtils.convertDpToPixel(50 * unconfirmedAccountIDs.size(), this);
         popupWidth = ViewUtils.getScreenWidth(this) - (int) ViewUtils.convertDpToPixel(64, this);
 
-        confirm = new  Boolean[dataManager.accountsChase.size()];
-        for (int i = 0 ; i < dataManager.accountsChase.size() ; i ++){
-            confirm[i] = false;
-        }
 
-        adapter = new ChaseSpinnerItem(this, dataManager.accountsChase, confirm);
+        adapter = new SpinnerItem(this, unconfirmedAccountIDs);
 
         lv = new ListView(this);
         lv.setAdapter(adapter);
@@ -162,18 +163,45 @@ public class AccountConfirmActivity extends BaseActivity implements AdapterView.
 
     private void updateAccount(){
 
-        AccountID accountID = new AccountID(dataManager.accountsChase.get(selectedPosition), etValue.getText().toString());
+        AccountID accountID = new AccountID(unconfirmedAccountIDs.get(selectedPosition).getType(), etValue.getText().toString());
         User user = dataManager.getUser();
         user.getAccountIDs().add(accountID);
+
+        for (int i = 0 ; i < user.getUnconfirmedAccountIDs().size() ; i ++){
+
+            AccountID accountID1 = user.getUnconfirmedAccountIDs().get(i);
+            if (accountID1.getType().equals(unconfirmedAccountIDs.get(selectedPosition).getType())){
+                user.getUnconfirmedAccountIDs().remove(accountID1);
+            }
+
+        }
+
         dataManager.setUser(user);
 
-        etValue.setText("");
+        if (checkBox.isChecked()){
 
-        confirm[selectedPosition] = true;
-        adapter.setConfirm(confirm);
+            checkBox.setChecked(false);
+
+            dataManager.defaultAccountSelected = true;
+            dataManager.defaultAccountIndex = dataManager.getUser().getAccountIDs().size() - 1;
+        }
+
+        unconfirmedAccountIDs.get(selectedPosition).setConfirmed(true);
+        adapter.setAccountIDs(unconfirmedAccountIDs);
         adapter.notifyDataSetChanged();
 
+        etValue.setText("");
+        tiValue.setError(null);
+
     }
+
+    private void updateLoginState(){
+
+        AuthLogIn logIn = new AuthLogIn();
+        logIn.setLogin(true);
+        dataManager.setAuthLogin(logIn);
+    }
+
 
     private void goHome(){
         Intent intent = new Intent(this, MainActivity_.class);
@@ -191,7 +219,7 @@ public class AccountConfirmActivity extends BaseActivity implements AdapterView.
     void spinnerClicked(){
         if (!opened){
 
-            if (dataManager.accountsChase != null && dataManager.accountsChase.size() >= 0){
+            if (unconfirmedAccountIDs!= null && unconfirmedAccountIDs.size() > 0){
                 if (pw == null || !pw.isShowing()) {
                     pw = new PopupWindow(spinner);
                     pw.setContentView(lv);
@@ -224,14 +252,26 @@ public class AccountConfirmActivity extends BaseActivity implements AdapterView.
 
         } else {
 
-            saveAccountName();
+            if (unconfirmedAccountIDs.get(selectedPosition).isConfirmed()){
+
+                showAlert("", "This account is already confirmed.");
+
+            } else {
+
+                saveAccountName();
+
+            }
+
 
         }
     }
 
     @Click(R.id.cvFinish)
     void finishButtonClicked(){
+
+        updateLoginState();
         goHome();
+
     }
 
     @AfterTextChange(R.id.etValue)
@@ -253,7 +293,7 @@ public class AccountConfirmActivity extends BaseActivity implements AdapterView.
         if (pw != null)
             pw.dismiss();
         selectedPosition = position;
-        etAccount.setText(dataManager.accountsChase.get(selectedPosition));
+        etAccount.setText(unconfirmedAccountIDs.get(selectedPosition).getType());
     }
 
     @Override

@@ -9,6 +9,7 @@ import org.androidannotations.annotations.sharedpreferences.SharedPref;
 @SharedPref(value=SharedPref.Scope.UNIQUE)
 public interface AuthoritiPref {
 
+    String loginJson();
     String userJson();
     String schemeJson();
     String accountPickerJson();

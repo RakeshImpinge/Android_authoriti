@@ -13,14 +13,18 @@ public class AccountID {
     @SerializedName("value")
     private String identifier;
 
+    private boolean confirmed = true;
+
     public AccountID(){
         this.type = "";
         this.identifier = "";
+        confirmed = true;
     }
 
     public AccountID(String type, String identifier){
         this.type = type;
         this.identifier = identifier;
+        confirmed = true;
     }
 
     public String getType() {
@@ -37,5 +41,13 @@ public class AccountID {
 
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
+    }
+
+    public boolean isConfirmed() {
+        return confirmed;
+    }
+
+    public void setConfirmed(boolean confirmed) {
+        this.confirmed = confirmed;
     }
 }

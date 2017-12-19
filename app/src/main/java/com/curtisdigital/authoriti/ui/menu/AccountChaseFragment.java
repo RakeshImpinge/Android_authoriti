@@ -1,7 +1,7 @@
 package com.curtisdigital.authoriti.ui.menu;
 
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
@@ -19,8 +19,6 @@ import com.curtisdigital.authoriti.api.model.AccountID;
 import com.curtisdigital.authoriti.api.model.Picker;
 import com.curtisdigital.authoriti.api.model.User;
 import com.curtisdigital.authoriti.api.model.Value;
-import com.curtisdigital.authoriti.api.model.request.RequestUserUpdate;
-import com.curtisdigital.authoriti.api.model.response.ResponseSignUp;
 import com.curtisdigital.authoriti.core.BaseFragment;
 import com.curtisdigital.authoriti.ui.items.SpinnerItem;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
@@ -35,7 +33,6 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -43,12 +40,11 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Created by mac on 11/30/17.
+ * Created by mac on 12/17/17.
  */
 
-@EFragment(R.layout.fragment_account)
-public class AccountFragment extends BaseFragment implements AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener, PopupWindow.OnDismissListener {
-
+@EFragment(R.layout.fragment_account_chase)
+public class AccountChaseFragment extends BaseFragment implements AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener, PopupWindow.OnDismissListener {
 
     @Bean
     AuthoritiUtils utils;
@@ -56,11 +52,8 @@ public class AccountFragment extends BaseFragment implements AdapterView.OnItemC
     @Bean
     AuthoritiData dataManager;
 
-    @ViewById(R.id.tiName)
-    TextInputLayout tiName;
-
-    @ViewById(R.id.etName)
-    EditText etName;
+    @ViewById(R.id.id_account_confirm_fragment)
+    View view;
 
     @ViewById(R.id.tiValue)
     TextInputLayout tiValue;
@@ -77,6 +70,7 @@ public class AccountFragment extends BaseFragment implements AdapterView.OnItemC
     @ViewById(R.id.checkbox)
     CheckBox checkBox;
 
+    List<AccountID> accountIDs;
     SpinnerItem adapter;
     private PopupWindow pw;
     private ListView lv;
@@ -87,15 +81,35 @@ public class AccountFragment extends BaseFragment implements AdapterView.OnItemC
     @AfterViews
     void callAfterViewInjection(){
 
+        tiValue.setError(null);
+
+        setAccountIDs();
         setSpinner();
         setAccount();
+
+    }
+
+    private void setAccountIDs(){
+
+        accountIDs = dataManager.getUser().getAccountIDs();
+
+        if (dataManager.getUser().getUnconfirmedAccountIDs() != null && dataManager.getUser().getUnconfirmedAccountIDs().size() > 0){
+
+            for (AccountID accountID : dataManager.getUser().getUnconfirmedAccountIDs()){
+
+                accountIDs.add(accountID);
+
+            }
+        }
     }
 
     private void setSpinner(){
 
+        popupHeight = (int) ViewUtils.convertDpToPixel(50 * accountIDs.size(), mContext);
         popupWidth = ViewUtils.getScreenWidth(mContext) - (int) ViewUtils.convertDpToPixel(64, mContext);
 
-        adapter = new SpinnerItem(mContext, dataManager.getUser().getAccountIDs());
+
+        adapter = new SpinnerItem(mContext, accountIDs);
 
         lv = new ListView(mContext);
         lv.setAdapter(adapter);
@@ -107,125 +121,111 @@ public class AccountFragment extends BaseFragment implements AdapterView.OnItemC
         lv.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
         lv.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        selectedPosition = 0;
-    }
 
-    private void setPopupHeight(){
-
-        if (dataManager.getUser().getAccountIDs() == null || dataManager.getUser().getAccountIDs().size() == 0){
-
-            popupHeight = 0;
-
-        } else {
-
-            if (dataManager.getUser().getAccountIDs().size() > 2){
-
-                popupHeight = (int) ViewUtils.convertDpToPixel(150, mContext);
-
-            } else {
-
-                popupHeight = (int) ViewUtils.convertDpToPixel(50 * dataManager.getUser().getAccountIDs().size(), mContext);
-
-            }
-        }
     }
 
     private void setAccount(){
-        if (dataManager.getUser().getAccountIDs() != null && dataManager.getUser().getAccountIDs().size() > 0){
-            etAccount.setText(dataManager.getUser().getAccountIDs().get(selectedPosition).getType());
+        if (accountIDs != null && accountIDs.size() > 0){
+            etAccount.setText(accountIDs.get(selectedPosition).getType());
         }
     }
 
-    private void saveAccount(){
-
-        RequestUserUpdate request = new RequestUserUpdate();
-        AccountID accountID = new AccountID(etName.getText().toString(), etValue.getText().toString());
-        List<AccountID> accountIDs = new ArrayList<>();
-        accountIDs.add(accountID);
-        request.setAccountIDs(accountIDs);
+    private void saveAccountName(){
 
         String token = "Bearer " + dataManager.getUser().getToken();
-
         displayProgressDialog("");
 
-        AuthoritiAPI.APIService().updateUser(token, request).enqueue(new Callback<ResponseSignUp>() {
+        AuthoritiAPI.APIService().confirmAccountValue(token, etValue.getText().toString()).enqueue(new Callback<JsonObject>() {
+
             @Override
-            public void onResponse(Call<ResponseSignUp> call, Response<ResponseSignUp> response) {
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
 
                 dismissProgressDialog();
 
                 if (response.code() == 200 && response.body() != null){
+                    JsonObject jsonObject = response.body();
+                    if (jsonObject.get("status") != null){
+                        if (jsonObject.get("status").getAsString().equals("Success")){
 
-                    updateAccount();
+                            Snackbar.make(view, "Add Account Successfully", 1000).show();
 
+                            updateAccount();
+
+                        } else {
+                            showAlert("","Failed to confirm your account number. Try again later.");
+                        }
+                    } else {
+                        showAlert("","Failed to confirm your account number. Try again later.");
+                    }
                 } else {
-
-                    showAlert("", "Account Save Failed.");
-
+                    showAlert("","Failed to confirm your account number. Try again later.");
                 }
-
 
             }
 
             @Override
-            public void onFailure(Call<ResponseSignUp> call, Throwable t) {
+            public void onFailure(Call<JsonObject> call, Throwable t) {
 
                 dismissProgressDialog();
-                showAlert("", "Account Save Failed.");
+                showAlert("","Failed to confirm your account number. Try again later.");
 
             }
         });
-
     }
 
     private void updateAccount(){
 
+        AccountID accountID = new AccountID(accountIDs.get(selectedPosition).getType(), etValue.getText().toString());
         User user = dataManager.getUser();
-        List<AccountID> accountIDs = user.getAccountIDs();
-        accountIDs.add(new AccountID(etName.getText().toString(), etValue.getText().toString()));
+        user.getAccountIDs().add(accountID);
+
+        for (int i = 0 ; i < user.getUnconfirmedAccountIDs().size() ; i ++){
+
+            AccountID accountID1 = user.getUnconfirmedAccountIDs().get(i);
+            if (accountID1.getType().equals(accountIDs.get(selectedPosition).getType())){
+                user.getUnconfirmedAccountIDs().remove(accountID1);
+            }
+
+        }
+
         dataManager.setUser(user);
 
-        adapter.setAccountIDs(dataManager.getUser().getAccountIDs());
+        updateAccountPicker(accountID);
+        accountIDs.get(selectedPosition).setConfirmed(true);
+        adapter.setAccountIDs(accountIDs);
         adapter.notifyDataSetChanged();
 
-        Picker accountPicker = dataManager.getAccountPicker();
-        List<Value> values = accountPicker.getValues();
-        Value value = new Value(etValue.getText().toString(), etName.getText().toString());
-        values.add(value);
+        etValue.setText("");
+        tiValue.setError(null);
+
+    }
+
+    private void updateAccountPicker(AccountID accountID){
+
+        Picker picker = dataManager.getAccountPicker();
+        Value value = new Value(accountID.getIdentifier(), accountID.getType());
+        picker.getValues().add(value);
+
+        dataManager.setAccountPicker(picker);
 
         if (checkBox.isChecked()){
 
             checkBox.setChecked(false);
-            accountPicker.setEnableDefault(true);
-            accountPicker.setDefaultIndex(values.size() - 1);
 
+            picker.setEnableDefault(true);
+            picker.setDefaultIndex(selectedPosition);
         }
 
-        dataManager.setAccountPicker(accountPicker);
+        dataManager.setAccountPicker(picker);
 
-        etValue.setText("");
-        tiValue.setError(null);
-        etName.setText("");
-        tiName.setError(null);
 
-        etName.requestFocus();
-
-    }
-
-    @Click(R.id.cvFinish)
-    void generateButtonClicked(){
-        Intent intent = new Intent(BROADCAST_CHANGE_MENU);
-        intent.putExtra(MENU_ID, MENU_CODE);
-        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
     @Click(R.id.spinner)
     void spinnerClicked(){
         if (!opened){
 
-            setPopupHeight();
-
-            if (dataManager.getUser() != null && dataManager.getUser().getAccountIDs() != null && dataManager.getUser().getAccountIDs().size() > 0){
+            if (accountIDs!= null && accountIDs.size() > 0){
                 if (pw == null || !pw.isShowing()) {
                     pw = new PopupWindow(spinner);
                     pw.setContentView(lv);
@@ -249,40 +249,48 @@ public class AccountFragment extends BaseFragment implements AdapterView.OnItemC
         }
     }
 
-    @AfterTextChange(R.id.etName)
-    void nameChanged(){
-        if (TextUtils.isEmpty(etName.getText())){
-            tiName.setError(utils.getSpannableStringForEditTextError("This field is required", mContext));
+    @Click(R.id.cvConfirm)
+    void confirmButtonClicked(){
+
+        if (TextUtils.isEmpty(etValue.getText())){
+
+            tiValue.setError(utils.getSpannableStringForEditTextError("This field is required", mContext));
 
         } else {
-            tiName.setError(null);
+
+            if (accountIDs.get(selectedPosition).isConfirmed()){
+
+                showAlert("", "This account is already confirmed.");
+
+            } else {
+
+                saveAccountName();
+
+            }
+
+
         }
     }
 
     @AfterTextChange(R.id.etValue)
     void valueChanged(){
+
         if (TextUtils.isEmpty(etValue.getText())){
+
             tiValue.setError(utils.getSpannableStringForEditTextError("This field is required", mContext));
 
         } else {
+
             tiValue.setError(null);
+
         }
     }
 
-    @Click(R.id.cvSave)
-    void saveButtonClicked(){
-        if (TextUtils.isEmpty(etName.getText())){
-            tiName.setError(utils.getSpannableStringForEditTextError("This field is required", mContext));
-
-        }
-        if (TextUtils.isEmpty(etValue.getText())){
-            tiValue.setError(utils.getSpannableStringForEditTextError("This field is required", mContext));
-
-        }
-
-        if (!TextUtils.isEmpty(etName.getText()) && !TextUtils.isEmpty(etValue.getText())){
-            saveAccount();
-        }
+    @Click(R.id.cvFinish)
+    void generateButtonClicked(){
+        Intent intent = new Intent(BROADCAST_CHANGE_MENU);
+        intent.putExtra(MENU_ID, MENU_CODE);
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
     @Override
@@ -305,9 +313,7 @@ public class AccountFragment extends BaseFragment implements AdapterView.OnItemC
 
     @Override
     public void onDismiss() {
-
         pw = null;
         opened = false;
-
     }
 }

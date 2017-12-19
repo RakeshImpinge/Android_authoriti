@@ -17,6 +17,32 @@
         android:layout_marginStart="10dp"
         android:textColor="@android:color/black" />
 
+    <LinearLayout
+        android:id="@+id/llConfirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="16dp"
+        android:gravity="center">
+
+        <android.support.v7.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Conformation Needed"
+            android:textSize="12sp"
+            fontPath="@string/font_oswaldo_light"
+            android:textColor="@android:color/darker_gray" />
+
+        <ImageView
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/bg_yellow_dot"/>
+
+    </LinearLayout>
+
+
     <View
         android:id="@+id/divider"
         android:layout_width="match_parent"

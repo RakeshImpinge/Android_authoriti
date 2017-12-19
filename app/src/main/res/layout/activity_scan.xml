@@ -70,7 +70,9 @@
             <android.support.v7.widget.AppCompatTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:text="Let's confirm that you are you by taking a picture of your driver's license, followed by a selfie."
                 android:textColor="@color/colorTextPrimary"
                 fontPath="@string/font_oswaldo_regular"
@@ -131,6 +133,7 @@
                                 android:textSize="11sp"/>
 
                             <ImageView
+                                android:id="@+id/cameraFront"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_centerHorizontal="true"
@@ -184,6 +187,7 @@
                                 android:textSize="11sp"/>
 
                             <ImageView
+                                android:id="@+id/cameraBack"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_centerHorizontal="true"

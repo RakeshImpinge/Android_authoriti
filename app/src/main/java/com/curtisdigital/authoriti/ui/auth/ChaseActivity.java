@@ -1,12 +1,16 @@
 package com.curtisdigital.authoriti.ui.auth;
 
+import android.content.Intent;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
 import android.widget.EditText;
+import android.widget.TextView;
 
+import com.curtisdigital.authoriti.MainActivity_;
 import com.curtisdigital.authoriti.R;
 import com.curtisdigital.authoriti.api.AuthoritiAPI;
 import com.curtisdigital.authoriti.api.model.AccountID;
+import com.curtisdigital.authoriti.api.model.AuthLogIn;
 import com.curtisdigital.authoriti.api.model.User;
 import com.curtisdigital.authoriti.api.model.request.RequestSignUp;
 import com.curtisdigital.authoriti.api.model.response.ResponseSignUpChase;
@@ -19,6 +23,7 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
@@ -27,6 +32,10 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import se.simbio.encryption.Encryption;
+
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 /**
  * Created by mac on 12/13/17.
@@ -40,6 +49,13 @@ public class ChaseActivity extends BaseActivity {
 
     @Bean
     AuthoritiData dataManager;
+
+
+    @Extra
+    String customer;
+
+    @ViewById(R.id.tvTitle)
+    TextView tvTitle;
 
     @ViewById(R.id.tiIdentifier)
     TextInputLayout tiIdentifier;
@@ -56,12 +72,11 @@ public class ChaseActivity extends BaseActivity {
     @AfterViews
     void callAfterViewInjection(){
 
+        tvTitle.setText(customer + " is a partner of Authority. Please enter your " + customer + " password so we can authorize you.");
+
     }
 
     private void signUp(){
-
-        dataManager.key = "privatekey";
-        dataManager.salt = "salt";
 
         AccountID accountID = new AccountID("", etIdentifier.getText().toString());
         List<AccountID> accountIDs = new ArrayList<>();
@@ -110,17 +125,63 @@ public class ChaseActivity extends BaseActivity {
         user.setSalt(dataManager.salt);
         user.setPrivateKey(dataManager.key);
 
+        Encryption encryption = Encryption.getDefault(dataManager.key, dataManager.salt, dataManager.iv);
+
+        user.setEncryptKey(encryption.encryptOrNull(dataManager.key));
+        user.setEncryptSalt(encryption.encryptOrNull(dataManager.salt));
+        user.setEncryptPassword(encryption.encryptOrNull(etPassword.getText().toString()));
+
         AccountID accountID = new AccountID(responseSignUpChase.getAccountName(), etIdentifier.getText().toString());
         List<AccountID> accountIDs = new ArrayList<>();
         accountIDs.add(accountID);
 
         user.setAccountIDs(accountIDs);
+
+        if (responseSignUpChase.getAccounts() != null && responseSignUpChase.getAccounts().size() > 0){
+
+            List<AccountID> accountIDs1 = new ArrayList<>();
+
+            for (int i = 0 ; i < responseSignUpChase.getAccounts().size() ; i ++){
+
+                AccountID accountID1 = new AccountID();
+                accountID1.setConfirmed(false);
+                accountID1.setType(responseSignUpChase.getAccounts().get(i));
+                accountID1.setIdentifier("");
+
+                accountIDs1.add(accountID1);
+
+            }
+
+            user.setUnconfirmedAccountIDs(accountIDs1);
+        }
+
         dataManager.setUser(user);
 
-        dataManager.accountsChase = responseSignUpChase.getAccounts();
+        if (responseSignUpChase.getAccounts() != null && responseSignUpChase.getAccounts().size() > 0){
 
-        AccountConfirmActivity_.intent(this).start();
+            AccountConfirmActivity_.intent(this).start();
 
+        } else {
+
+            updateLoginState();
+            goHome();
+
+        }
+
+
+    }
+
+    private void goHome(){
+        Intent intent = new Intent(this, MainActivity_.class);
+        intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+    private void updateLoginState(){
+
+        AuthLogIn logIn = new AuthLogIn();
+        logIn.setLogin(true);
+        dataManager.setAuthLogin(logIn);
     }
 
     @AfterTextChange(R.id.etIdentifier)

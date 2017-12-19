@@ -3,6 +3,14 @@
     package="com.curtisdigital.authoriti">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:name=".AuthoritiApplication_"
@@ -37,6 +45,12 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="a2bac8382233b9fab9a9b00a0a2d2ad3a17022a2" />
+
+        <activity android:name="com.acuant.mobilesdk.detect.CameraCardDetectManual"/>
+        <activity android:name="com.acuant.mobilesdk.detect.PDF417.CameraPDF417"/>
+        <activity android:name="com.acuant.mobilesdk.detect.Camera2CardDetectManual"/>
+        <activity android:name="com.acuant.mobilesdk.detect.Camera2FacialRecognitionManual" />
+
     </application>
 
 </manifest>

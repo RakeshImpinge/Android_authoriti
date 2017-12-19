@@ -12,7 +12,6 @@ public interface Constants {
 
     // BroadCast Id
     String BROADCAST_CHANGE_MENU        = "BROADCAST_CHANGE_MENU";
-    String BROADCAST_ACCOUNT_ADDED      = "BROADCAST_ACCOUNT_ADDED";
 
     // Menu Id
     long MENU_CODE                      = 1001;
@@ -27,5 +26,7 @@ public interface Constants {
     String PICKER_INDUSTRY              = "industry";
     String PICKER_LOCATION_STATE        = "location_state";
     String PICKER_TIME                  = "time";
+
+    String ACUANT_LICENSE_KEY           = "FAD9B2F0E7F1";
 
 }

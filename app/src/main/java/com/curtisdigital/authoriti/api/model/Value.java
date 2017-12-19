@@ -17,6 +17,8 @@ public class Value {
     @SerializedName("title")
     private String title;
 
+    private boolean isCustomDate = false;
+
     public Value(String value, String title){
         this.value = value;
         this.title = title;
@@ -36,5 +38,13 @@ public class Value {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public boolean isCustomDate() {
+        return isCustomDate;
+    }
+
+    public void setCustomDate(boolean customDate) {
+        isCustomDate = customDate;
     }
 }

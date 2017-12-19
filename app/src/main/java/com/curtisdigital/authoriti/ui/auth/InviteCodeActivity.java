@@ -123,7 +123,7 @@ public class InviteCodeActivity extends BaseActivity{
 
             if (responseInviteCode.getCustomer() != null){
 
-                ChaseActivity_.intent(mContext).start();
+                ChaseActivity_.intent(mContext).customer(responseInviteCode.getCustomer()).start();
 
             } else {
 

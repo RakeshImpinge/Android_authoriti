@@ -1,58 +1,213 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:card_view="http://schemas.android.com/tools"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:text="Accounts"
-        android:textSize="18sp"
-        android:textColor="@color/colorTextPrimary"
-        fontPath="@string/font_oswaldo_light"
-        tools:ignore="MissingPrefix" />
+    android:layout_height="match_parent"
+    android:focusableInTouchMode="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:orientation="vertical">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rvAccount"
+        <android.support.v7.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="My Accounts to Authorize"
+            android:textColor="@color/colorTextPrimary"
+            fontPath="@string/font_oswaldo_regular"
+            android:textSize="17sp"/>
+
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:overScrollMode="never"/>
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginTop="24dp">
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/tiAccount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:errorEnabled="true"
+                app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+
+                <android.support.v7.widget.AppCompatEditText
+                    android:id="@+id/etAccount"
+                    fontPath="@string/font_oswaldo_regular"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:backgroundTint="@color/colorPrimary"
+                    android:textCursorDrawable="@color/colorPrimary"
+                    android:hint="Add an Account below"
+                    android:imeOptions="actionNext"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:maxLength="100"
+                    android:textSize="15sp" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <LinearLayout
+                android:id="@+id/spinner"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_marginTop="8dp"
+                android:gravity="end"
+                android:clickable="true">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="8dp"
+                    android:tint="@android:color/black"
+                    android:src="@android:drawable/arrow_down_float"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:cardCornerRadius="4dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/tiName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:errorEnabled="true"
+                    app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+
+                    <android.support.v7.widget.AppCompatEditText
+                        android:id="@+id/etName"
+                        fontPath="@string/font_oswaldo_regular"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:backgroundTint="@color/colorPrimary"
+                        android:textCursorDrawable="@color/colorPrimary"
+                        android:hint="Account Name"
+                        android:imeOptions="actionNext"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:maxLength="100"
+                        android:textSize="15sp" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/tiValue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:errorEnabled="true"
+                    app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+
+                    <android.support.v7.widget.AppCompatEditText
+                        android:id="@+id/etValue"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:maxLength="100"
+                        android:imeOptions="actionDone"
+                        android:hint="Account Value"
+                        android:textSize="15sp"
+                        android:backgroundTint="@color/colorPrimary"
+                        android:textCursorDrawable="@color/colorPrimary"
+                        fontPath="@string/font_oswaldo_regular"/>
+
+                </android.support.design.widget.TextInputLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_gravity="end"
+                    android:gravity="center">
+
+                    <android.support.v7.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:text="MAKE DEFAULT"
+                        android:textSize="12sp"
+                        android:textColor="@color/colorPrimary"
+                        fontPath="@string/font_oswaldo_regular"/>
+
+                    <android.support.v7.widget.AppCompatCheckBox
+                        android:id="@+id/checkbox"
+                        android:theme="@style/CheckBoxTheme"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="false"/>
+
+                </LinearLayout>
+
+
+                <android.support.v7.widget.CardView
+                    android:id="@+id/cvSave"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_gravity="end"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardBackgroundColor="@color/colorPrimary"
+                    app:cardCornerRadius="4dp"
+                    app:cardElevation="4dp">
+
+                    <android.support.v7.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:gravity="center"
+                        android:text="SAVE"
+                        android:textColor="@android:color/white"
+                        fontPath="@string/font_oswaldo_regular"
+                        android:textSize="17sp"/>
+
+                </android.support.v7.widget.CardView>
+
+
+            </LinearLayout>
+
+
+        </android.support.v7.widget.CardView>
 
     </LinearLayout>
 
     <android.support.v7.widget.CardView
-        android:id="@+id/cvGenerate"
+        android:id="@+id/cvFinish"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:foreground="?attr/selectableItemBackground"
         android:clickable="true"
         android:focusable="true"
-        android:foreground="?selectableItemBackground"
-        app:cardBackgroundColor="@color/colorPrimary"
-        card_view:cardCornerRadius="0dp"
-        card_view:cardElevation="0dp">
+        app:cardBackgroundColor="@color/colorPrimary">
 
         <android.support.v7.widget.AppCompatTextView
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:gravity="center"
-            android:text="Generate Permission Code"
-            android:textSize="18sp"
-            fontPath="@string/font_oswaldo_light"
-            android:textAllCaps="true"
-            android:textColor="@android:color/white"/>
+            android:text="FINISHED"
+            android:textColor="@android:color/white"
+            fontPath="@string/font_oswaldo_regular"
+            android:textSize="17sp"/>
 
     </android.support.v7.widget.CardView>
-
 
 </LinearLayout>

@@ -13,4 +13,6 @@
     <color name="colorTextSecondary">#9d9d9d</color>
     <color name="colorTextThird">#465156</color>
 
+    <color name="colorShadow">#880e2c2e</color>
+
 </resources>

@@ -5,24 +5,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Typeface;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageButton;
 
-import com.curtisdigital.authoriti.api.model.Value;
+import com.curtisdigital.authoriti.api.model.AuthLogIn;
 import com.curtisdigital.authoriti.core.BaseActivity;
 import com.curtisdigital.authoriti.ui.auth.LoginActivity_;
-import com.curtisdigital.authoriti.ui.dialog.AccountAddDialog;
-import com.curtisdigital.authoriti.ui.dialog.AccountAddDialogListener;
+import com.curtisdigital.authoriti.ui.menu.AccountChaseFragment_;
 import com.curtisdigital.authoriti.ui.menu.AccountFragment_;
 import com.curtisdigital.authoriti.ui.menu.CodeGenerateFragment_;
 import com.curtisdigital.authoriti.ui.menu.WipeFragment_;
-import com.curtisdigital.authoriti.utils.AuthoritiUtils_;
+import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -31,6 +28,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
@@ -39,7 +37,7 @@ import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 @EActivity(R.layout.activity_main)
-public class MainActivity extends BaseActivity implements AccountAddDialogListener{
+public class MainActivity extends BaseActivity{
 
     private static String TAG = "Authoriti/" + MainActivity.class.getName();
 
@@ -52,7 +50,8 @@ public class MainActivity extends BaseActivity implements AccountAddDialogListen
 
     BroadcastReceiver broadcastReceiver;
 
-    private AccountAddDialog accountAddDialog;
+    @Bean
+    AuthoritiData dataManager;
 
 
     @ViewById(R.id.toolbar)
@@ -111,22 +110,40 @@ public class MainActivity extends BaseActivity implements AccountAddDialogListen
     private void menuSelected(long menu_id){
         Fragment fragment = null;
         if (menu_id == MENU_CODE){
+
             if (codeGenerateFragment == null){
+
                 codeGenerateFragment = CodeGenerateFragment_.builder().build();
+
             }
+
             fragment = codeGenerateFragment;
         }
-//        else if (menu_id == MENU_ACCOUNT){
-//            if (accountFragment == null){
-//                accountFragment = AccountFragment_.builder().build();
-//            }
-//            fragment = accountFragment;
-//        } else if (menu_id == MENU_WIPE){
-//            if (wipeFragment == null){
-//                wipeFragment = WipeFragment_.builder().build();
-//            }
-//            fragment = wipeFragment;
-//        }
+        else if (menu_id == MENU_ACCOUNT){
+
+            if (dataManager.getUser().getInviteCode().equals("Startup2018")){
+
+                accountFragment = AccountFragment_.builder().build();
+
+            } else {
+
+                accountFragment = AccountChaseFragment_.builder().build();
+
+            }
+
+            fragment = accountFragment;
+
+        } else if (menu_id == MENU_WIPE){
+
+            if (wipeFragment == null){
+
+                wipeFragment = WipeFragment_.builder().build();
+
+            }
+
+            fragment = wipeFragment;
+
+        }
 
         changeFragment(fragment);
     }
@@ -139,27 +156,16 @@ public class MainActivity extends BaseActivity implements AccountAddDialogListen
     }
 
     private void logOut(){
+
+        AuthLogIn logIn = dataManager.loginStatus();
+        logIn.setLogin(false);
+        dataManager.setAuthLogin(logIn);
+
         Intent intent = new Intent(this, LoginActivity_.class);
         intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
 
-    private void showAccountAddDialog(){
-        if (accountAddDialog == null){
-            accountAddDialog = new AccountAddDialog(mContext);
-            accountAddDialog.setListener(this);
-        }
-        if (!isFinishing()){
-            accountAddDialog.show();
-        }
-    }
-
-    private void hideAccountAddDialog(){
-        if (accountAddDialog != null){
-            accountAddDialog.dismiss();
-            accountAddDialog = null;
-        }
-    }
 
     @Click(R.id.ivMenu)
     void menuButtonClicked(){
@@ -180,18 +186,4 @@ public class MainActivity extends BaseActivity implements AccountAddDialogListen
 
     }
 
-
-    // AccountAddDialogListener
-    @Override
-    public void accountDialogCancelButtonClicked() {
-       hideAccountAddDialog();
-    }
-
-    @Override
-    public void accountDialogOKButtonClicked(String name, String value) {
-        hideAccountAddDialog();
-
-        AuthoritiUtils_.getInstance_(mContext).addValueToAccountPicker(mContext, new Value(value, name));
-        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(BROADCAST_ACCOUNT_ADDED));
-    }
 }

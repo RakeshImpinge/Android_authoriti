@@ -26,6 +26,18 @@ public class OptionItem extends AbstractItem<OptionItem, OptionItem.ViewHolder>{
         this.checked = checked;
     }
 
+    public void setValue(Value value){
+        this.value = value;
+    }
+
+    public Value getValue(){
+        return this.value;
+    }
+
+    public void setChecked(boolean checked){
+        this.checked = checked;
+    }
+
     @Override
     public ViewHolder getViewHolder(View v) {
         return new ViewHolder(v);
@@ -48,10 +60,40 @@ public class OptionItem extends AbstractItem<OptionItem, OptionItem.ViewHolder>{
         holder.tvOption.setText(value.getTitle());
 
         if (checked){
+
             holder.ivCheck.setVisibility(View.VISIBLE);
+
         } else {
+
             holder.ivCheck.setVisibility(View.INVISIBLE);
+
         }
+
+
+        if (value.isCustomDate() && checked){
+
+            holder.llDate.setVisibility(View.VISIBLE);
+
+            if (!value.getValue().equals("")){
+                int diff = Integer.parseInt(value.getValue());
+
+                if (diff > 1){
+
+                    holder.tvDate.setText(value.getValue() + " days");
+
+                } else {
+
+                    holder.tvDate.setText(value.getValue() + " day");
+
+                }
+            }
+
+        } else {
+
+            holder.llDate.setVisibility(View.INVISIBLE);
+
+        }
+
 
     }
 
@@ -59,12 +101,16 @@ public class OptionItem extends AbstractItem<OptionItem, OptionItem.ViewHolder>{
 
         TextView tvOption;
         ImageView ivCheck;
+        View llDate;
+        TextView tvDate;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             tvOption = (TextView) itemView.findViewById(R.id.tvOption);
             ivCheck = (ImageView) itemView.findViewById(R.id.ivCheck);
+            llDate = itemView.findViewById(R.id.llDate);
+            tvDate = (TextView) itemView.findViewById(R.id.tvDate);
         }
     }
 

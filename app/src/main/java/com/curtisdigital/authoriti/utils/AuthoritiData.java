@@ -1,6 +1,7 @@
 package com.curtisdigital.authoriti.utils;
 
 import com.curtisdigital.authoriti.api.model.AccountID;
+import com.curtisdigital.authoriti.api.model.AuthLogIn;
 import com.curtisdigital.authoriti.api.model.Picker;
 import com.curtisdigital.authoriti.api.model.Scheme;
 import com.curtisdigital.authoriti.api.model.User;
@@ -24,10 +25,12 @@ public class AuthoritiData {
     // Auth Processing Temp Data
     public String inviteCode;
     public String password;
-    public String key;
-    public String salt;
+    public String key = "privatekey";
+    public String salt = "salt";
+    public byte[] iv = {-100, 34, 63, 23, -111, 30, -11, -45, 40, 96, -100, 73, 63, 12, -124, 23};
     public List<AccountID> accountIDs;
-    public List<String> accountsChase;
+    public boolean defaultAccountSelected;
+    public int defaultAccountIndex;
 
 
     private int selectedAccountIndex;
@@ -35,10 +38,24 @@ public class AuthoritiData {
     private int selectedCountryIndex;
     private int selectedTimeIndex;
 
-    private int preSelectedAccountIndex;
-    private int preSelectedIndustryIndex;
-    private int preSelectedCountryIndex;
-    private int preSelectedTimeIndex;
+    private boolean accountIndexSelected;
+    private boolean industryIndexSelected;
+    private boolean countryIndexSelected;
+    private boolean timeIndexSelected;
+
+    public void setAuthLogin(AuthLogIn login){
+        if (login != null){
+            Gson gson = new Gson();
+            pref.edit().loginJson().put(gson.toJson(login)).apply();
+        } else {
+            pref.edit().loginJson().remove().apply();
+        }
+    }
+
+    public AuthLogIn loginStatus(){
+        Gson gson = new Gson();
+        return gson.fromJson(pref.loginJson().get(), AuthLogIn.class);
+    }
 
     public void setUser(User user){
         if (user != null){
@@ -157,35 +174,62 @@ public class AuthoritiData {
         this.selectedTimeIndex = selectedTimeIndex;
     }
 
-    public int getPreSelectedAccountIndex() {
-        return preSelectedAccountIndex;
+    public boolean isAccountIndexSelected() {
+        return accountIndexSelected;
     }
 
-    public void setPreSelectedAccountIndex(int preSelectedAccountIndex) {
-        this.preSelectedAccountIndex = preSelectedAccountIndex;
+    public void setAccountIndexSelected(boolean accountIndexSelected) {
+        this.accountIndexSelected = accountIndexSelected;
     }
 
-    public int getPreSelectedIndustryIndex() {
-        return preSelectedIndustryIndex;
+    public boolean isIndustryIndexSelected() {
+        return industryIndexSelected;
     }
 
-    public void setPreSelectedIndustryIndex(int preSelectedIndustryIndex) {
-        this.preSelectedIndustryIndex = preSelectedIndustryIndex;
+    public void setIndustryIndexSelected(boolean industryIndexSelected) {
+        this.industryIndexSelected = industryIndexSelected;
     }
 
-    public int getPreSelectedCountryIndex() {
-        return preSelectedCountryIndex;
+    public boolean isCountryIndexSelected() {
+        return countryIndexSelected;
     }
 
-    public void setPreSelectedCountryIndex(int preSelectedCountryIndex) {
-        this.preSelectedCountryIndex = preSelectedCountryIndex;
+    public void setCountryIndexSelected(boolean countryIndexSelected) {
+        this.countryIndexSelected = countryIndexSelected;
     }
 
-    public int getPreSelectedTimeIndex() {
-        return preSelectedTimeIndex;
+    public boolean isTimeIndexSelected() {
+        return timeIndexSelected;
     }
 
-    public void setPreSelectedTimeIndex(int preSelectedTimeIndex) {
-        this.preSelectedTimeIndex = preSelectedTimeIndex;
+    public void setTimeIndexSelected(boolean timeIndexSelected) {
+        this.timeIndexSelected = timeIndexSelected;
+    }
+
+    public void wipeSetting(){
+
+        setUser(null);
+
+        setScheme(null);
+
+        setAccountPicker(null);
+        setIndustryPicker(null);
+        setLocationPicker(null);
+        setTimePicker(null);
+
+        accountIDs = null;
+        defaultAccountSelected = false;
+        defaultAccountIndex = 0;
+
+        setSelectedAccountIndex(0);
+        setSelectedIndustryIndex(0);
+        setSelectedCountryIndex(0);
+        setSelectedTimeIndex(0);
+
+        setAccountIndexSelected(false);
+        setIndustryIndexSelected(false);
+        setCountryIndexSelected(false);
+        setTimeIndexSelected(false);
+
     }
 }

@@ -8,16 +8,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:text="Generate Permission Code"
-        android:textAllCaps="true"
-        android:textSize="18sp"
-        android:textColor="@color/colorTextPrimary"
-        fontPath="@string/font_oswaldo_light"
-        tools:ignore="MissingPrefix" />
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp">
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="CREATE AUTHORITI PERMISSION CODE ™"
+            android:textSize="18sp"
+            android:textColor="@color/colorTextPrimary"
+            fontPath="@string/font_oswaldo_light"
+            tools:ignore="MissingPrefix" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

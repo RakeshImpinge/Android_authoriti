@@ -46,6 +46,7 @@
                         fontPath="@string/font_oswaldo_regular"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
                         android:gravity="center"
                         android:text="Hello There, Welcome Back!"
                         android:textColor="@color/colorPrimary"
@@ -117,6 +118,7 @@
                             fontPath="@string/font_oswaldo_regular"/>
 
                         <android.support.v7.widget.AppCompatCheckBox
+                            android:id="@+id/checkbox"
                             android:theme="@style/CheckBoxTheme"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

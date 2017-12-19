@@ -16,6 +16,7 @@ import com.curtisdigital.authoriti.MainActivity_;
 import com.curtisdigital.authoriti.R;
 import com.curtisdigital.authoriti.api.AuthoritiAPI;
 import com.curtisdigital.authoriti.api.model.AccountID;
+import com.curtisdigital.authoriti.api.model.AuthLogIn;
 import com.curtisdigital.authoriti.api.model.User;
 import com.curtisdigital.authoriti.api.model.request.RequestSignUp;
 import com.curtisdigital.authoriti.api.model.response.ResponseSignUp;
@@ -33,10 +34,12 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import se.simbio.encryption.Encryption;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -164,6 +167,9 @@ public class AccountManagerActivity extends BaseActivity implements AdapterView.
             markDefault = true;
             checkBox.setChecked(false);
 
+            dataManager.defaultAccountSelected = true;
+            dataManager.defaultAccountIndex = dataManager.accountIDs.size() ;
+
         }
 
         if (dataManager.accountIDs == null){
@@ -181,18 +187,15 @@ public class AccountManagerActivity extends BaseActivity implements AdapterView.
 
     private void resetInputForm(){
 
-        etName.setText("");
-        tiName.setError(null);
         etValue.setText("");
         tiValue.setError(null);
+        etName.setText("");
+        tiName.setError(null);
 
         etName.requestFocus();
     }
 
     private void signUp(){
-
-        dataManager.key = "privatekey";
-        dataManager.salt = "salt";
 
         RequestSignUp requestSignUp = new RequestSignUp(dataManager.password, dataManager.key, dataManager.salt, dataManager.inviteCode, dataManager.accountIDs);
 
@@ -237,8 +240,15 @@ public class AccountManagerActivity extends BaseActivity implements AdapterView.
         user.setSalt(dataManager.salt);
         user.setPrivateKey(dataManager.key);
 
+        Encryption encryption = Encryption.getDefault(dataManager.key, dataManager.salt, dataManager.iv);
+
+        user.setEncryptKey(encryption.encryptOrNull(dataManager.key));
+        user.setEncryptSalt(encryption.encryptOrNull(dataManager.salt));
+        user.setEncryptPassword(encryption.encryptOrNull(dataManager.password));
+
         dataManager.setUser(user);
 
+        updateLoginState();
         goHome();
 
     }
@@ -296,7 +306,7 @@ public class AccountManagerActivity extends BaseActivity implements AdapterView.
 
             setPopupHeight();
 
-            if (dataManager.accountIDs != null && dataManager.accountIDs.size() >= 0){
+            if (dataManager.accountIDs != null && dataManager.accountIDs.size() > 0){
                 if (pw == null || !pw.isShowing()) {
                     pw = new PopupWindow(spinner);
                     pw.setContentView(lv);
@@ -345,6 +355,14 @@ public class AccountManagerActivity extends BaseActivity implements AdapterView.
         pw = null;
         opened = false;
     }
+
+    private void updateLoginState(){
+
+        AuthLogIn logIn = new AuthLogIn();
+        logIn.setLogin(true);
+        dataManager.setAuthLogin(logIn);
+    }
+
 
     private void goHome(){
         Intent intent = new Intent(this, MainActivity_.class);

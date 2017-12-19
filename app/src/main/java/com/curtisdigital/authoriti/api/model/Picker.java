@@ -27,6 +27,24 @@ public class Picker {
     @SerializedName("title")
     private String title;
 
+    private boolean enableDefault = false;
+    private int defaultIndex = -1;
+
+    public Picker(){
+
+    }
+
+    public Picker(String picker, int bytes, List<Value> values, String title){
+
+        this.picker = picker;
+        this.bytes = bytes;
+        this.values = values;
+        this.title = title;
+
+        enableDefault = false;
+        defaultIndex = -1;
+    }
+
     public String getPicker() {
         return picker;
     }
@@ -57,5 +75,21 @@ public class Picker {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public boolean isEnableDefault() {
+        return enableDefault;
+    }
+
+    public void setEnableDefault(boolean enableDefault) {
+        this.enableDefault = enableDefault;
+    }
+
+    public int getDefaultIndex() {
+        return defaultIndex;
+    }
+
+    public void setDefaultIndex(int defaultIndex) {
+        this.defaultIndex = defaultIndex;
     }
 }

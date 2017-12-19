@@ -25,6 +25,16 @@ public class User {
     @SerializedName("key")
     private String privateKey;
 
+    @SerializedName("encrypt_key")
+    private String encryptKey;
+    @SerializedName("encrypt_salt")
+    private String encryptSalt;
+    @SerializedName("encrypt_password")
+    private String encryptPassword;
+
+    private List<AccountID> unconfirmedAccountIDs;
+
+
     public User(){
 
     }
@@ -83,5 +93,37 @@ public class User {
 
     public void setPrivateKey(String privateKey) {
         this.privateKey = privateKey;
+    }
+
+    public String getEncryptKey() {
+        return encryptKey;
+    }
+
+    public void setEncryptKey(String encryptKey) {
+        this.encryptKey = encryptKey;
+    }
+
+    public String getEncryptSalt() {
+        return encryptSalt;
+    }
+
+    public void setEncryptSalt(String encryptSalt) {
+        this.encryptSalt = encryptSalt;
+    }
+
+    public String getEncryptPassword() {
+        return encryptPassword;
+    }
+
+    public void setEncryptPassword(String encryptPassword) {
+        this.encryptPassword = encryptPassword;
+    }
+
+    public List<AccountID> getUnconfirmedAccountIDs() {
+        return unconfirmedAccountIDs;
+    }
+
+    public void setUnconfirmedAccountIDs(List<AccountID> unconfirmedAccountIDs) {
+        this.unconfirmedAccountIDs = unconfirmedAccountIDs;
     }
 }

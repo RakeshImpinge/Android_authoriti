@@ -2,7 +2,10 @@ package com.curtisdigital.authoriti.utils;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.os.Build;
+import android.text.Html;
 import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.style.TypefaceSpan;
 
 import com.curtisdigital.authoriti.api.model.Picker;
@@ -19,6 +22,14 @@ import java.util.List;
 
 @EBean(scope = EBean.Scope.Singleton)
 public class AuthoritiUtils implements Constants{
+
+    public Spanned fromHtml(String source) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            return Html.fromHtml(source);
+        }
+    }
 
     public String getPickerTitle(String identifier){
 
@@ -72,22 +83,22 @@ public class AuthoritiUtils implements Constants{
         return index;
     }
 
-    public int getPickerPreSelectedIndex(Context context, String identifier){
+    public int getPickerDefaultIndex(Context context, String identifier){
 
         int index = 0;
 
         switch (identifier){
             case PICKER_ACCOUNT:
-                index = AuthoritiData_.getInstance_(context).getPreSelectedAccountIndex();
+                index = AuthoritiData_.getInstance_(context).getAccountPicker().getDefaultIndex();
                 break;
             case PICKER_INDUSTRY:
-                index = AuthoritiData_.getInstance_(context).getPreSelectedIndustryIndex();
+                index = AuthoritiData_.getInstance_(context).getIndustryPicker().getDefaultIndex();
                 break;
             case PICKER_LOCATION_STATE:
-                index = AuthoritiData_.getInstance_(context).getPreSelectedCountryIndex();
+                index = AuthoritiData_.getInstance_(context).getLocationPicker().getDefaultIndex();
                 break;
             case PICKER_TIME:
-                index = AuthoritiData_.getInstance_(context).getPreSelectedTimeIndex();
+                index = AuthoritiData_.getInstance_(context).getTimePicker().getDefaultIndex();;
                 break;
             default:
                 index = 0;
@@ -120,6 +131,117 @@ public class AuthoritiUtils implements Constants{
         }
 
         return picker;
+    }
+
+    public void setSelectedPickerIndex(Context context, String identifier, int index){
+
+        AuthoritiData dataManager = AuthoritiData_.getInstance_(context);
+
+        switch (identifier){
+            case PICKER_ACCOUNT:
+                dataManager.setSelectedAccountIndex(index);
+                break;
+            case PICKER_INDUSTRY:
+                dataManager.setSelectedIndustryIndex(index);
+                break;
+            case PICKER_LOCATION_STATE:
+                dataManager.setSelectedCountryIndex(index);
+                break;
+            case PICKER_TIME:
+                dataManager.setSelectedTimeIndex(index);
+                break;
+            default:
+
+                break;
+        }
+
+    }
+
+    public void setDefaultPickerItemIndex(Context context, String identifier, int index){
+
+        AuthoritiData dataManager = AuthoritiData_.getInstance_(context);
+        Picker picker = null;
+
+        switch (identifier){
+            case PICKER_ACCOUNT:
+                picker = dataManager.getAccountPicker();
+                picker.setEnableDefault(true);
+                picker.setDefaultIndex(index);
+                dataManager.setAccountPicker(picker);
+                break;
+            case PICKER_INDUSTRY:
+                picker = dataManager.getIndustryPicker();
+                picker.setEnableDefault(true);
+                picker.setDefaultIndex(index);
+                dataManager.setIndustryPicker(picker);
+                break;
+            case PICKER_LOCATION_STATE:
+                picker = dataManager.getLocationPicker();
+                picker.setEnableDefault(true);
+                picker.setDefaultIndex(index);
+                dataManager.setLocationPicker(picker);
+                break;
+            case PICKER_TIME:
+                picker = dataManager.getTimePicker();
+                picker.setEnableDefault(true);
+                picker.setDefaultIndex(index);
+                dataManager.setTimePicker(picker);
+                break;
+            default:
+
+                break;
+        }
+
+    }
+
+    public void setIndexSelected(Context context, String identifier, boolean selected){
+
+        AuthoritiData dataManager = AuthoritiData_.getInstance_(context);
+
+        switch (identifier){
+            case PICKER_ACCOUNT:
+                dataManager.setAccountIndexSelected(selected);
+                break;
+            case PICKER_INDUSTRY:
+                dataManager.setIndustryIndexSelected(selected);
+                break;
+            case PICKER_LOCATION_STATE:
+                dataManager.setCountryIndexSelected(selected);
+                break;
+            case PICKER_TIME:
+                dataManager.setTimeIndexSelected(selected);
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    public boolean presentSelectedIndex(Context context, String identifier){
+
+        boolean selected;
+        AuthoritiData dataManager = AuthoritiData_.getInstance_(context);
+
+        switch (identifier){
+            case PICKER_ACCOUNT:
+                selected = dataManager.isAccountIndexSelected();
+                break;
+            case PICKER_INDUSTRY:
+                selected = dataManager.isIndustryIndexSelected();
+                break;
+            case PICKER_LOCATION_STATE:
+                selected = dataManager.isCountryIndexSelected();
+                break;
+            case PICKER_TIME:
+                selected = dataManager.isTimeIndexSelected();
+                break;
+            default:
+                selected = false;
+                break;
+        }
+
+        return selected;
+
     }
 
     public Picker getDefaultTimePicker(Picker picker){

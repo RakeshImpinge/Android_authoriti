@@ -2,9 +2,11 @@ package com.curtisdigital.authoriti.core;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.inputmethod.InputMethodManager;
 
@@ -51,6 +53,26 @@ public class BaseFragment extends Fragment implements Constants{
             }
 
             progress = null;
+        }
+    }
+
+    @UiThread
+    protected void showAlert(String title, String message) {
+        if(!mActivity.isFinishing()) {
+            AlertDialog alertDialog = new AlertDialog.Builder(mActivity).create();
+            alertDialog.setTitle(title);
+            alertDialog.setMessage(message);
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+
+                }
+            });
+
+            try {
+                alertDialog.show();
+            } catch (Exception e) {
+
+            }
         }
     }
 

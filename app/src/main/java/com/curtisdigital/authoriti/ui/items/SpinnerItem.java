@@ -25,6 +25,7 @@ public class SpinnerItem extends BaseAdapter{
     public SpinnerItem(Context context, List<AccountID> accountIDs){
         this.context = context;
         this.accountIDs = accountIDs;
+
     }
 
     public void setAccountIDs(List<AccountID> accountIDs){
@@ -54,6 +55,13 @@ public class SpinnerItem extends BaseAdapter{
 
         TextView tvOption = (TextView) view.findViewById(R.id.tvOption);
         tvOption.setText(accountIDs.get(position).getType());
+
+        View confirmView = view.findViewById(R.id.llConfirm);
+        if (accountIDs.get(position).isConfirmed()){
+            confirmView.setVisibility(View.INVISIBLE);
+        } else {
+            confirmView.setVisibility(View.VISIBLE);
+        }
 
         return view;
     }
