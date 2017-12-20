@@ -11,7 +11,7 @@ import java.util.Date;
 public class Crypto {
 
     public CryptoKeyPair generateKeyPair(String password, String salt) {
-        BigInteger[] keys = CryptoUtil.keys(28);
+        BigInteger[] keys = CryptoUtil.keys(29);
         BigInteger n = keys[0];
         BigInteger e = keys[1];
         BigInteger d = keys[2];
