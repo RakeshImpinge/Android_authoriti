@@ -26,7 +26,7 @@ public class Crypto {
 
     public String addAccountNumberToPayload(String payload, String accountId) {
         String p = CryptoUtil.cleanup(payload, 10);
-        String a = CryptoUtil.cleanup(accountId, 10);
+        String a = CryptoUtil.cleanup(accountId, 4);
 
         BigInteger pInt = CryptoUtil.base62ToInt(p);
         BigInteger aInt = CryptoUtil.base62ToInt(a);
