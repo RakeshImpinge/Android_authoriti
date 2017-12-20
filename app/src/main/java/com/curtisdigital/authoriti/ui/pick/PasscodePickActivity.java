@@ -164,7 +164,6 @@ public class PasscodePickActivity extends BaseActivity {
                     value.setValue(String.valueOf(diff));
                 }
 
-
                 Log.e("Diff - ", String.valueOf(diff));
 
                 item.setChecked(true);

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.CardView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -25,6 +26,9 @@ import com.curtisdigital.authoriti.ui.items.SpinnerItem;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.curtisdigital.authoriti.utils.AuthoritiUtils;
 import com.curtisdigital.authoriti.utils.ViewUtils;
+import com.curtisdigital.authoriti.utils.alice.Alice;
+import com.curtisdigital.authoriti.utils.alice.AliceContext;
+import com.curtisdigital.authoriti.utils.crypto.CryptoKeyPair;
 
 import org.androidannotations.annotations.AfterTextChange;
 import org.androidannotations.annotations.AfterViews;
@@ -33,6 +37,7 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +48,8 @@ import se.simbio.encryption.Encryption;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static com.curtisdigital.authoriti.utils.alice.AliceContext.Pbkdf.PBKDF_2_WITH_HMAC_SHA_1;
+import static com.curtisdigital.authoriti.utils.alice.AliceContext.Pbkdf.PBKDF_2_WITH_HMAC_SHA_256;
 
 /**
  * Created by mac on 12/13/17.
@@ -89,8 +96,12 @@ public class AccountManagerActivity extends BaseActivity implements AdapterView.
     private int popupHeight, popupWidth;
     private boolean markDefault;
 
+    private CryptoKeyPair keyPair;
+
     @AfterViews
     void callAfterViewInjection(){
+
+        keyPair = dataManager.getCryptoKeyPair(dataManager.password, "");
 
         setSpinner();
         updateFinishButton();
@@ -197,7 +208,11 @@ public class AccountManagerActivity extends BaseActivity implements AdapterView.
 
     private void signUp(){
 
-        RequestSignUp requestSignUp = new RequestSignUp(dataManager.password, dataManager.key, dataManager.salt, dataManager.inviteCode, dataManager.accountIDs);
+        Log.e("Private Key", keyPair.getPrivateKey());
+        Log.e("Public Key", keyPair.getPublicKey());
+        Log.e("Salt", keyPair.getSalt());
+
+        RequestSignUp requestSignUp = new RequestSignUp(dataManager.password, keyPair.getPublicKey(), keyPair.getSalt(), dataManager.inviteCode, dataManager.accountIDs);
 
         displayProgressDialog("Sign Up...");
 
@@ -237,19 +252,34 @@ public class AccountManagerActivity extends BaseActivity implements AdapterView.
         user.setToken(responseSignUp.getToken());
         user.setPassword(dataManager.password);
         user.setInviteCode(dataManager.inviteCode);
-        user.setSalt(dataManager.salt);
-        user.setPrivateKey(dataManager.key);
-
-        Encryption encryption = Encryption.getDefault(dataManager.key, dataManager.salt, dataManager.iv);
-
-        user.setEncryptKey(encryption.encryptOrNull(dataManager.key));
-        user.setEncryptSalt(encryption.encryptOrNull(dataManager.salt));
-        user.setEncryptPassword(encryption.encryptOrNull(dataManager.password));
+        user.setSalt(keyPair.getSalt());
+        user.setPrivateKey(keyPair.getPrivateKey());
 
         dataManager.setUser(user);
 
         updateLoginState();
         goHome();
+
+
+//        try {
+//
+//            byte bytes[] = Alice.generateKey(AliceContext.Algorithm.AES, AliceContext.KeyLength.BITS_256);
+//
+//            user.setEncryptionIV(bytes);
+//            user.setEncryptKey(dataManager.getAlice().encrypt(keyPair.getPrivateKey().getBytes(), new String(bytes).toCharArray()));
+//            user.setEncryptSalt(dataManager.getAlice().encrypt(keyPair.getSalt().getBytes(), new String(bytes).toCharArray()));
+//            user.setEncryptPassword(dataManager.getAlice().encrypt(dataManager.password.getBytes(), new String(bytes).toCharArray()));
+//
+//
+//            dataManager.setUser(user);
+//
+//            updateLoginState();
+//            goHome();
+//
+//
+//        } catch (GeneralSecurityException e) {
+//            e.printStackTrace();
+//        }
 
     }
 
@@ -298,6 +328,7 @@ public class AccountManagerActivity extends BaseActivity implements AdapterView.
     void finishButtonClicked(){
 
         signUp();
+
     }
 
     @Click(R.id.spinner)

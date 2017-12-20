@@ -7,6 +7,7 @@ import android.widget.TextView;
 import com.curtisdigital.authoriti.R;
 import com.curtisdigital.authoriti.api.AuthoritiAPI;
 import com.curtisdigital.authoriti.api.model.AccountID;
+import com.curtisdigital.authoriti.api.model.Order;
 import com.curtisdigital.authoriti.api.model.Picker;
 import com.curtisdigital.authoriti.api.model.Scheme;
 import com.curtisdigital.authoriti.api.model.Value;
@@ -96,7 +97,12 @@ public class CodeGenerateFragment extends BaseFragment {
 
         if (dataManager.getScheme() != null && dataManager.getScheme().getPickers() != null) {
 
+            Order order = new Order();
+            List<String> pickers = new ArrayList<>();
+
             for (Picker picker : dataManager.getScheme().getPickers()) {
+
+                pickers.add(picker.getPicker());
 
                 switch (picker.getPicker()) {
 
@@ -143,12 +149,19 @@ public class CodeGenerateFragment extends BaseFragment {
                         dataManager.setLocationPicker(picker);
                         break;
 
+                    case PICKER_LOCATION_COUNTRY:
+                        dataManager.setCountryPicker(picker);
+                        break;
+
                     case PICKER_TIME:
                         dataManager.setTimePicker(AuthoritiUtils_.getInstance_(mContext).getDefaultTimePicker(picker));
                         break;
 
                 }
             }
+
+            order.setPickers(pickers);
+            dataManager.setPickerOrder(order);
 
             showPickers();
         }
@@ -162,27 +175,44 @@ public class CodeGenerateFragment extends BaseFragment {
             adapter.clear();
         }
 
-        if (dataManager.getAccountPicker() != null){
-            adapter.add(new CodeItem(dataManager.getAccountPicker()));
-        }
+        if (dataManager.getPickerOrder() != null && dataManager.getPickerOrder().getPickers() != null && dataManager.getPickerOrder().getPickers().size() > 0){
 
-        if (dataManager.getIndustryPicker() != null){
-            adapter.add(new CodeItem(dataManager.getIndustryPicker()));
-        }
+            for (String picker : dataManager.getPickerOrder().getPickers()){
 
-        if (dataManager.getLocationPicker() != null){
-            adapter.add(new CodeItem(dataManager.getLocationPicker()));
-        }
+                switch (picker){
 
-        if (dataManager.getTimePicker() != null){
-            adapter.add(new CodeItem(dataManager.getTimePicker()));
+                    case PICKER_ACCOUNT:
+                        if (dataManager.getAccountPicker() != null){
+                            adapter.add(new CodeItem(dataManager.getAccountPicker()));
+                        }
+                        break;
+
+                    case PICKER_INDUSTRY:
+                        if (dataManager.getIndustryPicker() != null){
+                            adapter.add(new CodeItem(dataManager.getIndustryPicker()));
+                        }
+                        break;
+                    case PICKER_LOCATION_STATE:
+                        if (dataManager.getLocationPicker() != null){
+                            adapter.add(new CodeItem(dataManager.getLocationPicker()));
+                        }
+                        break;
+                    case PICKER_TIME:
+                        if (dataManager.getTimePicker() != null){
+                            adapter.add(new CodeItem(dataManager.getTimePicker()));
+                        }
+                        break;
+                }
+
+            }
+
         }
 
     }
 
     @Click(R.id.cvGenerate)
     void generateButtonClicked(){
-//        CodeGenerateActivity_.intent(mContext).start();
+        CodeGenerateActivity_.intent(mContext).start();
     }
 
 

@@ -253,11 +253,11 @@ public class AuthoritiUtils implements Constants{
         timePicker.setTitle(picker.getTitle());
 
         List<Value> values = new ArrayList<>();
-        values.add(new Value("", "2 Days"));
-        values.add(new Value("", "5 Days"));
-        values.add(new Value("", "2 Weeks"));
-        values.add(new Value("", "1 Month"));
-        values.add(new Value("", "Custom"));
+        values.add(new Value("", TIME_2_DAYS));
+        values.add(new Value("", TIME_5_DAYS));
+        values.add(new Value("", TIME_2_WEEKS));
+        values.add(new Value("", TIME_1_MONTH));
+        values.add(new Value("", TIME_CUSTOM));
 
         timePicker.setValues(values);
 

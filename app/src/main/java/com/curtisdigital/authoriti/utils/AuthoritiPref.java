@@ -15,5 +15,7 @@ public interface AuthoritiPref {
     String accountPickerJson();
     String industryPickerJson();
     String locationPickerJson();
+    String countryPickerJson();
     String timePickerJson();
+    String pickerOrderJson();
 }

@@ -25,12 +25,14 @@ public class User {
     @SerializedName("key")
     private String privateKey;
 
-    @SerializedName("encrypt_key")
-    private String encryptKey;
-    @SerializedName("encrypt_salt")
-    private String encryptSalt;
-    @SerializedName("encrypt_password")
-    private String encryptPassword;
+
+    private byte[] encryptKey;
+
+    private byte[] encryptSalt;
+
+    private byte[] encryptPassword;
+
+    private byte[] encryptionIV;
 
     private List<AccountID> unconfirmedAccountIDs;
 
@@ -95,27 +97,27 @@ public class User {
         this.privateKey = privateKey;
     }
 
-    public String getEncryptKey() {
+    public byte[] getEncryptKey() {
         return encryptKey;
     }
 
-    public void setEncryptKey(String encryptKey) {
+    public void setEncryptKey(byte[] encryptKey) {
         this.encryptKey = encryptKey;
     }
 
-    public String getEncryptSalt() {
+    public byte[] getEncryptSalt() {
         return encryptSalt;
     }
 
-    public void setEncryptSalt(String encryptSalt) {
+    public void setEncryptSalt(byte[] encryptSalt) {
         this.encryptSalt = encryptSalt;
     }
 
-    public String getEncryptPassword() {
+    public byte[] getEncryptPassword() {
         return encryptPassword;
     }
 
-    public void setEncryptPassword(String encryptPassword) {
+    public void setEncryptPassword(byte[] encryptPassword) {
         this.encryptPassword = encryptPassword;
     }
 
@@ -125,5 +127,13 @@ public class User {
 
     public void setUnconfirmedAccountIDs(List<AccountID> unconfirmedAccountIDs) {
         this.unconfirmedAccountIDs = unconfirmedAccountIDs;
+    }
+
+    public byte[] getEncryptionIV() {
+        return encryptionIV;
+    }
+
+    public void setEncryptionIV(byte[] encryptionIV) {
+        this.encryptionIV = encryptionIV;
     }
 }

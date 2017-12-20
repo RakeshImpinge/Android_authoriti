@@ -2,9 +2,15 @@ package com.curtisdigital.authoriti.utils;
 
 import com.curtisdigital.authoriti.api.model.AccountID;
 import com.curtisdigital.authoriti.api.model.AuthLogIn;
+import com.curtisdigital.authoriti.api.model.Order;
 import com.curtisdigital.authoriti.api.model.Picker;
 import com.curtisdigital.authoriti.api.model.Scheme;
 import com.curtisdigital.authoriti.api.model.User;
+import com.curtisdigital.authoriti.utils.alice.Alice;
+import com.curtisdigital.authoriti.utils.alice.AliceContext;
+import com.curtisdigital.authoriti.utils.alice.AliceContextBuilder;
+import com.curtisdigital.authoriti.utils.crypto.Crypto;
+import com.curtisdigital.authoriti.utils.crypto.CryptoKeyPair;
 import com.google.gson.Gson;
 
 import org.androidannotations.annotations.EBean;
@@ -25,8 +31,6 @@ public class AuthoritiData {
     // Auth Processing Temp Data
     public String inviteCode;
     public String password;
-    public String key = "privatekey";
-    public String salt = "salt";
     public byte[] iv = {-100, 34, 63, 23, -111, 30, -11, -45, 40, 96, -100, 73, 63, 12, -124, 23};
     public List<AccountID> accountIDs;
     public boolean defaultAccountSelected;
@@ -128,6 +132,20 @@ public class AuthoritiData {
         }
     }
 
+    public Picker getCountryPicker(){
+        Gson gson = new Gson();
+        return gson.fromJson(pref.countryPickerJson().get(), Picker.class);
+    }
+
+    public void setCountryPicker(Picker picker){
+        if (picker != null){
+            Gson gson = new Gson();
+            pref.edit().countryPickerJson().put(gson.toJson(picker)).apply();
+        } else {
+            pref.edit().countryPickerJson().remove().apply();
+        }
+    }
+
     public Picker getTimePicker() {
         Gson gson = new Gson();
         return gson.fromJson(pref.timePickerJson().get(), Picker.class);
@@ -139,6 +157,20 @@ public class AuthoritiData {
             pref.edit().timePickerJson().put(gson.toJson(picker)).apply();
         } else {
             pref.edit().timePickerJson().remove().apply();
+        }
+    }
+
+    public Order getPickerOrder(){
+        Gson gson = new Gson();
+        return gson.fromJson(pref.pickerOrderJson().get(), Order.class);
+    }
+
+    public void setPickerOrder(Order order){
+        if (order != null){
+            Gson gson = new Gson();
+            pref.edit().pickerOrderJson().put(gson.toJson(order)).apply();
+        } else {
+            pref.edit().pickerOrderJson().remove().apply();
         }
     }
 
@@ -215,7 +247,9 @@ public class AuthoritiData {
         setAccountPicker(null);
         setIndustryPicker(null);
         setLocationPicker(null);
+        setCountryPicker(null);
         setTimePicker(null);
+        setPickerOrder(null);
 
         accountIDs = null;
         defaultAccountSelected = false;
@@ -230,6 +264,30 @@ public class AuthoritiData {
         setIndustryIndexSelected(false);
         setCountryIndexSelected(false);
         setTimeIndexSelected(false);
+
+    }
+
+    public CryptoKeyPair getCryptoKeyPair(String password, String salt){
+
+        Crypto crypto = new Crypto();
+
+        return crypto.generateKeyPair(password, salt);
+
+    }
+
+    public Alice getAlice(){
+        AliceContext aliceContext = new AliceContextBuilder()
+                .setAlgorithm(AliceContext.Algorithm.AES)
+                .setMode(AliceContext.Mode.CBC) // or AliceContext.Mode.CTR
+                .setIvLength(16)
+                .build();
+
+        return new Alice(aliceContext);
+    }
+
+    public String getValidString(String origin){
+
+        return origin.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
 
     }
 }

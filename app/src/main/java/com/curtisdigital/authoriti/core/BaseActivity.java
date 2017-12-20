@@ -1,5 +1,6 @@
 package com.curtisdigital.authoriti.core;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -43,6 +44,18 @@ public class BaseActivity extends AppCompatActivity implements Constants{
     @UiThread
     protected void displayProgressDialog(String message) {
         progress = new ProgressDialog(mActivity);
+        progress.setMessage(message);
+        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progress.setIndeterminate(true);
+        progress.setCancelable(false);
+        if (!isFinishing()){
+            progress.show();
+        }
+    }
+
+    @UiThread
+    protected void displayProgressDialog(Activity activity, String message) {
+        progress = new ProgressDialog(activity);
         progress.setMessage(message);
         progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progress.setIndeterminate(true);

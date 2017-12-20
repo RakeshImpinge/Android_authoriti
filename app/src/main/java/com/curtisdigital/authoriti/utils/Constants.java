@@ -24,9 +24,16 @@ public interface Constants {
     // Picker Identification
     String PICKER_ACCOUNT               = "accountId";
     String PICKER_INDUSTRY              = "industry";
+    String PICKER_LOCATION_COUNTRY      = "location_country";
     String PICKER_LOCATION_STATE        = "location_state";
     String PICKER_TIME                  = "time";
 
-    String ACUANT_LICENSE_KEY           = "FAD9B2F0E7F1";
+    String TIME_2_DAYS                  = "2 Days";
+    String TIME_5_DAYS                  = "5 Days";
+    String TIME_2_WEEKS                 = "2 Weeks";
+    String TIME_1_MONTH                 = "1 Month";
+    String TIME_CUSTOM                  = "Custom";
+
+    String ACUANT_LICENSE_KEY           = "634CAC50A4F2";
 
 }

@@ -17,6 +17,9 @@ import com.curtisdigital.authoriti.api.model.response.ResponseSignUpChase;
 import com.curtisdigital.authoriti.core.BaseActivity;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.curtisdigital.authoriti.utils.AuthoritiUtils;
+import com.curtisdigital.authoriti.utils.alice.Alice;
+import com.curtisdigital.authoriti.utils.alice.AliceContext;
+import com.curtisdigital.authoriti.utils.crypto.CryptoKeyPair;
 
 import org.androidannotations.annotations.AfterTextChange;
 import org.androidannotations.annotations.AfterViews;
@@ -26,6 +29,7 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,8 +73,12 @@ public class ChaseActivity extends BaseActivity {
     @ViewById(R.id.etPassword)
     EditText etPassword;
 
+    private CryptoKeyPair keyPair;
+
     @AfterViews
     void callAfterViewInjection(){
+
+        keyPair = dataManager.getCryptoKeyPair(dataManager.password, "");
 
         tvTitle.setText(customer + " is a partner of Authority. Please enter your " + customer + " password so we can authorize you.");
 
@@ -82,7 +90,7 @@ public class ChaseActivity extends BaseActivity {
         List<AccountID> accountIDs = new ArrayList<>();
         accountIDs.add(accountID);
 
-        RequestSignUp requestSignUp = new RequestSignUp(etPassword.getText().toString(), dataManager.key, dataManager.salt, dataManager.inviteCode, accountIDs);
+        RequestSignUp requestSignUp = new RequestSignUp(etPassword.getText().toString(), keyPair.getPublicKey(), keyPair.getSalt(), dataManager.inviteCode, accountIDs);
 
         displayProgressDialog("Sign Up...");
 
@@ -122,14 +130,9 @@ public class ChaseActivity extends BaseActivity {
         user.setToken(responseSignUpChase.getToken());
         user.setPassword(etPassword.getText().toString());
         user.setInviteCode(dataManager.inviteCode);
-        user.setSalt(dataManager.salt);
-        user.setPrivateKey(dataManager.key);
+        user.setSalt(keyPair.getSalt());
+        user.setPrivateKey(keyPair.getPrivateKey());
 
-        Encryption encryption = Encryption.getDefault(dataManager.key, dataManager.salt, dataManager.iv);
-
-        user.setEncryptKey(encryption.encryptOrNull(dataManager.key));
-        user.setEncryptSalt(encryption.encryptOrNull(dataManager.salt));
-        user.setEncryptPassword(encryption.encryptOrNull(etPassword.getText().toString()));
 
         AccountID accountID = new AccountID(responseSignUpChase.getAccountName(), etIdentifier.getText().toString());
         List<AccountID> accountIDs = new ArrayList<>();
@@ -167,6 +170,35 @@ public class ChaseActivity extends BaseActivity {
             goHome();
 
         }
+
+//        try {
+//
+//            byte bytes[] = Alice.generateKey(AliceContext.Algorithm.AES, AliceContext.KeyLength.BITS_256);
+//
+//            user.setEncryptionIV(bytes);
+//            user.setEncryptKey(dataManager.getAlice().encrypt(keyPair.getPrivateKey().getBytes(), new String(bytes).toCharArray()));
+//            user.setEncryptSalt(dataManager.getAlice().encrypt(keyPair.getSalt().getBytes(), new String(bytes).toCharArray()));
+//            user.setEncryptPassword(dataManager.getAlice().encrypt(dataManager.password.getBytes(), new String(bytes).toCharArray()));
+//
+//
+//            dataManager.setUser(user);
+//
+//            if (responseSignUpChase.getAccounts() != null && responseSignUpChase.getAccounts().size() > 0){
+//
+//                AccountConfirmActivity_.intent(this).start();
+//
+//            } else {
+//
+//                updateLoginState();
+//                goHome();
+//
+//            }
+//
+//
+//        } catch (GeneralSecurityException e) {
+//            e.printStackTrace();
+//        }
+
 
 
     }
