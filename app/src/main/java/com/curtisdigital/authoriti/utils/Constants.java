@@ -34,6 +34,6 @@ public interface Constants {
     String TIME_1_MONTH                 = "1 Month";
     String TIME_CUSTOM                  = "Custom";
 
-    String ACUANT_LICENSE_KEY           = "634CAC50A4F2";
+    String ACUANT_LICENSE_KEY           = "C1C8C5BD8EE2";
 
 }

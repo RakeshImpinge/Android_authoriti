@@ -1,8 +1,6 @@
 package com.curtisdigital.authoriti.ui.auth;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -15,7 +13,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.widget.ImageView;
 
 import com.acuant.mobilesdk.AcuantAndroidMobileSDKController;
@@ -45,8 +42,6 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -73,8 +68,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
     private String assureIDSubscription;
     private String assureIDURL;
     private boolean isConnect = false;
-    private boolean isCropping = false;
-    private boolean isFirstLoad = true;
+    private boolean capturedsPdf417String = false;
 
     @ViewById(R.id.ivFront)
     ImageView ivFront;
@@ -85,7 +79,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
     private boolean capturedFront = false;
     private boolean capturedBack = false;
     private boolean isBack = false;
-    private Card processedCard;
+
 
     @AfterViews
     void callAfterViewInjection(){
@@ -157,23 +151,6 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
         acuantAndroidMobileSdkControllerInstance.setCardCroppingListener(this);
         acuantAndroidMobileSdkControllerInstance.setAcuantErrorListener(this);
 
-    }
-
-    private void SaveImage(Bitmap finalBitmap) {
-
-        String fname = "/sdcard/cropped.jpg";
-        File file = new File(fname);
-        if (file.exists ()) file.delete ();
-        try {
-            file.createNewFile();
-            FileOutputStream out = new FileOutputStream(file);
-            finalBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-            out.flush();
-            out.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     private boolean isConnectWS(){
@@ -277,12 +254,73 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
             Log.e("TID ", licenseCard.getTransactionId());
 
 
-            Gson gson = new Gson();
-            saveDLInfo(gson.toJson(licenseCard));
-            
+            String builder = "Authentication Result - " + licenseCard.getAuthenticationResult() +
+                    ", First Name - " + licenseCard.getNameFirst() +
+                    ", Middle Name - " + licenseCard.getNameMiddle() +
+                    ", Last Name - " + licenseCard.getNameLast() +
+                    ", Name Suffix - " + licenseCard.getNameSuffix() +
+                    ", ID - " + licenseCard.getLicenceID() +
+                    ", License - " + licenseCard.getLicense() +
+                    ", DOB Long - " + licenseCard.getDateOfBirth4() +
+                    ", DOB Short - " + licenseCard.getDateOfBirth() +
+                    ", Date Of Birth Local - " + licenseCard.getDateOfBirthLocal() +
+                    ", Issue Date Long - " + licenseCard.getIssueDate4() +
+                    ", Issue Date Short - " + licenseCard.getIssueDate() +
+                    ", Issue Date Local - " + licenseCard.getIssueDateLocal() +
+                    ", Expiration Date Long - " + licenseCard.getExpirationDate4() +
+                    ", Expiration Date Short - " + licenseCard.getExpirationDate() +
+                    ", Eye Color - " + licenseCard.getEyeColor() +
+                    ", Hair Color - " + licenseCard.getHair() +
+                    ", Height - " + licenseCard.getHeight() +
+                    ", Weight - " + licenseCard.getWeight() +
+                    ", Address - " + licenseCard.getAddress() +
+                    ", Address2 - " + licenseCard.getAddress2() +
+                    ", Address3 - " + licenseCard.getAddress3() +
+                    ", Address4 - " + licenseCard.getAddress4() +
+                    ", Address5 - " + licenseCard.getAddress5() +
+                    ", Address6 - " + licenseCard.getAddress6() +
+                    ", City - " + licenseCard.getCity() +
+                    ", Zip - " + licenseCard.getZip() +
+                    ", State - " + licenseCard.getState() +
+                    ", Country - " + licenseCard.getCounty() +
+                    ", Country Short - " + licenseCard.getCountryShort() +
+                    ", Country Long - " + licenseCard.getIdCountry() +
+                    ", Class - " + licenseCard.getClass() +
+                    ", Restriction - " + licenseCard.getRestriction() +
+                    ", Sex - " + licenseCard.getSex() +
+                    ", Audit - " + licenseCard.getAudit() +
+                    ", Endorsements - " + licenseCard.getEndorsements() +
+                    ", Fee - " + licenseCard.getFee() +
+                    ", CSC - " + licenseCard.getCSC() +
+                    ", SigNum - " + licenseCard.getSigNum() +
+                    ", Text1 - " + licenseCard.getText1() +
+                    ", Text2 - " + licenseCard.getText2() +
+                    ", Text3 - " + licenseCard.getText3() +
+                    ", Type - " + licenseCard.getType() +
+                    ", Doc Type - " + licenseCard.getDocType() +
+                    ", Father Name - " + licenseCard.getFatherName() +
+                    ", Mother Name - " + licenseCard.getMotherName() +
+                    ", NameFirst_NonMRZ - " + licenseCard.getNameFirst_NonMRZ() +
+                    ", NameLast_NonMRZ - " + licenseCard.getNameLast_NonMRZ() +
+                    ", NameLast1 - " + licenseCard.getNameLast1() +
+                    ", NameLast2 - " + licenseCard.getNameLast2() +
+                    ", NameMiddle_NonMRZ - " + licenseCard.getNameMiddle_NonMRZ() +
+                    ", Document Detected Name - " + licenseCard.getDocumentDetectedName() +
+                    ", Docuemtn Detected Name Short - " + licenseCard.getDocumentDetectedNameShort() +
+                    ", Nationality - " + licenseCard.getNationality() +
+                    ", Original - " + licenseCard.getOriginal() +
+                    ", PlaceOfBirth - " + licenseCard.getPlaceOfBirth() +
+                    ", PlaceOfIssue - " + licenseCard.getPlaceOfIssue() +
+                    ", Social Security - " + licenseCard.getSocialSecurity() +
+                    ", TID - " + licenseCard.getTransactionId();
+
+            saveDLInfo(builder);
+
             if (licenseCard.getAuthenticationResult().toLowerCase().equals("passed")){
 
                 Log.e("Verification - ", "Passed");
+                AccountManagerActivity_.intent(mContext).start();
+
             } else {
 
                 showAlert("", "Could not verify your Driver's License, Please try again.");
@@ -323,8 +361,78 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
     }
 
+    private void checkProcess(){
+
+        if (!capturedFront){
+
+            showAlert("", "Please provide a front image.");
+
+        } else {
+
+            if (capturedsPdf417String){
+
+                processCardValidation();
+
+            } else {
+
+                if(!capturedBack){
+
+                    showAlert("", "Please provide a back image.");
+
+                } else {
+
+                    processCardValidation();
+
+                }
+
+            }
+
+
+        }
+
+    }
+
+    private void processCardValidation(){
+
+        ProcessImageRequestOptions options = ProcessImageRequestOptions.getInstance();
+        options.autoDetectState = true;
+        options.stateID = -1;
+        options.reformatImage = true;
+        options.reformatImageColor = 0;
+        options.DPI = 150;
+        options.cropImage = false;
+        options.faceDetec = true;
+        options.signDetec = true;
+        options.iRegion = Region.REGION_UNITED_STATES;
+        options.acuantCardType = CardType.DRIVERS_LICENSE;
+
+
+        BitmapDrawable drawable_front = (BitmapDrawable) ivFront.getDrawable();
+        Bitmap bitmap_front = drawable_front.getBitmap();
+
+        BitmapDrawable drawable_back = (BitmapDrawable) ivBackward.getDrawable();
+        Bitmap bitmap_back = null;
+        if (drawable_back != null && drawable_back.getBitmap() != null){
+            bitmap_back = drawable_back.getBitmap();
+        }
+
+        displayProgressDialog("Processing...");
+
+        if(isConnect){
+            acuantAndroidMobileSdkControllerInstance.callProcessImageConnectServices(bitmap_front, bitmap_back, sPdf417String, this, options);
+        }else {
+            acuantAndroidMobileSdkControllerInstance.callProcessImageServices(bitmap_front, bitmap_back, sPdf417String, this, options);
+
+        }
+
+        resetPdf417String();
+
+    }
+
     private void resetPdf417String() {
+
         sPdf417String = "";
+        capturedsPdf417String = false;
     }
 
 
@@ -362,46 +470,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
     @Click(R.id.cvNext)
     void nextButtonClicked(){
 
-        if (!capturedFront){
-
-            showAlert("", "Please provide a front image.");
-
-        } else if (!capturedBack){
-
-            showAlert("", "Please provide a back image.");
-
-        } else {
-
-            ProcessImageRequestOptions options = ProcessImageRequestOptions.getInstance();
-            options.autoDetectState = true;
-            options.stateID = -1;
-            options.reformatImage = true;
-            options.reformatImageColor = 0;
-            options.DPI = 150;
-            options.cropImage = false;
-            options.faceDetec = true;
-            options.signDetec = true;
-            options.iRegion = Region.REGION_UNITED_STATES;
-            options.acuantCardType = CardType.DRIVERS_LICENSE;
-
-
-            BitmapDrawable drawable_front = (BitmapDrawable) ivFront.getDrawable();
-            Bitmap bitmap_front = drawable_front.getBitmap();
-
-            BitmapDrawable drawable_back = (BitmapDrawable) ivBackward.getDrawable();
-            Bitmap bitmap_back = drawable_back.getBitmap();
-
-            displayProgressDialog("Processing...");
-            if(isConnect){
-                acuantAndroidMobileSdkControllerInstance.callProcessImageConnectServices(bitmap_front, bitmap_back, sPdf417String, this, options);
-            }else {
-                acuantAndroidMobileSdkControllerInstance.callProcessImageServices(bitmap_front, bitmap_back, sPdf417String, this, options);
-
-            }
-
-            resetPdf417String();
-
-        }
+        checkProcess();
 
     }
 
@@ -411,7 +480,6 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
         dismissProgressDialog();
 
-        processedCard = card;
         showCardDetails(card);
 
     }
@@ -436,7 +504,6 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
         Log.e("CARD Cropping ", "Started");
         displayProgressDialog(activity, "Cropping Image...");
-        isCropping = true;
 
     }
 
@@ -445,37 +512,18 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
         dismissProgressDialog();
         Log.e("CARD Cropping - ", "Finished");
-        isCropping = false;
 
         if (card_bitmap == null){
 
             showAlert("", "Unable to detect ID, Please retry.");
 
-            if (isBack){
-
-                ivBackward.setImageBitmap(null);
-                capturedBack = false;
-
-            } else {
-
-                ivFront.setImageBitmap(null);
-                capturedFront = false;
-
-            }
+            ivFront.setImageBitmap(null);
+            capturedFront = false;
 
         } else {
 
-            if (isBack){
-
-                ivBackward.setImageBitmap(card_bitmap);
-                capturedBack = true;
-
-            } else {
-
-                ivFront.setImageBitmap(card_bitmap);
-                capturedFront = true;
-
-            }
+            ivFront.setImageBitmap(card_bitmap);
+            capturedFront = true;
 
         }
 
@@ -487,37 +535,18 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
         dismissProgressDialog();
         Log.e("CARD Cropping ", "Finished");
-        isCropping = false;
 
         if (bitmapCropped == null){
 
             showAlert("", "Unable to detect ID, Please retry.");
 
-            if (isBack){
-
-                ivBackward.setImageBitmap(null);
-                capturedBack = false;
-
-            } else {
-
-                ivFront.setImageBitmap(null);
-                capturedFront = false;
-
-            }
+            ivFront.setImageBitmap(null);
+            capturedFront = false;
 
         } else {
 
-            if (isBack){
-
-                ivBackward.setImageBitmap(bitmapCropped);
-                capturedBack = true;
-
-            } else {
-
-                ivFront.setImageBitmap(bitmapCropped);
-                capturedFront = true;
-
-            }
+            ivFront.setImageBitmap(bitmapCropped);
+            capturedFront = true;
 
         }
 
@@ -528,6 +557,10 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
     public void onPDF417Finish(String result) {
         sPdf417String = result;
         Log.e("sPdf417String", sPdf417String);
+
+        capturedsPdf417String = true;
+
+        checkProcess();
     }
 
     @Override
@@ -535,19 +568,14 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
         Log.e("Original Bitmap ", "Captured");
 
-        if (bitmapOriginal != null){
-
-            ivBackward.setImageBitmap(bitmapOriginal);
-            capturedBack = true;
-
-        }
-
     }
 
     @Override
     public void onCancelCapture(Bitmap croppedImageOnCancel, Bitmap originalImageonCancel) {
 
         Log.e("Capture ", "Cancelled");
+
+        capturedsPdf417String = false;
 
         if (croppedImageOnCancel != null){
 
@@ -561,6 +589,10 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
             capturedBack = true;
 
 
+        } else {
+
+            ivBackward.setImageBitmap(null);
+            capturedBack = false;
         }
 
 
@@ -570,6 +602,8 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
     public void onBarcodeTimeOut(Bitmap croppedImageOnTimeout, Bitmap originalImageOnTimeout) {
 
         Log.e("Barcode Scan ", "Time Out");
+
+        capturedsPdf417String = false;
 
         acuantAndroidMobileSdkControllerInstance.finishScanningBarcodeCamera();
 
@@ -585,6 +619,10 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
             capturedBack = true;
             return;
 
+        } else {
+
+            ivBackward.setImageBitmap(null);
+            capturedBack = false;
         }
 
         showAlert(acuantAndroidMobileSdkControllerInstance.getBarcodeCameraContext(), "", "Unable to scan barcode");
@@ -594,7 +632,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
     public void didFailWithError(int code, String message) {
 
         dismissProgressDialog();
-        Log.e("Did Faile with Error -", message + " - " + code);
+        Log.e("Did Failed with Error -", message + " - " + code);
         showAlert("", message + " - " + code);
     }
 
