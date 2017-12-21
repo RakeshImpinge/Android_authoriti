@@ -100,6 +100,26 @@ public class BaseActivity extends AppCompatActivity implements Constants{
     }
 
     @UiThread
+    protected void showAlert(Context context, String title, String message) {
+        if(!isFinishing()) {
+            AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+            alertDialog.setTitle(title);
+            alertDialog.setMessage(message);
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+
+                }
+            });
+
+            try {
+                alertDialog.show();
+            } catch (Exception e) {
+
+            }
+        }
+    }
+
+    @UiThread
     protected void hideKeyboard() {
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         if (getCurrentFocus() != null) {

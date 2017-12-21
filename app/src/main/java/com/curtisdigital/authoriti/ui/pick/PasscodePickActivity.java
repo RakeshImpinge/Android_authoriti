@@ -133,7 +133,13 @@ public class PasscodePickActivity extends BaseActivity {
             diff = Integer.parseInt(item.getValue().getValue());
 
         }
+
+
+        final Calendar calendar = Calendar.getInstance();
+        calendar.set(calendar.get(Calendar.YEAR) + 20, calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+
         final Calendar newCalendar = Calendar.getInstance();
+
         DatePickerDialog datePickerDialog = new DatePickerDialog(PasscodePickActivity.this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
@@ -166,26 +172,43 @@ public class PasscodePickActivity extends BaseActivity {
 
                 Log.e("Diff - ", String.valueOf(diff));
 
-                item.setChecked(true);
-                item.setValue(value);
-                adapter.notifyAdapterItemChanged(position);
+                if (newCalendar.getTimeInMillis() > calendar.getTimeInMillis()){
 
-                updateTimePicker(position, value);
+                    showAlert("", "You can not choose 20 year's later day. Please choose another.");
 
-                OptionItem prevItem = adapter.getAdapterItem(selectedIndex);
-                prevItem.setChecked(false);
-                adapter.notifyAdapterItemChanged(selectedIndex);
+                } else {
 
-                utils.setSelectedPickerIndex(mContext, pickerType, position);
-                utils.setIndexSelected(mContext, pickerType, true);
+                    if (diff < 0){
 
-                finish();
+                        showAlert("", "You can not choose passed day. Please choose another.");
 
+
+                    } else {
+
+                        item.setChecked(true);
+                        item.setValue(value);
+                        adapter.notifyAdapterItemChanged(position);
+
+                        updateTimePicker(position, value);
+
+                        OptionItem prevItem = adapter.getAdapterItem(selectedIndex);
+                        prevItem.setChecked(false);
+                        adapter.notifyAdapterItemChanged(selectedIndex);
+
+                        utils.setSelectedPickerIndex(mContext, pickerType, position);
+                        utils.setIndexSelected(mContext, pickerType, true);
+
+                        finish();
+
+                    }
+                }
 
             }
         }, newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH),
                 newCalendar.get(Calendar.DAY_OF_MONTH) + diff);
+
         datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
+        datePickerDialog.getDatePicker().setMaxDate(calendar.getTimeInMillis());
 
         datePickerDialog.show();
     }

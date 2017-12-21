@@ -2,6 +2,7 @@ package com.curtisdigital.authoriti.api;
 
 import com.curtisdigital.authoriti.api.model.AccountID;
 import com.curtisdigital.authoriti.api.model.Scheme;
+import com.curtisdigital.authoriti.api.model.request.RequestDLSave;
 import com.curtisdigital.authoriti.api.model.request.RequestSignUp;
 import com.curtisdigital.authoriti.api.model.request.RequestUserUpdate;
 import com.curtisdigital.authoriti.api.model.response.ResponseInviteCode;
@@ -52,4 +53,7 @@ public interface AuthoritiAPIService {
 
     @DELETE("api/v1/users")
     Call<JsonObject> wipe(@Header("Authorization") String token);
+
+    @POST("api/v1/log")
+    Call<JsonObject> saveDLInfo(@Body RequestDLSave request);
 }
