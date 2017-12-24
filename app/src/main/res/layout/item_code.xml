@@ -62,6 +62,7 @@
                     android:maxLines="1"
                     android:layout_marginStart="8dp"
                     android:text=""
+                    android:ellipsize="end"
                     android:textSize="18sp"
                     android:textColor="@color/colorTextPrimary"
                     fontPath="@string/font_oswaldo_regular"

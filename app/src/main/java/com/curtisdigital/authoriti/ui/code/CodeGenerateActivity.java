@@ -21,6 +21,7 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by mac on 12/2/17.
@@ -161,6 +162,11 @@ public class CodeGenerateActivity extends BaseActivity {
         String timePayload = "";
         Calendar newCalendar = Calendar.getInstance();
 
+        int day = 0;
+        int hour = 0;
+        int minute = 0;
+
+        long minutes;
 
         Value value = getValueForPicker(picker);
 
@@ -183,10 +189,26 @@ public class CodeGenerateActivity extends BaseActivity {
                 newCalendar.set(newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH) + 1, newCalendar.get(Calendar.DAY_OF_MONTH));
                 break;
 
+            case TIME_CUSTOM_TIME:
 
-            case TIME_CUSTOM:
+                minutes = Long.parseLong(value.getValue());
 
-                int day = Integer.parseInt(value.getValue());
+                day = (int) (minutes / (24 * 60));
+                hour = (int) (minutes % (24 * 60)/ 60);
+                minute = (int) (minutes % (24 * 60) % 60);
+
+                newCalendar.set(newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH) + day);
+
+                break;
+
+            case TIME_CUSTOM_DATE:
+
+                minutes = Long.parseLong(value.getValue());
+
+                day = (int) (minutes / (24 * 60));
+                hour = (int) (minutes % (24 * 60)/ 60);
+                minute = (int) (minutes % (24 * 60) % 60);
+
                 newCalendar.set(newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH) + day);
 
                 break;
@@ -196,7 +218,7 @@ public class CodeGenerateActivity extends BaseActivity {
 
         Crypto crypto = new Crypto();
         try {
-            timePayload = crypto.getTimeString(newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH), 0, 0);
+            timePayload = crypto.getTimeString(newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH), hour, minute);
         } catch (Exception e) {
             e.printStackTrace();
         }
