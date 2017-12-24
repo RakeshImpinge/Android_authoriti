@@ -15,6 +15,7 @@ import org.androidannotations.annotations.EBean;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by mac on 12/1/17.
@@ -257,7 +258,8 @@ public class AuthoritiUtils implements Constants{
         values.add(new Value("", TIME_5_DAYS));
         values.add(new Value("", TIME_2_WEEKS));
         values.add(new Value("", TIME_1_MONTH));
-        values.add(new Value("", TIME_CUSTOM));
+        values.add(new Value("", TIME_CUSTOM_TIME));
+        values.add(new Value("", TIME_CUSTOM_DATE));
 
         timePicker.setValues(values);
 
@@ -278,5 +280,55 @@ public class AuthoritiUtils implements Constants{
         SpannableString spannableString = new SpannableString(error);
         spannableString.setSpan(typefaceSpan, 0, error.length(), 0);
         return spannableString;
+    }
+
+    public String getDateTime(long minutes){
+
+        String dateTime = "";
+
+        int day = (int) (minutes / (24 * 60));
+        int hour = (int) (minutes % (24 * 60)/ 60);
+        int min = (int) (minutes % (24 * 60) % 60);
+
+        if (day > 0){
+
+            if (day == 1){
+
+                dateTime = day + " Day ";
+
+            } else {
+
+                dateTime = day + " Days ";
+            }
+        }
+
+        if (hour > 0){
+
+            if (hour == 1){
+
+                dateTime = dateTime + hour + " Hour ";
+
+            } else {
+
+                dateTime = dateTime + hour + " Hours ";
+
+            }
+        }
+
+        if (min > 0){
+
+            if (min == 1){
+
+                dateTime = dateTime + min + " Minute";
+
+            } else {
+
+                dateTime = dateTime + min + " Minutes";
+
+            }
+
+        }
+
+        return dateTime;
     }
 }

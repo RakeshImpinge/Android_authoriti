@@ -1,12 +1,14 @@
 package com.curtisdigital.authoriti.ui.pick;
 
 import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.curtisdigital.authoriti.R;
 import com.curtisdigital.authoriti.api.model.Picker;
@@ -28,11 +30,11 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+
 
 /**
  * Created by mac on 12/1/17.
@@ -66,10 +68,10 @@ public class PasscodePickActivity extends BaseActivity {
         picker = utils.getPicker(mContext, pickerType);
         if (picker == null) return;
 
-        if (Objects.equals(pickerType, PICKER_LOCATION_STATE)){
+        if (pickerType.equals(PICKER_LOCATION_STATE)){
             tvTitle.setText("Pick a Location");
 
-        } else if (Objects.equals(pickerType, PICKER_TIME)){
+        } else if (pickerType.equals(PICKER_TIME)){
             tvTitle.setText("Pick a expiry Time");
 
         } else {
@@ -103,9 +105,13 @@ public class PasscodePickActivity extends BaseActivity {
             @Override
             public boolean onClick(View v, IAdapter<OptionItem> adapter, OptionItem item, int position) {
 
-                if (Objects.equals(pickerType, PICKER_TIME) && position == picker.getValues().size() - 1){
+                if (pickerType.equals(PICKER_TIME) && position == picker.getValues().size() - 1){
 
                     showDatePicker(item, position);
+
+                 } else if(pickerType.equals(PICKER_TIME) && position == picker.getValues().size() - 2){
+
+                    showTimePicker(item, position);
 
                 } else {
 
@@ -126,19 +132,10 @@ public class PasscodePickActivity extends BaseActivity {
 
     private void showDatePicker(final OptionItem item, final int position){
 
-        int diff = 0;
-
-        if (!item.getValue().getValue().equals("")){
-
-            diff = Integer.parseInt(item.getValue().getValue());
-
-        }
-
+        final Calendar newCalendar = Calendar.getInstance();
 
         final Calendar calendar = Calendar.getInstance();
-        calendar.set(calendar.get(Calendar.YEAR) + 20, calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
-
-        final Calendar newCalendar = Calendar.getInstance();
+        calendar.set(calendar.get(Calendar.YEAR) + 19, calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
 
         DatePickerDialog datePickerDialog = new DatePickerDialog(PasscodePickActivity.this, new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -149,26 +146,11 @@ public class PasscodePickActivity extends BaseActivity {
                 Date date = newCalendar.getTime();
                 Date now = new Date();
 
-                int diff;
-
-                if (DateTimeUtils.isToday(date)){
-
-                    diff = 0;
-
-                } else {
-
-                    diff = DateTimeUtils.getDateDiff(date, now, DateTimeUnits.DAYS) + 1;
-
-                }
+                long diff = date.getTime() - now.getTime();
+                long minutes = TimeUnit.MILLISECONDS.toMinutes(diff);
 
                 Value value = item.getValue();
                 value.setCustomDate(true);
-
-                if (diff > 1){
-                    value.setValue(String.valueOf(diff));
-                } else {
-                    value.setValue(String.valueOf(diff));
-                }
 
                 Log.e("Diff - ", String.valueOf(diff));
 
@@ -185,32 +167,111 @@ public class PasscodePickActivity extends BaseActivity {
 
                     } else {
 
-                        item.setChecked(true);
-                        item.setValue(value);
-                        adapter.notifyAdapterItemChanged(position);
-
-                        updateTimePicker(position, value);
-
-                        OptionItem prevItem = adapter.getAdapterItem(selectedIndex);
-                        prevItem.setChecked(false);
-                        adapter.notifyAdapterItemChanged(selectedIndex);
-
-                        utils.setSelectedPickerIndex(mContext, pickerType, position);
-                        utils.setIndexSelected(mContext, pickerType, true);
-
-                        finish();
+                        showTimePicker(item, position, minutes);
 
                     }
                 }
 
             }
-        }, newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH),
-                newCalendar.get(Calendar.DAY_OF_MONTH) + diff);
+        }, newCalendar.get(Calendar.YEAR) - 19, newCalendar.get(Calendar.MONTH),
+                newCalendar.get(Calendar.DAY_OF_MONTH));
 
         datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
         datePickerDialog.getDatePicker().setMaxDate(calendar.getTimeInMillis());
 
         datePickerDialog.show();
+    }
+
+    private void showTimePicker(final OptionItem item, final int position, final long initialMinutes){
+
+        final Calendar newCalendar = Calendar.getInstance();
+
+        final TimePickerDialog timePickerDialog = new TimePickerDialog(PasscodePickActivity.this, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+
+                newCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                newCalendar.set(Calendar.MINUTE, minute);
+
+                Date date = newCalendar.getTime();
+                Date now = new Date();
+
+                long diff = date.getTime() - now.getTime();
+
+                if (diff < 0 && initialMinutes == 0 ){
+
+                    showAlert("", "You can not choose passed hours. Please choose another.");
+
+                } else {
+
+
+                    Log.e("Diff - ", String.valueOf(TimeUnit.MILLISECONDS.toMinutes(diff)));
+
+                    Value value = item.getValue();
+                    value.setCustomDate(true);
+                    value.setValue(String.valueOf(TimeUnit.MILLISECONDS.toMinutes(diff) + initialMinutes));
+
+                    item.setChecked(true);
+                    item.setValue(value);
+                    adapter.notifyAdapterItemChanged(position);
+
+                    updateTimePicker(position, value);
+
+                    OptionItem prevItem = adapter.getAdapterItem(selectedIndex);
+                    prevItem.setChecked(false);
+                    adapter.notifyAdapterItemChanged(selectedIndex);
+
+                    utils.setSelectedPickerIndex(mContext, pickerType, position);
+                    utils.setIndexSelected(mContext, pickerType, true);
+
+                    finish();
+                }
+
+            }
+        }, newCalendar.get(Calendar.HOUR_OF_DAY), newCalendar.get(Calendar.MINUTE), true);
+
+        timePickerDialog.show();
+
+    }
+
+    private void showTimePicker(final OptionItem item, final int position){
+
+        final TimePickerDialog timePickerDialog = new TimePickerDialog(PasscodePickActivity.this, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+
+                if (hourOfDay == 0 && minute == 0){
+
+                    showAlert("", "You should choose at least 1 minute.");
+
+                } else {
+
+                    Value value = item.getValue();
+                    value.setCustomDate(true);
+                    value.setValue(String.valueOf(hourOfDay * 60 + minute));
+
+                    item.setChecked(true);
+                    item.setValue(value);
+                    adapter.notifyAdapterItemChanged(position);
+
+                    updateTimePicker(position, value);
+
+                    OptionItem prevItem = adapter.getAdapterItem(selectedIndex);
+                    prevItem.setChecked(false);
+                    adapter.notifyAdapterItemChanged(selectedIndex);
+
+                    utils.setSelectedPickerIndex(mContext, pickerType, position);
+                    utils.setIndexSelected(mContext, pickerType, true);
+
+                    finish();
+
+                }
+
+            }
+        }, 0, 0, true);
+
+        timePickerDialog.show();
+
     }
 
     private void updateTimePicker(int position, Value value){

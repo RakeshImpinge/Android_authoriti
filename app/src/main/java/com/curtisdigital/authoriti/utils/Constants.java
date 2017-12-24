@@ -32,7 +32,8 @@ public interface Constants {
     String TIME_5_DAYS                  = "5 Days";
     String TIME_2_WEEKS                 = "2 Weeks";
     String TIME_1_MONTH                 = "1 Month";
-    String TIME_CUSTOM                  = "Custom";
+    String TIME_CUSTOM_TIME             = "Custom Time";
+    String TIME_CUSTOM_DATE             = "Custom Date/Time";
 
     String ACUANT_LICENSE_KEY           = "C1C8C5BD8EE2";
 

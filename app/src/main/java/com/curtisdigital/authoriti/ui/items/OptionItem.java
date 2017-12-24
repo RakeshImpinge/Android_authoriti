@@ -1,5 +1,6 @@
 package com.curtisdigital.authoriti.ui.items;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
@@ -7,6 +8,8 @@ import android.widget.TextView;
 
 import com.curtisdigital.authoriti.R;
 import com.curtisdigital.authoriti.api.model.Value;
+import com.curtisdigital.authoriti.utils.AuthoritiUtils;
+import com.curtisdigital.authoriti.utils.AuthoritiUtils_;
 import com.mikepenz.fastadapter.items.AbstractItem;
 
 import java.util.List;
@@ -57,6 +60,9 @@ public class OptionItem extends AbstractItem<OptionItem, OptionItem.ViewHolder>{
     public void bindView(ViewHolder holder, List<Object> payloads) {
         super.bindView(holder, payloads);
 
+        Context context = holder.itemView.getContext();
+        AuthoritiUtils utils = AuthoritiUtils_.getInstance_(context);
+
         holder.tvOption.setText(value.getTitle());
 
         if (checked){
@@ -75,17 +81,10 @@ public class OptionItem extends AbstractItem<OptionItem, OptionItem.ViewHolder>{
             holder.llDate.setVisibility(View.VISIBLE);
 
             if (!value.getValue().equals("")){
-                int diff = Integer.parseInt(value.getValue());
 
-                if (diff > 1){
+                long diff = Long.parseLong(value.getValue());
 
-                    holder.tvDate.setText(value.getValue() + " days");
-
-                } else {
-
-                    holder.tvDate.setText(value.getValue() + " day");
-
-                }
+                holder.tvDate.setText(utils.getDateTime(diff));
             }
 
         } else {

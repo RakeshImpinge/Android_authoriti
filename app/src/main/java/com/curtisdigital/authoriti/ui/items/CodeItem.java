@@ -98,16 +98,12 @@ public class CodeItem extends AbstractItem<CodeItem, CodeItem.ViewHolder>{
                 if (picker.getPicker().equals(PICKER_TIME) && value.getValue() != null && value.getValue().length() > 0){
 
                     if (!value.getValue().equals("")){
-                        int diff = Integer.parseInt(value.getValue());
 
-                        if (diff > 1){
+                        if (!value.getValue().equals("")){
 
-                            holder.tvSubTitle.setText(value.getTitle() + " - " + value.getValue() + " days");
+                            long diff = Long.parseLong(value.getValue());
 
-                        } else {
-
-                            holder.tvSubTitle.setText(value.getTitle() + " - " + value.getValue() + " day");
-
+                            holder.tvSubTitle.setText(value.getTitle() + " - " + utils.getDateTime(diff));
                         }
                     }
 
