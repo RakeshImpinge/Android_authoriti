@@ -41,6 +41,7 @@ public class Crypto {
 
         Calendar d = Calendar.getInstance();
         d.set(2017, Calendar.NOVEMBER, 1, 0 , 0);
+        d.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         Date epoch = d.getTime();
         Date expire = c.getTime();
