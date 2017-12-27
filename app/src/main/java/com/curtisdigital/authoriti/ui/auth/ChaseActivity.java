@@ -17,9 +17,8 @@ import com.curtisdigital.authoriti.api.model.response.ResponseSignUpChase;
 import com.curtisdigital.authoriti.core.BaseActivity;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.curtisdigital.authoriti.utils.AuthoritiUtils;
-import com.curtisdigital.authoriti.utils.alice.Alice;
-import com.curtisdigital.authoriti.utils.alice.AliceContext;
 import com.curtisdigital.authoriti.utils.crypto.CryptoKeyPair;
+import com.tozny.crypto.android.AesCbcWithIntegrity;
 
 import org.androidannotations.annotations.AfterTextChange;
 import org.androidannotations.annotations.AfterViews;
@@ -29,6 +28,7 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 
+import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,6 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import se.simbio.encryption.Encryption;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -130,8 +129,6 @@ public class ChaseActivity extends BaseActivity {
         user.setToken(responseSignUpChase.getToken());
         user.setPassword(etPassword.getText().toString());
         user.setInviteCode(dataManager.inviteCode);
-        user.setSalt(keyPair.getSalt());
-        user.setPrivateKey(keyPair.getPrivateKey());
 
 
         AccountID accountID = new AccountID(responseSignUpChase.getAccountName(), etIdentifier.getText().toString());
@@ -158,48 +155,47 @@ public class ChaseActivity extends BaseActivity {
             user.setUnconfirmedAccountIDs(accountIDs1);
         }
 
-        dataManager.setUser(user);
+        try {
 
-        if (responseSignUpChase.getAccounts() != null && responseSignUpChase.getAccounts().size() > 0){
+            AesCbcWithIntegrity.SecretKeys keys;
 
-            AccountConfirmActivity_.intent(this).start();
+            String salt = AesCbcWithIntegrity.saltString(AesCbcWithIntegrity.generateSalt());
+            keys = AesCbcWithIntegrity.generateKeyFromPassword(etPassword.getText().toString(), salt);
 
-        } else {
+            String keyStr = AesCbcWithIntegrity.keyString(keys);
 
-            updateLoginState();
-            goHome();
+            user.setEncryptKey(keyStr);
 
+            try {
+
+                user.setEncryptPrivateKey(AesCbcWithIntegrity.encrypt(keyPair.getPrivateKey(), keys).toString());
+                user.setEncryptSalt(AesCbcWithIntegrity.encrypt(keyPair.getSalt(), keys).toString());
+                user.setEncryptPassword(AesCbcWithIntegrity.encrypt(etPassword.getText().toString(), keys).toString());
+
+
+                dataManager.setUser(user);
+
+                if (responseSignUpChase.getAccounts() != null && responseSignUpChase.getAccounts().size() > 0){
+
+                    AccountConfirmActivity_.intent(this).start();
+
+                } else {
+
+                    updateLoginState();
+                    goHome();
+
+                }
+
+
+
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
+
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
         }
-
-//        try {
-//
-//            byte bytes[] = Alice.generateKey(AliceContext.Algorithm.AES, AliceContext.KeyLength.BITS_256);
-//
-//            user.setEncryptionIV(bytes);
-//            user.setEncryptKey(dataManager.getAlice().encrypt(keyPair.getPrivateKey().getBytes(), new String(bytes).toCharArray()));
-//            user.setEncryptSalt(dataManager.getAlice().encrypt(keyPair.getSalt().getBytes(), new String(bytes).toCharArray()));
-//            user.setEncryptPassword(dataManager.getAlice().encrypt(dataManager.password.getBytes(), new String(bytes).toCharArray()));
-//
-//
-//            dataManager.setUser(user);
-//
-//            if (responseSignUpChase.getAccounts() != null && responseSignUpChase.getAccounts().size() > 0){
-//
-//                AccountConfirmActivity_.intent(this).start();
-//
-//            } else {
-//
-//                updateLoginState();
-//                goHome();
-//
-//            }
-//
-//
-//        } catch (GeneralSecurityException e) {
-//            e.printStackTrace();
-//        }
-
-
 
     }
 

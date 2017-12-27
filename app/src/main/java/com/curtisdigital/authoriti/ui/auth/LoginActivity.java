@@ -3,7 +3,6 @@ package com.curtisdigital.authoriti.ui.auth;
 import android.content.Intent;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -17,15 +16,13 @@ import com.curtisdigital.authoriti.R;
 import com.curtisdigital.authoriti.api.model.AccountID;
 import com.curtisdigital.authoriti.api.model.AuthLogIn;
 import com.curtisdigital.authoriti.api.model.Picker;
-import com.curtisdigital.authoriti.api.model.User;
 import com.curtisdigital.authoriti.core.BaseActivity;
 import com.curtisdigital.authoriti.ui.items.SpinnerItem;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.curtisdigital.authoriti.utils.AuthoritiUtils;
 import com.curtisdigital.authoriti.utils.ViewUtils;
-import com.curtisdigital.authoriti.utils.alice.Alice;
-import com.curtisdigital.authoriti.utils.alice.AliceContext;
-import com.curtisdigital.authoriti.utils.alice.AliceContextBuilder;
+import com.tozny.crypto.android.AesCbcWithIntegrity;
+
 
 import org.androidannotations.annotations.AfterTextChange;
 import org.androidannotations.annotations.AfterViews;
@@ -35,11 +32,12 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
+import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.List;
 
-import se.simbio.encryption.Encryption;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -200,33 +198,40 @@ public class LoginActivity extends BaseActivity implements PopupWindow.OnDismiss
 
             if (dataManager.getUser() != null && dataManager.getUser().getAccountIDs() != null && dataManager.getUser().getAccountIDs().size() > 0){
 
-//                User user = dataManager.getUser();
-//                byte[] encryptionIV = user.getEncryptionIV();
-//
-//
-//                try {
-//
-//                    String decryptPassword = new String(dataManager.getAlice().decrypt(user.getEncryptPassword(), new String(encryptionIV).toCharArray()));
-//
-//                    if (decryptPassword.equals(etPassword.getText().toString())){
-//
-//                        updateLoginState();
-//                        goHome();
-//
-//                    } else {
-//
-//                        showAlert("", "Invalid username or password!");
-//
-//                    }
-//                } catch (GeneralSecurityException e) {
-//                    e.printStackTrace();
-//                }
+                AesCbcWithIntegrity.SecretKeys keys;
+                String keyStr = dataManager.getUser().getEncryptKey();
 
-                if (dataManager.getUser().getPassword().equals(etPassword.getText().toString())){
+                try {
 
-                    updateLoginState();
-                    goHome();
+                    keys = AesCbcWithIntegrity.keys(keyStr);
 
+                    String password = null;
+
+                    try {
+
+                        AesCbcWithIntegrity.CipherTextIvMac civ = new  AesCbcWithIntegrity.CipherTextIvMac(dataManager.getUser().getEncryptPassword());
+                        password = AesCbcWithIntegrity.decryptString(civ, keys);
+
+                        if (password.equals(etPassword.getText().toString())){
+
+                            updateLoginState();
+                            goHome();
+
+                        } else {
+
+                            showAlert("", "Invalid username or password!");
+                        }
+
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    } catch (GeneralSecurityException e) {
+                        e.printStackTrace();
+                    }
+
+
+
+                } catch (InvalidKeyException e) {
+                    e.printStackTrace();
                 }
 
             }

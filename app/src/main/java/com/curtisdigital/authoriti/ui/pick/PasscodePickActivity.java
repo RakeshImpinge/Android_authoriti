@@ -244,6 +244,7 @@ public class PasscodePickActivity extends BaseActivity {
 
                     showAlert("", "You should choose at least 1 minute.");
 
+
                 } else {
 
                     Value value = item.getValue();
@@ -264,8 +265,8 @@ public class PasscodePickActivity extends BaseActivity {
                     utils.setIndexSelected(mContext, pickerType, true);
 
                     finish();
-
                 }
+
 
             }
         }, 0, 0, true);

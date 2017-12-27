@@ -20,19 +20,15 @@ public class User {
     private List<AccountID> accountIDs;
     @SerializedName("token")
     private String token;
-    @SerializedName("salt")
-    private String salt;
-    @SerializedName("key")
-    private String privateKey;
 
+    private String encryptKey;
 
-    private byte[] encryptKey;
+    private String encryptPrivateKey;
 
-    private byte[] encryptSalt;
+    private String encryptSalt;
 
-    private byte[] encryptPassword;
+    private String encryptPassword;
 
-    private byte[] encryptionIV;
 
     private List<AccountID> unconfirmedAccountIDs;
 
@@ -81,43 +77,27 @@ public class User {
         this.token = token;
     }
 
-    public String getSalt() {
-        return salt;
-    }
-
-    public void setSalt(String salt) {
-        this.salt = salt;
-    }
-
-    public String getPrivateKey() {
-        return privateKey;
-    }
-
-    public void setPrivateKey(String privateKey) {
-        this.privateKey = privateKey;
-    }
-
-    public byte[] getEncryptKey() {
+    public String getEncryptKey() {
         return encryptKey;
     }
 
-    public void setEncryptKey(byte[] encryptKey) {
+    public void setEncryptKey(String encryptKey) {
         this.encryptKey = encryptKey;
     }
 
-    public byte[] getEncryptSalt() {
+    public String getEncryptSalt() {
         return encryptSalt;
     }
 
-    public void setEncryptSalt(byte[] encryptSalt) {
+    public void setEncryptSalt(String encryptSalt) {
         this.encryptSalt = encryptSalt;
     }
 
-    public byte[] getEncryptPassword() {
+    public String getEncryptPassword() {
         return encryptPassword;
     }
 
-    public void setEncryptPassword(byte[] encryptPassword) {
+    public void setEncryptPassword(String encryptPassword) {
         this.encryptPassword = encryptPassword;
     }
 
@@ -129,11 +109,11 @@ public class User {
         this.unconfirmedAccountIDs = unconfirmedAccountIDs;
     }
 
-    public byte[] getEncryptionIV() {
-        return encryptionIV;
+    public String getEncryptPrivateKey() {
+        return encryptPrivateKey;
     }
 
-    public void setEncryptionIV(byte[] encryptionIV) {
-        this.encryptionIV = encryptionIV;
+    public void setEncryptPrivateKey(String encryptPrivateKey) {
+        this.encryptPrivateKey = encryptPrivateKey;
     }
 }

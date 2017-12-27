@@ -11,6 +11,7 @@ import com.curtisdigital.authoriti.core.BaseActivity;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.curtisdigital.authoriti.utils.AuthoritiUtils;
 import com.curtisdigital.authoriti.utils.crypto.Crypto;
+import com.tozny.crypto.android.AesCbcWithIntegrity;
 
 import net.glxn.qrgen.android.QRCode;
 
@@ -20,7 +21,11 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
+import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
 import java.util.Calendar;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -137,9 +142,32 @@ public class CodeGenerateActivity extends BaseActivity {
         String code = "";
 
         Crypto crypto = new Crypto();
-        code = crypto.sign(generatePayload(), dataManager.getUser().getPrivateKey());
 
-        Log.e("Code", code);
+        AesCbcWithIntegrity.SecretKeys keys;
+        String keyStr = dataManager.getUser().getEncryptKey();
+
+        try {
+
+            keys = AesCbcWithIntegrity.keys(keyStr);
+            AesCbcWithIntegrity.CipherTextIvMac civ = new AesCbcWithIntegrity.CipherTextIvMac(dataManager.getUser().getEncryptPrivateKey());
+
+            try {
+
+                String privateKey = AesCbcWithIntegrity.decryptString(civ, keys);
+                code = crypto.sign(generatePayload(), privateKey);
+
+                Log.e("Code", code);
+
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (GeneralSecurityException e) {
+                e.printStackTrace();
+            }
+
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
+
 
         return code;
     }
@@ -197,7 +225,7 @@ public class CodeGenerateActivity extends BaseActivity {
                 hour = (int) (minutes % (24 * 60)/ 60);
                 minute = (int) (minutes % (24 * 60) % 60);
 
-                newCalendar.set(newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH) + day);
+                newCalendar.set(newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH) + day, newCalendar.get(Calendar.HOUR_OF_DAY) + hour, newCalendar.get(Calendar.MINUTE) + minute);
 
                 break;
 
@@ -209,16 +237,21 @@ public class CodeGenerateActivity extends BaseActivity {
                 hour = (int) (minutes % (24 * 60)/ 60);
                 minute = (int) (minutes % (24 * 60) % 60);
 
-                newCalendar.set(newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH) + day);
+                newCalendar.set(newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH) + day, newCalendar.get(Calendar.HOUR_OF_DAY) + hour, newCalendar.get(Calendar.MINUTE) + minute);
 
                 break;
 
         }
 
+        Log.e("HOUR", String.valueOf(newCalendar.get(Calendar.HOUR_OF_DAY)));
+
+        newCalendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+        
+        Log.e("HOUR", String.valueOf(newCalendar.get(Calendar.HOUR_OF_DAY)));
 
         Crypto crypto = new Crypto();
         try {
-            timePayload = crypto.getTimeString(newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH), hour, minute);
+            timePayload = crypto.getTimeString(newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH), newCalendar.get(Calendar.HOUR_OF_DAY), newCalendar.get(Calendar.MINUTE));
         } catch (Exception e) {
             e.printStackTrace();
         }
