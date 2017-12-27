@@ -6,9 +6,6 @@ import com.curtisdigital.authoriti.api.model.Order;
 import com.curtisdigital.authoriti.api.model.Picker;
 import com.curtisdigital.authoriti.api.model.Scheme;
 import com.curtisdigital.authoriti.api.model.User;
-import com.curtisdigital.authoriti.utils.alice.Alice;
-import com.curtisdigital.authoriti.utils.alice.AliceContext;
-import com.curtisdigital.authoriti.utils.alice.AliceContextBuilder;
 import com.curtisdigital.authoriti.utils.crypto.Crypto;
 import com.curtisdigital.authoriti.utils.crypto.CryptoKeyPair;
 import com.google.gson.Gson;
@@ -273,16 +270,6 @@ public class AuthoritiData {
 
         return crypto.generateKeyPair(password, salt);
 
-    }
-
-    public Alice getAlice(){
-        AliceContext aliceContext = new AliceContextBuilder()
-                .setAlgorithm(AliceContext.Algorithm.AES)
-                .setMode(AliceContext.Mode.CBC) // or AliceContext.Mode.CTR
-                .setIvLength(16)
-                .build();
-
-        return new Alice(aliceContext);
     }
 
     public String getValidString(String origin){
