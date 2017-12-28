@@ -625,7 +625,11 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
             capturedBack = false;
         }
 
-        showAlert(acuantAndroidMobileSdkControllerInstance.getBarcodeCameraContext(), "", "Unable to scan barcode");
+        if (acuantAndroidMobileSdkControllerInstance.getBarcodeCameraContext() != null){
+
+            showAlert(acuantAndroidMobileSdkControllerInstance.getBarcodeCameraContext(), "", "Unable to scan barcode");
+
+        }
     }
 
     @Override
