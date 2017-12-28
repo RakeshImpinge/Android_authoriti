@@ -39,11 +39,12 @@ public class Crypto {
     public String getTimeString(int year, int month, int day, int hour, int minute) throws  Exception {
         Calendar c = Calendar.getInstance();
         c.set(year, month, day, hour, minute);
+        c.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         Calendar d = Calendar.getInstance();
         d.set(2017, Calendar.NOVEMBER, 1, 0 , 0);
         d.setTimeZone(TimeZone.getTimeZone("UTC"));
-        
+
         Date epoch = d.getTime();
         Date expire = c.getTime();
 
@@ -55,12 +56,13 @@ public class Crypto {
         System.out.println("Difference: " +  diff);
 
         long minutes = diff / 60000;
-        System.out.println("minutes: " + minutes);
+        System.out.println("CRYPTO: " + minutes);
         return CryptoUtil.intToBase62(BigInteger.valueOf(minutes), 4);
-
     }
 
     public String sign(String payload, String privateKey) {
-        return CryptoUtil.sign(payload, privateKey);
+        String signature = CryptoUtil.sign(payload, privateKey);
+        System.out.println("CRYPTO: " + signature);
+        return signature;
     }
 }
