@@ -1,6 +1,7 @@
 package com.curtisdigital.authoriti.ui.auth;
 
 import android.content.Intent;
+import android.hardware.fingerprint.FingerprintManager;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
 import android.widget.EditText;
@@ -15,9 +16,11 @@ import com.curtisdigital.authoriti.api.model.User;
 import com.curtisdigital.authoriti.api.model.request.RequestSignUp;
 import com.curtisdigital.authoriti.api.model.response.ResponseSignUpChase;
 import com.curtisdigital.authoriti.core.BaseActivity;
+import com.curtisdigital.authoriti.core.SecurityActivity;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.curtisdigital.authoriti.utils.AuthoritiUtils;
 import com.curtisdigital.authoriti.utils.crypto.CryptoKeyPair;
+import com.multidots.fingerprintauth.AuthErrorCodes;
 import com.tozny.crypto.android.AesCbcWithIntegrity;
 
 import org.androidannotations.annotations.AfterTextChange;
@@ -45,7 +48,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
  */
 
 @EActivity(R.layout.activity_chase)
-public class ChaseActivity extends BaseActivity {
+public class ChaseActivity extends SecurityActivity {
 
     @Bean
     AuthoritiUtils utils;
@@ -73,6 +76,8 @@ public class ChaseActivity extends BaseActivity {
     EditText etPassword;
 
     private CryptoKeyPair keyPair;
+
+    private boolean saveSuccess = false;
 
     @AfterViews
     void callAfterViewInjection(){
@@ -181,8 +186,11 @@ public class ChaseActivity extends BaseActivity {
 
                 } else {
 
-                    updateLoginState();
-                    goHome();
+                    saveSuccess = true;
+                    mFingerPrintAuthHelper.startAuth();
+
+                    hideKeyboard();
+                    checkFingerPrintAuth();
 
                 }
 
@@ -195,6 +203,22 @@ public class ChaseActivity extends BaseActivity {
 
         } catch (GeneralSecurityException e) {
             e.printStackTrace();
+        }
+
+    }
+
+    private void checkFingerPrintAuth(){
+
+        if (!fingerPrintNotRegistered){
+
+            showTouchIdAlert();
+
+
+        } else {
+
+            updateLoginState();
+            goHome();
+
         }
 
     }
@@ -255,5 +279,78 @@ public class ChaseActivity extends BaseActivity {
             signUp();
 
         }
+    }
+
+    private void goLoginPage(){
+        Intent intent = new Intent(this, LoginActivity_.class);
+        intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onAuthSuccess(FingerprintManager.CryptoObject cryptoObject) {
+        super.onAuthSuccess(cryptoObject);
+
+        if (saveSuccess){
+
+            dismissTouchIDAlert();
+
+            updateLoginState();
+            goHome();
+
+        }
+
+
+    }
+
+    @Override
+    public void onAuthFailed(int errorCode, String errorMessage) {
+        super.onAuthFailed(errorCode, errorMessage);
+
+        if (saveSuccess){
+
+            switch (errorCode) {
+                case AuthErrorCodes.CANNOT_RECOGNIZE_ERROR:
+                    updateTouchIDAlert("Cannot recognize your finger print. Please try again.");
+                    break;
+                case AuthErrorCodes.NON_RECOVERABLE_ERROR:
+                    updateTouchIDAlert("Cannot initialize finger print authentication.");
+                    break;
+                case AuthErrorCodes.RECOVERABLE_ERROR:
+                    updateTouchIDAlert(errorMessage);
+                    break;
+            }
+
+        }
+
+    }
+
+    @Override
+    public void touchIDAlertDialogCancelButtonClicked() {
+
+        dismissTouchIDAlert();
+
+        goLoginPage();
+
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (saveSuccess){
+
+            mFingerPrintAuthHelper.startAuth();
+
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        mFingerPrintAuthHelper.stopAuth();
+
     }
 }

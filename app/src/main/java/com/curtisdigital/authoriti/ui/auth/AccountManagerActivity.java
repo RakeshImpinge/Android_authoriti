@@ -1,6 +1,7 @@
 package com.curtisdigital.authoriti.ui.auth;
 
 import android.content.Intent;
+import android.hardware.fingerprint.FingerprintManager;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.CardView;
 import android.text.TextUtils;
@@ -22,11 +23,13 @@ import com.curtisdigital.authoriti.api.model.User;
 import com.curtisdigital.authoriti.api.model.request.RequestSignUp;
 import com.curtisdigital.authoriti.api.model.response.ResponseSignUp;
 import com.curtisdigital.authoriti.core.BaseActivity;
+import com.curtisdigital.authoriti.core.SecurityActivity;
 import com.curtisdigital.authoriti.ui.items.SpinnerItem;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.curtisdigital.authoriti.utils.AuthoritiUtils;
 import com.curtisdigital.authoriti.utils.ViewUtils;
 import com.curtisdigital.authoriti.utils.crypto.CryptoKeyPair;
+import com.multidots.fingerprintauth.AuthErrorCodes;
 import com.tozny.crypto.android.AesCbcWithIntegrity;
 
 import org.androidannotations.annotations.AfterTextChange;
@@ -52,7 +55,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
  */
 
 @EActivity(R.layout.activity_account_manager)
-public class AccountManagerActivity extends BaseActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener, PopupWindow.OnDismissListener {
+public class AccountManagerActivity extends SecurityActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener, PopupWindow.OnDismissListener {
 
     @Bean
     AuthoritiUtils utils;
@@ -93,6 +96,8 @@ public class AccountManagerActivity extends BaseActivity implements AdapterView.
     private boolean markDefault;
 
     private CryptoKeyPair keyPair;
+
+    private boolean saveSuccess = false;
 
     @AfterViews
     void callAfterViewInjection(){
@@ -220,6 +225,12 @@ public class AccountManagerActivity extends BaseActivity implements AdapterView.
 
                 if (response.code() == 200 && response.body() != null){
 
+                    saveSuccess = true;
+                    mFingerPrintAuthHelper.startAuth();
+
+                    hideKeyboard();
+                    checkFingerPrintAuth();
+
                     fetchSignUpInfo(response.body());
 
 
@@ -267,11 +278,6 @@ public class AccountManagerActivity extends BaseActivity implements AdapterView.
                 user.setEncryptPassword(AesCbcWithIntegrity.encrypt(dataManager.password, keys).toString());
 
                 dataManager.setUser(user);
-
-                updateLoginState();
-                goHome();
-
-
 
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
@@ -396,10 +402,98 @@ public class AccountManagerActivity extends BaseActivity implements AdapterView.
         dataManager.setAuthLogin(logIn);
     }
 
+    private void checkFingerPrintAuth(){
+
+        if (!fingerPrintNotRegistered){
+
+            showTouchIdAlert();
+
+
+        } else {
+
+            updateLoginState();
+            goHome();
+
+        }
+
+    }
 
     private void goHome(){
         Intent intent = new Intent(this, MainActivity_.class);
         intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+    }
+
+    private void goLoginPage(){
+        Intent intent = new Intent(this, LoginActivity_.class);
+        intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onAuthSuccess(FingerprintManager.CryptoObject cryptoObject) {
+        super.onAuthSuccess(cryptoObject);
+
+        if (saveSuccess){
+
+            dismissTouchIDAlert();
+
+            updateLoginState();
+            goHome();
+
+        }
+
+
+    }
+
+    @Override
+    public void onAuthFailed(int errorCode, String errorMessage) {
+        super.onAuthFailed(errorCode, errorMessage);
+
+        if (saveSuccess){
+
+            switch (errorCode) {
+                case AuthErrorCodes.CANNOT_RECOGNIZE_ERROR:
+                    updateTouchIDAlert("Cannot recognize your finger print. Please try again.");
+                    break;
+                case AuthErrorCodes.NON_RECOVERABLE_ERROR:
+                    updateTouchIDAlert("Cannot initialize finger print authentication.");
+                    break;
+                case AuthErrorCodes.RECOVERABLE_ERROR:
+                    updateTouchIDAlert(errorMessage);
+                    break;
+            }
+
+        }
+
+    }
+
+    @Override
+    public void touchIDAlertDialogCancelButtonClicked() {
+
+        dismissTouchIDAlert();
+
+        goLoginPage();
+
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (saveSuccess){
+
+            mFingerPrintAuthHelper.startAuth();
+
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        mFingerPrintAuthHelper.stopAuth();
+
     }
 }

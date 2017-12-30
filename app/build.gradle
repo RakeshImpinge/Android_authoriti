@@ -98,4 +98,6 @@ dependencies {
     compile 'com.github.dmytrodanylyk.shadow-layout:library:1.0.3'
     compile 'com.github.tozny:java-aes-crypto:1.1.0'
 
+    compile 'com.multidots:fingerprint-auth:1.0.1'
+
 }

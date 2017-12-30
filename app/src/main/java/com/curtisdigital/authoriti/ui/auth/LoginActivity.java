@@ -1,6 +1,7 @@
 package com.curtisdigital.authoriti.ui.auth;
 
 import android.content.Intent;
+import android.hardware.fingerprint.FingerprintManager;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
 import android.view.View;
@@ -16,11 +17,12 @@ import com.curtisdigital.authoriti.R;
 import com.curtisdigital.authoriti.api.model.AccountID;
 import com.curtisdigital.authoriti.api.model.AuthLogIn;
 import com.curtisdigital.authoriti.api.model.Picker;
-import com.curtisdigital.authoriti.core.BaseActivity;
+import com.curtisdigital.authoriti.core.SecurityActivity;
 import com.curtisdigital.authoriti.ui.items.SpinnerItem;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.curtisdigital.authoriti.utils.AuthoritiUtils;
 import com.curtisdigital.authoriti.utils.ViewUtils;
+import com.multidots.fingerprintauth.AuthErrorCodes;
 import com.tozny.crypto.android.AesCbcWithIntegrity;
 
 
@@ -47,7 +49,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
  */
 
 @EActivity(R.layout.activity_login)
-public class LoginActivity extends BaseActivity implements PopupWindow.OnDismissListener, AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener {
+public class LoginActivity extends SecurityActivity implements PopupWindow.OnDismissListener, AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener {
 
     @Bean
     AuthoritiUtils utils;
@@ -79,6 +81,8 @@ public class LoginActivity extends BaseActivity implements PopupWindow.OnDismiss
     private boolean opened;
     private int selectedPosition = 0;
     private int popupHeight, popupWidth;
+
+    private boolean matchedPassword = false;
 
     Picker picker;
 
@@ -214,8 +218,11 @@ public class LoginActivity extends BaseActivity implements PopupWindow.OnDismiss
 
                         if (password.equals(etPassword.getText().toString())){
 
-                            updateLoginState();
-                            goHome();
+                            matchedPassword = true;
+                            mFingerPrintAuthHelper.startAuth();
+
+                            hideKeyboard();
+                            checkFingerPrintAuth();
 
                         } else {
 
@@ -237,6 +244,23 @@ public class LoginActivity extends BaseActivity implements PopupWindow.OnDismiss
             }
         }
     }
+
+    private void checkFingerPrintAuth(){
+
+        if (!fingerPrintNotRegistered){
+
+            showTouchIdAlert();
+
+
+        } else {
+
+            updateLoginState();
+            goHome();
+
+        }
+
+    }
+
 
     private void updateLoginState(){
 
@@ -336,6 +360,68 @@ public class LoginActivity extends BaseActivity implements PopupWindow.OnDismiss
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
+    @Override
+    public void onAuthSuccess(FingerprintManager.CryptoObject cryptoObject) {
+        super.onAuthSuccess(cryptoObject);
+
+        if (matchedPassword){
+
+            dismissTouchIDAlert();
+            updateLoginState();
+            goHome();
+
+        }
+
+
+    }
+
+    @Override
+    public void onAuthFailed(int errorCode, String errorMessage) {
+        super.onAuthFailed(errorCode, errorMessage);
+
+        if (matchedPassword){
+
+            switch (errorCode) {
+                case AuthErrorCodes.CANNOT_RECOGNIZE_ERROR:
+                    updateTouchIDAlert("Cannot recognize your finger print. Please try again.");
+                    break;
+                case AuthErrorCodes.NON_RECOVERABLE_ERROR:
+                    updateTouchIDAlert("Cannot initialize finger print authentication.");
+                    break;
+                case AuthErrorCodes.RECOVERABLE_ERROR:
+                    updateTouchIDAlert(errorMessage);
+                    break;
+            }
+
+        }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (matchedPassword){
+
+            mFingerPrintAuthHelper.startAuth();
+
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        mFingerPrintAuthHelper.stopAuth();
+    }
+
+    @Override
+    public void touchIDAlertDialogCancelButtonClicked() {
+
+        dismissTouchIDAlert();
 
     }
 }
