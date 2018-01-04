@@ -82,7 +82,7 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
     private int selectedPosition = 0;
     private int popupHeight, popupWidth;
 
-    private boolean matchedPassword = false;
+    private boolean fingerPrintAuthEnabled = false;
 
     Picker picker;
 
@@ -96,6 +96,14 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
 
         tiAccount.setError(null);
         tiPassword.setError(null);
+
+        if (dataManager != null && dataManager.getUser() != null && dataManager.getUser().isFingerPrintAuthEnabled()){
+
+            mFingerPrintAuthHelper.startAuth();
+            fingerPrintAuthEnabled = true;
+            checkFingerPrintAuth();
+        }
+
 
     }
 
@@ -218,15 +226,13 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
 
                         if (password.equals(etPassword.getText().toString())){
 
-                            matchedPassword = true;
-                            mFingerPrintAuthHelper.startAuth();
-
                             hideKeyboard();
-                            checkFingerPrintAuth();
+                            updateLoginState();
+                            goHome();
 
                         } else {
 
-                            showAlert("", "Invalid username or password!");
+                            showAlert("Oops!", "Invalid username or password!");
                         }
 
                     } catch (UnsupportedEncodingException e) {
@@ -250,12 +256,6 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
         if (!fingerPrintNotRegistered){
 
             showTouchIdAlert();
-
-
-        } else {
-
-            updateLoginState();
-            goHome();
 
         }
 
@@ -367,7 +367,7 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
     public void onAuthSuccess(FingerprintManager.CryptoObject cryptoObject) {
         super.onAuthSuccess(cryptoObject);
 
-        if (matchedPassword){
+        if (fingerPrintAuthEnabled){
 
             dismissTouchIDAlert();
             updateLoginState();
@@ -382,7 +382,7 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
     public void onAuthFailed(int errorCode, String errorMessage) {
         super.onAuthFailed(errorCode, errorMessage);
 
-        if (matchedPassword){
+        if (fingerPrintAuthEnabled){
 
             switch (errorCode) {
                 case AuthErrorCodes.CANNOT_RECOGNIZE_ERROR:
@@ -404,7 +404,7 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
     protected void onResume() {
         super.onResume();
 
-        if (matchedPassword){
+        if (fingerPrintAuthEnabled){
 
             mFingerPrintAuthHelper.startAuth();
 

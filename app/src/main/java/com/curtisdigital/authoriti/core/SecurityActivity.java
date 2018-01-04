@@ -1,8 +1,12 @@
 package com.curtisdigital.authoriti.core;
 
+import android.content.DialogInterface;
 import android.hardware.fingerprint.FingerprintManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
 import com.curtisdigital.authoriti.R;
@@ -23,6 +27,16 @@ public class SecurityActivity extends BaseActivity implements FingerPrintAuthCal
     public FingerPrintAuthHelper mFingerPrintAuthHelper;
 
     TouchIDAlert touchIDAlert;
+    AlertDialog alertDialog;
+    TouchIDEnableAlertListener listener;
+
+    public void setListener(TouchIDEnableAlertListener listener){
+        this.listener = listener;
+    }
+
+    public void removeListener(){
+        this.listener = null;
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -70,6 +84,91 @@ public class SecurityActivity extends BaseActivity implements FingerPrintAuthCal
 
     }
 
+    public void showTouchIDEnableAlert(){
+
+        if(!isFinishing()) {
+
+            if (alertDialog == null){
+
+                alertDialog = new AlertDialog.Builder(this).create();
+
+            }
+
+            alertDialog.setTitle("");
+            alertDialog.setMessage("Do you want to allow Authoriti to use Fingerprints?");
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Allow", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+
+                    if (listener != null){
+                        listener.allowButtonClicked();
+                    }
+
+                }
+            });
+            alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Don't allow", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+
+                    if (listener != null){
+                        listener.dontAllowButtonClicked();
+                    }
+
+                }
+            });
+
+            try {
+                alertDialog.show();
+            } catch (Exception e) {
+
+            }
+        }
+    }
+
+    public void hideTouchIDEnabledAlert(){
+
+        if (alertDialog != null){
+
+            alertDialog.dismiss();
+            alertDialog = null;
+
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            isBelowMarshmallow = false;
+
+            //Fingerprint API only available on from Android 6.0 (M)
+            FingerprintManagerCompat fingerprintManager = FingerprintManagerCompat.from(this);
+
+            if (!fingerprintManager.isHardwareDetected()) {
+
+                // Device doesn't support fingerprint authentication
+
+                fingerPrintHardwareNotDetected = true;
+
+            } else if (!fingerprintManager.hasEnrolledFingerprints()) {
+
+                // User hasn't enrolled any fingerprints to authenticate with
+
+                fingerPrintNotRegistered = true;
+
+            } else {
+
+                fingerPrintHardwareNotDetected = false;
+                fingerPrintNotRegistered = false;
+
+            }
+
+        } else {
+
+            isBelowMarshmallow = true;
+        }
+    }
+
     @Override
     public void onNoFingerPrintHardwareFound() {
 
@@ -112,6 +211,13 @@ public class SecurityActivity extends BaseActivity implements FingerPrintAuthCal
 
     @Override
     public void touchIDAlertDialogCancelButtonClicked() {
+
+    }
+
+    public interface TouchIDEnableAlertListener{
+
+        void allowButtonClicked();
+        void dontAllowButtonClicked();
 
     }
 }

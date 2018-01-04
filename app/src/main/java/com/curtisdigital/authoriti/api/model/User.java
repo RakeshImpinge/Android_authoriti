@@ -29,6 +29,8 @@ public class User {
 
     private String encryptPassword;
 
+    private boolean fingerPrintAuthEnabled = false;
+
 
     private List<AccountID> unconfirmedAccountIDs;
 
@@ -115,5 +117,13 @@ public class User {
 
     public void setEncryptPrivateKey(String encryptPrivateKey) {
         this.encryptPrivateKey = encryptPrivateKey;
+    }
+
+    public boolean isFingerPrintAuthEnabled() {
+        return fingerPrintAuthEnabled;
+    }
+
+    public void setFingerPrintAuthEnabled(boolean fingerPrintAuthEnabled) {
+        this.fingerPrintAuthEnabled = fingerPrintAuthEnabled;
     }
 }

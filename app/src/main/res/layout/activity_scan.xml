@@ -73,7 +73,7 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
-                android:text="Let's confirm that you are you by taking a picture of your driver's license, followed by a selfie."
+                android:text="Let's confirm that you are you by taking pictures of your driver's license, followed by a selfie."
                 android:textColor="@color/colorTextPrimary"
                 fontPath="@string/font_oswaldo_regular"
                 android:textSize="17sp"/>
@@ -102,7 +102,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="50dp"
                             android:gravity="center"
-                            android:text="FRONT"
+                            android:text="DRIVER LICENSE FRONT"
                             android:textColor="@color/colorTextPrimary"
                             fontPath="@string/font_oswaldo_light"
                             android:textSize="16sp"/>
@@ -157,7 +157,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="50dp"
                             android:gravity="center"
-                            android:text="BACK"
+                            android:text="DRIVER LICENSE BACK"
                             android:textColor="@color/colorTextPrimary"
                             fontPath="@string/font_oswaldo_light"
                             android:textSize="16sp"/>

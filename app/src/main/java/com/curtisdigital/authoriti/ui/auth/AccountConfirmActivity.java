@@ -2,6 +2,7 @@ package com.curtisdigital.authoriti.ui.auth;
 
 import android.content.Intent;
 import android.hardware.fingerprint.FingerprintManager;
+import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.CardView;
@@ -50,7 +51,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
  */
 
 @EActivity(R.layout.activity_account_confirm)
-public class AccountConfirmActivity extends SecurityActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener, PopupWindow.OnDismissListener {
+public class AccountConfirmActivity extends SecurityActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener, PopupWindow.OnDismissListener, SecurityActivity.TouchIDEnableAlertListener {
 
     @Bean
     AuthoritiUtils utils;
@@ -207,11 +208,26 @@ public class AccountConfirmActivity extends SecurityActivity implements AdapterV
         dataManager.setAuthLogin(logIn);
     }
 
-
     private void goHome(){
         Intent intent = new Intent(this, MainActivity_.class);
         intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+    }
+
+    private void enableFingerPrintAndGoHome(){
+
+        removeListener();
+
+        if (dataManager != null && dataManager.getUser() != null){
+
+            User user = dataManager.getUser();
+            user.setFingerPrintAuthEnabled(true);
+            dataManager.setUser(user);
+
+            updateLoginState();
+            goHome();
+        }
+
     }
 
     @Click(R.id.ivBack)
@@ -322,90 +338,59 @@ public class AccountConfirmActivity extends SecurityActivity implements AdapterV
 
     private void checkFingerPrintAuth(){
 
-        if (!fingerPrintNotRegistered){
 
-            showTouchIdAlert();
+        if (isBelowMarshmallow || fingerPrintHardwareNotDetected){
 
+            updateLoginState();
+            goHome();
 
         } else {
 
-            updateLoginState();
-            goHome();
+            setListener(this);
+            showTouchIDEnableAlert();
 
         }
 
     }
-
-    private void goLoginPage(){
-        Intent intent = new Intent(this, LoginActivity_.class);
-        intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-    }
-
-    @Override
-    public void onAuthSuccess(FingerprintManager.CryptoObject cryptoObject) {
-        super.onAuthSuccess(cryptoObject);
-
-        if (saveSuccess){
-
-            dismissTouchIDAlert();
-
-            updateLoginState();
-            goHome();
-
-        }
-
-
-    }
-
-    @Override
-    public void onAuthFailed(int errorCode, String errorMessage) {
-        super.onAuthFailed(errorCode, errorMessage);
-
-        if (saveSuccess){
-
-            switch (errorCode) {
-                case AuthErrorCodes.CANNOT_RECOGNIZE_ERROR:
-                    updateTouchIDAlert("Cannot recognize your finger print. Please try again.");
-                    break;
-                case AuthErrorCodes.NON_RECOVERABLE_ERROR:
-                    updateTouchIDAlert("Cannot initialize finger print authentication.");
-                    break;
-                case AuthErrorCodes.RECOVERABLE_ERROR:
-                    updateTouchIDAlert(errorMessage);
-                    break;
-            }
-
-        }
-
-    }
-
-    @Override
-    public void touchIDAlertDialogCancelButtonClicked() {
-
-        dismissTouchIDAlert();
-
-        goLoginPage();
-
-    }
-
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        if (saveSuccess){
-
-            mFingerPrintAuthHelper.startAuth();
-
-        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-        mFingerPrintAuthHelper.stopAuth();
+    }
+
+    @Override
+    public void allowButtonClicked() {
+
+        hideTouchIDEnabledAlert();
+
+        if (fingerPrintNotRegistered){
+
+            Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
+            startActivity(intent);
+
+
+        } else {
+
+            enableFingerPrintAndGoHome();
+
+        }
+
+    }
+
+    @Override
+    public void dontAllowButtonClicked() {
+
+        hideTouchIDEnabledAlert();
+
+        updateLoginState();
+        goHome();
 
     }
 }

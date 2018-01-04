@@ -68,7 +68,11 @@ public class PasscodePickActivity extends BaseActivity {
         picker = utils.getPicker(mContext, pickerType);
         if (picker == null) return;
 
-        if (pickerType.equals(PICKER_LOCATION_STATE)){
+        if (pickerType.equals(PICKER_ACCOUNT)){
+
+            tvTitle.setText("PLEASE SELECT A WALLET ID");
+
+        } else if (pickerType.equals(PICKER_LOCATION_STATE)){
             tvTitle.setText("Pick a Location");
 
         } else if (pickerType.equals(PICKER_TIME)){
