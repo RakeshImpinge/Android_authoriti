@@ -12,7 +12,13 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 
+import com.curtisdigital.authoriti.api.AuthoritiAPI;
+import com.curtisdigital.authoriti.api.model.AccountID;
 import com.curtisdigital.authoriti.api.model.AuthLogIn;
+import com.curtisdigital.authoriti.api.model.Order;
+import com.curtisdigital.authoriti.api.model.Picker;
+import com.curtisdigital.authoriti.api.model.Scheme;
+import com.curtisdigital.authoriti.api.model.Value;
 import com.curtisdigital.authoriti.core.BaseActivity;
 import com.curtisdigital.authoriti.ui.auth.LoginActivity_;
 import com.curtisdigital.authoriti.ui.menu.AccountChaseFragment_;
@@ -20,6 +26,7 @@ import com.curtisdigital.authoriti.ui.menu.AccountFragment_;
 import com.curtisdigital.authoriti.ui.menu.CodeGenerateFragment_;
 import com.curtisdigital.authoriti.ui.menu.WipeFragment_;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
+import com.curtisdigital.authoriti.utils.AuthoritiUtils_;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -32,6 +39,13 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -184,6 +198,118 @@ public class MainActivity extends BaseActivity{
             super.onBackPressed();
         }
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (dataManager.getScheme() != null){
+
+            loadScheme();
+        }
+
+    }
+
+    private void loadScheme(){
+
+        AuthoritiAPI.APIService().getScheme().enqueue(new Callback<Scheme>() {
+
+            @Override
+            public void onResponse(Call<Scheme> call, Response<Scheme> response) {
+
+                if (response.code() == 200 && response.body() != null){
+
+                    dataManager.setScheme(response.body());
+                    updatePickers();
+
+                    Log.e("Scheme", "Refreshed");
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Scheme> call, Throwable t) {
+
+
+            }
+        });
+    }
+
+    private void updatePickers(){
+
+        if (dataManager.getScheme() != null && dataManager.getScheme().getPickers() != null) {
+
+            Order order = new Order();
+            List<String> pickers = new ArrayList<>();
+
+            for (Picker picker : dataManager.getScheme().getPickers()) {
+
+                pickers.add(picker.getPicker());
+
+                switch (picker.getPicker()) {
+
+                    case PICKER_ACCOUNT:
+
+                        break;
+
+                    case PICKER_INDUSTRY:
+
+                        if (dataManager.getIndustryPicker() != null){
+
+                            if (dataManager.getIndustryPicker().isEnableDefault() && dataManager.getIndustryPicker().getDefaultIndex() < picker.getValues().size()){
+
+                                picker.setEnableDefault(dataManager.getIndustryPicker().isEnableDefault());
+                                picker.setDefaultIndex(dataManager.getIndustryPicker().getDefaultIndex());
+
+                                dataManager.setIndustryPicker(picker);
+                            }
+
+
+                        } else {
+
+                            dataManager.setIndustryPicker(picker);
+                        }
+
+                        break;
+
+                    case PICKER_LOCATION_STATE:
+
+                        if (dataManager.getLocationPicker() != null){
+
+                            if (dataManager.getLocationPicker().isEnableDefault() && dataManager.getLocationPicker().getDefaultIndex() < picker.getValues().size()){
+
+                                picker.setEnableDefault(dataManager.getLocationPicker().isEnableDefault());
+                                picker.setDefaultIndex(dataManager.getLocationPicker().getDefaultIndex());
+
+                                dataManager.setLocationPicker(picker);
+                            }
+
+
+                        } else {
+
+                            dataManager.setLocationPicker(picker);
+                        }
+
+                        break;
+
+                    case PICKER_LOCATION_COUNTRY:
+
+                        dataManager.setCountryPicker(picker);
+
+                        break;
+
+                    case PICKER_TIME:
+
+                        break;
+
+                }
+            }
+
+            order.setPickers(pickers);
+            dataManager.setPickerOrder(order);
+
+        }
     }
 
 }
