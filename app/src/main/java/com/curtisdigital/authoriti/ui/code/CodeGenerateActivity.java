@@ -1,5 +1,6 @@
 package com.curtisdigital.authoriti.ui.code;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -51,8 +52,35 @@ public class CodeGenerateActivity extends BaseActivity {
     void callAfterViewInjection(){
 
         ivQRCode.setImageBitmap(QRCode.from(generateCode()).bitmap());
-        tvCode.setText(generateCode());
 
+        String code = generateCode();
+
+        tvCode.setText(utils.fromHtml(generateHTMLString(code)));
+
+    }
+
+    private String generateHTMLString(String code){
+
+        StringBuilder html = new StringBuilder();
+
+
+        for (int i = 0 ; i < code.length() ; i ++){
+
+            char c = code.charAt(i);
+
+            if (Character.isDigit(c)){
+
+                html.append("<font color='#DB381B'>").append(c).append("</font>");
+
+            } else {
+
+                html.append("<font color='##465156'>").append(c).append("</font>");
+
+            }
+
+        }
+
+        return html.toString();
     }
 
     private String generateInitialPayload(){
