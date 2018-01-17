@@ -228,21 +228,25 @@ public class CodeGenerateActivity extends BaseActivity {
 
         switch (value.getTitle()){
 
-            case TIME_2_DAYS:
-                newCalendar.set(newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH) + 2);
+            case TIME_15_MINS:
+                newCalendar.set(newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH), newCalendar.get(Calendar.HOUR_OF_DAY), newCalendar.get(Calendar.MINUTE) + 15);
 
                 break;
 
-            case TIME_5_DAYS:
-                newCalendar.set(newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH) + 5);
+            case TIME_1_HOUR:
+                newCalendar.set(newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH), newCalendar.get(Calendar.HOUR_OF_DAY) + 1, newCalendar.get(Calendar.MINUTE));
                 break;
 
-            case TIME_2_WEEKS:
-                newCalendar.set(newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH) + 14);
+            case TIME_4_HOURS:
+                newCalendar.set(newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH), newCalendar.get(Calendar.HOUR_OF_DAY) + 4, newCalendar.get(Calendar.MINUTE));
                 break;
 
-            case  TIME_1_MONTH:
-                newCalendar.set(newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH) + 1, newCalendar.get(Calendar.DAY_OF_MONTH));
+            case  TIME_1_DAY:
+                newCalendar.set(newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH) + 1, newCalendar.get(Calendar.HOUR_OF_DAY), newCalendar.get(Calendar.MINUTE));
+                break;
+
+            case  TIME_1_WEEK:
+                newCalendar.set(newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH) + 7, newCalendar.get(Calendar.HOUR_OF_DAY), newCalendar.get(Calendar.MINUTE));
                 break;
 
             case TIME_CUSTOM_TIME:

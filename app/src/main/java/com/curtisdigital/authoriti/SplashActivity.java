@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.curtisdigital.authoriti.ui.auth.InviteCodeActivity_;
 import com.curtisdigital.authoriti.ui.auth.LoginActivity_;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.curtisdigital.authoriti.utils.AuthoritiData_;
@@ -26,15 +27,24 @@ public class SplashActivity extends AppCompatActivity {
 
         dataManager = AuthoritiData_.getInstance_(this);
 
-        if (dataManager != null && dataManager.loginStatus() != null && dataManager.loginStatus().isLogin()){
+        if (dataManager.loginStatus() != null && dataManager.loginStatus().isLogin()){
 
             Intent intent = new Intent(this, MainActivity_.class);
             startActivity(intent);
 
         } else {
 
-            Intent intent = new Intent(this, LoginActivity_.class);
-            startActivity(intent);
+            if (dataManager.getUser() != null && dataManager.getUser().getAccountIDs() != null && dataManager.getUser().getAccountIDs().size() > 0){
+
+                Intent intent = new Intent(this, LoginActivity_.class);
+                startActivity(intent);
+
+            } else {
+
+                Intent intent = new Intent(this, InviteCodeActivity_.class);
+                startActivity(intent);
+            }
+
         }
 
         finish();

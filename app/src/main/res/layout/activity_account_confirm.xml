@@ -134,7 +134,7 @@
                         android:maxLines="1"
                         android:maxLength="100"
                         android:imeOptions="actionDone"
-                        android:hint="Value"
+                        android:hint="ID Number"
                         android:textSize="15sp"
                         android:backgroundTint="@color/colorPrimary"
                         android:textCursorDrawable="@color/colorPrimary"

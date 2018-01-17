@@ -6,6 +6,7 @@ import com.curtisdigital.authoriti.R;
 import com.curtisdigital.authoriti.api.AuthoritiAPI;
 import com.curtisdigital.authoriti.api.model.AuthLogIn;
 import com.curtisdigital.authoriti.core.BaseFragment;
+import com.curtisdigital.authoriti.ui.auth.InviteCodeActivity_;
 import com.curtisdigital.authoriti.ui.auth.LoginActivity_;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.google.gson.JsonObject;
@@ -56,6 +57,21 @@ public class WipeFragment extends BaseFragment {
         startActivity(intent);
     }
 
+    private void wipeLogOut(){
+
+        deleteAccount();
+
+        AuthLogIn logIn = dataManager.loginStatus();
+        logIn.setLogin(false);
+        logIn.setWipe(true);
+        dataManager.setAuthLogin(logIn);
+
+        Intent intent = new Intent(mContext, InviteCodeActivity_.class);
+        intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+
+    }
+
     @Click(R.id.cvWipe)
     void wipe(){
 
@@ -70,9 +86,8 @@ public class WipeFragment extends BaseFragment {
                 dismissProgressDialog();
                 if (response.code() == 200){
 
+                    wipeLogOut();
 
-                    deleteAccount();
-                    logOut();
                 }
 
             }

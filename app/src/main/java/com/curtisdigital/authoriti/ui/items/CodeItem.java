@@ -130,6 +130,7 @@ public class CodeItem extends AbstractItem<CodeItem, CodeItem.ViewHolder>{
         });
 
         holder.swipeLayout.addDrag(SwipeLayout.DragEdge.Left, holder.tvDefault);
+        holder.swipeLayout.addDrag(SwipeLayout.DragEdge.Right, holder.tvDefault);
         holder.swipeLayout.addSwipeListener(new SwipeLayout.SwipeListener() {
             @Override
             public void onStartOpen(SwipeLayout layout) {

@@ -28,10 +28,11 @@ public interface Constants {
     String PICKER_LOCATION_STATE        = "location_state";
     String PICKER_TIME                  = "time";
 
-    String TIME_2_DAYS                  = "2 Days";
-    String TIME_5_DAYS                  = "5 Days";
-    String TIME_2_WEEKS                 = "2 Weeks";
-    String TIME_1_MONTH                 = "1 Month";
+    String TIME_15_MINS                 = "15 Mins";
+    String TIME_1_HOUR                  = "1 Hour";
+    String TIME_4_HOURS                 = "4 Hours";
+    String TIME_1_DAY                   = "1 Day";
+    String TIME_1_WEEK                  = "1 Week";
     String TIME_CUSTOM_TIME             = "Custom Time";
     String TIME_CUSTOM_DATE             = "Custom Date/Time";
 
