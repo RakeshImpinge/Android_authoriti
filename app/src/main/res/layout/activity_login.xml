@@ -48,7 +48,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:gravity="center"
-                        android:text="Hello There, Welcome Back!"
+                        android:text="Welcome Back!"
                         android:textColor="@color/colorPrimary"
                         android:textSize="17sp" />
 
