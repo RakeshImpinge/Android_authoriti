@@ -85,7 +85,7 @@ public class MainActivity extends BaseActivity{
                 long inactiveTime = Long.parseLong(dataManager.getInactiveTime());
                 Log.e("Inactive TimeStamp", String.valueOf(inactiveTime));
 
-                if (currentTime - inactiveTime > 10){
+                if (currentTime - inactiveTime > 300){
 
                     logOut();
 

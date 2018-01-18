@@ -80,6 +80,9 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
     private boolean capturedBack = false;
     private boolean isBack = false;
 
+    private boolean isSkip = false;
+    private boolean isNext = false;
+
 
     @AfterViews
     void callAfterViewInjection(){
@@ -316,18 +319,25 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
             saveDLInfo(builder);
 
-            if (licenseCard.getAuthenticationResult().toLowerCase().equals("passed")){
+            if (isNext){
 
-                Log.e("Verification - ", "Passed");
-                AccountManagerActivity_.intent(mContext).start();
+                if (licenseCard.getAuthenticationResult().toLowerCase().equals("passed")){
 
-            } else {
+                    Log.e("Verification - ", "Passed");
+                    AccountManagerActivity_.intent(mContext).start();
 
-                showAlert("", "Could not verify your Driver's License, Please try again.");
+                } else {
+
+                    showAlert("", "Could not verify your Driver's License, Please try again.");
+                }
+
             }
 
+            if (isSkip){
 
+                AccountManagerActivity_.intent(mContext).start();
 
+            }
         }
 
     }
@@ -464,11 +474,18 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
     @Click(R.id.tvSkip)
     void skipButtonClicked(){
-        AccountManagerActivity_.intent(mContext).start();
+
+        isSkip = true;
+        isNext = false;
+
+        checkProcess();
     }
 
     @Click(R.id.cvNext)
     void nextButtonClicked(){
+
+        isSkip = false;
+        isNext = true;
 
         checkProcess();
 
@@ -637,7 +654,19 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
         dismissProgressDialog();
         Log.e("Did Failed with Error -", message + " - " + code);
-        showAlert("", message + " - " + code);
+
+        if (isNext){
+
+            showAlert("", message + " - " + code);
+
+        }
+
+        if (isSkip){
+
+            AccountManagerActivity_.intent(mContext).start();
+
+        }
+
     }
 
     @Override
