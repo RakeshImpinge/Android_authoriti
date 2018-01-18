@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Typeface;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -13,7 +15,6 @@ import android.util.Log;
 import android.view.View;
 
 import com.curtisdigital.authoriti.api.AuthoritiAPI;
-import com.curtisdigital.authoriti.api.model.AccountID;
 import com.curtisdigital.authoriti.api.model.AuthLogIn;
 import com.curtisdigital.authoriti.api.model.Order;
 import com.curtisdigital.authoriti.api.model.Picker;
@@ -26,13 +27,13 @@ import com.curtisdigital.authoriti.ui.menu.AccountFragment_;
 import com.curtisdigital.authoriti.ui.menu.CodeGenerateFragment_;
 import com.curtisdigital.authoriti.ui.menu.WipeFragment_;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
-import com.curtisdigital.authoriti.utils.AuthoritiUtils_;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.sjl.foreground.Foreground;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -70,6 +71,53 @@ public class MainActivity extends BaseActivity{
 
     @ViewById(R.id.toolbar)
     Toolbar toolbar;
+
+    Foreground.Listener listener = new Foreground.Listener() {
+        @Override
+        public void onBecameForeground() {
+
+            if (dataManager.getInactiveTime() != null && !dataManager.getInactiveTime().equals("")){
+
+
+                long currentTime = System.currentTimeMillis() / 1000;
+                Log.e("Active TimeStamp", String.valueOf(currentTime));
+
+                long inactiveTime = Long.parseLong(dataManager.getInactiveTime());
+                Log.e("Inactive TimeStamp", String.valueOf(inactiveTime));
+
+                if (currentTime - inactiveTime > 10){
+
+                    logOut();
+
+                }
+
+            }
+
+        }
+
+        @Override
+        public void onBecameBackground() {
+
+            long time = System.currentTimeMillis() / 1000;
+            dataManager.setInactiveTime(String.valueOf(time));
+            Log.e("Inactive TimeStamp", String.valueOf(time));
+
+        }
+    };
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Foreground.get(getApplication()).addListener(listener);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+    }
 
     @AfterViews
     void callAfterViewInjection(){

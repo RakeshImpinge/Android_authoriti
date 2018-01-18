@@ -18,4 +18,5 @@ public interface AuthoritiPref {
     String countryPickerJson();
     String timePickerJson();
     String pickerOrderJson();
+    String inactiveTime();
 }

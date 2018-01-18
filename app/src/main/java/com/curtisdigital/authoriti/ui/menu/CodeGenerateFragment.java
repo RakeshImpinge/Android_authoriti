@@ -222,7 +222,11 @@ public class CodeGenerateFragment extends BaseFragment {
 
         if (dataManager.getScheme() != null && adapter != null){
 
-            showPickers();
+            if(mActivity != null && !mActivity.isFinishing()){
+
+                showPickers();
+
+            }
 
         }
     }

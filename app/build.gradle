@@ -99,5 +99,6 @@ dependencies {
     compile 'com.github.tozny:java-aes-crypto:1.1.0'
 
     compile 'com.multidots:fingerprint-auth:1.0.1'
+    compile 'com.sjl:Foredroid:1.0.2'
 
 }

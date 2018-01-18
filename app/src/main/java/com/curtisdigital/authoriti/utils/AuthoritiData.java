@@ -44,6 +44,17 @@ public class AuthoritiData {
     private boolean countryIndexSelected;
     private boolean timeIndexSelected;
 
+    public void setInactiveTime(String timeStamp){
+
+        pref.edit().inactiveTime().put(timeStamp).apply();
+    }
+
+    public String getInactiveTime(){
+
+       return pref.inactiveTime().get();
+
+    }
+
     public void setAuthLogin(AuthLogIn login){
         if (login != null){
             Gson gson = new Gson();
