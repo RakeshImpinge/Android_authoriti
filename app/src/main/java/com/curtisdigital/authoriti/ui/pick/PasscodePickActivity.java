@@ -307,9 +307,4 @@ public class PasscodePickActivity extends BaseActivity {
         finish();
     }
 
-    @Click(R.id.cvSave)
-    void saveButtonClicked(){
-        finish();
-    }
-
 }

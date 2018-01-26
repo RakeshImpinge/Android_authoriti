@@ -3,7 +3,7 @@
 
     <string name="menu_code_generate">Generate Permission Code</string>
     <string name="menu_account">MY IDs</string>
-    <string name="menu_wipe">Wipe</string>
+    <string name="menu_wipe">About Us</string>
     <string name="menu_logOut">Logout</string>
 
     <!-- Fonts -->
@@ -16,5 +16,9 @@
     <string name="font_oswaldo_medium">fonts/Oswald_Medium.ttf</string>
     <string name="font_oswaldo_regular">fonts/Oswald_Regular.ttf</string>
     <string name="title_touch_id">Touch ID for \"Authoriti\"</string>
+
+    <string name="text_about">Authoriti is an innovation of CTM Insights. CTM is an early stage technology studio and incubator, focused on finding new approaches to structural problems in cyber security.  We have significant leadership experience dealing with InfoSec at-scale at the world's leading financial institutions.
+
+Authoriti is the developer of the Authoriti Permission Code™, which gives institutions the confidence that financial transactions are authorized.</string>
 
 </resources>

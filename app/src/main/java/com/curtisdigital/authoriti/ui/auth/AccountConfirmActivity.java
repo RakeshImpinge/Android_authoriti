@@ -1,19 +1,12 @@
 package com.curtisdigital.authoriti.ui.auth;
 
 import android.content.Intent;
-import android.hardware.fingerprint.FingerprintManager;
 import android.provider.Settings;
 import android.support.design.widget.Snackbar;
-import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.CardView;
-import android.text.TextUtils;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.PopupWindow;
 
 import com.curtisdigital.authoriti.MainActivity_;
 import com.curtisdigital.authoriti.R;
@@ -21,23 +14,21 @@ import com.curtisdigital.authoriti.api.AuthoritiAPI;
 import com.curtisdigital.authoriti.api.model.AccountID;
 import com.curtisdigital.authoriti.api.model.AuthLogIn;
 import com.curtisdigital.authoriti.api.model.User;
-import com.curtisdigital.authoriti.core.BaseActivity;
 import com.curtisdigital.authoriti.core.SecurityActivity;
-import com.curtisdigital.authoriti.ui.items.SpinnerItem;
+import com.curtisdigital.authoriti.ui.alert.AccountConfirmDialog;
+import com.curtisdigital.authoriti.ui.items.AccountConfirmItem;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.curtisdigital.authoriti.utils.AuthoritiUtils;
-import com.curtisdigital.authoriti.utils.ViewUtils;
 import com.google.gson.JsonObject;
-import com.multidots.fingerprintauth.AuthErrorCodes;
+import com.mikepenz.fastadapter.FastAdapter;
+import com.mikepenz.fastadapter.IAdapter;
+import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 
-import org.androidannotations.annotations.AfterTextChange;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
-
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -51,7 +42,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
  */
 
 @EActivity(R.layout.activity_account_confirm)
-public class AccountConfirmActivity extends SecurityActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener, PopupWindow.OnDismissListener, SecurityActivity.TouchIDEnableAlertListener {
+public class AccountConfirmActivity extends SecurityActivity implements SecurityActivity.TouchIDEnableAlertListener, AccountConfirmDialog.AccountConfirmDialogListener {
 
     @Bean
     AuthoritiUtils utils;
@@ -59,77 +50,103 @@ public class AccountConfirmActivity extends SecurityActivity implements AdapterV
     @Bean
     AuthoritiData dataManager;
 
-
-    @ViewById(R.id.tiValue)
-    TextInputLayout tiValue;
-
-    @ViewById(R.id.etValue)
-    EditText etValue;
-
-    @ViewById(R.id.etAccount)
-    EditText etAccount;
-
-    @ViewById(R.id.spinner)
-    View spinner;
-
     @ViewById(R.id.cvFinish)
     CardView cvFinish;
 
-    @ViewById(R.id.checkbox)
-    CheckBox checkBox;
+    @ViewById(R.id.rvAccount)
+    RecyclerView rvAccount;
 
-    List<AccountID> unconfirmedAccountIDs;
-    SpinnerItem adapter;
-    private PopupWindow pw;
-    private ListView lv;
-    private boolean opened;
-    private int selectedPosition;
-    private int popupHeight, popupWidth;
+    FastItemAdapter<AccountConfirmItem> adapter;
+    AccountConfirmDialog accountConfirmDialog;
+
+    AccountID selectedAccountId;
+    int selectedPosition;
 
     private boolean saveSuccess = false;
 
     @AfterViews
     void callAfterViewInjection(){
 
-        unconfirmedAccountIDs = dataManager.getUser().getUnconfirmedAccountIDs();
+        adapter = new FastItemAdapter<AccountConfirmItem>();
+        rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
+        rvAccount.setAdapter(adapter);
 
-        if (unconfirmedAccountIDs == null)
-            return;
+        adapter.withOnClickListener(new FastAdapter.OnClickListener<AccountConfirmItem>() {
+            @Override
+            public boolean onClick(View v, IAdapter<AccountConfirmItem> adapter, AccountConfirmItem item, int position) {
 
-        selectedPosition = 0;
-        etAccount.setText(unconfirmedAccountIDs.get(selectedPosition).getType());
+                selectedAccountId = item.getAccountID();
+                selectedPosition = position;
+                if (selectedAccountId.isConfirmed()){
+                    showAlert("", "This account has already confirmed.");
 
-        setSpinner();
+                } else {
 
+                    showAccountConfirmDialog();
+                }
+
+                return false;
+            }
+        });
+        showAccounts();
     }
 
-    private void setSpinner(){
+    private void showAccounts(){
 
-        popupHeight = (int) ViewUtils.convertDpToPixel(50 * unconfirmedAccountIDs.size(), this);
-        popupWidth = ViewUtils.getScreenWidth(this) - (int) ViewUtils.convertDpToPixel(64, this);
+        if (adapter != null){
+            adapter.clear();
+        } else {
+            adapter = new FastItemAdapter<>();
+        }
 
+        User user = dataManager.getUser();
+        if (user.getAccountIDs() != null && user.getAccountIDs().size() > 0){
+            for (int i = 0 ; i < user.getAccountIDs().size() ; i ++){
+                adapter.add(new AccountConfirmItem(user.getAccountIDs().get(i),dataManager.defaultAccountSelected && i == dataManager.defaultAccountIndex));
+            }
+        }
 
-        adapter = new SpinnerItem(this, unconfirmedAccountIDs);
-
-        lv = new ListView(this);
-        lv.setAdapter(adapter);
-        lv.setDividerHeight(0);
-        lv.setOnItemClickListener(this);
-        lv.setOnItemSelectedListener(this);
-        lv.setSelector(android.R.color.transparent);
-        lv.setBackgroundResource(R.drawable.bg_spinner_pop);
-        lv.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
-        lv.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        selectedPosition = 0;
+        if (user.getUnconfirmedAccountIDs() != null && user.getUnconfirmedAccountIDs().size() > 0){
+            for (int i = 0 ; i < user.getUnconfirmedAccountIDs().size() ; i ++){
+                adapter.add(new AccountConfirmItem(user.getUnconfirmedAccountIDs().get(i),false));
+            }
+        }
     }
 
-    private void saveAccountName(){
+    private void showAccountConfirmDialog(){
+
+        if (accountConfirmDialog == null){
+
+            accountConfirmDialog = new AccountConfirmDialog(this);
+            accountConfirmDialog.setListener(this);
+
+        } else {
+
+            accountConfirmDialog.init();
+
+        }
+
+        if (!isFinishing() && !accountConfirmDialog.isShowing()){
+
+            accountConfirmDialog.show();
+        }
+    }
+
+    private void hideAccountConfirmDialog(){
+
+        if (accountConfirmDialog != null){
+
+            accountConfirmDialog.dismiss();
+            accountConfirmDialog = null;
+        }
+    }
+
+    private void saveAccountName(final String id, final boolean setDefault){
 
         String token = "Bearer " + dataManager.getUser().getToken();
         displayProgressDialog("");
 
-        AuthoritiAPI.APIService().confirmAccountValue(token, etValue.getText().toString()).enqueue(new Callback<JsonObject>() {
+        AuthoritiAPI.APIService().confirmAccountValue(token, id).enqueue(new Callback<JsonObject>() {
 
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
@@ -143,7 +160,7 @@ public class AccountConfirmActivity extends SecurityActivity implements AdapterV
 
                             Snackbar.make(findViewById(R.id.id_account_confirm_activity), "Add Account Successfully", 1000).show();
 
-                            updateAccount();
+                            updateAccount(id, setDefault);
 
                         } else {
                             showAlert("","Failed to confirm your account number. Try again later.");
@@ -167,37 +184,30 @@ public class AccountConfirmActivity extends SecurityActivity implements AdapterV
         });
     }
 
-    private void updateAccount(){
+    private void updateAccount(String id, boolean setDefault){
 
-        AccountID accountID = new AccountID(unconfirmedAccountIDs.get(selectedPosition).getType(), etValue.getText().toString());
+        AccountID accountID = new AccountID(selectedAccountId.getType(), id);
         User user = dataManager.getUser();
         user.getAccountIDs().add(accountID);
 
         for (int i = 0 ; i < user.getUnconfirmedAccountIDs().size() ; i ++){
 
             AccountID accountID1 = user.getUnconfirmedAccountIDs().get(i);
-            if (accountID1.getType().equals(unconfirmedAccountIDs.get(selectedPosition).getType())){
+            if (accountID1.getType().equals(selectedAccountId.getType())){
                 user.getUnconfirmedAccountIDs().remove(accountID1);
             }
 
         }
 
+
         dataManager.setUser(user);
 
-        if (checkBox.isChecked()){
-
-            checkBox.setChecked(false);
-
+        if (setDefault){
             dataManager.defaultAccountSelected = true;
             dataManager.defaultAccountIndex = dataManager.getUser().getAccountIDs().size() - 1;
         }
 
-        unconfirmedAccountIDs.get(selectedPosition).setConfirmed(true);
-        adapter.setAccountIDs(unconfirmedAccountIDs);
-        adapter.notifyDataSetChanged();
-
-        etValue.setText("");
-        tiValue.setError(null);
+        showAccounts();
 
     }
 
@@ -236,57 +246,6 @@ public class AccountConfirmActivity extends SecurityActivity implements AdapterV
     }
 
 
-    @Click(R.id.spinner)
-    void spinnerClicked(){
-        if (!opened){
-
-            if (unconfirmedAccountIDs!= null && unconfirmedAccountIDs.size() > 0){
-                if (pw == null || !pw.isShowing()) {
-                    pw = new PopupWindow(spinner);
-                    pw.setContentView(lv);
-                    pw.setWidth(popupWidth);
-                    pw.setHeight(popupHeight);
-                    pw.setOutsideTouchable(true);
-                    pw.setFocusable(true);
-                    pw.setClippingEnabled(false);
-                    pw.showAsDropDown(spinner, spinner.getLeft(),0);
-                    pw.setBackgroundDrawable(getResources().getDrawable(R.drawable.bg_spinner_pop));
-                    pw.setOnDismissListener(this);
-                    opened = true;
-                }
-
-            }
-
-        } else {
-            if (pw != null){
-                pw.dismiss();
-            }
-        }
-    }
-
-    @Click(R.id.cvConfirm)
-    void confirmButtonClicked(){
-
-        if (TextUtils.isEmpty(etValue.getText())){
-
-            tiValue.setError(utils.getSpannableStringForEditTextError("This field is required", this));
-
-        } else {
-
-            if (unconfirmedAccountIDs.get(selectedPosition).isConfirmed()){
-
-                showAlert("", "This account is already confirmed.");
-
-            } else {
-
-                saveAccountName();
-
-            }
-
-
-        }
-    }
-
     @Click(R.id.cvFinish)
     void finishButtonClicked(){
 
@@ -296,44 +255,6 @@ public class AccountConfirmActivity extends SecurityActivity implements AdapterV
         hideKeyboard();
         checkFingerPrintAuth();
 
-    }
-
-    @AfterTextChange(R.id.etValue)
-    void valueChanged(){
-
-        if (TextUtils.isEmpty(etValue.getText())){
-
-            tiValue.setError(utils.getSpannableStringForEditTextError("This field is required", this));
-
-        } else {
-
-            tiValue.setError(null);
-
-        }
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (pw != null)
-            pw.dismiss();
-        selectedPosition = position;
-        etAccount.setText(unconfirmedAccountIDs.get(selectedPosition).getType());
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
-
-    @Override
-    public void onDismiss() {
-        pw = null;
-        opened = false;
     }
 
     private void checkFingerPrintAuth(){
@@ -350,18 +271,6 @@ public class AccountConfirmActivity extends SecurityActivity implements AdapterV
             showTouchIDEnableAlert();
 
         }
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
 
     }
 
@@ -392,5 +301,18 @@ public class AccountConfirmActivity extends SecurityActivity implements AdapterV
         updateLoginState();
         goHome();
 
+    }
+
+    @Override
+    public void accountConfirmDialogOKButtonClicked(String id, boolean setDefault) {
+
+        hideAccountConfirmDialog();
+        saveAccountName(id, setDefault);
+    }
+
+    @Override
+    public void accountConfirmDialogCancelButtonClicked() {
+
+        hideAccountConfirmDialog();
     }
 }

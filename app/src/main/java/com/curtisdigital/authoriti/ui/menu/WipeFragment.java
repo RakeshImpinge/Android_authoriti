@@ -1,7 +1,10 @@
 package com.curtisdigital.authoriti.ui.menu;
 
 import android.content.Intent;
+import android.graphics.Paint;
+import android.widget.TextView;
 
+import com.curtisdigital.authoriti.BuildConfig;
 import com.curtisdigital.authoriti.R;
 import com.curtisdigital.authoriti.api.AuthoritiAPI;
 import com.curtisdigital.authoriti.api.model.AuthLogIn;
@@ -15,6 +18,7 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.ViewById;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -33,9 +37,18 @@ public class WipeFragment extends BaseFragment {
     @Bean
     AuthoritiData dataManager;
 
+    @ViewById(R.id.tvVersion)
+    TextView tvVersion;
+
+    @ViewById(R.id.tvWipe)
+    TextView tvWipe;
+
     @AfterViews
     void callAfterViewInjection(){
 
+        tvVersion.setText("Version " + BuildConfig.VERSION_NAME + "." + BuildConfig.VERSION_CODE);
+
+        tvWipe.setPaintFlags(tvWipe.getPaintFlags() |Paint.UNDERLINE_TEXT_FLAG);
     }
 
     private void deleteAccount(){
@@ -51,10 +64,7 @@ public class WipeFragment extends BaseFragment {
         logIn.setWipe(true);
         dataManager.setAuthLogin(logIn);
 
-
-        Intent intent = new Intent(mContext, LoginActivity_.class);
-        intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+        LoginActivity_.intent(mContext).flags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK).start();
     }
 
     private void wipeLogOut(){
@@ -66,13 +76,11 @@ public class WipeFragment extends BaseFragment {
         logIn.setWipe(true);
         dataManager.setAuthLogin(logIn);
 
-        Intent intent = new Intent(mContext, InviteCodeActivity_.class);
-        intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+        InviteCodeActivity_.intent(mContext).flags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK).showBack(false).start();
 
     }
 
-    @Click(R.id.cvWipe)
+    @Click(R.id.tvWipe)
     void wipe(){
 
         String token = "Bearer " + dataManager.getUser().getToken();

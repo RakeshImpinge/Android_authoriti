@@ -2,17 +2,10 @@ package com.curtisdigital.authoriti.ui.auth;
 
 import android.content.Intent;
 import android.provider.Settings;
-import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.CardView;
-import android.text.TextUtils;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.PopupWindow;
 
 import com.curtisdigital.authoriti.MainActivity_;
 import com.curtisdigital.authoriti.R;
@@ -23,14 +16,14 @@ import com.curtisdigital.authoriti.api.model.User;
 import com.curtisdigital.authoriti.api.model.request.RequestSignUp;
 import com.curtisdigital.authoriti.api.model.response.ResponseSignUp;
 import com.curtisdigital.authoriti.core.SecurityActivity;
-import com.curtisdigital.authoriti.ui.items.SpinnerItem;
+import com.curtisdigital.authoriti.ui.alert.AccountAddDialog;
+import com.curtisdigital.authoriti.ui.items.AccountAddItem;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.curtisdigital.authoriti.utils.AuthoritiUtils;
-import com.curtisdigital.authoriti.utils.ViewUtils;
 import com.curtisdigital.authoriti.utils.crypto.CryptoKeyPair;
+import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 import com.tozny.crypto.android.AesCbcWithIntegrity;
 
-import org.androidannotations.annotations.AfterTextChange;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
@@ -53,7 +46,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
  */
 
 @EActivity(R.layout.activity_account_manager)
-public class AccountManagerActivity extends SecurityActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener, PopupWindow.OnDismissListener, SecurityActivity.TouchIDEnableAlertListener {
+public class AccountManagerActivity extends SecurityActivity implements SecurityActivity.TouchIDEnableAlertListener, AccountAddDialog.AccountAddDialogListener, AccountAddItem.AccountAddItemListener {
 
     @Bean
     AuthoritiUtils utils;
@@ -61,40 +54,17 @@ public class AccountManagerActivity extends SecurityActivity implements AdapterV
     @Bean
     AuthoritiData dataManager;
 
-    @ViewById(R.id.tiAccount)
-    TextInputLayout tiAccount;
-
-    @ViewById(R.id.tiName)
-    TextInputLayout tiName;
-
-    @ViewById(R.id.etName)
-    EditText etName;
-
-    @ViewById(R.id.tiValue)
-    TextInputLayout tiValue;
-
-    @ViewById(R.id.etValue)
-    EditText etValue;
-
-    @ViewById(R.id.etAccount)
-    EditText etAccount;
-
-    @ViewById(R.id.spinner)
-    View spinner;
-
     @ViewById(R.id.cvFinish)
     CardView cvFinish;
 
-    @ViewById(R.id.checkbox)
-    CheckBox checkBox;
+    @ViewById(R.id.rvAccount)
+    RecyclerView rvAccount;
 
-    SpinnerItem adapter;
-    private PopupWindow pw;
-    private ListView lv;
-    private boolean opened;
-    private int selectedPosition;
-    private int popupHeight, popupWidth;
+    FastItemAdapter<AccountAddItem> adapter;
+
     private boolean markDefault;
+
+    private AccountAddDialog accountAddDialog;
 
     private CryptoKeyPair keyPair;
 
@@ -105,52 +75,17 @@ public class AccountManagerActivity extends SecurityActivity implements AdapterV
 
         keyPair = dataManager.getCryptoKeyPair(dataManager.password, "");
 
-        setSpinner();
+        dataManager.accountIDs = new ArrayList<>();
+
         updateFinishButton();
 
-    }
+        accountAddDialog = new AccountAddDialog(this);
+        accountAddDialog.setListener(this);
 
-    private void setSpinner(){
+        adapter = new FastItemAdapter<AccountAddItem>();
+        rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
+        rvAccount.setAdapter(adapter);
 
-        popupWidth = ViewUtils.getScreenWidth(this) - (int) ViewUtils.convertDpToPixel(64, this);
-
-        if (dataManager.accountIDs == null){
-            dataManager.accountIDs = new ArrayList<>();
-        }
-
-        adapter = new SpinnerItem(this, dataManager.accountIDs);
-
-        lv = new ListView(this);
-        lv.setAdapter(adapter);
-        lv.setDividerHeight(0);
-        lv.setOnItemClickListener(this);
-        lv.setOnItemSelectedListener(this);
-        lv.setSelector(android.R.color.transparent);
-        lv.setBackgroundResource(R.drawable.bg_spinner_pop);
-        lv.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
-        lv.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        selectedPosition = 0;
-    }
-
-    private void setPopupHeight(){
-
-        if (dataManager.accountIDs == null || dataManager.accountIDs.size() == 0){
-
-            popupHeight = 0;
-
-        } else {
-
-            if (dataManager.accountIDs.size() > 2){
-
-                popupHeight = (int) ViewUtils.convertDpToPixel(150, this);
-
-            } else {
-
-                popupHeight = (int) ViewUtils.convertDpToPixel(50 * dataManager.accountIDs.size(), this);
-
-            }
-        }
     }
 
     private void updateFinishButton(){
@@ -168,19 +103,11 @@ public class AccountManagerActivity extends SecurityActivity implements AdapterV
         }
     }
 
-    private void saveAccount(){
+    private void saveAccount(String name, String id, boolean setDefault){
 
-        tiAccount.setHint("Click to select an ID");
+        if (setDefault){
 
-        if (!checkBox.isChecked() && !markDefault){
-
-            etAccount.setText(etName.getText().toString());
-
-        } else if (checkBox.isChecked()){
-
-            etAccount.setText(etName.getText().toString());
             markDefault = true;
-            checkBox.setChecked(false);
 
             dataManager.defaultAccountSelected = true;
             dataManager.defaultAccountIndex = dataManager.accountIDs.size() ;
@@ -191,23 +118,26 @@ public class AccountManagerActivity extends SecurityActivity implements AdapterV
             dataManager.accountIDs = new ArrayList<>();
         }
 
-        AccountID accountID = new AccountID(etName.getText().toString(), etValue.getText().toString());
+        AccountID accountID = new AccountID(name, id);
         dataManager.accountIDs.add(accountID);
-        adapter.setAccountIDs(dataManager.accountIDs);
-        adapter.notifyDataSetChanged();
 
-        resetInputForm();
+        showAccount();
+
         updateFinishButton();
     }
 
-    private void resetInputForm(){
+    private void showAccount(){
 
-        etValue.setText("");
-        tiValue.setError(null);
-        etName.setText("");
-        tiName.setError(null);
+        if (adapter != null){
+            adapter.clear();
+        } else {
+            adapter = new FastItemAdapter<>();
+        }
 
-        etName.requestFocus();
+        for (int i = 0 ; i < dataManager.accountIDs.size() ; i ++){
+
+            adapter.add(new AccountAddItem(dataManager.accountIDs.get(i), dataManager.defaultAccountSelected && i == dataManager.defaultAccountIndex, this));
+        }
     }
 
     private void signUp(){
@@ -295,45 +225,16 @@ public class AccountManagerActivity extends SecurityActivity implements AdapterV
 
     }
 
-    @AfterTextChange(R.id.etName)
-    void nameChanged(){
-        if (TextUtils.isEmpty(etName.getText())){
-            tiName.setError(utils.getSpannableStringForEditTextError("This field is required", this));
-
-        } else {
-            tiName.setError(null);
-        }
-    }
-
-    @AfterTextChange(R.id.etValue)
-    void valueChanged(){
-        if (TextUtils.isEmpty(etValue.getText())){
-            tiValue.setError(utils.getSpannableStringForEditTextError("This field is required", this));
-
-        } else {
-            tiValue.setError(null);
-        }
-    }
-
     @Click(R.id.ivBack)
     void backButtonClicked(){
         finish();
     }
 
-    @Click(R.id.cvSave)
-    void saveButtonClicked(){
-        if (TextUtils.isEmpty(etName.getText())){
-            tiName.setError(utils.getSpannableStringForEditTextError("This field is required", this));
+    @Click(R.id.btnAdd)
+    void addButtonClicked(){
 
-        }
-        if (TextUtils.isEmpty(etValue.getText())){
-            tiValue.setError(utils.getSpannableStringForEditTextError("This field is required", this));
+        showAccountAddDialog();
 
-        }
-
-        if (!TextUtils.isEmpty(etName.getText()) && !TextUtils.isEmpty(etValue.getText())){
-            saveAccount();
-        }
     }
 
     @Click(R.id.cvFinish)
@@ -341,62 +242,6 @@ public class AccountManagerActivity extends SecurityActivity implements AdapterV
 
         signUp();
 
-    }
-
-    @Click(R.id.spinner)
-    void spinnerClicked(){
-        if (!opened){
-
-            setPopupHeight();
-
-            if (dataManager.accountIDs != null && dataManager.accountIDs.size() > 0){
-                if (pw == null || !pw.isShowing()) {
-                    pw = new PopupWindow(spinner);
-                    pw.setContentView(lv);
-                    pw.setWidth(popupWidth);
-                    pw.setHeight(popupHeight);
-                    pw.setOutsideTouchable(true);
-                    pw.setFocusable(true);
-                    pw.setClippingEnabled(false);
-                    pw.showAsDropDown(spinner, spinner.getLeft(),0);
-                    pw.setBackgroundDrawable(getResources().getDrawable(R.drawable.bg_spinner_pop));
-                    pw.setOnDismissListener(this);
-                    opened = true;
-                }
-
-            }
-
-        } else {
-            if (pw != null){
-                pw.dismiss();
-            }
-        }
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-        if (pw != null)
-            pw.dismiss();
-
-        selectedPosition = position;
-        etAccount.setText(dataManager.accountIDs.get(selectedPosition).getType());
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
-
-    @Override
-    public void onDismiss() {
-        pw = null;
-        opened = false;
     }
 
     private void updateLoginState(){
@@ -475,4 +320,60 @@ public class AccountManagerActivity extends SecurityActivity implements AdapterV
 
     }
 
+    private void showAccountAddDialog(){
+
+        if (accountAddDialog == null){
+
+            accountAddDialog = new AccountAddDialog(this);
+            accountAddDialog.setListener(this);
+
+        } else {
+
+            accountAddDialog.init();
+        }
+
+        if (!isFinishing() && !accountAddDialog.isShowing()){
+
+            accountAddDialog.show();
+        }
+
+    }
+
+    private void hideAccountAddDialog(){
+
+        if (accountAddDialog != null){
+
+            accountAddDialog.dismiss();
+            accountAddDialog = null;
+
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+
+    }
+
+    @Override
+    public void accountAddDialogOKButtonClicked(String name, String id, boolean setDefault) {
+
+        saveAccount(name, id, setDefault);
+        hideAccountAddDialog();
+
+    }
+
+    @Override
+    public void accountAddDialogCancelButtonClicked() {
+
+        hideAccountAddDialog();
+
+    }
+
+    @Override
+    public void itemDelete(int position) {
+
+        dataManager.accountIDs.remove(position);
+        showAccount();
+        updateFinishButton();
+    }
 }

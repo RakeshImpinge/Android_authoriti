@@ -150,6 +150,27 @@
 
                     </android.support.design.widget.TextInputLayout>
 
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp">
+
+                        <android.support.v7.widget.AppCompatButton
+                            android:id="@+id/btnReset"
+                            android:layout_width="wrap_content"
+                            android:layout_height="30dp"
+                            android:layout_alignParentEnd="true"
+                            android:inputType="text"
+                            android:text="RESET PASSWORD"
+                            android:textSize="12sp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:textColor="@color/colorPrimary"
+                            fontPath="@string/font_oswaldo_regular"
+                            style="@android:style/Widget.Holo.Button.Borderless"/>
+
+                    </RelativeLayout>
+
                     <android.support.v7.widget.CardView
                         android:id="@+id/cvSign"
                         android:layout_width="match_parent"

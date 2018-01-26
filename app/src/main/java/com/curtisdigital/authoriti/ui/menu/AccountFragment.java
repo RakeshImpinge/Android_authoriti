@@ -1,17 +1,12 @@
 package com.curtisdigital.authoriti.ui.menu;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.TextUtils;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.PopupWindow;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
 import com.curtisdigital.authoriti.R;
 import com.curtisdigital.authoriti.api.AuthoritiAPI;
@@ -22,13 +17,12 @@ import com.curtisdigital.authoriti.api.model.Value;
 import com.curtisdigital.authoriti.api.model.request.RequestUserUpdate;
 import com.curtisdigital.authoriti.api.model.response.ResponseSignUp;
 import com.curtisdigital.authoriti.core.BaseFragment;
-import com.curtisdigital.authoriti.ui.items.SpinnerItem;
+import com.curtisdigital.authoriti.ui.alert.AccountAddDialog;
+import com.curtisdigital.authoriti.ui.items.AccountAddItem;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.curtisdigital.authoriti.utils.AuthoritiUtils;
-import com.curtisdigital.authoriti.utils.ViewUtils;
-import com.google.gson.JsonObject;
+import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 
-import org.androidannotations.annotations.AfterTextChange;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
@@ -42,12 +36,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+
 /**
  * Created by mac on 11/30/17.
  */
 
 @EFragment(R.layout.fragment_account)
-public class AccountFragment extends BaseFragment implements AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener, PopupWindow.OnDismissListener {
+public class AccountFragment extends BaseFragment implements AccountAddItem.AccountAddItemListener, AccountAddDialog.AccountAddDialogListener {
 
 
     @Bean
@@ -56,90 +51,66 @@ public class AccountFragment extends BaseFragment implements AdapterView.OnItemC
     @Bean
     AuthoritiData dataManager;
 
-    @ViewById(R.id.tiName)
-    TextInputLayout tiName;
+    @ViewById(R.id.rvAccount)
+    RecyclerView rvAccount;
 
-    @ViewById(R.id.etName)
-    EditText etName;
-
-    @ViewById(R.id.tiValue)
-    TextInputLayout tiValue;
-
-    @ViewById(R.id.etValue)
-    EditText etValue;
-
-    @ViewById(R.id.etAccount)
-    EditText etAccount;
-
-    @ViewById(R.id.spinner)
-    View spinner;
-
-    @ViewById(R.id.checkbox)
-    CheckBox checkBox;
-
-    SpinnerItem adapter;
-    private PopupWindow pw;
-    private ListView lv;
-    private boolean opened;
-    private int selectedPosition;
-    private int popupHeight, popupWidth;
+    FastItemAdapter<AccountAddItem> adapter;
+    private AccountAddDialog accountAddDialog;
+    BroadcastReceiver broadcastReceiver;
 
     @AfterViews
     void callAfterViewInjection(){
 
-        setSpinner();
-        setAccount();
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(BROADCAST_ADD_BUTTON_CLICKED)){
+                    showAccountAddDialog();
+                }
+            }
+        };
+
+        LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastReceiver, new IntentFilter(BROADCAST_ADD_BUTTON_CLICKED));
+
+        adapter = new FastItemAdapter<AccountAddItem>();
+        rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
+        rvAccount.setAdapter(adapter);
+
+        showAccounts();
     }
 
-    private void setSpinner(){
+    @Override
+    public void onPause() {
+        super.onPause();
 
-        popupWidth = ViewUtils.getScreenWidth(mContext) - (int) ViewUtils.convertDpToPixel(64, mContext);
-
-        adapter = new SpinnerItem(mContext, dataManager.getUser().getAccountIDs());
-
-        lv = new ListView(mContext);
-        lv.setAdapter(adapter);
-        lv.setDividerHeight(0);
-        lv.setOnItemClickListener(this);
-        lv.setOnItemSelectedListener(this);
-        lv.setSelector(android.R.color.transparent);
-        lv.setBackgroundResource(R.drawable.bg_spinner_pop);
-        lv.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
-        lv.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        selectedPosition = 0;
+        LocalBroadcastManager.getInstance(mContext).unregisterReceiver(broadcastReceiver);
     }
 
-    private void setPopupHeight(){
+    private void showAccounts(){
 
-        if (dataManager.getUser().getAccountIDs() == null || dataManager.getUser().getAccountIDs().size() == 0){
+        if (dataManager.getUser().getAccountIDs() != null){
 
-            popupHeight = 0;
-
-        } else {
-
-            if (dataManager.getUser().getAccountIDs().size() > 2){
-
-                popupHeight = (int) ViewUtils.convertDpToPixel(150, mContext);
-
+            if (adapter != null){
+                adapter.clear();
             } else {
+                adapter = new FastItemAdapter<>();
+            }
 
-                popupHeight = (int) ViewUtils.convertDpToPixel(50 * dataManager.getUser().getAccountIDs().size(), mContext);
+            for (int i = 0 ; i < dataManager.getUser().getAccountIDs().size() ; i ++){
+
+                AccountID accountID = dataManager.getUser().getAccountIDs().get(i);
+                adapter.add(new AccountAddItem(accountID, dataManager.getAccountPicker().isEnableDefault() && i == dataManager.getAccountPicker().getDefaultIndex(), this));
+
 
             }
         }
+
     }
 
-    private void setAccount(){
-        if (dataManager.getUser().getAccountIDs() != null && dataManager.getUser().getAccountIDs().size() > 0){
-            etAccount.setText(dataManager.getUser().getAccountIDs().get(selectedPosition).getType());
-        }
-    }
-
-    private void saveAccount(){
+    private void saveAccount(final String name, final String id, final boolean setDefault){
 
         RequestUserUpdate request = new RequestUserUpdate();
-        AccountID accountID = new AccountID(etName.getText().toString(), etValue.getText().toString());
+        AccountID accountID = new AccountID(name, id);
         List<AccountID> accountIDs = new ArrayList<>();
         accountIDs.add(accountID);
         request.setAccountIDs(accountIDs);
@@ -156,7 +127,7 @@ public class AccountFragment extends BaseFragment implements AdapterView.OnItemC
 
                 if (response.code() == 200 && response.body() != null){
 
-                    updateAccount();
+                    addAccount(name, id, setDefault);
 
                 } else {
 
@@ -178,24 +149,21 @@ public class AccountFragment extends BaseFragment implements AdapterView.OnItemC
 
     }
 
-    private void updateAccount(){
+    private void addAccount(String name, String id, boolean setDefault){
 
         User user = dataManager.getUser();
         List<AccountID> accountIDs = user.getAccountIDs();
-        accountIDs.add(new AccountID(etName.getText().toString(), etValue.getText().toString()));
+        accountIDs.add(new AccountID(name, id));
         dataManager.setUser(user);
 
-        adapter.setAccountIDs(dataManager.getUser().getAccountIDs());
-        adapter.notifyDataSetChanged();
 
         Picker accountPicker = dataManager.getAccountPicker();
         List<Value> values = accountPicker.getValues();
-        Value value = new Value(etValue.getText().toString(), etName.getText().toString());
+        Value value = new Value(id, name);
         values.add(value);
 
-        if (checkBox.isChecked()){
+        if (setDefault){
 
-            checkBox.setChecked(false);
             accountPicker.setEnableDefault(true);
             accountPicker.setDefaultIndex(values.size() - 1);
 
@@ -203,111 +171,105 @@ public class AccountFragment extends BaseFragment implements AdapterView.OnItemC
 
         dataManager.setAccountPicker(accountPicker);
 
-        etValue.setText("");
-        tiValue.setError(null);
-        etName.setText("");
-        tiName.setError(null);
-
-        etName.requestFocus();
-
+        showAccounts();
     }
 
-    @Click(R.id.cvFinish)
-    void generateButtonClicked(){
-        Intent intent = new Intent(BROADCAST_CHANGE_MENU);
-        intent.putExtra(MENU_ID, MENU_CODE);
-        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-    }
+    private void deleteAccount(int position){
 
-    @Click(R.id.spinner)
-    void spinnerClicked(){
-        if (!opened){
+        User user = dataManager.getUser();
+        List<AccountID> accountIDs = user.getAccountIDs();
+        accountIDs.remove(position);
+        dataManager.setUser(user);
 
-            setPopupHeight();
+        Picker accountPicker = dataManager.getAccountPicker();
+        List<Value> values = accountPicker.getValues();
+        values.remove(position);
 
-            if (dataManager.getUser() != null && dataManager.getUser().getAccountIDs() != null && dataManager.getUser().getAccountIDs().size() > 0){
-                if (pw == null || !pw.isShowing()) {
-                    pw = new PopupWindow(spinner);
-                    pw.setContentView(lv);
-                    pw.setWidth(popupWidth);
-                    pw.setHeight(popupHeight);
-                    pw.setOutsideTouchable(true);
-                    pw.setFocusable(true);
-                    pw.setClippingEnabled(false);
-                    pw.showAsDropDown(spinner, spinner.getLeft(),0);
-                    pw.setBackgroundDrawable(getResources().getDrawable(R.drawable.bg_spinner_pop));
-                    pw.setOnDismissListener(this);
-                    opened = true;
+        if (accountPicker.isEnableDefault()){
+
+            if (accountPicker.getDefaultIndex() == position){
+
+                accountPicker.setEnableDefault(false);
+
+            } else {
+
+                if (accountPicker.getDefaultIndex() != 0 && accountPicker.getDefaultIndex() == values.size()){
+
+                    accountPicker.setDefaultIndex(accountPicker.getDefaultIndex() - 1);
                 }
 
             }
 
-        } else {
-            if (pw != null){
-                pw.dismiss();
-            }
+
         }
+
+        dataManager.setAccountPicker(accountPicker);
+
+        showAccounts();
     }
 
-    @AfterTextChange(R.id.etName)
-    void nameChanged(){
-        if (TextUtils.isEmpty(etName.getText())){
-            tiName.setError(utils.getSpannableStringForEditTextError("This field is required", mContext));
 
-        } else {
-            tiName.setError(null);
-        }
-    }
+    private void showAccountAddDialog(){
 
-    @AfterTextChange(R.id.etValue)
-    void valueChanged(){
-        if (TextUtils.isEmpty(etValue.getText())){
-            tiValue.setError(utils.getSpannableStringForEditTextError("This field is required", mContext));
+        if (accountAddDialog == null){
+
+            accountAddDialog = new AccountAddDialog(mActivity);
+            accountAddDialog.setListener(this);
 
         } else {
-            tiValue.setError(null);
+
+            accountAddDialog.init();
+        }
+
+        if (!mActivity.isFinishing() && !accountAddDialog.isShowing()){
+
+            accountAddDialog.show();
+        }
+
+    }
+
+    private void hideAccountAddDialog(){
+
+        if (accountAddDialog != null){
+
+            accountAddDialog.dismiss();
+            accountAddDialog = null;
+
         }
     }
 
-    @Click(R.id.cvSave)
-    void saveButtonClicked(){
-        if (TextUtils.isEmpty(etName.getText())){
-            tiName.setError(utils.getSpannableStringForEditTextError("This field is required", mContext));
+    @Click(R.id.cvFinish)
+    void finishButtonClicked(){
 
-        }
-        if (TextUtils.isEmpty(etValue.getText())){
-            tiValue.setError(utils.getSpannableStringForEditTextError("This field is required", mContext));
-
-        }
-
-        if (!TextUtils.isEmpty(etName.getText()) && !TextUtils.isEmpty(etValue.getText())){
-            saveAccount();
-        }
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (pw != null)
-            pw.dismiss();
-        selectedPosition = position;
-        setAccount();
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        Intent intent = new Intent(BROADCAST_CHANGE_MENU);
+        intent.putExtra(MENU_ID, MENU_CODE);
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
 
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> parent) {
+    public void itemDelete(int position) {
+
+        if (dataManager.getUser().getAccountIDs().size() == 1){
+            showAlert("", "You have to at least 1 account ID.");
+
+        } else {
+            deleteAccount(position);
+        }
 
     }
 
     @Override
-    public void onDismiss() {
+    public void accountAddDialogOKButtonClicked(String name, String id, boolean setDefault) {
 
-        pw = null;
-        opened = false;
+        hideAccountAddDialog();
+        saveAccount(name, id, setDefault);
+    }
+
+    @Override
+    public void accountAddDialogCancelButtonClicked() {
+
+        hideAccountAddDialog();
 
     }
 }

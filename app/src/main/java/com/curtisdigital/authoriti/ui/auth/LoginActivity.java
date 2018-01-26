@@ -148,7 +148,7 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
 
     private void setAccount(){
 
-        if (list != null && list.size() > 0){
+        if (list != null && list.size() > 0  && selectedPosition < list.size()){
 
             etAccount.setText(list.get(selectedPosition).getType());
 
@@ -337,6 +337,11 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
                 pw.dismiss();
             }
         }
+    }
+
+    @Click(R.id.btnReset)
+    void resetButtonClicked(){
+        ResetPasswordActivity_.intent(mContext).start();
     }
 
     @Override

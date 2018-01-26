@@ -12,6 +12,7 @@ public interface Constants {
 
     // BroadCast Id
     String BROADCAST_CHANGE_MENU        = "BROADCAST_CHANGE_MENU";
+    String BROADCAST_ADD_BUTTON_CLICKED = "BROADCAST_ADD_BUTTON_CLICKED";
 
     // Menu Id
     long MENU_CODE                      = 1001;

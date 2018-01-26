@@ -13,7 +13,7 @@
         android:background="@color/primary"
         android:elevation="4dp">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -23,6 +23,7 @@
                 android:id="@+id/ivMenu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
                 android:padding="8dp"
                 android:layout_marginStart="-8dp"
                 android:tint="@android:color/white"
@@ -31,9 +32,9 @@
 
             <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/tvTitle"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_centerInParent="true"
                 android:gravity="center"
                 android:maxLines="1"
                 android:layout_marginStart="-8dp"
@@ -44,17 +45,31 @@
                 android:textSize="18sp"/>
 
             <ImageButton
-                android:id="@+id/ivAdd"
+                android:id="@+id/ivHelp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
                 android:padding="4dp"
                 android:layout_marginEnd="16dp"
-                android:src="@drawable/ic_add"
+                android:src="@drawable/ic_help_outline_white_24dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:visibility="invisible"/>
+                android:visibility="visible"/>
 
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btnAdd"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="8dp"
+                android:textAllCaps="false"
+                android:text="Add"
+                android:visibility="invisible"
+                fontPath="@string/font_oswaldo_regular"
+                style="@android:style/Widget.Holo.Button.Borderless"/>
 
-        </LinearLayout>
+        </RelativeLayout>
     </android.support.v7.widget.Toolbar>
 
     <FrameLayout

@@ -128,12 +128,13 @@ public class BaseActivity extends AppCompatActivity implements Constants{
     }
 
     @UiThread
-    protected void setupUI(View view){
+    protected void setupUI(final View view){
         // Set up touch listener for non-text box views to hide keyboard.
         if (!(view instanceof EditText)) {
             view.setOnTouchListener(new View.OnTouchListener() {
                 public boolean onTouch(View v, MotionEvent event) {
                     hideKeyboard();
+                    view.clearFocus();
                     return false;
                 }
             });

@@ -13,6 +13,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.curtisdigital.authoriti.api.AuthoritiAPI;
 import com.curtisdigital.authoriti.api.model.AuthLogIn;
@@ -22,6 +24,7 @@ import com.curtisdigital.authoriti.api.model.Scheme;
 import com.curtisdigital.authoriti.api.model.Value;
 import com.curtisdigital.authoriti.core.BaseActivity;
 import com.curtisdigital.authoriti.ui.auth.LoginActivity_;
+import com.curtisdigital.authoriti.ui.help.HelpActivity_;
 import com.curtisdigital.authoriti.ui.menu.AccountChaseFragment_;
 import com.curtisdigital.authoriti.ui.menu.AccountFragment_;
 import com.curtisdigital.authoriti.ui.menu.CodeGenerateFragment_;
@@ -72,6 +75,12 @@ public class MainActivity extends BaseActivity{
     @ViewById(R.id.toolbar)
     Toolbar toolbar;
 
+    @ViewById(R.id.btnAdd)
+    Button btnAdd;
+
+    @ViewById(R.id.ivHelp)
+    ImageButton ivHelp;
+
     Foreground.Listener listener = new Foreground.Listener() {
         @Override
         public void onBecameForeground() {
@@ -89,8 +98,14 @@ public class MainActivity extends BaseActivity{
 
                     logOut();
 
+                } else {
+
+                    dataManager.setInactiveTime("");
                 }
 
+            } else {
+
+                dataManager.setInactiveTime("");
             }
 
         }
@@ -207,6 +222,22 @@ public class MainActivity extends BaseActivity{
 
         }
 
+        if (menu_id == MENU_ACCOUNT){
+
+            if (dataManager.getUser().getInviteCode().equals("Startup2018")){
+                btnAdd.setVisibility(View.VISIBLE);
+            } else {
+                btnAdd.setVisibility(View.INVISIBLE);
+            }
+
+            ivHelp.setVisibility(View.INVISIBLE);
+
+        } else {
+
+            btnAdd.setVisibility(View.INVISIBLE);
+            ivHelp.setVisibility(View.VISIBLE);
+
+        }
         changeFragment(fragment);
     }
 
@@ -236,6 +267,16 @@ public class MainActivity extends BaseActivity{
         } else {
             drawer.openDrawer();
         }
+    }
+
+    @Click(R.id.ivHelp)
+    void helpButtonClicked(){
+        HelpActivity_.intent(mContext).start();
+    }
+
+    @Click(R.id.btnAdd)
+    void addButtonClicked(){
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(BROADCAST_ADD_BUTTON_CLICKED));
     }
 
     @Override

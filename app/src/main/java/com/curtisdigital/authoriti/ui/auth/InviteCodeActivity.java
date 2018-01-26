@@ -2,7 +2,9 @@ package com.curtisdigital.authoriti.ui.auth;
 
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.curtisdigital.authoriti.R;
 import com.curtisdigital.authoriti.api.AuthoritiAPI;
@@ -17,6 +19,7 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 
 import retrofit2.Call;
@@ -30,6 +33,9 @@ import retrofit2.Response;
 @EActivity(R.layout.activity_invite_code)
 public class InviteCodeActivity extends BaseActivity{
 
+    @Extra
+    boolean showBack = true;
+
     @Bean
     AuthoritiUtils utils;
 
@@ -42,8 +48,17 @@ public class InviteCodeActivity extends BaseActivity{
     @ViewById(R.id.etCode)
     EditText etCode;
 
+    @ViewById(R.id.ivBack)
+    ImageView ivBack;
+
     @AfterViews
     void callAfterViewInjection(){
+
+        if (showBack){
+            ivBack.setVisibility(View.VISIBLE);
+        } else {
+            ivBack.setVisibility(View.INVISIBLE);
+        }
 
     }
 

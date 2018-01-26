@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.curtisdigital.authoriti">
+    package="com.curtisdigital.authoriti"
+    android:versionName="1.0"
+    android:versionCode="1">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA"/>
@@ -21,7 +23,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
 
-        <activity android:name=".SplashActivity"
+        <activity android:name=".SplashActivity_"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -41,6 +43,8 @@
         <activity android:name=".ui.auth.AccountConfirmActivity_"/>
         <activity android:name=".ui.pick.PasscodePickActivity_"/>
         <activity android:name=".ui.code.CodeGenerateActivity_"/>
+        <activity android:name=".ui.help.HelpActivity_"/>
+        <activity android:name=".ui.auth.ResetPasswordActivity_"/>
 
         <meta-data
             android:name="io.fabric.ApiKey"

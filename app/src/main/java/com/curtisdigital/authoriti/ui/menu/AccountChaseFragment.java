@@ -2,16 +2,10 @@ package com.curtisdigital.authoriti.ui.menu;
 
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.TextUtils;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.PopupWindow;
 
 import com.curtisdigital.authoriti.R;
 import com.curtisdigital.authoriti.api.AuthoritiAPI;
@@ -20,13 +14,15 @@ import com.curtisdigital.authoriti.api.model.Picker;
 import com.curtisdigital.authoriti.api.model.User;
 import com.curtisdigital.authoriti.api.model.Value;
 import com.curtisdigital.authoriti.core.BaseFragment;
-import com.curtisdigital.authoriti.ui.items.SpinnerItem;
+import com.curtisdigital.authoriti.ui.alert.AccountConfirmDialog;
+import com.curtisdigital.authoriti.ui.items.AccountConfirmItem;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.curtisdigital.authoriti.utils.AuthoritiUtils;
-import com.curtisdigital.authoriti.utils.ViewUtils;
 import com.google.gson.JsonObject;
+import com.mikepenz.fastadapter.FastAdapter;
+import com.mikepenz.fastadapter.IAdapter;
+import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 
-import org.androidannotations.annotations.AfterTextChange;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
@@ -44,7 +40,7 @@ import retrofit2.Response;
  */
 
 @EFragment(R.layout.fragment_account_chase)
-public class AccountChaseFragment extends BaseFragment implements AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener, PopupWindow.OnDismissListener {
+public class AccountChaseFragment extends BaseFragment implements AccountConfirmDialog.AccountConfirmDialogListener {
 
     @Bean
     AuthoritiUtils utils;
@@ -55,87 +51,70 @@ public class AccountChaseFragment extends BaseFragment implements AdapterView.On
     @ViewById(R.id.id_account_confirm_fragment)
     View view;
 
-    @ViewById(R.id.tiValue)
-    TextInputLayout tiValue;
+    @ViewById(R.id.rvAccount)
+    RecyclerView rvAccount;
 
-    @ViewById(R.id.etValue)
-    EditText etValue;
+    FastItemAdapter<AccountConfirmItem> adapter;
+    AccountConfirmDialog accountConfirmDialog;
 
-    @ViewById(R.id.etAccount)
-    EditText etAccount;
-
-    @ViewById(R.id.spinner)
-    View spinner;
-
-    @ViewById(R.id.checkbox)
-    CheckBox checkBox;
-
-    List<AccountID> accountIDs;
-    SpinnerItem adapter;
-    private PopupWindow pw;
-    private ListView lv;
-    private boolean opened;
-    private int selectedPosition;
-    private int popupHeight, popupWidth;
+    AccountID selectedAccountId;
+    int selectedPosition;
 
     @AfterViews
     void callAfterViewInjection(){
 
-        tiValue.setError(null);
+        adapter = new FastItemAdapter<AccountConfirmItem>();
+        rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
+        rvAccount.setAdapter(adapter);
 
-        setAccountIDs();
-        setSpinner();
-        setAccount();
+        adapter.withOnClickListener(new FastAdapter.OnClickListener<AccountConfirmItem>() {
+            @Override
+            public boolean onClick(View v, IAdapter<AccountConfirmItem> adapter, AccountConfirmItem item, int position) {
 
+                selectedAccountId = item.getAccountID();
+                selectedPosition = position;
+                if (selectedAccountId.isConfirmed()){
+                    showAlert("", "This account has already confirmed.");
+
+                } else {
+
+                    showAccountConfirmDialog();
+                }
+
+                return false;
+            }
+        });
+        showAccounts();
     }
 
-    private void setAccountIDs(){
+    private void showAccounts(){
 
-        accountIDs = dataManager.getUser().getAccountIDs();
+        if (adapter != null){
+            adapter.clear();
+        } else {
+            adapter = new FastItemAdapter<>();
+        }
 
-        if (dataManager.getUser().getUnconfirmedAccountIDs() != null && dataManager.getUser().getUnconfirmedAccountIDs().size() > 0){
+        User user = dataManager.getUser();
+        if (user.getAccountIDs() != null && user.getAccountIDs().size() > 0){
+            for (int i = 0 ; i < user.getAccountIDs().size() ; i ++){
+                adapter.add(new AccountConfirmItem(user.getAccountIDs().get(i),dataManager.getAccountPicker().isEnableDefault() && i == dataManager.getAccountPicker().getDefaultIndex()));
+            }
+        }
 
-            for (AccountID accountID : dataManager.getUser().getUnconfirmedAccountIDs()){
-
-                accountIDs.add(accountID);
-
+        if (user.getUnconfirmedAccountIDs() != null && user.getUnconfirmedAccountIDs().size() > 0){
+            for (int i = 0 ; i < user.getUnconfirmedAccountIDs().size() ; i ++){
+                adapter.add(new AccountConfirmItem(user.getUnconfirmedAccountIDs().get(i),false));
             }
         }
     }
 
-    private void setSpinner(){
-
-        popupHeight = (int) ViewUtils.convertDpToPixel(50 * accountIDs.size(), mContext);
-        popupWidth = ViewUtils.getScreenWidth(mContext) - (int) ViewUtils.convertDpToPixel(64, mContext);
-
-
-        adapter = new SpinnerItem(mContext, accountIDs);
-
-        lv = new ListView(mContext);
-        lv.setAdapter(adapter);
-        lv.setDividerHeight(0);
-        lv.setOnItemClickListener(this);
-        lv.setOnItemSelectedListener(this);
-        lv.setSelector(android.R.color.transparent);
-        lv.setBackgroundResource(R.drawable.bg_spinner_pop);
-        lv.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
-        lv.setOverScrollMode(View.OVER_SCROLL_NEVER);
-
-    }
-
-    private void setAccount(){
-        if (accountIDs != null && accountIDs.size() > 0){
-            etAccount.setText(accountIDs.get(selectedPosition).getType());
-        }
-    }
-
-    private void saveAccountName(){
+    private void saveAccountName(final String id, final boolean setDefault){
 
         String token = "Bearer " + dataManager.getUser().getToken();
         displayProgressDialog("");
 
-        AuthoritiAPI.APIService().confirmAccountValue(token, etValue.getText().toString()).enqueue(new Callback<JsonObject>() {
+        AuthoritiAPI.APIService().confirmAccountValue(token, id).enqueue(new Callback<JsonObject>() {
 
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
@@ -149,7 +128,7 @@ public class AccountChaseFragment extends BaseFragment implements AdapterView.On
 
                             Snackbar.make(view, "Add Account Successfully", 1000).show();
 
-                            updateAccount();
+                            updateAccount(id, setDefault);
 
                         } else {
                             showAlert("","Failed to confirm your account number. Try again later.");
@@ -173,16 +152,16 @@ public class AccountChaseFragment extends BaseFragment implements AdapterView.On
         });
     }
 
-    private void updateAccount(){
+    private void updateAccount(String id, boolean setDefault){
 
-        AccountID accountID = new AccountID(accountIDs.get(selectedPosition).getType(), etValue.getText().toString());
+        AccountID accountID = new AccountID(selectedAccountId.getType(), id);
         User user = dataManager.getUser();
         user.getAccountIDs().add(accountID);
 
         for (int i = 0 ; i < user.getUnconfirmedAccountIDs().size() ; i ++){
 
             AccountID accountID1 = user.getUnconfirmedAccountIDs().get(i);
-            if (accountID1.getType().equals(accountIDs.get(selectedPosition).getType())){
+            if (accountID1.getType().equals(selectedAccountId.getType())){
                 user.getUnconfirmedAccountIDs().remove(accountID1);
             }
 
@@ -190,100 +169,22 @@ public class AccountChaseFragment extends BaseFragment implements AdapterView.On
 
         dataManager.setUser(user);
 
-        updateAccountPicker(accountID);
-        accountIDs.get(selectedPosition).setConfirmed(true);
-        adapter.setAccountIDs(accountIDs);
-        adapter.notifyDataSetChanged();
+        Picker accountPicker = dataManager.getAccountPicker();
+        List<Value> values = accountPicker.getValues();
+        Value value = new Value(id, selectedAccountId.getType());
+        values.add(value);
 
-        etValue.setText("");
-        tiValue.setError(null);
+        if (setDefault){
 
-    }
-
-    private void updateAccountPicker(AccountID accountID){
-
-        Picker picker = dataManager.getAccountPicker();
-        Value value = new Value(accountID.getIdentifier(), accountID.getType());
-        picker.getValues().add(value);
-
-        dataManager.setAccountPicker(picker);
-
-        if (checkBox.isChecked()){
-
-            checkBox.setChecked(false);
-
-            picker.setEnableDefault(true);
-            picker.setDefaultIndex(selectedPosition);
-        }
-
-        dataManager.setAccountPicker(picker);
-
-
-    }
-
-    @Click(R.id.spinner)
-    void spinnerClicked(){
-        if (!opened){
-
-            if (accountIDs!= null && accountIDs.size() > 0){
-                if (pw == null || !pw.isShowing()) {
-                    pw = new PopupWindow(spinner);
-                    pw.setContentView(lv);
-                    pw.setWidth(popupWidth);
-                    pw.setHeight(popupHeight);
-                    pw.setOutsideTouchable(true);
-                    pw.setFocusable(true);
-                    pw.setClippingEnabled(false);
-                    pw.showAsDropDown(spinner, spinner.getLeft(),0);
-                    pw.setBackgroundDrawable(getResources().getDrawable(R.drawable.bg_spinner_pop));
-                    pw.setOnDismissListener(this);
-                    opened = true;
-                }
-
-            }
-
-        } else {
-            if (pw != null){
-                pw.dismiss();
-            }
-        }
-    }
-
-    @Click(R.id.cvConfirm)
-    void confirmButtonClicked(){
-
-        if (TextUtils.isEmpty(etValue.getText())){
-
-            tiValue.setError(utils.getSpannableStringForEditTextError("This field is required", mContext));
-
-        } else {
-
-            if (accountIDs.get(selectedPosition).isConfirmed()){
-
-                showAlert("", "This account is already confirmed.");
-
-            } else {
-
-                saveAccountName();
-
-            }
-
+            accountPicker.setEnableDefault(true);
+            accountPicker.setDefaultIndex(values.size() - 1);
 
         }
-    }
 
-    @AfterTextChange(R.id.etValue)
-    void valueChanged(){
+        dataManager.setAccountPicker(accountPicker);
 
-        if (TextUtils.isEmpty(etValue.getText())){
+        showAccounts();
 
-            tiValue.setError(utils.getSpannableStringForEditTextError("This field is required", mContext));
-
-        } else {
-
-            tiValue.setError(null);
-
-        }
     }
 
     @Click(R.id.cvFinish)
@@ -293,27 +194,45 @@ public class AccountChaseFragment extends BaseFragment implements AdapterView.On
         LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (pw != null)
-            pw.dismiss();
-        selectedPosition = position;
-        setAccount();
+    private void showAccountConfirmDialog(){
+
+        if (accountConfirmDialog == null){
+
+            accountConfirmDialog = new AccountConfirmDialog(mActivity);
+            accountConfirmDialog.setListener(this);
+
+        } else {
+
+            accountConfirmDialog.init();
+
+        }
+
+        if (!mActivity.isFinishing() && !accountConfirmDialog.isShowing()){
+
+            accountConfirmDialog.show();
+        }
+    }
+
+    private void hideAccountConfirmDialog(){
+
+        if (accountConfirmDialog != null){
+
+            accountConfirmDialog.dismiss();
+            accountConfirmDialog = null;
+        }
     }
 
     @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+    public void accountConfirmDialogOKButtonClicked(String id, boolean setDefault) {
 
+        hideAccountConfirmDialog();
+        saveAccountName(id, setDefault);
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> parent) {
+    public void accountConfirmDialogCancelButtonClicked() {
 
-    }
+        hideAccountConfirmDialog();
 
-    @Override
-    public void onDismiss() {
-        pw = null;
-        opened = false;
     }
 }
