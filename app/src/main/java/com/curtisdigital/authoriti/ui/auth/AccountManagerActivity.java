@@ -268,6 +268,9 @@ public class AccountManagerActivity extends SecurityActivity implements Security
     }
 
     private void goHome(){
+
+        dataManager.setScheme(null);
+        
         Intent intent = new Intent(this, MainActivity_.class);
         intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
