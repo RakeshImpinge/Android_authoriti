@@ -24,6 +24,10 @@ public class Picker {
     private List<Value> values;
 
     @Expose
+    @SerializedName("label")
+    private String label;
+
+    @Expose
     @SerializedName("title")
     private String title;
 
@@ -34,12 +38,13 @@ public class Picker {
 
     }
 
-    public Picker(String picker, int bytes, List<Value> values, String title){
+    public Picker(String picker, int bytes, List<Value> values, String title, String label){
 
         this.picker = picker;
         this.bytes = bytes;
         this.values = values;
         this.title = title;
+        this.label = label;
 
         enableDefault = false;
         defaultIndex = -1;
@@ -91,5 +96,13 @@ public class Picker {
 
     public void setDefaultIndex(int defaultIndex) {
         this.defaultIndex = defaultIndex;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 }

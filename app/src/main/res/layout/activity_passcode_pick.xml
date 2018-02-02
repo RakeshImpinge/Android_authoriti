@@ -66,6 +66,7 @@
                 android:text=""
                 android:textSize="18sp"
                 android:textColor="@color/colorTextPrimary"
+                android:textAllCaps="true"
                 fontPath="@string/font_oswaldo_light"
                 tools:ignore="MissingPrefix" />
 

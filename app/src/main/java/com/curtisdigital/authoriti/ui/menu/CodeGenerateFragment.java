@@ -110,7 +110,7 @@ public class CodeGenerateFragment extends BaseFragment {
 
                         if (dataManager.getUser() != null && dataManager.getUser().getAccountIDs() != null && dataManager.getUser().getAccountIDs().size() > 0){
 
-                            Picker picker1 = new Picker(picker.getPicker(), picker.getBytes(), picker.getValues(), picker.getTitle());
+                            Picker picker1 = new Picker(picker.getPicker(), picker.getBytes(), picker.getValues(), picker.getTitle(), picker.getLabel());
 
                             List<Value> values = new ArrayList<>();
                             for (AccountID accountID : dataManager.getUser().getAccountIDs()){

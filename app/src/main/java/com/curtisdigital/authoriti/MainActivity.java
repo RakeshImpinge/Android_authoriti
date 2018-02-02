@@ -340,19 +340,36 @@ public class MainActivity extends BaseActivity{
 
                     case PICKER_ACCOUNT:
 
+                        if (dataManager.getAccountPicker() != null){
+
+                            Picker temp = new Picker();
+                            temp.setPicker(dataManager.getAccountPicker().getPicker());
+                            temp.setBytes(dataManager.getAccountPicker().getBytes());
+                            temp.setValues(dataManager.getAccountPicker().getValues());
+                            temp.setTitle(picker.getTitle());
+                            temp.setLabel(picker.getLabel());
+                            temp.setEnableDefault(dataManager.getAccountPicker().isEnableDefault());
+                            temp.setDefaultIndex(dataManager.getAccountPicker().getDefaultIndex());
+
+                            dataManager.setAccountPicker(temp);
+                        }
+
                         break;
 
                     case PICKER_INDUSTRY:
 
                         if (dataManager.getIndustryPicker() != null){
 
-                            if (dataManager.getIndustryPicker().isEnableDefault() && dataManager.getIndustryPicker().getDefaultIndex() < picker.getValues().size()){
+                            Picker temp = new Picker();
+                            temp.setPicker(picker.getPicker());
+                            temp.setBytes(picker.getBytes());
+                            temp.setValues(picker.getValues());
+                            temp.setTitle(picker.getTitle());
+                            temp.setLabel(picker.getLabel());
+                            temp.setEnableDefault(dataManager.getIndustryPicker().isEnableDefault());
+                            temp.setDefaultIndex(dataManager.getIndustryPicker().getDefaultIndex());
 
-                                picker.setEnableDefault(dataManager.getIndustryPicker().isEnableDefault());
-                                picker.setDefaultIndex(dataManager.getIndustryPicker().getDefaultIndex());
-
-                                dataManager.setIndustryPicker(picker);
-                            }
+                            dataManager.setIndustryPicker(temp);
 
 
                         } else {
@@ -366,13 +383,16 @@ public class MainActivity extends BaseActivity{
 
                         if (dataManager.getLocationPicker() != null){
 
-                            if (dataManager.getLocationPicker().isEnableDefault() && dataManager.getLocationPicker().getDefaultIndex() < picker.getValues().size()){
+                            Picker temp = new Picker();
+                            temp.setPicker(picker.getPicker());
+                            temp.setBytes(picker.getBytes());
+                            temp.setValues(picker.getValues());
+                            temp.setTitle(picker.getTitle());
+                            temp.setLabel(picker.getLabel());
+                            temp.setEnableDefault(dataManager.getLocationPicker().isEnableDefault());
+                            temp.setDefaultIndex(dataManager.getLocationPicker().getDefaultIndex());
 
-                                picker.setEnableDefault(dataManager.getLocationPicker().isEnableDefault());
-                                picker.setDefaultIndex(dataManager.getLocationPicker().getDefaultIndex());
-
-                                dataManager.setLocationPicker(picker);
-                            }
+                            dataManager.setLocationPicker(temp);
 
 
                         } else {
@@ -389,6 +409,21 @@ public class MainActivity extends BaseActivity{
                         break;
 
                     case PICKER_TIME:
+
+                        if (dataManager.getTimePicker() != null){
+
+                            Picker temp = new Picker();
+                            temp.setPicker(picker.getPicker());
+                            temp.setBytes(picker.getBytes());
+                            temp.setValues(dataManager.getTimePicker().getValues());
+                            temp.setTitle(picker.getTitle());
+                            temp.setLabel(picker.getLabel());
+                            temp.setEnableDefault(dataManager.getTimePicker().isEnableDefault());
+                            temp.setDefaultIndex(dataManager.getTimePicker().getDefaultIndex());
+
+                            dataManager.setTimePicker(temp);
+
+                        }
 
                         break;
 

@@ -55,7 +55,7 @@ public class CodeItem extends AbstractItem<CodeItem, CodeItem.ViewHolder>{
 
         final AuthoritiUtils_ utils = AuthoritiUtils_.getInstance_(context);
 
-        holder.tvTitle.setText(utils.getPickerTitle(picker.getPicker()));
+        holder.tvTitle.setText(picker.getLabel() + " : ");
 
         if (utils.presentSelectedIndex(context, picker.getPicker())){
 
@@ -73,7 +73,7 @@ public class CodeItem extends AbstractItem<CodeItem, CodeItem.ViewHolder>{
 
         } else {
 
-            if (picker.isEnableDefault() && picker.getDefaultIndex() != -1){
+            if (picker.isEnableDefault() && picker.getDefaultIndex() != -1 && picker.getDefaultIndex() < picker.getValues().size()){
 
                 holder.markDefault.setVisibility(View.VISIBLE);
 

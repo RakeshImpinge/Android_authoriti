@@ -83,30 +83,32 @@ public class WipeFragment extends BaseFragment {
     @Click(R.id.tvWipe)
     void wipe(){
 
-        String token = "Bearer " + dataManager.getUser().getToken();
+        wipeLogOut();
 
-        displayProgressDialog("");
-
-        AuthoritiAPI.APIService().wipe(token).enqueue(new Callback<JsonObject>() {
-            @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-
-                dismissProgressDialog();
-                if (response.code() == 200){
-
-                    wipeLogOut();
-
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-
-                dismissProgressDialog();
-
-            }
-        });
+//        String token = "Bearer " + dataManager.getUser().getToken();
+//
+//        displayProgressDialog("");
+//
+//        AuthoritiAPI.APIService().wipe(token).enqueue(new Callback<JsonObject>() {
+//            @Override
+//            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+//
+//                dismissProgressDialog();
+//                if (response.code() == 200){
+//
+//                    wipeLogOut();
+//
+//                }
+//
+//            }
+//
+//            @Override
+//            public void onFailure(Call<JsonObject> call, Throwable t) {
+//
+//                dismissProgressDialog();
+//
+//            }
+//        });
 
     }
 }

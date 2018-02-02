@@ -32,33 +32,6 @@ public class AuthoritiUtils implements Constants{
         }
     }
 
-    public String getPickerTitle(String identifier){
-
-        String title = "";
-
-        switch (identifier){
-            case PICKER_ACCOUNT:
-                title = "AccountId : ";
-                break;
-            case PICKER_INDUSTRY:
-                title = "Industry : ";
-                break;
-            case PICKER_LOCATION_STATE:
-                title = "Location : ";
-                break;
-            case PICKER_TIME:
-                title = "Time : ";
-                break;
-            default:
-                title = "";
-                break;
-
-        }
-
-        return title;
-
-    }
-
     public int getPickerSelectedIndex(Context context, String identifier){
 
         int index = 0;
@@ -252,6 +225,7 @@ public class AuthoritiUtils implements Constants{
         timePicker.setPicker(picker.getPicker());
         timePicker.setBytes(picker.getBytes());
         timePicker.setTitle(picker.getTitle());
+        timePicker.setLabel(picker.getLabel());
 
         List<Value> values = new ArrayList<>();
         values.add(new Value("", TIME_15_MINS));
