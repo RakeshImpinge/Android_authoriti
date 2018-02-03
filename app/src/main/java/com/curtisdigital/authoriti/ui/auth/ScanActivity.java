@@ -475,12 +475,12 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
     @Click(R.id.tvSkip)
     void skipButtonClicked(){
 
-//        isSkip = true;
-//        isNext = false;
-//
-//        checkProcess();
+        isSkip = true;
+        isNext = false;
 
-        AccountManagerActivity_.intent(mContext).start();
+        checkProcess();
+
+//        AccountManagerActivity_.intent(mContext).start();
     }
 
     @Click(R.id.cvNext)
