@@ -37,6 +37,6 @@ public interface Constants {
     String TIME_CUSTOM_TIME             = "Custom Time";
     String TIME_CUSTOM_DATE             = "Custom Date/Time";
 
-    String ACUANT_LICENSE_KEY           = "C1C8C5BD8EE2";
+    String ACUANT_LICENSE_KEY           = "FAD9B2F0E7F1";
 
 }
