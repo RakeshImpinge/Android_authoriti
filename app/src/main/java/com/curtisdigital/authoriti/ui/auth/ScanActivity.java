@@ -510,9 +510,9 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
         displayProgressDialog("Processing...");
 
         if(isConnect){
-            acuantAndroidMobileSdkControllerInstance.callProcessImageConnectServices(frontBitmap, backBitmap, sPdf417String, this, options);
+            acuantAndroidMobileSdkControllerInstance.callProcessImageConnectServices(frontBitmap, backBitmap, null, this, options);
         }else {
-            acuantAndroidMobileSdkControllerInstance.callProcessImageServices(frontBitmap, backBitmap, sPdf417String, this, options);
+            acuantAndroidMobileSdkControllerInstance.callProcessImageServices(frontBitmap, backBitmap, null, this, options);
 
         }
 

@@ -20,6 +20,6 @@
     <string name="text_about">Authoriti is an innovation of CTM Insights. CTM is an early stage technology studio and incubator, focused on finding new approaches to structural problems in cyber security.  We have significant leadership experience dealing with InfoSec at-scale at the world's leading financial institutions.
 
 Authoriti is the developer of the Authoriti Permission Code™, which gives institutions the confidence that financial transactions are authorized.</string>
-    <string name="txt_add_account">To complete sign up, you need to add at least an account. \n Please click \"Add\" on top right.</string>
+    <string name="txt_add_account">To complete sign up, you need to add at least one ID to your wallet. \n Please click \"Add\" on top right.</string>
 
 </resources>

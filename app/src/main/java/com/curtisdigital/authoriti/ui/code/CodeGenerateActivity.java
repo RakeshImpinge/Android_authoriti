@@ -1,9 +1,12 @@
 package com.curtisdigital.authoriti.ui.code;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.curtisdigital.authoriti.R;
 import com.curtisdigital.authoriti.api.model.Picker;
@@ -56,6 +59,11 @@ public class CodeGenerateActivity extends BaseActivity {
         String code = generateCode();
 
         tvCode.setText(utils.fromHtml(generateHTMLString(code)));
+
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("permission code", code);
+        clipboard.setPrimaryClip(clip);
+//        Toast.makeText(this,"Code copied to clipboard", Toast.LENGTH_SHORT).show();
 
     }
 
