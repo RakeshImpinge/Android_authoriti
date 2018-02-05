@@ -6,6 +6,8 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import com.curtisdigital.authoriti.MainActivity_;
 import com.curtisdigital.authoriti.R;
@@ -29,6 +31,7 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
+import org.w3c.dom.Text;
 
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
@@ -59,6 +62,9 @@ public class AccountManagerActivity extends SecurityActivity implements Security
 
     @ViewById(R.id.rvAccount)
     RecyclerView rvAccount;
+
+    @ViewById(R.id.tvEmpty)
+    TextView tvEmpty;
 
     FastItemAdapter<AccountAddItem> adapter;
 
@@ -127,6 +133,8 @@ public class AccountManagerActivity extends SecurityActivity implements Security
     }
 
     private void showAccount(){
+
+        tvEmpty.setVisibility(View.GONE);
 
         if (adapter != null){
             adapter.clear();

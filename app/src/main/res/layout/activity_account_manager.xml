@@ -65,6 +65,18 @@
             fontPath="@string/font_oswaldo_regular"
             android:textSize="17sp"/>
 
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/tvEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="@string/txt_add_account"
+            android:textColor="@color/colorTextSecondary"
+            android:textAlignment="center"
+            android:lineSpacingMultiplier="1.2"
+            fontPath="@string/font_oswaldo_regular"
+            android:textSize="12sp"/>
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rvAccount"
             android:layout_width="match_parent"
