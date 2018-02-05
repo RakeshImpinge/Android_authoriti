@@ -63,7 +63,7 @@ public class CodeGenerateActivity extends BaseActivity {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("permission code", code);
         clipboard.setPrimaryClip(clip);
-//        Toast.makeText(this,"Code copied to clipboard", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,"Code copied to clipboard", Toast.LENGTH_SHORT).show();
 
     }
 
