@@ -21,5 +21,7 @@
 
 Authoriti is the developer of the Authoriti Permission Code™, which gives institutions the confidence that financial transactions are authorized.</string>
     <string name="txt_add_account">To complete sign up, you need to add at least one ID to your wallet. \n Please click \"Add\" on top right.</string>
+    <string name="hold_steady">HOLD STEADY</string>
+    <string name="align_and_tap">ALIGN AND TAP</string>
 
 </resources>

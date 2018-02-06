@@ -117,6 +117,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
         }
 
+        acuantAndroidMobileSdkControllerInstance.setLicensekey(ACUANT_LICENSE_KEY);
 
         acuantAndroidMobileSdkControllerInstance.setWebServiceListener(this);
         acuantAndroidMobileSdkControllerInstance.setWatermarkText("Powered By Acuant", 0, 0, 30, 0);
@@ -191,15 +192,19 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
     private void showCameraInterface(){
 
-//        if (!isBack){
-//
-//            acuantAndroidMobileSdkControllerInstance.showManualCameraInterface(this, CardType.DRIVERS_LICENSE, cardRegion, true);
-//        } else {
-//
-//            acuantAndroidMobileSdkControllerInstance.showCameraInterfacePDF417(this, CardType.DRIVERS_LICENSE, cardRegion);
-//        }
+        acuantAndroidMobileSdkControllerInstance.setInitialMessageDescriptor(R.layout.align_an_tap);
+        acuantAndroidMobileSdkControllerInstance.setFinalMessageDescriptor(R.layout.hold_stay);
+        acuantAndroidMobileSdkControllerInstance.setPdf417BarcodeImageDrawable(getResources().getDrawable(R.drawable.barcode));
 
-        acuantAndroidMobileSdkControllerInstance.showManualCameraInterface(this, CardType.DRIVERS_LICENSE, cardRegion, isBack);
+        if (!isBack){
+
+            acuantAndroidMobileSdkControllerInstance.showManualCameraInterface(this, CardType.DRIVERS_LICENSE, cardRegion, true);
+        } else {
+
+            acuantAndroidMobileSdkControllerInstance.showCameraInterfacePDF417(this, CardType.DRIVERS_LICENSE, cardRegion);
+        }
+
+//        acuantAndroidMobileSdkControllerInstance.showManualCameraInterface(this, CardType.DRIVERS_LICENSE, cardRegion, isBack);
 
     }
 
@@ -510,9 +515,9 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
         displayProgressDialog("Processing...");
 
         if(isConnect){
-            acuantAndroidMobileSdkControllerInstance.callProcessImageConnectServices(frontBitmap, backBitmap, null, this, options);
+            acuantAndroidMobileSdkControllerInstance.callProcessImageConnectServices(frontBitmap, backBitmap, sPdf417String, this, options);
         }else {
-            acuantAndroidMobileSdkControllerInstance.callProcessImageServices(frontBitmap, backBitmap, null, this, options);
+            acuantAndroidMobileSdkControllerInstance.callProcessImageServices(frontBitmap, backBitmap, sPdf417String, this, options);
 
         }
 
@@ -602,7 +607,6 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
 
     }
-
 
     @Override
     public void activateLicenseKeyCompleted(LicenseActivationDetails licenseActivationDetails) {
