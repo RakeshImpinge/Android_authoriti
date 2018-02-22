@@ -125,6 +125,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
         DisplayMetrics metrics = this.getResources().getDisplayMetrics();
         acuantAndroidMobileSdkControllerInstance.setAcuantErrorListener(this);
 
+
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         int height = displaymetrics.heightPixels;
@@ -157,6 +158,10 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
         acuantAndroidMobileSdkControllerInstance.setInstructionText(instrunctionStr, left,top,textPaint);
         acuantAndroidMobileSdkControllerInstance.setSubInstructionText(subInstString, subLeft,top+30,subtextPaint);
+
+        acuantAndroidMobileSdkControllerInstance.setInitialMessageDescriptor(R.layout.align_an_tap);
+        acuantAndroidMobileSdkControllerInstance.setFinalMessageDescriptor(R.layout.hold_stay);
+        acuantAndroidMobileSdkControllerInstance.setPdf417BarcodeImageDrawable(getResources().getDrawable(R.drawable.image_hold));
 
         acuantAndroidMobileSdkControllerInstance.setFlashlight(false);
         acuantAndroidMobileSdkControllerInstance.setCropBarcode(false);
@@ -191,10 +196,6 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
     }
 
     private void showCameraInterface(){
-
-        acuantAndroidMobileSdkControllerInstance.setInitialMessageDescriptor(R.layout.align_an_tap);
-        acuantAndroidMobileSdkControllerInstance.setFinalMessageDescriptor(R.layout.hold_stay);
-        acuantAndroidMobileSdkControllerInstance.setPdf417BarcodeImageDrawable(getResources().getDrawable(R.drawable.barcode));
 
         if (!isBack){
 
@@ -366,7 +367,8 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
                 } else {
 
-                    showAlert("", "Could not verify your Driver's License, Please try again.");
+//                    showAlert("", "Could not verify your Driver's License, Please try again.");
+                    showFacialCamera();
                 }
 
             }
@@ -726,9 +728,10 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
     @Override
     public void onPDF417Finish(String result) {
-        sPdf417String = result;
-        Log.e("sPdf417String", sPdf417String);
 
+        Log.e("sPdf417String", result);
+
+        sPdf417String = result;
         capturedsPdf417String = true;
 
 //        checkProcess();
@@ -902,12 +905,13 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
         } else {
 
-            if (faceBitmap != null){
+//            if (faceBitmap != null){
+//
+//                processFaceValidation(faceBitmap);
+//
+//            }
 
-                processFaceValidation(faceBitmap);
-
-            }
-
+            AccountManagerActivity_.intent(mContext).start();
 
         }
 
