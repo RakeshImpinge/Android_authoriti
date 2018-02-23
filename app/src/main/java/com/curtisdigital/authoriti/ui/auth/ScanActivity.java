@@ -42,10 +42,14 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -367,8 +371,8 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
                 } else {
 
-//                    showAlert("", "Could not verify your Driver's License, Please try again.");
-                    showFacialCamera();
+                    showAlert("", "Could not verify your Driver's License, Please try again.");
+//                    showFacialCamera();
                 }
 
             }
@@ -390,6 +394,28 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
         event.setTime(now.toString());
         event.setMetaData(metaData);
 
+        MultipartBody.Part front = null;
+        if (frontBitmap != null){
+
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            frontBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            final byte[] bitmapData = stream.toByteArray();
+            RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), bitmapData);
+            front = MultipartBody.Part.createFormData("front", "front.jpg", reqFile);
+
+        }
+
+        MultipartBody.Part back = null;
+        if (backBitmap != null){
+
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            backBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            final byte[] bitmapData = stream.toByteArray();
+            RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), bitmapData);
+            back = MultipartBody.Part.createFormData("back", "back.jpg", reqFile);
+
+        }
+
         List<Event> events = new ArrayList<>();
         events.add(event);
 
@@ -397,7 +423,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
         requestDLSave.setEvents(events);
         requestDLSave.setToken("");
 
-        AuthoritiAPI.APIService().saveDLInfo(requestDLSave).enqueue(new Callback<JsonObject>() {
+        AuthoritiAPI.APIService().saveDLInfo(RequestBody.create(MediaType.parse("text/plain"),RequestDLSave.toJSON(requestDLSave)), front, back).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
 
@@ -522,8 +548,6 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
             acuantAndroidMobileSdkControllerInstance.callProcessImageServices(frontBitmap, backBitmap, sPdf417String, this, options);
 
         }
-
-        resetPdf417String();
 
     }
 

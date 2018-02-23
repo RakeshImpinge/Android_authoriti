@@ -15,7 +15,6 @@ import org.androidannotations.annotations.EBean;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by mac on 12/1/17.
