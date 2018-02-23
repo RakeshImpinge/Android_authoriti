@@ -906,7 +906,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
                 } else {
 
-                    showAlert("", "Denied permission, Please give location permission go proceed.");
+//                    showAlert("", "Denied permission, Please give location permission go proceed.");
 
                 }
                 return;
