@@ -570,21 +570,25 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
     }
 
 
-    @Click(R.id.cameraFront)
+    @Click({R.id.cameraFront, R.id.ivFront})
     void captureFront(){
 
-        System.gc();
-        System.runFinalization();
+//        System.gc();
+//        System.runFinalization();
+
+        Log.e("TAG", "Front Camera Clicked");
 
         isBack = false;
         showCameraInterface();
 
     }
 
-    @Click(R.id.cameraBack)
+    @Click({R.id.cameraBack, R.id.ivBackward})
     void captureBack(){
-        System.gc();
-        System.runFinalization();
+//        System.gc();
+//        System.runFinalization();
+
+        Log.e("TAG", "Back Camera Clicked");
 
         isBack = true;
         showCameraInterface();
