@@ -7,8 +7,9 @@ package com.curtisdigital.authoriti.utils;
 public interface Constants {
 
     // Server Url
-    String API_BASE_URL = "https://validate.authroriti.crts.io";
+//    String API_BASE_URL = "https://validate.authroriti.crts.io";
 //    String API_BASE_URL = "https://authoriti-test.crts.io";
+    String API_BASE_URL = "https://authoriti-qa.crts.io";
 
     // BroadCast Id
     String BROADCAST_CHANGE_MENU        = "BROADCAST_CHANGE_MENU";

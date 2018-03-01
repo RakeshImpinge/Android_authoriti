@@ -21,13 +21,12 @@ import com.curtisdigital.authoriti.api.model.AuthLogIn;
 import com.curtisdigital.authoriti.api.model.Order;
 import com.curtisdigital.authoriti.api.model.Picker;
 import com.curtisdigital.authoriti.api.model.Scheme;
-import com.curtisdigital.authoriti.api.model.Value;
 import com.curtisdigital.authoriti.core.BaseActivity;
 import com.curtisdigital.authoriti.ui.auth.LoginActivity_;
 import com.curtisdigital.authoriti.ui.help.HelpActivity_;
 import com.curtisdigital.authoriti.ui.menu.AccountChaseFragment_;
 import com.curtisdigital.authoriti.ui.menu.AccountFragment_;
-import com.curtisdigital.authoriti.ui.menu.CodeGenerateFragment_;
+import com.curtisdigital.authoriti.ui.menu.PurposeFragment_;
 import com.curtisdigital.authoriti.ui.menu.WipeFragment_;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -62,7 +61,7 @@ public class MainActivity extends BaseActivity{
     private AccountHeader header = null;
     private Drawer drawer = null;
 
-    private Fragment codeGenerateFragment;
+    private Fragment purposeFragment;
     private Fragment accountFragment;
     private Fragment wipeFragment;
 
@@ -188,13 +187,13 @@ public class MainActivity extends BaseActivity{
         Fragment fragment = null;
         if (menu_id == MENU_CODE){
 
-            if (codeGenerateFragment == null){
+            if (purposeFragment == null){
 
-                codeGenerateFragment = CodeGenerateFragment_.builder().build();
+                purposeFragment = PurposeFragment_.builder().build();
 
             }
 
-            fragment = codeGenerateFragment;
+            fragment = purposeFragment;
         }
         else if (menu_id == MENU_ACCOUNT){
 
@@ -295,7 +294,7 @@ public class MainActivity extends BaseActivity{
 
         if (dataManager.getScheme() != null){
 
-            loadScheme();
+//            loadScheme();
         }
 
     }

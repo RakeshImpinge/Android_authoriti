@@ -1,6 +1,7 @@
 package com.curtisdigital.authoriti.api;
 
 import com.curtisdigital.authoriti.api.model.AccountID;
+import com.curtisdigital.authoriti.api.model.Purpose;
 import com.curtisdigital.authoriti.api.model.Scheme;
 import com.curtisdigital.authoriti.api.model.request.RequestDLSave;
 import com.curtisdigital.authoriti.api.model.request.RequestSignUp;
@@ -35,6 +36,9 @@ public interface AuthoritiAPIService {
 
     @GET("api/v1/schema")
     Call<Scheme> getScheme();
+
+    @GET("api/v1/purpose")
+    Call<List<Purpose>> getPurposes();
 
     @FormUrlEncoded
     @POST("api/v1/invite")

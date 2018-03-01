@@ -4,6 +4,8 @@ import com.curtisdigital.authoriti.api.model.AccountID;
 import com.curtisdigital.authoriti.api.model.AuthLogIn;
 import com.curtisdigital.authoriti.api.model.Order;
 import com.curtisdigital.authoriti.api.model.Picker;
+import com.curtisdigital.authoriti.api.model.Purpose;
+import com.curtisdigital.authoriti.api.model.Purposes;
 import com.curtisdigital.authoriti.api.model.Scheme;
 import com.curtisdigital.authoriti.api.model.User;
 import com.curtisdigital.authoriti.utils.crypto.Crypto;
@@ -287,5 +289,31 @@ public class AuthoritiData {
 
         return origin.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
 
+    }
+
+    public void setDefaultPurposeIndex(int index){
+
+        pref.edit().defaultPurposeIndex().put(String.valueOf(index)).apply();
+    }
+
+    public int getDefaultPurposeIndex(){
+
+        String index = pref.defaultPurposeIndex().getOr("-1");
+
+        return Integer.parseInt(index);
+    }
+
+    public void setPurposes(Purposes purposes){
+        if (purposes != null){
+            Gson gson = new Gson();
+            pref.edit().purposesJson().put(gson.toJson(purposes)).apply();
+        } else {
+            pref.edit().purposesJson().remove().apply();
+        }
+    }
+
+    public Purposes getPurposes(){
+        Gson gson = new Gson();
+        return gson.fromJson(pref.purposesJson().get(), Purposes.class);
     }
 }

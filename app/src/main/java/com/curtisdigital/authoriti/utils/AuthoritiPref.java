@@ -19,4 +19,7 @@ public interface AuthoritiPref {
     String timePickerJson();
     String pickerOrderJson();
     String inactiveTime();
+
+    String purposesJson();
+    String defaultPurposeIndex();
 }
