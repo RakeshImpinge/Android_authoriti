@@ -17,10 +17,13 @@ import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.curtisdigital.authoriti.api.AuthoritiAPI;
+import com.curtisdigital.authoriti.api.model.AccountID;
 import com.curtisdigital.authoriti.api.model.AuthLogIn;
 import com.curtisdigital.authoriti.api.model.Order;
 import com.curtisdigital.authoriti.api.model.Picker;
+import com.curtisdigital.authoriti.api.model.SchemaGroup;
 import com.curtisdigital.authoriti.api.model.Scheme;
+import com.curtisdigital.authoriti.api.model.Value;
 import com.curtisdigital.authoriti.core.BaseActivity;
 import com.curtisdigital.authoriti.ui.auth.LoginActivity_;
 import com.curtisdigital.authoriti.ui.help.HelpActivity_;
@@ -29,6 +32,7 @@ import com.curtisdigital.authoriti.ui.menu.AccountFragment_;
 import com.curtisdigital.authoriti.ui.menu.PurposeFragment_;
 import com.curtisdigital.authoriti.ui.menu.WipeFragment_;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
+import com.curtisdigital.authoriti.utils.AuthoritiUtils_;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -292,36 +296,110 @@ public class MainActivity extends BaseActivity{
     protected void onResume() {
         super.onResume();
 
-        if (dataManager.getScheme() != null){
-
-//            loadScheme();
-        }
+        loadScheme();
 
     }
 
     private void loadScheme(){
 
-        AuthoritiAPI.APIService().getScheme().enqueue(new Callback<Scheme>() {
-
+        AuthoritiAPI.APIService().getSchemeGroup().enqueue(new Callback<SchemaGroup>() {
             @Override
-            public void onResponse(Call<Scheme> call, Response<Scheme> response) {
+            public void onResponse(Call<SchemaGroup> call, Response<SchemaGroup> response) {
+
+                dismissProgressDialog();
 
                 if (response.code() == 200 && response.body() != null){
 
-                    dataManager.setScheme(response.body());
-                    updatePickers();
-
-                    Log.e("Scheme", "Refreshed");
+                    if (dataManager.getScheme() == null){
+                        dataManager.setScheme(response.body().getScheme());
+                        firstUpdatePickers();
+                    } else {
+                        dataManager.setScheme(response.body().getScheme());
+                        updatePickers();
+                    }
 
                 }
             }
 
             @Override
-            public void onFailure(Call<Scheme> call, Throwable t) {
+            public void onFailure(Call<SchemaGroup> call, Throwable t) {
 
-
+                dismissProgressDialog();
             }
         });
+    }
+
+    private void firstUpdatePickers() {
+
+        if (dataManager.getScheme() != null && dataManager.getScheme().getPickers() != null) {
+
+            Order order = new Order();
+            List<String> pickers = new ArrayList<>();
+
+            for (Picker picker : dataManager.getScheme().getPickers()) {
+
+                pickers.add(picker.getPicker());
+
+                switch (picker.getPicker()) {
+
+                    case PICKER_ACCOUNT:
+
+                        if (dataManager.getUser() != null && dataManager.getUser().getAccountIDs() != null && dataManager.getUser().getAccountIDs().size() > 0) {
+
+                            Picker picker1 = new Picker(picker.getPicker(), picker.getBytes(), picker.getValues(), picker.getTitle(), picker.getLabel());
+
+                            List<Value> values = new ArrayList<>();
+                            for (AccountID accountID : dataManager.getUser().getAccountIDs()) {
+
+                                Value value = new Value(accountID.getIdentifier(), accountID.getType());
+                                values.add(value);
+
+                            }
+                            picker1.setValues(values);
+
+                            if (dataManager.defaultAccountSelected) {
+
+                                picker1.setEnableDefault(true);
+                                picker1.setDefaultIndex(dataManager.defaultAccountIndex);
+
+                                dataManager.defaultAccountSelected = false;
+
+                            }
+
+                            dataManager.setAccountPicker(picker1);
+
+
+                        } else {
+
+                            dataManager.setAccountPicker(picker);
+
+                        }
+
+                        break;
+
+                    case PICKER_INDUSTRY:
+                        dataManager.setIndustryPicker(picker);
+                        break;
+
+                    case PICKER_LOCATION_STATE:
+                        dataManager.setLocationPicker(picker);
+                        break;
+
+                    case PICKER_LOCATION_COUNTRY:
+                        dataManager.setCountryPicker(picker);
+                        break;
+
+                    case PICKER_TIME:
+                        dataManager.setTimePicker(AuthoritiUtils_.getInstance_(mContext).getDefaultTimePicker(picker));
+                        break;
+
+                }
+            }
+
+            order.setPickers(pickers);
+            dataManager.setPickerOrder(order);
+
+        }
     }
 
     private void updatePickers(){

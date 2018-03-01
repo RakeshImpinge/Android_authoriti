@@ -1,8 +1,7 @@
 package com.curtisdigital.authoriti.api;
 
-import com.curtisdigital.authoriti.api.model.AccountID;
 import com.curtisdigital.authoriti.api.model.Purpose;
-import com.curtisdigital.authoriti.api.model.Scheme;
+import com.curtisdigital.authoriti.api.model.SchemaGroup;
 import com.curtisdigital.authoriti.api.model.request.RequestDLSave;
 import com.curtisdigital.authoriti.api.model.request.RequestSignUp;
 import com.curtisdigital.authoriti.api.model.request.RequestUserUpdate;
@@ -11,7 +10,6 @@ import com.curtisdigital.authoriti.api.model.response.ResponseSignUp;
 import com.curtisdigital.authoriti.api.model.response.ResponseSignUpChase;
 import com.google.gson.JsonObject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.MultipartBody;
@@ -35,7 +33,7 @@ import retrofit2.http.Part;
 public interface AuthoritiAPIService {
 
     @GET("api/v1/schema")
-    Call<Scheme> getScheme();
+    Call<SchemaGroup> getSchemeGroup();
 
     @GET("api/v1/purpose")
     Call<List<Purpose>> getPurposes();

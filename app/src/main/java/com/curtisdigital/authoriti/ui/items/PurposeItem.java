@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import com.curtisdigital.authoriti.R;
 import com.curtisdigital.authoriti.api.model.Purpose;
+import com.curtisdigital.authoriti.ui.code.CodePermissionActivity_;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.curtisdigital.authoriti.utils.AuthoritiData_;
 import com.daimajia.swipe.SwipeLayout;
@@ -56,7 +57,7 @@ public class PurposeItem extends AbstractItem<PurposeItem, PurposeItem.ViewHolde
         super.bindView(holder, payloads);
 
         final Context context = holder.itemView.getContext();
-        AuthoritiData dataManager = AuthoritiData_.getInstance_(context);
+        final AuthoritiData dataManager = AuthoritiData_.getInstance_(context);
 
         if (isDefault){
             holder.markDefault.setVisibility(View.VISIBLE);
@@ -116,10 +117,11 @@ public class PurposeItem extends AbstractItem<PurposeItem, PurposeItem.ViewHolde
         holder.swipeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if (dataManager.getScheme() != null){
+                    CodePermissionActivity_.intent(context).purposeIndex(index).start();
+                }
             }
         });
-
 
     }
 

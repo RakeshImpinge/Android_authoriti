@@ -45,6 +45,7 @@
         <activity android:name=".ui.code.CodeGenerateActivity_"/>
         <activity android:name=".ui.help.HelpActivity_"/>
         <activity android:name=".ui.auth.ResetPasswordActivity_"/>
+        <activity android:name=".ui.code.CodePermissionActivity_"/>
 
         <meta-data
             android:name="io.fabric.ApiKey"
