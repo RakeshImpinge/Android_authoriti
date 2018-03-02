@@ -17,8 +17,6 @@ import com.mikepenz.fastadapter.items.AbstractItem;
 
 import java.util.List;
 
-import static com.curtisdigital.authoriti.utils.Constants.PICKER_DATA_TYPE;
-import static com.curtisdigital.authoriti.utils.Constants.PICKER_REQUEST;
 import static com.curtisdigital.authoriti.utils.Constants.PICKER_TIME;
 
 /**
@@ -56,7 +54,6 @@ public class CodeItem extends AbstractItem<CodeItem, CodeItem.ViewHolder>{
         final Context context = holder.itemView.getContext();
 
         final AuthoritiUtils_ utils = AuthoritiUtils_.getInstance_(context);
-        AuthoritiData_ dataManager = AuthoritiData_.getInstance_(context);
 
         holder.tvTitle.setText(picker.getLabel() + " : ");
 
@@ -117,29 +114,6 @@ public class CodeItem extends AbstractItem<CodeItem, CodeItem.ViewHolder>{
 
                 }
 
-            } else {
-                holder.tvSubTitle.setText("");
-            }
-        } else {
-
-            if (picker.getPicker().equals(PICKER_DATA_TYPE)){
-
-                List<Value> values = dataManager.getDataType().getType(utils.getPickerSelectedIndex(context, PICKER_REQUEST));
-
-                if (selectedIndex >= values.size()){
-                    selectedIndex = 0;
-                }
-
-                if (values.size() > 0){
-
-                    Value value = values.get(selectedIndex);
-                    holder.tvSubTitle.setText(value.getTitle());
-
-                } else {
-
-                    holder.tvSubTitle.setText("");
-
-                }
 
             }
         }

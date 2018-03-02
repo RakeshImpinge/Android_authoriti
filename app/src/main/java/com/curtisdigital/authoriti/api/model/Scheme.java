@@ -15,17 +15,11 @@ public class Scheme {
     @SerializedName("1")
     private List<Picker> pickers;
 
-    @Expose
-    @SerializedName("2")
-    private List<Picker> pickers2;
-
-
     public List<Picker> getPickers() {
         return pickers;
     }
 
-    public List<Picker> getPickers2() {
-        return pickers2;
+    public void setPickers(List<Picker> pickers) {
+        this.pickers = pickers;
     }
-
 }

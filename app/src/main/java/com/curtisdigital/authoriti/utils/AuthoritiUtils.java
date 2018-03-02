@@ -48,15 +48,6 @@ public class AuthoritiUtils implements Constants{
             case PICKER_TIME:
                 index = AuthoritiData_.getInstance_(context).getSelectedTimeIndex();
                 break;
-            case PICKER_GEO:
-                index = AuthoritiData_.getInstance_(context).getSelectedGeoIndex();
-                break;
-            case PICKER_REQUEST:
-                index = AuthoritiData_.getInstance_(context).getSelectedRequestIndex();
-                break;
-            case PICKER_DATA_TYPE:
-                index = AuthoritiData_.getInstance_(context).getSelectedDataTypeIndex();
-                break;
             default:
                 index = 0;
                 break;
@@ -81,15 +72,6 @@ public class AuthoritiUtils implements Constants{
                 break;
             case PICKER_TIME:
                 index = AuthoritiData_.getInstance_(context).getTimePicker().getDefaultIndex();;
-                break;
-            case PICKER_GEO:
-                index = AuthoritiData_.getInstance_(context).getGeoPicker().getDefaultIndex();
-                break;
-            case PICKER_REQUEST:
-                index = AuthoritiData_.getInstance_(context).getRequestPicker().getDefaultIndex();
-                break;
-            case PICKER_DATA_TYPE:
-                index = AuthoritiData_.getInstance_(context).getDataTypePicker().getDefaultIndex();
                 break;
             default:
                 index = 0;
@@ -116,15 +98,6 @@ public class AuthoritiUtils implements Constants{
             case PICKER_TIME:
                 picker = AuthoritiData_.getInstance_(context).getTimePicker();
                 break;
-            case PICKER_GEO:
-                picker = AuthoritiData_.getInstance_(context).getGeoPicker();
-                break;
-            case PICKER_REQUEST:
-                picker = AuthoritiData_.getInstance_(context).getRequestPicker();
-                break;
-            case PICKER_DATA_TYPE:
-                picker = AuthoritiData_.getInstance_(context).getDataTypePicker();
-                break;
             default:
                 picker = null;
                 break;
@@ -149,15 +122,6 @@ public class AuthoritiUtils implements Constants{
                 break;
             case PICKER_TIME:
                 dataManager.setSelectedTimeIndex(index);
-                break;
-            case PICKER_GEO:
-                dataManager.setSelectedGeoIndex(index);
-                break;
-            case PICKER_REQUEST:
-                dataManager.setSelectedRequestIndex(index);
-                break;
-            case PICKER_DATA_TYPE:
-                dataManager.setSelectedDataTypeIndex(index);
                 break;
             default:
 
@@ -196,24 +160,6 @@ public class AuthoritiUtils implements Constants{
                 picker.setDefaultIndex(index);
                 dataManager.setTimePicker(picker);
                 break;
-            case PICKER_GEO:
-                picker = dataManager.getGeoPicker();
-                picker.setEnableDefault(true);
-                picker.setDefaultIndex(index);
-                dataManager.setGeoPicker(picker);
-                break;
-            case PICKER_REQUEST:
-                picker = dataManager.getRequestPicker();
-                picker.setEnableDefault(true);
-                picker.setDefaultIndex(index);
-                dataManager.setRequestPicker(picker);
-                break;
-            case PICKER_DATA_TYPE:
-                picker = dataManager.getDataTypePicker();
-                picker.setEnableDefault(true);
-                picker.setDefaultIndex(index);
-                dataManager.setDataTypePicker(picker);
-                break;
             default:
 
                 break;
@@ -237,15 +183,6 @@ public class AuthoritiUtils implements Constants{
                 break;
             case PICKER_TIME:
                 dataManager.setTimeIndexSelected(selected);
-                break;
-            case PICKER_GEO:
-                dataManager.setGeoIndexSelected(selected);
-                break;
-            case PICKER_REQUEST:
-                dataManager.setRequestIndexSelected(selected);
-                break;
-            case PICKER_DATA_TYPE:
-                dataManager.setDataTypeIndexSelected(selected);
                 break;
             default:
                 break;
@@ -271,14 +208,6 @@ public class AuthoritiUtils implements Constants{
             case PICKER_TIME:
                 selected = dataManager.isTimeIndexSelected();
                 break;
-            case PICKER_GEO:
-                selected = dataManager.isGeoIndexSelected();
-                break;
-            case PICKER_REQUEST:
-                selected = dataManager.isRequestIndexSelected();
-                break;
-            case PICKER_DATA_TYPE:
-                selected = dataManager.isDataTypeIndexSelected();
             default:
                 selected = false;
                 break;
