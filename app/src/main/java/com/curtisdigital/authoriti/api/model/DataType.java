@@ -51,4 +51,25 @@ public class DataType {
     public List<Value> getType6() {
         return type6;
     }
+
+    public List<Value> getType(int index){
+
+        switch (index){
+            case 0:
+                return type1;
+            case 1:
+                return type2;
+            case 2:
+                return type3;
+            case 3:
+                return type4;
+            case 4:
+                return type5;
+            case 5:
+                return type6;
+            default:
+                return null;
+        }
+
+    }
 }

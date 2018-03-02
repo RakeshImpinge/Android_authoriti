@@ -312,10 +312,14 @@ public class MainActivity extends BaseActivity{
 
                     if (dataManager.getScheme() == null){
                         dataManager.setScheme(response.body().getScheme());
-                        firstUpdatePickers();
+                        firstUpdateSchema();
                     } else {
                         dataManager.setScheme(response.body().getScheme());
-                        updatePickers();
+                        updateSchema();
+                    }
+
+                    if (response.body().getDataType() != null){
+                        dataManager.setDataType(response.body().getDataType());
                     }
 
                 }
@@ -329,7 +333,7 @@ public class MainActivity extends BaseActivity{
         });
     }
 
-    private void firstUpdatePickers() {
+    private void firstUpdateSchema() {
 
         if (dataManager.getScheme() != null && dataManager.getScheme().getPickers() != null) {
 
@@ -398,11 +402,51 @@ public class MainActivity extends BaseActivity{
 
             order.setPickers(pickers);
             dataManager.setPickerOrder(order);
-
         }
+
+
+
+        if (dataManager.getScheme() != null && dataManager.getScheme().getPickers2() != null) {
+
+            Order order = new Order();
+            List<String> pickers = new ArrayList<>();
+
+            for (Picker picker : dataManager.getScheme().getPickers2()) {
+
+                pickers.add(picker.getPicker());
+
+                switch (picker.getPicker()) {
+
+                    case PICKER_ACCOUNT:
+
+                        break;
+
+                    case PICKER_GEO:
+                        dataManager.setGeoPicker(picker);
+                        break;
+
+                    case PICKER_REQUEST:
+                        dataManager.setRequestPicker(picker);
+                        break;
+
+                    case PICKER_DATA_TYPE:
+                        dataManager.setDataTypePicker(picker);
+                        break;
+
+                    case PICKER_TIME:
+
+                        break;
+
+                }
+            }
+
+            order.setPickers(pickers);
+            dataManager.setPickerOrder2(order);
+        }
+
     }
 
-    private void updatePickers(){
+    private void updateSchema(){
 
         if (dataManager.getScheme() != null && dataManager.getScheme().getPickers() != null) {
 
@@ -509,6 +553,102 @@ public class MainActivity extends BaseActivity{
 
             order.setPickers(pickers);
             dataManager.setPickerOrder(order);
+
+        }
+
+        if (dataManager.getScheme() != null && dataManager.getScheme().getPickers2() != null) {
+
+            Order order = new Order();
+            List<String> pickers = new ArrayList<>();
+
+            for (Picker picker : dataManager.getScheme().getPickers2()) {
+
+                pickers.add(picker.getPicker());
+
+                switch (picker.getPicker()) {
+
+                    case PICKER_ACCOUNT:
+
+                        break;
+
+                    case PICKER_GEO:
+
+                        if (dataManager.getGeoPicker() != null){
+
+                            Picker temp = new Picker();
+                            temp.setPicker(picker.getPicker());
+                            temp.setBytes(picker.getBytes());
+                            temp.setValues(picker.getValues());
+                            temp.setTitle(picker.getTitle());
+                            temp.setLabel(picker.getLabel());
+                            temp.setEnableDefault(dataManager.getGeoPicker().isEnableDefault());
+                            temp.setDefaultIndex(dataManager.getGeoPicker().getDefaultIndex());
+
+                            dataManager.setGeoPicker(temp);
+
+
+                        } else {
+
+                            dataManager.setGeoPicker(picker);
+                        }
+
+                        break;
+
+                    case PICKER_REQUEST:
+
+                        if (dataManager.getRequestPicker() != null){
+
+                            Picker temp = new Picker();
+                            temp.setPicker(picker.getPicker());
+                            temp.setBytes(picker.getBytes());
+                            temp.setValues(picker.getValues());
+                            temp.setTitle(picker.getTitle());
+                            temp.setLabel(picker.getLabel());
+                            temp.setEnableDefault(dataManager.getRequestPicker().isEnableDefault());
+                            temp.setDefaultIndex(dataManager.getRequestPicker().getDefaultIndex());
+
+                            dataManager.setRequestPicker(temp);
+
+
+                        } else {
+
+                            dataManager.setRequestPicker(picker);
+                        }
+
+                        break;
+
+                    case PICKER_DATA_TYPE:
+
+                        if (dataManager.getDataTypePicker() != null){
+
+                            Picker temp = new Picker();
+                            temp.setPicker(picker.getPicker());
+                            temp.setBytes(picker.getBytes());
+                            temp.setValues(picker.getValues());
+                            temp.setTitle(picker.getTitle());
+                            temp.setLabel(picker.getLabel());
+                            temp.setEnableDefault(dataManager.getDataTypePicker().isEnableDefault());
+                            temp.setDefaultIndex(dataManager.getDataTypePicker().getDefaultIndex());
+
+                            dataManager.setDataTypePicker(temp);
+
+
+                        } else {
+
+                            dataManager.setDataTypePicker(picker);
+                        }
+
+                        break;
+
+                    case PICKER_TIME:
+
+                        break;
+
+                }
+            }
+
+            order.setPickers(pickers);
+            dataManager.setPickerOrder2(order);
 
         }
     }

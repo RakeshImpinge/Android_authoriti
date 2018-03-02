@@ -2,6 +2,7 @@ package com.curtisdigital.authoriti.utils;
 
 import com.curtisdigital.authoriti.api.model.AccountID;
 import com.curtisdigital.authoriti.api.model.AuthLogIn;
+import com.curtisdigital.authoriti.api.model.DataType;
 import com.curtisdigital.authoriti.api.model.Order;
 import com.curtisdigital.authoriti.api.model.Picker;
 import com.curtisdigital.authoriti.api.model.Purpose;
@@ -11,10 +12,12 @@ import com.curtisdigital.authoriti.api.model.User;
 import com.curtisdigital.authoriti.utils.crypto.Crypto;
 import com.curtisdigital.authoriti.utils.crypto.CryptoKeyPair;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 /**
@@ -40,11 +43,17 @@ public class AuthoritiData {
     private int selectedIndustryIndex;
     private int selectedCountryIndex;
     private int selectedTimeIndex;
+    private int selectedGeoIndex;
+    private int selectedRequestIndex;
+    private int selectedDataTypeIndex;
 
     private boolean accountIndexSelected;
     private boolean industryIndexSelected;
     private boolean countryIndexSelected;
     private boolean timeIndexSelected;
+    private boolean geoIndexSelected;
+    private boolean requestIndexSelected;
+    private boolean dataTypeIndexSelected;
 
     public void setInactiveTime(String timeStamp){
 
@@ -98,6 +107,20 @@ public class AuthoritiData {
     public Scheme getScheme(){
         Gson gson = new Gson();
         return gson.fromJson(pref.schemeJson().get(), Scheme.class);
+    }
+
+    public void setDataType(DataType dataType){
+        if (dataType != null){
+            Gson gson = new Gson();
+            pref.edit().dataTypeJson().put(gson.toJson(dataType)).apply();
+        } else {
+            pref.edit().dataTypeJson().remove().apply();
+        }
+    }
+
+    public DataType getDataType(){
+        Gson gson = new Gson();
+        return gson.fromJson(pref.dataTypeJson().get(), DataType.class);
     }
 
     public Picker getAccountPicker(){
@@ -184,6 +207,62 @@ public class AuthoritiData {
         }
     }
 
+    public Order getPickerOrder2(){
+        Gson gson = new Gson();
+        return gson.fromJson(pref.pickerOrder2Json().get(), Order.class);
+    }
+
+    public void setPickerOrder2(Order order){
+        if (order != null){
+            Gson gson = new Gson();
+            pref.edit().pickerOrder2Json().put(gson.toJson(order)).apply();
+        } else {
+            pref.edit().pickerOrder2Json().remove().apply();
+        }
+    }
+
+    public Picker getGeoPicker(){
+        Gson gson = new Gson();
+        return gson.fromJson(pref.getPickerJson().get(), Picker.class);
+    }
+
+    public void setGeoPicker(Picker picker){
+        if (picker != null){
+            Gson gson = new Gson();
+            pref.edit().getPickerJson().put(gson.toJson(picker)).apply();
+        } else {
+            pref.edit().getPickerJson().remove().apply();
+        }
+    }
+
+    public Picker getRequestPicker(){
+        Gson gson = new Gson();
+        return gson.fromJson(pref.requestPickerJson().get(), Picker.class);
+    }
+
+    public void setRequestPicker(Picker picker){
+        if (picker != null){
+            Gson gson = new Gson();
+            pref.edit().requestPickerJson().put(gson.toJson(picker)).apply();
+        } else {
+            pref.edit().requestPickerJson().remove().apply();
+        }
+    }
+
+    public Picker getDataTypePicker(){
+        Gson gson = new Gson();
+        return gson.fromJson(pref.dataTypePickerJson().get(), Picker.class);
+    }
+
+    public void setDataTypePicker(Picker picker){
+        if (picker != null){
+            Gson gson = new Gson();
+            pref.edit().dataTypePickerJson().put(gson.toJson(picker)).apply();
+        } else {
+            pref.edit().dataTypePickerJson().remove().apply();
+        }
+    }
+
     public int getSelectedAccountIndex() {
         return selectedAccountIndex;
     }
@@ -260,6 +339,9 @@ public class AuthoritiData {
         setCountryPicker(null);
         setTimePicker(null);
         setPickerOrder(null);
+        setGeoPicker(null);
+        setRequestPicker(null);
+        setDataTypePicker(null);
 
         accountIDs = null;
         defaultAccountSelected = false;
@@ -269,11 +351,17 @@ public class AuthoritiData {
         setSelectedIndustryIndex(0);
         setSelectedCountryIndex(0);
         setSelectedTimeIndex(0);
+        setSelectedGeoIndex(0);
+        setSelectedRequestIndex(0);
+        setSelectedDataTypeIndex(0);
 
         setAccountIndexSelected(false);
         setIndustryIndexSelected(false);
         setCountryIndexSelected(false);
         setTimeIndexSelected(false);
+        setGeoIndexSelected(false);
+        setRequestIndexSelected(false);
+        setDataTypeIndexSelected(false);
 
     }
 
@@ -303,7 +391,7 @@ public class AuthoritiData {
         return Integer.parseInt(index);
     }
 
-    public void setPurposes(Purposes purposes){
+    public void setPurposes(List<Purpose> purposes){
         if (purposes != null){
             Gson gson = new Gson();
             pref.edit().purposesJson().put(gson.toJson(purposes)).apply();
@@ -312,8 +400,57 @@ public class AuthoritiData {
         }
     }
 
-    public Purposes getPurposes(){
+    public List<Purpose> getPurposes(){
         Gson gson = new Gson();
-        return gson.fromJson(pref.purposesJson().get(), Purposes.class);
+        Type type = new TypeToken<List<Purpose>>(){}.getType();
+        return gson.fromJson(pref.purposesJson().get(), type);
+    }
+
+    public boolean isGeoIndexSelected() {
+        return geoIndexSelected;
+    }
+
+    public void setGeoIndexSelected(boolean geoIndexSelected) {
+        this.geoIndexSelected = geoIndexSelected;
+    }
+
+    public boolean isRequestIndexSelected() {
+        return requestIndexSelected;
+    }
+
+    public void setRequestIndexSelected(boolean requestIndexSelected) {
+        this.requestIndexSelected = requestIndexSelected;
+    }
+
+    public boolean isDataTypeIndexSelected() {
+        return dataTypeIndexSelected;
+    }
+
+    public void setDataTypeIndexSelected(boolean dataTypeIndexSelected) {
+        this.dataTypeIndexSelected = dataTypeIndexSelected;
+    }
+
+    public int getSelectedGeoIndex() {
+        return selectedGeoIndex;
+    }
+
+    public void setSelectedGeoIndex(int selectedGeoIndex) {
+        this.selectedGeoIndex = selectedGeoIndex;
+    }
+
+    public int getSelectedRequestIndex() {
+        return selectedRequestIndex;
+    }
+
+    public void setSelectedRequestIndex(int selectedRequestIndex) {
+        this.selectedRequestIndex = selectedRequestIndex;
+    }
+
+    public int getSelectedDataTypeIndex() {
+        return selectedDataTypeIndex;
+    }
+
+    public void setSelectedDataTypeIndex(int selectedDataTypeIndex) {
+        this.selectedDataTypeIndex = selectedDataTypeIndex;
     }
 }

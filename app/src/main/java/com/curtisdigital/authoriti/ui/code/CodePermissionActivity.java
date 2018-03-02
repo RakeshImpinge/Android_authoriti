@@ -2,6 +2,7 @@ package com.curtisdigital.authoriti.ui.code;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 import com.curtisdigital.authoriti.R;
 import com.curtisdigital.authoriti.api.model.Purpose;
@@ -40,6 +41,9 @@ public class CodePermissionActivity extends BaseActivity {
     @ViewById(R.id.rvPermission)
     RecyclerView rvPermission;
 
+    @ViewById(R.id.codeView)
+    View codeView;
+
     @AfterViews
     void callAfterViewInjection(){
 
@@ -47,7 +51,10 @@ public class CodePermissionActivity extends BaseActivity {
         rvPermission.setLayoutManager(new LinearLayoutManager(mContext));
         rvPermission.setAdapter(adapter);
 
-        purpose = dataManager.getPurposes().getPurposes().get(purposeIndex);
+        purpose = dataManager.getPurposes().get(purposeIndex);
+        if (purpose.getSchemaIndex() == 2){
+            codeView.setVisibility(View.VISIBLE);
+        }
 
     }
 
@@ -102,6 +109,64 @@ public class CodePermissionActivity extends BaseActivity {
 
     }
 
+    private void showSchema2(){
+
+        if (adapter == null){
+            adapter = new FastItemAdapter<CodeItem>();
+        } else {
+            adapter.clear();
+        }
+
+        if (dataManager.getPickerOrder2() != null && dataManager.getPickerOrder2().getPickers() != null && dataManager.getPickerOrder2().getPickers().size() > 0){
+
+            for (String picker : dataManager.getPickerOrder2().getPickers()){
+
+                switch (picker){
+
+                    case PICKER_ACCOUNT:
+                        if (dataManager.getAccountPicker() != null){
+                            if (purpose.getPickerName() == null || !purpose.getPickerName().equals(PICKER_ACCOUNT)){
+                                adapter.add(new CodeItem(dataManager.getAccountPicker()));
+                            }
+                        }
+                        break;
+
+                    case PICKER_GEO:
+                        if (dataManager.getGeoPicker() != null){
+                            if (purpose.getPickerName() == null || !purpose.getPickerName().equals(PICKER_GEO)){
+                                adapter.add(new CodeItem(dataManager.getGeoPicker()));
+                            }
+                        }
+                        break;
+                    case PICKER_REQUEST:
+                        if (dataManager.getRequestPicker() != null){
+                            if (purpose.getPickerName() == null || !purpose.getPickerName().equals(PICKER_REQUEST)){
+                                adapter.add(new CodeItem(dataManager.getRequestPicker()));
+                            }
+                        }
+                        break;
+                    case PICKER_DATA_TYPE:
+                        if (dataManager.getDataTypePicker() != null){
+                            if (purpose.getPickerName() == null || !purpose.getPickerName().equals(PICKER_DATA_TYPE)){
+                                adapter.add(new CodeItem(dataManager.getDataTypePicker()));
+                            }
+                        }
+                        break;
+                    case PICKER_TIME:
+                        if (dataManager.getTimePicker() != null){
+                            if (purpose.getPickerName() == null || !purpose.getPickerName().equals(PICKER_TIME)){
+                                adapter.add(new CodeItem(dataManager.getTimePicker()));
+                            }
+                        }
+                        break;
+                }
+
+            }
+
+        }
+
+    }
+
 
     @Click(R.id.ivBack)
     void backButtonClicked(){
@@ -118,11 +183,18 @@ public class CodePermissionActivity extends BaseActivity {
     public void onResume() {
         super.onResume();
 
-        if (purpose != null && purpose.getSchemaIndex() == 1 && dataManager.getScheme() != null && adapter != null){
+        if (purpose != null && dataManager.getScheme() != null && adapter != null){
 
             if(!isFinishing()){
 
-                showSchema1();
+                if (purpose.getSchemaIndex() == 1){
+
+                    showSchema1();
+
+                } else if (purpose.getSchemaIndex() == 2) {
+
+                    showSchema2();
+                }
 
             }
 

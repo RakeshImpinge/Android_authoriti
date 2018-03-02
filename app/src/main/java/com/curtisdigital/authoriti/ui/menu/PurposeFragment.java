@@ -67,10 +67,7 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
 
                 if (response.code() == 200 && response.body() != null){
 
-                    Purposes purposes = new Purposes();
-                    purposes.setPurposes(response.body());
-
-                    dataManager.setPurposes(purposes);
+                    dataManager.setPurposes(response.body());
 
                     showPurposes();
                 }
@@ -85,7 +82,7 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
 
     private void showPurposes(){
 
-        if (dataManager.getPurposes().getPurposes() != null && dataManager.getPurposes().getPurposes().size() > 0){
+        if (dataManager.getPurposes() != null && dataManager.getPurposes().size() > 0){
 
             if (adapter == null){
                 adapter = new FastItemAdapter<PurposeItem>();
@@ -95,9 +92,9 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
 
             int defaultIndex = dataManager.getDefaultPurposeIndex();
 
-            for (int i = 0 ; i < dataManager.getPurposes().getPurposes().size() ; i ++){
+            for (int i = 0 ; i < dataManager.getPurposes().size() ; i ++){
                 boolean isDefault = defaultIndex == i;
-                adapter.add(new PurposeItem(dataManager.getPurposes().getPurposes().get(i), i, isDefault,this));
+                adapter.add(new PurposeItem(dataManager.getPurposes().get(i), i, isDefault,this));
             }
         }
 
@@ -108,7 +105,7 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
 
         int defaultIndex = dataManager.getDefaultPurposeIndex();
 
-        if (defaultIndex < 0 || defaultIndex >= dataManager.getPurposes().getPurposes().size()){
+        if (defaultIndex < 0 || defaultIndex >= dataManager.getPurposes().size()){
 
             PurposeItem item = adapter.getAdapterItem(index);
             item.setDefault(true);
