@@ -629,6 +629,7 @@ public class MainActivity extends BaseActivity{
                             temp.setLabel(picker.getLabel());
                             temp.setEnableDefault(dataManager.getDataTypePicker().isEnableDefault());
                             temp.setDefaultIndex(dataManager.getDataTypePicker().getDefaultIndex());
+                            temp.setDefaultValues(dataManager.getDataTypePicker().getDefaultValues());
 
                             dataManager.setDataTypePicker(temp);
 

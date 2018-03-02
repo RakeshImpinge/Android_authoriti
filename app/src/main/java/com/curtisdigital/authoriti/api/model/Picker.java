@@ -3,6 +3,7 @@ package com.curtisdigital.authoriti.api.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,6 +35,9 @@ public class Picker {
     private boolean enableDefault = false;
     private int defaultIndex = -1;
 
+    // For Data Type Picker
+    private List<Value> defaultValues;
+
     public Picker(){
 
     }
@@ -48,6 +52,7 @@ public class Picker {
 
         enableDefault = false;
         defaultIndex = -1;
+        defaultValues = new ArrayList<>();
     }
 
     public String getPicker() {
@@ -104,5 +109,13 @@ public class Picker {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public List<Value> getDefaultValues() {
+        return defaultValues;
+    }
+
+    public void setDefaultValues(List<Value> defaultValues) {
+        this.defaultValues = defaultValues;
     }
 }

@@ -6,7 +6,6 @@ import com.curtisdigital.authoriti.api.model.DataType;
 import com.curtisdigital.authoriti.api.model.Order;
 import com.curtisdigital.authoriti.api.model.Picker;
 import com.curtisdigital.authoriti.api.model.Purpose;
-import com.curtisdigital.authoriti.api.model.Purposes;
 import com.curtisdigital.authoriti.api.model.Scheme;
 import com.curtisdigital.authoriti.api.model.User;
 import com.curtisdigital.authoriti.utils.crypto.Crypto;

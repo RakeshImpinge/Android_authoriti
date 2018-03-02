@@ -11,14 +11,13 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.curtisdigital.authoriti.R;
+import com.curtisdigital.authoriti.api.model.DataType;
 import com.curtisdigital.authoriti.api.model.Picker;
 import com.curtisdigital.authoriti.api.model.Value;
 import com.curtisdigital.authoriti.core.BaseActivity;
 import com.curtisdigital.authoriti.ui.items.OptionItem;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.curtisdigital.authoriti.utils.AuthoritiUtils;
-import com.github.thunder413.datetimeutils.DateTimeUnits;
-import com.github.thunder413.datetimeutils.DateTimeUtils;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
@@ -110,6 +109,18 @@ public class PasscodePickActivity extends BaseActivity {
 
                      if (picker.getPicker().equals(PICKER_DATA_TYPE)){
 
+                         DataType dataType = dataManager.getDataType();
+                         List<Value> values = dataType.getSelectedValues();
+                         if (item.isChecked()){
+                             if (values.size() > 1){
+                                 values.remove(item.getValue());
+                             }
+                         } else {
+                             values.add(item.getValue());
+                         }
+                         dataType.setSelectedValues(values);
+                         dataManager.setDataType(dataType);
+
                          item.setChecked(!item.isChecked());
                          optionAdapter.notifyAdapterItemChanged(position);
 
@@ -118,6 +129,19 @@ public class PasscodePickActivity extends BaseActivity {
 
                          utils.setSelectedPickerIndex(mContext, pickerType, position);
                          utils.setIndexSelected(mContext, pickerType, true);
+
+                         if (picker.getPicker().equals(PICKER_REQUEST)){
+
+                             DataType dataType = dataManager.getDataType();
+                             if (dataType.getPreSelectedTypeIndex() != position){
+                                 dataType.setSelectedValues(null);
+                             }
+                             dataType.setPreSelectedTypeIndex(dataType.getSelectedTypeIndex());
+                             dataType.setSelectedTypeIndex(position);
+
+                             dataManager.setDataType(dataType);
+                         }
+
                          finish();
                      }
 
@@ -320,12 +344,26 @@ public class PasscodePickActivity extends BaseActivity {
             selectedIndex = 0;
         }
 
-        for (int i = 0 ; i < values.size() ; i ++){
+        for (Value value : values){
 
-            optionAdapter.add(new OptionItem(values.get(i), selectedIndex == i));
+            optionAdapter.add(new OptionItem(value, isSelected(value)));
 
         }
 
+    }
+
+    private boolean isSelected(Value value){
+
+        if (dataManager.getDataType().getSelectedValues() != null && dataManager.getDataType().getSelectedValues().size() > 0){
+
+            for (Value value1 : dataManager.getDataType().getSelectedValues()){
+                if (value1.getValue().equals(value.getValue()) && value1.getTitle().equals(value.getTitle())){
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     @Click(R.id.ivBack)

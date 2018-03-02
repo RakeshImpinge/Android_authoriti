@@ -166,6 +166,18 @@ public class AuthoritiUtils implements Constants{
 
     }
 
+    public void initSelectedIndex(Context context){
+        AuthoritiData dataManager = AuthoritiData_.getInstance_(context);
+
+        dataManager.setSelectedAccountIndex(getPickerDefaultIndex(context, PICKER_ACCOUNT) < 0 ? 0 : getPickerDefaultIndex(context, PICKER_ACCOUNT));
+        dataManager.setSelectedIndustryIndex(getPickerDefaultIndex(context, PICKER_INDUSTRY) < 0 ? 0 : getPickerDefaultIndex(context, PICKER_INDUSTRY));
+        dataManager.setSelectedCountryIndex(getPickerDefaultIndex(context, PICKER_LOCATION_STATE) < 0 ? 0 : getPickerDefaultIndex(context, PICKER_LOCATION_STATE));
+        dataManager.setSelectedTimeIndex(getPickerDefaultIndex(context, PICKER_TIME) < 0 ? 0 : getPickerDefaultIndex(context, PICKER_TIME));
+        dataManager.setSelectedGeoIndex(getPickerDefaultIndex(context, PICKER_GEO) < 0 ? 0 : getPickerDefaultIndex(context, PICKER_GEO));
+        dataManager.setSelectedRequestIndex(getPickerDefaultIndex(context, PICKER_REQUEST) < 0 ? 0 : getPickerDefaultIndex(context, PICKER_REQUEST));
+        dataManager.setSelectedDataTypeIndex(getPickerDefaultIndex(context, PICKER_DATA_TYPE) < 0 ? 0 : getPickerDefaultIndex(context, PICKER_DATA_TYPE));
+    }
+
     public void setDefaultPickerItemIndex(Context context, String identifier, int index){
 
         AuthoritiData dataManager = AuthoritiData_.getInstance_(context);
@@ -219,6 +231,14 @@ public class AuthoritiUtils implements Constants{
                 break;
         }
 
+    }
+
+    public void setDefaultValuesForDataTypePicker(Context context, List<Value> values){
+        AuthoritiData dataManager = AuthoritiData_.getInstance_(context);
+        Picker picker = dataManager.getDataTypePicker();
+        picker.setEnableDefault(true);
+        picker.setDefaultValues(values);
+        dataManager.setDataTypePicker(picker);
     }
 
     public void setIndexSelected(Context context, String identifier, boolean selected){

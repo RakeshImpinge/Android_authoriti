@@ -6,7 +6,6 @@ import android.support.v7.widget.RecyclerView;
 import com.curtisdigital.authoriti.R;
 import com.curtisdigital.authoriti.api.AuthoritiAPI;
 import com.curtisdigital.authoriti.api.model.Purpose;
-import com.curtisdigital.authoriti.api.model.Purposes;
 import com.curtisdigital.authoriti.core.BaseFragment;
 import com.curtisdigital.authoriti.ui.items.PurposeItem;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
@@ -126,5 +125,14 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
             dataManager.setDefaultPurposeIndex(index);
         }
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (dataManager.getScheme() != null){
+            utils.initSelectedIndex(mContext         );
+        }
     }
 }

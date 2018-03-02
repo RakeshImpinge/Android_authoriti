@@ -52,6 +52,11 @@ public class DataType {
         return type6;
     }
 
+
+    private int preSelectedTypeIndex;
+    private int selectedTypeIndex;
+    private List<Value> selectedValues;
+
     public List<Value> getType(int index){
 
         switch (index){
@@ -72,4 +77,29 @@ public class DataType {
         }
 
     }
+
+    public int getPreSelectedTypeIndex() {
+        return preSelectedTypeIndex;
+    }
+
+    public void setPreSelectedTypeIndex(int preSelectedTypeIndex) {
+        this.preSelectedTypeIndex = preSelectedTypeIndex;
+    }
+
+    public int getSelectedTypeIndex() {
+        return selectedTypeIndex;
+    }
+
+    public void setSelectedTypeIndex(int selectedTypeIndex) {
+        this.selectedTypeIndex = selectedTypeIndex;
+    }
+
+    public List<Value> getSelectedValues() {
+        return selectedValues;
+    }
+
+    public void setSelectedValues(List<Value> selectedValues) {
+        this.selectedValues = selectedValues;
+    }
+
 }
