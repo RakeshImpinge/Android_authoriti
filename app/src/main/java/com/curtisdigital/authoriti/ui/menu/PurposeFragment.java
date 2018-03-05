@@ -132,7 +132,7 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
         super.onResume();
 
         if (dataManager.getScheme() != null){
-            utils.initSelectedIndex(mContext         );
+            utils.initSelectedIndex(mContext);
         }
     }
 }

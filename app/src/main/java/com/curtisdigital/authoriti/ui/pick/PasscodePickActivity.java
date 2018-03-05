@@ -30,6 +30,7 @@ import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -113,16 +114,26 @@ public class PasscodePickActivity extends BaseActivity {
                          List<Value> values = dataType.getSelectedValues();
                          if (item.isChecked()){
                              if (values.size() > 1){
-                                 values.remove(item.getValue());
+
+                                 for (Value value : values){
+                                     if (value.getValue().equals(item.getValue().getValue()) && value.getTitle().equals(item.getValue().getTitle())){
+                                         values.remove(value);
+
+                                         item.setChecked(!item.isChecked());
+                                         optionAdapter.notifyAdapterItemChanged(position);
+
+                                         break;
+                                     }
+                                 }
                              }
                          } else {
                              values.add(item.getValue());
+
+                             item.setChecked(!item.isChecked());
+                             optionAdapter.notifyAdapterItemChanged(position);
                          }
                          dataType.setSelectedValues(values);
                          dataManager.setDataType(dataType);
-
-                         item.setChecked(!item.isChecked());
-                         optionAdapter.notifyAdapterItemChanged(position);
 
 
                      } else {

@@ -9,7 +9,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.curtisdigital.authoriti.R;
+import com.curtisdigital.authoriti.api.model.Order;
 import com.curtisdigital.authoriti.api.model.Picker;
+import com.curtisdigital.authoriti.api.model.Purpose;
 import com.curtisdigital.authoriti.api.model.Value;
 import com.curtisdigital.authoriti.core.BaseActivity;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
@@ -23,12 +25,14 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.util.Calendar;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -38,6 +42,16 @@ import java.util.concurrent.TimeUnit;
 
 @EActivity(R.layout.activity_code_generate)
 public class CodeGenerateActivity extends BaseActivity {
+
+    private Order order;;
+    private Purpose purpose;
+    private Crypto crypto;
+
+    @Extra
+    int purposeIndex;
+
+    @Extra
+    String codeExtra = "";
 
     @Bean
     AuthoritiData dataManager;
@@ -54,10 +68,18 @@ public class CodeGenerateActivity extends BaseActivity {
     @AfterViews
     void callAfterViewInjection(){
 
-        ivQRCode.setImageBitmap(QRCode.from(generateCode()).bitmap());
+        purpose = dataManager.getPurposes().get(purposeIndex);
+        if (purpose.getSchemaIndex() == 1){
+            order = dataManager.getPickerOrder();
+        } else if (purpose.getSchemaIndex() == 2){
+            order = dataManager.getPickerOrder2();
+        }
+
+        crypto = new Crypto();
 
         String code = generateCode();
 
+        ivQRCode.setImageBitmap(QRCode.from(code).bitmap());
         tvCode.setText(utils.fromHtml(generateHTMLString(code)));
 
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
@@ -95,9 +117,9 @@ public class CodeGenerateActivity extends BaseActivity {
 
         StringBuilder payload = new StringBuilder();
 
-        if (dataManager.getPickerOrder() != null && dataManager.getPickerOrder().getPickers() != null && dataManager.getPickerOrder().getPickers().size() > 0){
+        if (order != null && order.getPickers() != null && order.getPickers().size() > 0){
 
-            for (String picker : dataManager.getPickerOrder().getPickers()){
+            for (String picker : order.getPickers()){
 
                 switch (picker){
 
@@ -109,11 +131,7 @@ public class CodeGenerateActivity extends BaseActivity {
 
                     case PICKER_INDUSTRY:
 
-                        if (dataManager.getIndustryPicker() != null){
-
-                            payload.append(getIndividualPayload(dataManager.getIndustryPicker()));
-
-                        }
+                        payload.append(industryPayload());
 
                         break;
 
@@ -143,7 +161,33 @@ public class CodeGenerateActivity extends BaseActivity {
 
                         break;
 
+                    case PICKER_REQUEST:
 
+                        if (dataManager.getRequestPicker() != null){
+
+                            payload.append(getIndividualPayload(dataManager.getRequestPicker()));
+                        }
+
+                        break;
+
+                    case PICKER_GEO:
+
+                        if (dataManager.getGeoPicker() != null){
+
+                            String tempPayload = crypto.encodeGeo(getIndividualPayload(dataManager.getGeoPicker()), payload.toString());
+                            payload = new StringBuilder(tempPayload);
+                        }
+                        break;
+
+                    case PICKER_DATA_TYPE:
+
+                        if (dataManager.getDataTypePicker() != null){
+
+                            String tempPayload = crypto.encodeDataTypes(dataTypePayload(), payload.toString());
+                            payload = new StringBuilder(tempPayload);
+                        }
+
+                        break;
                 }
 
             }
@@ -163,9 +207,13 @@ public class CodeGenerateActivity extends BaseActivity {
         Value value = getValueForPicker(dataManager.getAccountPicker());
         String trimValue = dataManager.getValidString(value.getValue());
 
-        Crypto crypto = new Crypto();
+        if (purpose.getSchemaIndex() == 2){
+            payload = crypto.addIdentifierToAccountId(dataManager.getValidString(codeExtra), trimValue);
+            payload = crypto.addAccountNumberToPayload(generateInitialPayload(), payload);
+        } else {
+            payload = crypto.addAccountNumberToPayload(generateInitialPayload(), trimValue);
 
-        payload = crypto.addAccountNumberToPayload(generateInitialPayload(), trimValue);
+        }
 
         Log.e("Payload", payload);
 
@@ -176,8 +224,6 @@ public class CodeGenerateActivity extends BaseActivity {
     private String generateCode(){
 
         String code = "";
-
-        Crypto crypto = new Crypto();
 
         AesCbcWithIntegrity.SecretKeys keys;
         String keyStr = dataManager.getUser().getEncryptKey();
@@ -213,10 +259,71 @@ public class CodeGenerateActivity extends BaseActivity {
         return "1";
     }
 
+    private String industryPayload(){
+
+        if (purpose.getPickerName() != null && purpose.getValue() != null){
+
+            return purpose.getValue();
+
+        } else {
+
+            if (dataManager.getIndustryPicker() != null){
+
+                return getIndividualPayload(dataManager.getIndustryPicker());
+
+            } else {
+                return "";
+            }
+
+        }
+    }
+
+    private String dataTypePayload(){
+
+        List<Value> values = dataManager.getDataType().getType(utils.getPickerSelectedIndex(this, PICKER_REQUEST));
+
+        StringBuilder bitMask = new StringBuilder();
+
+        if (values != null){
+
+            for (Value value : values){
+
+                if (checkDataType(value)){
+                    bitMask.append("1");
+                } else {
+                    bitMask.append("0");
+                }
+            }
+
+        }
+
+        Log.e("DataType Payload - ", bitMask.toString());
+
+        return bitMask.toString();
+    }
+
+    private boolean checkDataType(Value value){
+
+        List<Value> selectedValues = dataManager.getDataType().getSelectedValues();
+        if (selectedValues != null){
+
+            for (Value value1 : selectedValues){
+
+                if (value.getValue().equals(value1.getValue()) && value.getTitle().equals(value1.getTitle())){
+                    return true;
+                }
+            }
+
+        }
+
+        return false;
+    }
+
     private String getIndividualPayload(Picker picker){
 
         Value value = getValueForPicker(picker);
 
+        Log.e("Selected Value - ", value.getTitle());
         return value.getValue();
 
     }

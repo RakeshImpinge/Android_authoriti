@@ -21,6 +21,7 @@ import com.curtisdigital.authoriti.api.model.AccountID;
 import com.curtisdigital.authoriti.api.model.AuthLogIn;
 import com.curtisdigital.authoriti.api.model.Order;
 import com.curtisdigital.authoriti.api.model.Picker;
+import com.curtisdigital.authoriti.api.model.Purpose;
 import com.curtisdigital.authoriti.api.model.SchemaGroup;
 import com.curtisdigital.authoriti.api.model.Scheme;
 import com.curtisdigital.authoriti.api.model.Value;
@@ -296,8 +297,30 @@ public class MainActivity extends BaseActivity{
     protected void onResume() {
         super.onResume();
 
+        loadPurposes();
         loadScheme();
 
+    }
+
+    private void loadPurposes(){
+
+        AuthoritiAPI.APIService().getPurposes().enqueue(new Callback<List<Purpose>>() {
+            @Override
+            public void onResponse(Call<List<Purpose>> call, Response<List<Purpose>> response) {
+                dismissProgressDialog();
+
+                if (response.code() == 200 && response.body() != null){
+
+                    dataManager.setPurposes(response.body());
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Purpose>> call, Throwable t) {
+                dismissProgressDialog();
+            }
+        });
     }
 
     private void loadScheme(){

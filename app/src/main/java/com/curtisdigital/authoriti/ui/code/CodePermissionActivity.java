@@ -3,8 +3,10 @@ package com.curtisdigital.authoriti.ui.code;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.EditText;
 
 import com.curtisdigital.authoriti.R;
+import com.curtisdigital.authoriti.api.model.Order;
 import com.curtisdigital.authoriti.api.model.Purpose;
 import com.curtisdigital.authoriti.core.BaseActivity;
 import com.curtisdigital.authoriti.ui.items.CodeItem;
@@ -28,6 +30,7 @@ public class CodePermissionActivity extends BaseActivity {
 
     private Purpose purpose;
     FastItemAdapter<CodeItem> adapter;
+    private Order order;
 
     @Extra
     int purposeIndex;
@@ -44,6 +47,9 @@ public class CodePermissionActivity extends BaseActivity {
     @ViewById(R.id.codeView)
     View codeView;
 
+    @ViewById(R.id.etCode)
+    EditText etCode;
+
     @AfterViews
     void callAfterViewInjection(){
 
@@ -52,13 +58,17 @@ public class CodePermissionActivity extends BaseActivity {
         rvPermission.setAdapter(adapter);
 
         purpose = dataManager.getPurposes().get(purposeIndex);
-        if (purpose.getSchemaIndex() == 2){
+
+        if (purpose.getSchemaIndex() == 1){
+            order = dataManager.getPickerOrder();
+        } else {
+            order = dataManager.getPickerOrder2();
             codeView.setVisibility(View.VISIBLE);
         }
 
     }
 
-    private void showSchema1(){
+    private void showSchema(){
 
         if (adapter == null){
             adapter = new FastItemAdapter<CodeItem>();
@@ -66,9 +76,9 @@ public class CodePermissionActivity extends BaseActivity {
             adapter.clear();
         }
 
-        if (dataManager.getPickerOrder() != null && dataManager.getPickerOrder().getPickers() != null && dataManager.getPickerOrder().getPickers().size() > 0){
+        if (order != null && order.getPickers() != null && order.getPickers().size() > 0){
 
-            for (String picker : dataManager.getPickerOrder().getPickers()){
+            for (String picker : order.getPickers()){
 
                 switch (picker){
 
@@ -101,36 +111,6 @@ public class CodePermissionActivity extends BaseActivity {
                             }
                         }
                         break;
-                }
-
-            }
-
-        }
-
-    }
-
-    private void showSchema2(){
-
-        if (adapter == null){
-            adapter = new FastItemAdapter<CodeItem>();
-        } else {
-            adapter.clear();
-        }
-
-        if (dataManager.getPickerOrder2() != null && dataManager.getPickerOrder2().getPickers() != null && dataManager.getPickerOrder2().getPickers().size() > 0){
-
-            for (String picker : dataManager.getPickerOrder2().getPickers()){
-
-                switch (picker){
-
-                    case PICKER_ACCOUNT:
-                        if (dataManager.getAccountPicker() != null){
-                            if (purpose.getPickerName() == null || !purpose.getPickerName().equals(PICKER_ACCOUNT)){
-                                adapter.add(new CodeItem(dataManager.getAccountPicker()));
-                            }
-                        }
-                        break;
-
                     case PICKER_GEO:
                         if (dataManager.getGeoPicker() != null){
                             if (purpose.getPickerName() == null || !purpose.getPickerName().equals(PICKER_GEO)){
@@ -152,13 +132,6 @@ public class CodePermissionActivity extends BaseActivity {
                             }
                         }
                         break;
-                    case PICKER_TIME:
-                        if (dataManager.getTimePicker() != null){
-                            if (purpose.getPickerName() == null || !purpose.getPickerName().equals(PICKER_TIME)){
-                                adapter.add(new CodeItem(dataManager.getTimePicker()));
-                            }
-                        }
-                        break;
                 }
 
             }
@@ -166,7 +139,6 @@ public class CodePermissionActivity extends BaseActivity {
         }
 
     }
-
 
     @Click(R.id.ivBack)
     void backButtonClicked(){
@@ -176,7 +148,24 @@ public class CodePermissionActivity extends BaseActivity {
 
     @Click(R.id.cvGenerate)
     void generateButtonClicked(){
-        CodeGenerateActivity_.intent(mContext).start();
+
+        if (purpose.getSchemaIndex() == 1){
+
+            CodeGenerateActivity_.intent(mContext).purposeIndex(purposeIndex).start();
+
+        } else if (purpose.getSchemaIndex() == 2){
+
+            hideKeyboard();
+
+            if (etCode.getText().length() == 0){
+
+                showAlert("", "Please enter the code provided by the Company you wish to grant access.");
+
+            } else {
+
+                CodeGenerateActivity_.intent(mContext).purposeIndex(purposeIndex).codeExtra(etCode.getText().toString()).start();
+            }
+        }
     }
 
     @Override
@@ -187,15 +176,7 @@ public class CodePermissionActivity extends BaseActivity {
 
             if(!isFinishing()){
 
-                if (purpose.getSchemaIndex() == 1){
-
-                    showSchema1();
-
-                } else if (purpose.getSchemaIndex() == 2) {
-
-                    showSchema2();
-                }
-
+                showSchema();
             }
 
         }
