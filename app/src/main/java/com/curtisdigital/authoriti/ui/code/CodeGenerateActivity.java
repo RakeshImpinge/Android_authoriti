@@ -256,7 +256,7 @@ public class CodeGenerateActivity extends BaseActivity {
 
     private String accountPayload(){
 
-        return "1";
+        return String.valueOf(purpose.getSchemaIndex());
     }
 
     private String industryPayload(){
