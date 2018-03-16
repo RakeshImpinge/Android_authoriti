@@ -1,7 +1,9 @@
 package com.curtisdigital.authoriti.ui.auth;
 
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.widget.NestedScrollView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -12,7 +14,10 @@ import com.curtisdigital.authoriti.api.model.response.ResponseInviteCode;
 import com.curtisdigital.authoriti.core.BaseActivity;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.curtisdigital.authoriti.utils.AuthoritiUtils;
-import com.google.gson.JsonObject;
+import com.curtisdigital.authoriti.utils.ViewUtils;
+
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
 import org.androidannotations.annotations.AfterTextChange;
 import org.androidannotations.annotations.AfterViews;
@@ -51,6 +56,9 @@ public class InviteCodeActivity extends BaseActivity{
     @ViewById(R.id.ivBack)
     ImageView ivBack;
 
+    @ViewById(R.id.scrollView)
+    NestedScrollView scrollView;
+
     @AfterViews
     void callAfterViewInjection(){
 
@@ -59,6 +67,19 @@ public class InviteCodeActivity extends BaseActivity{
         } else {
             ivBack.setVisibility(View.INVISIBLE);
         }
+
+        KeyboardVisibilityEvent.setEventListener(this, new KeyboardVisibilityEventListener() {
+            @Override
+            public void onVisibilityChanged(boolean isOpen) {
+
+                if (isOpen){
+                    scrollView.scrollTo(0, (int)ViewUtils.convertDpToPixel(50, mContext));
+
+                } else {
+                    scrollView.scrollTo(0, 0);
+                }
+            }
+        });
 
     }
 
@@ -89,6 +110,7 @@ public class InviteCodeActivity extends BaseActivity{
 
         } else {
 
+            hideKeyboard();
             checkInviteCode();
 //            StartupActivity_.intent(mContext).start();
 
