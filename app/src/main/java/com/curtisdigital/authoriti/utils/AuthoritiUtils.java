@@ -9,6 +9,7 @@ import android.text.Spanned;
 import android.text.style.TypefaceSpan;
 
 import com.curtisdigital.authoriti.api.model.Picker;
+import com.curtisdigital.authoriti.api.model.Purpose;
 import com.curtisdigital.authoriti.api.model.Value;
 
 import org.androidannotations.annotations.EBean;

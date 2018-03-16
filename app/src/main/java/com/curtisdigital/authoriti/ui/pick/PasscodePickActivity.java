@@ -112,6 +112,9 @@ public class PasscodePickActivity extends BaseActivity {
 
                          DataType dataType = dataManager.getDataType();
                          List<Value> values = dataType.getSelectedValues();
+                         if (values == null){
+                             values = new ArrayList<>();
+                         }
                          if (item.isChecked()){
                              if (values.size() > 1){
 
