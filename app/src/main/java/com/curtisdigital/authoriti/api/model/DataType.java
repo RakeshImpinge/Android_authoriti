@@ -28,6 +28,18 @@ public class DataType {
     @SerializedName("06")
     private List<Value> type6;
 
+    @SerializedName("07")
+    private List<Value> type7;
+
+    @SerializedName("08")
+    private List<Value> type8;
+
+    @SerializedName("09")
+    private List<Value> type9;
+
+    @SerializedName("10")
+    private List<Value> type10;
+
     public List<Value> getType1() {
         return type1;
     }
@@ -52,6 +64,21 @@ public class DataType {
         return type6;
     }
 
+    public List<Value> getType7() {
+        return type7;
+    }
+
+    public List<Value> getType8() {
+        return type8;
+    }
+
+    public List<Value> getType9() {
+        return type9;
+    }
+
+    public List<Value> getType10() {
+        return type10;
+    }
 
     private int preSelectedTypeIndex;
     private int selectedTypeIndex;
@@ -72,6 +99,14 @@ public class DataType {
                 return type5;
             case 5:
                 return type6;
+            case 6:
+                return type7;
+            case 7:
+                return type8;
+            case 8:
+                return type9;
+            case 9:
+                return type10;
             default:
                 return null;
         }

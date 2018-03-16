@@ -45,6 +45,7 @@ import org.androidannotations.annotations.ViewById;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.MediaType;
@@ -639,11 +640,6 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
     }
 
     @Override
-    public void activateLicenseKeyCompleted(LicenseActivationDetails licenseActivationDetails) {
-
-    }
-
-    @Override
     public void validateLicenseKeyCompleted(LicenseDetails licenseDetails) {
 
     }
@@ -661,7 +657,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
     }
 
     @Override
-    public void onCardCroppingFinish(Bitmap card_bitmap, int detectedCardType) {
+    public void onCardCroppingFinish(Bitmap card_bitmap, int detectedCardType, HashMap<String, Object> imageMetrics) {
 
         dismissProgressDialog();
         Log.e("CARD Cropping - ", "Finished");
@@ -708,8 +704,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
     }
 
     @Override
-    public void onCardCroppingFinish(Bitmap bitmapCropped, boolean scanBackSide, int detectedCardType) {
-
+    public void onCardCroppingFinish(Bitmap bitmapCropped, boolean scanBackSide, int detectedCardType, HashMap<String, Object> imageMetrics) {
         dismissProgressDialog();
         Log.e("CARD Cropping ", "Finished");
 
@@ -751,7 +746,6 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
         }
 
         updateSkipButton();
-
     }
 
     @Override
@@ -773,7 +767,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
     }
 
     @Override
-    public void onCancelCapture(Bitmap croppedImageOnCancel, Bitmap originalImageonCancel) {
+    public void onCancelCapture(Bitmap croppedImageOnCancel, HashMap<String, Object> imageMetrics, Bitmap originalImageonCancel) {
 
         Log.e("Capture ", "Cancelled");
 
@@ -796,12 +790,10 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
             ivBackward.setImageBitmap(null);
             capturedBack = false;
         }
-
-
     }
 
     @Override
-    public void onBarcodeTimeOut(Bitmap croppedImageOnTimeout, Bitmap originalImageOnTimeout) {
+    public void onBarcodeTimeOut(Bitmap croppedImageOnTimeout, HashMap<String, Object> imageMetrics, Bitmap originalImageOnTimeout) {
 
         Log.e("Barcode Scan ", "Time Out");
 
@@ -832,6 +824,11 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
             showAlert(acuantAndroidMobileSdkControllerInstance.getBarcodeCameraContext(), "", "Unable to scan barcode");
 
         }
+    }
+
+    @Override
+    public void onCardImageCaptured() {
+
     }
 
     @Override
