@@ -1,6 +1,9 @@
 package com.curtisdigital.authoriti.utils.crypto;
 
 import java.math.BigInteger;
+import java.nio.charset.Charset;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -36,6 +39,20 @@ public class Crypto {
         return CryptoUtil.intToBase62(x, 10);
     }
 
+    public String addIdentifierToAccountId(String identifier, String accountId) {
+        String acc = CryptoUtil.cleanup(accountId, 4);
+        String _identifier = CryptoUtil.cleanup(identifier.toLowerCase(), identifier.length());
+
+        String id = CryptoUtil.cleanup(CryptoUtil.MD5(_identifier), 4);
+
+        BigInteger a = CryptoUtil.base62ToInt(acc);
+        BigInteger b = CryptoUtil.base62ToInt(id);
+
+        BigInteger c = a.add(b);
+
+        return CryptoUtil.intToBase62(c, 4);
+    }
+
     public String getTimeString(int year, int month, int day, int hour, int minute) throws  Exception {
         Calendar c = Calendar.getInstance();
         c.set(year, month, day, hour, minute);
@@ -53,16 +70,22 @@ public class Crypto {
             throw new Exception("Invalid expiry date received.");
         }
 
-        System.out.println("Difference: " +  diff);
-
         long minutes = diff / 60000;
-        System.out.println("CRYPTO: " + minutes);
         return CryptoUtil.intToBase62(BigInteger.valueOf(minutes), 4);
+    }
+
+    public String encodeGeo(String geo, String payload) {
+        BigInteger p = new BigInteger(geo);
+        return payload + CryptoUtil.intToBase62(p, 1);
+    }
+
+    public String encodeDataTypes(String selectedTypes, String payload) {
+        int dt = Integer.parseInt(selectedTypes, 2);
+        return payload + CryptoUtil.intToBase62(new BigInteger(dt + ""), 2);
     }
 
     public String sign(String payload, String privateKey) {
         String signature = CryptoUtil.sign(payload, privateKey);
-        System.out.println("CRYPTO: " + signature);
         return signature;
     }
 }

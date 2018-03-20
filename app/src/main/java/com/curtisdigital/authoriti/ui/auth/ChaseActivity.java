@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.hardware.fingerprint.FingerprintManager;
 import android.provider.Settings;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.widget.NestedScrollView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -20,9 +22,13 @@ import com.curtisdigital.authoriti.core.BaseActivity;
 import com.curtisdigital.authoriti.core.SecurityActivity;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.curtisdigital.authoriti.utils.AuthoritiUtils;
+import com.curtisdigital.authoriti.utils.ViewUtils;
 import com.curtisdigital.authoriti.utils.crypto.CryptoKeyPair;
 import com.multidots.fingerprintauth.AuthErrorCodes;
 import com.tozny.crypto.android.AesCbcWithIntegrity;
+
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
 import org.androidannotations.annotations.AfterTextChange;
 import org.androidannotations.annotations.AfterViews;
@@ -76,6 +82,9 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity.
     @ViewById(R.id.etPassword)
     EditText etPassword;
 
+    @ViewById(R.id.scrollView)
+    NestedScrollView scrollView;
+
     private CryptoKeyPair keyPair;
 
     private boolean saveSuccess = false;
@@ -87,6 +96,18 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity.
 
         tvTitle.setText(customer + " is a partner of Authority. Please enter your " + customer + " password so we can authorize you.");
 
+        KeyboardVisibilityEvent.setEventListener(this, new KeyboardVisibilityEventListener() {
+            @Override
+            public void onVisibilityChanged(boolean isOpen) {
+
+                if (isOpen){
+                    scrollView.scrollTo(0, (int) ViewUtils.convertDpToPixel(100, mContext));
+
+                } else {
+                    scrollView.scrollTo(0, 0);
+                }
+            }
+        });
     }
 
     private void signUp(){
@@ -297,6 +318,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity.
 
         if (!TextUtils.isEmpty(etIdentifier.getText()) && !TextUtils.isEmpty(etPassword.getText())){
 
+            hideKeyboard();
             signUp();
 
         }

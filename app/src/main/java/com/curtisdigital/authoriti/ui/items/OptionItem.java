@@ -41,6 +41,10 @@ public class OptionItem extends AbstractItem<OptionItem, OptionItem.ViewHolder>{
         this.checked = checked;
     }
 
+    public boolean isChecked(){
+        return checked;
+    }
+
     @Override
     public ViewHolder getViewHolder(View v) {
         return new ViewHolder(v);

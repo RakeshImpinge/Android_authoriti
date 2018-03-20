@@ -17,9 +17,12 @@ import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.curtisdigital.authoriti.api.AuthoritiAPI;
+import com.curtisdigital.authoriti.api.model.AccountID;
 import com.curtisdigital.authoriti.api.model.AuthLogIn;
 import com.curtisdigital.authoriti.api.model.Order;
 import com.curtisdigital.authoriti.api.model.Picker;
+import com.curtisdigital.authoriti.api.model.Purpose;
+import com.curtisdigital.authoriti.api.model.SchemaGroup;
 import com.curtisdigital.authoriti.api.model.Scheme;
 import com.curtisdigital.authoriti.api.model.Value;
 import com.curtisdigital.authoriti.core.BaseActivity;
@@ -27,9 +30,10 @@ import com.curtisdigital.authoriti.ui.auth.LoginActivity_;
 import com.curtisdigital.authoriti.ui.help.HelpActivity_;
 import com.curtisdigital.authoriti.ui.menu.AccountChaseFragment_;
 import com.curtisdigital.authoriti.ui.menu.AccountFragment_;
-import com.curtisdigital.authoriti.ui.menu.CodeGenerateFragment_;
+import com.curtisdigital.authoriti.ui.menu.PurposeFragment_;
 import com.curtisdigital.authoriti.ui.menu.WipeFragment_;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
+import com.curtisdigital.authoriti.utils.AuthoritiUtils_;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -62,7 +66,7 @@ public class MainActivity extends BaseActivity{
     private AccountHeader header = null;
     private Drawer drawer = null;
 
-    private Fragment codeGenerateFragment;
+    private Fragment purposeFragment;
     private Fragment accountFragment;
     private Fragment wipeFragment;
 
@@ -188,13 +192,13 @@ public class MainActivity extends BaseActivity{
         Fragment fragment = null;
         if (menu_id == MENU_CODE){
 
-            if (codeGenerateFragment == null){
+            if (purposeFragment == null){
 
-                codeGenerateFragment = CodeGenerateFragment_.builder().build();
+                purposeFragment = PurposeFragment_.builder().build();
 
             }
 
-            fragment = codeGenerateFragment;
+            fragment = purposeFragment;
         }
         else if (menu_id == MENU_ACCOUNT){
 
@@ -293,39 +297,179 @@ public class MainActivity extends BaseActivity{
     protected void onResume() {
         super.onResume();
 
-        if (dataManager.getScheme() != null){
-
-            loadScheme();
-        }
+        loadPurposes();
+        loadScheme();
 
     }
 
-    private void loadScheme(){
+    private void loadPurposes(){
 
-        AuthoritiAPI.APIService().getScheme().enqueue(new Callback<Scheme>() {
-
+        AuthoritiAPI.APIService().getPurposes().enqueue(new Callback<List<Purpose>>() {
             @Override
-            public void onResponse(Call<Scheme> call, Response<Scheme> response) {
+            public void onResponse(Call<List<Purpose>> call, Response<List<Purpose>> response) {
+                dismissProgressDialog();
 
                 if (response.code() == 200 && response.body() != null){
 
-                    dataManager.setScheme(response.body());
-                    updatePickers();
-
-                    Log.e("Scheme", "Refreshed");
+                    dataManager.setPurposes(response.body());
 
                 }
             }
 
             @Override
-            public void onFailure(Call<Scheme> call, Throwable t) {
-
-
+            public void onFailure(Call<List<Purpose>> call, Throwable t) {
+                dismissProgressDialog();
             }
         });
     }
 
-    private void updatePickers(){
+    private void loadScheme(){
+
+        AuthoritiAPI.APIService().getSchemeGroup().enqueue(new Callback<SchemaGroup>() {
+            @Override
+            public void onResponse(Call<SchemaGroup> call, Response<SchemaGroup> response) {
+
+                dismissProgressDialog();
+
+                if (response.code() == 200 && response.body() != null){
+
+                    if (dataManager.getScheme() == null){
+                        dataManager.setScheme(response.body().getScheme());
+                        firstUpdateSchema();
+                    } else {
+                        dataManager.setScheme(response.body().getScheme());
+                        updateSchema();
+                    }
+
+                    if (response.body().getDataType() != null){
+                        dataManager.setDataType(response.body().getDataType());
+                    }
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SchemaGroup> call, Throwable t) {
+
+                dismissProgressDialog();
+            }
+        });
+    }
+
+    private void firstUpdateSchema() {
+
+        if (dataManager.getScheme() != null && dataManager.getScheme().getPickers() != null) {
+
+            Order order = new Order();
+            List<String> pickers = new ArrayList<>();
+
+            for (Picker picker : dataManager.getScheme().getPickers()) {
+
+                pickers.add(picker.getPicker());
+
+                switch (picker.getPicker()) {
+
+                    case PICKER_ACCOUNT:
+
+                        if (dataManager.getUser() != null && dataManager.getUser().getAccountIDs() != null && dataManager.getUser().getAccountIDs().size() > 0) {
+
+                            Picker picker1 = new Picker(picker.getPicker(), picker.getBytes(), picker.getValues(), picker.getTitle(), picker.getLabel());
+
+                            List<Value> values = new ArrayList<>();
+                            for (AccountID accountID : dataManager.getUser().getAccountIDs()) {
+
+                                Value value = new Value(accountID.getIdentifier(), accountID.getType());
+                                values.add(value);
+
+                            }
+                            picker1.setValues(values);
+
+                            if (dataManager.defaultAccountSelected) {
+
+                                picker1.setEnableDefault(true);
+                                picker1.setDefaultIndex(dataManager.defaultAccountIndex);
+
+                                dataManager.defaultAccountSelected = false;
+
+                            }
+
+                            dataManager.setAccountPicker(picker1);
+
+
+                        } else {
+
+                            dataManager.setAccountPicker(picker);
+
+                        }
+
+                        break;
+
+                    case PICKER_INDUSTRY:
+                        dataManager.setIndustryPicker(picker);
+                        break;
+
+                    case PICKER_LOCATION_STATE:
+                        dataManager.setLocationPicker(picker);
+                        break;
+
+                    case PICKER_LOCATION_COUNTRY:
+                        dataManager.setCountryPicker(picker);
+                        break;
+
+                    case PICKER_TIME:
+                        dataManager.setTimePicker(AuthoritiUtils_.getInstance_(mContext).getDefaultTimePicker(picker));
+                        break;
+
+                }
+            }
+
+            order.setPickers(pickers);
+            dataManager.setPickerOrder(order);
+        }
+
+
+
+        if (dataManager.getScheme() != null && dataManager.getScheme().getPickers2() != null) {
+
+            Order order = new Order();
+            List<String> pickers = new ArrayList<>();
+
+            for (Picker picker : dataManager.getScheme().getPickers2()) {
+
+                pickers.add(picker.getPicker());
+
+                switch (picker.getPicker()) {
+
+                    case PICKER_ACCOUNT:
+
+                        break;
+
+                    case PICKER_GEO:
+                        dataManager.setGeoPicker(picker);
+                        break;
+
+                    case PICKER_REQUEST:
+                        dataManager.setRequestPicker(picker);
+                        break;
+
+                    case PICKER_DATA_TYPE:
+                        dataManager.setDataTypePicker(picker);
+                        break;
+
+                    case PICKER_TIME:
+
+                        break;
+
+                }
+            }
+
+            order.setPickers(pickers);
+            dataManager.setPickerOrder2(order);
+        }
+
+    }
+
+    private void updateSchema(){
 
         if (dataManager.getScheme() != null && dataManager.getScheme().getPickers() != null) {
 
@@ -432,6 +576,103 @@ public class MainActivity extends BaseActivity{
 
             order.setPickers(pickers);
             dataManager.setPickerOrder(order);
+
+        }
+
+        if (dataManager.getScheme() != null && dataManager.getScheme().getPickers2() != null) {
+
+            Order order = new Order();
+            List<String> pickers = new ArrayList<>();
+
+            for (Picker picker : dataManager.getScheme().getPickers2()) {
+
+                pickers.add(picker.getPicker());
+
+                switch (picker.getPicker()) {
+
+                    case PICKER_ACCOUNT:
+
+                        break;
+
+                    case PICKER_GEO:
+
+                        if (dataManager.getGeoPicker() != null){
+
+                            Picker temp = new Picker();
+                            temp.setPicker(picker.getPicker());
+                            temp.setBytes(picker.getBytes());
+                            temp.setValues(picker.getValues());
+                            temp.setTitle(picker.getTitle());
+                            temp.setLabel(picker.getLabel());
+                            temp.setEnableDefault(dataManager.getGeoPicker().isEnableDefault());
+                            temp.setDefaultIndex(dataManager.getGeoPicker().getDefaultIndex());
+
+                            dataManager.setGeoPicker(temp);
+
+
+                        } else {
+
+                            dataManager.setGeoPicker(picker);
+                        }
+
+                        break;
+
+                    case PICKER_REQUEST:
+
+                        if (dataManager.getRequestPicker() != null){
+
+                            Picker temp = new Picker();
+                            temp.setPicker(picker.getPicker());
+                            temp.setBytes(picker.getBytes());
+                            temp.setValues(picker.getValues());
+                            temp.setTitle(picker.getTitle());
+                            temp.setLabel(picker.getLabel());
+                            temp.setEnableDefault(dataManager.getRequestPicker().isEnableDefault());
+                            temp.setDefaultIndex(dataManager.getRequestPicker().getDefaultIndex());
+
+                            dataManager.setRequestPicker(temp);
+
+
+                        } else {
+
+                            dataManager.setRequestPicker(picker);
+                        }
+
+                        break;
+
+                    case PICKER_DATA_TYPE:
+
+                        if (dataManager.getDataTypePicker() != null){
+
+                            Picker temp = new Picker();
+                            temp.setPicker(picker.getPicker());
+                            temp.setBytes(picker.getBytes());
+                            temp.setValues(picker.getValues());
+                            temp.setTitle(picker.getTitle());
+                            temp.setLabel(picker.getLabel());
+                            temp.setEnableDefault(dataManager.getDataTypePicker().isEnableDefault());
+                            temp.setDefaultIndex(dataManager.getDataTypePicker().getDefaultIndex());
+                            temp.setDefaultValues(dataManager.getDataTypePicker().getDefaultValues());
+
+                            dataManager.setDataTypePicker(temp);
+
+
+                        } else {
+
+                            dataManager.setDataTypePicker(picker);
+                        }
+
+                        break;
+
+                    case PICKER_TIME:
+
+                        break;
+
+                }
+            }
+
+            order.setPickers(pickers);
+            dataManager.setPickerOrder2(order);
 
         }
     }

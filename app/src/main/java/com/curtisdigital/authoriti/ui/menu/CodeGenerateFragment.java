@@ -9,7 +9,7 @@ import com.curtisdigital.authoriti.api.AuthoritiAPI;
 import com.curtisdigital.authoriti.api.model.AccountID;
 import com.curtisdigital.authoriti.api.model.Order;
 import com.curtisdigital.authoriti.api.model.Picker;
-import com.curtisdigital.authoriti.api.model.Scheme;
+import com.curtisdigital.authoriti.api.model.SchemaGroup;
 import com.curtisdigital.authoriti.api.model.Value;
 import com.curtisdigital.authoriti.core.BaseFragment;
 import com.curtisdigital.authoriti.ui.code.CodeGenerateActivity_;
@@ -69,26 +69,24 @@ public class CodeGenerateFragment extends BaseFragment {
 
         displayProgressDialog("Loading...");
 
-        AuthoritiAPI.APIService().getScheme().enqueue(new Callback<Scheme>() {
-
+        AuthoritiAPI.APIService().getSchemeGroup().enqueue(new Callback<SchemaGroup>() {
             @Override
-            public void onResponse(Call<Scheme> call, Response<Scheme> response) {
+            public void onResponse(Call<SchemaGroup> call, Response<SchemaGroup> response) {
 
                 dismissProgressDialog();
 
                 if (response.code() == 200 && response.body() != null){
 
-                    dataManager.setScheme(response.body());
+                    dataManager.setScheme(response.body().getScheme());
                     updatePickers();
 
                 }
             }
 
             @Override
-            public void onFailure(Call<Scheme> call, Throwable t) {
+            public void onFailure(Call<SchemaGroup> call, Throwable t) {
 
                 dismissProgressDialog();
-
             }
         });
     }

@@ -1,13 +1,19 @@
 package com.curtisdigital.authoriti.ui.auth;
 
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.widget.NestedScrollView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.EditText;
 
 import com.curtisdigital.authoriti.R;
 import com.curtisdigital.authoriti.core.BaseActivity;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.curtisdigital.authoriti.utils.AuthoritiUtils;
+import com.curtisdigital.authoriti.utils.ViewUtils;
+
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
 import org.androidannotations.annotations.AfterTextChange;
 import org.androidannotations.annotations.AfterViews;
@@ -43,8 +49,24 @@ public class StartupActivity extends BaseActivity {
     @ViewById(R.id.etPasswordConfirm)
     EditText etPasswordConfirm;
 
+    @ViewById(R.id.scrollView)
+    NestedScrollView scrollView;
+
     @AfterViews
     void callAfterViewInjection(){
+
+        KeyboardVisibilityEvent.setEventListener(this, new KeyboardVisibilityEventListener() {
+            @Override
+            public void onVisibilityChanged(boolean isOpen) {
+
+                if (isOpen){
+                    scrollView.scrollTo(0, (int) ViewUtils.convertDpToPixel(100, mContext));
+
+                } else {
+                    scrollView.scrollTo(0, 0);
+                }
+            }
+        });
 
     }
 
@@ -107,6 +129,7 @@ public class StartupActivity extends BaseActivity {
 
         if (!TextUtils.isEmpty(etPassword.getText()) && !TextUtils.isEmpty(etPassword.getText()) && passwordMatched){
 
+            hideKeyboard();
             dataManager.password = etPassword.getText().toString();
             ScanActivity_.intent(mContext).start();
 

@@ -11,14 +11,13 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.curtisdigital.authoriti.R;
+import com.curtisdigital.authoriti.api.model.DataType;
 import com.curtisdigital.authoriti.api.model.Picker;
 import com.curtisdigital.authoriti.api.model.Value;
 import com.curtisdigital.authoriti.core.BaseActivity;
 import com.curtisdigital.authoriti.ui.items.OptionItem;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.curtisdigital.authoriti.utils.AuthoritiUtils;
-import com.github.thunder413.datetimeutils.DateTimeUnits;
-import com.github.thunder413.datetimeutils.DateTimeUtils;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
@@ -31,8 +30,10 @@ import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
@@ -44,7 +45,7 @@ import java.util.concurrent.TimeUnit;
 public class PasscodePickActivity extends BaseActivity {
 
     private Picker picker;
-    private FastItemAdapter<OptionItem> adapter;
+    private FastItemAdapter<OptionItem> optionAdapter;
     private int selectedIndex;
 
     @Bean
@@ -88,12 +89,12 @@ public class PasscodePickActivity extends BaseActivity {
             }
         }
 
-        adapter = new FastItemAdapter<OptionItem>();
-        adapter.withSelectable(true);
+        optionAdapter = new FastItemAdapter<OptionItem>();
+        optionAdapter.withSelectable(true);
         rvOptions.setLayoutManager(new LinearLayoutManager(mContext));
-        rvOptions.setAdapter(adapter);
+        rvOptions.setAdapter(optionAdapter);
 
-        adapter.withOnClickListener(new FastAdapter.OnClickListener<OptionItem>() {
+        optionAdapter.withOnClickListener(new FastAdapter.OnClickListener<OptionItem>() {
             @Override
             public boolean onClick(View v, IAdapter<OptionItem> adapter, OptionItem item, int position) {
 
@@ -107,9 +108,56 @@ public class PasscodePickActivity extends BaseActivity {
 
                 } else {
 
-                    utils.setSelectedPickerIndex(mContext, pickerType, position);
-                    utils.setIndexSelected(mContext, pickerType, true);
-                    finish();
+                     if (picker.getPicker().equals(PICKER_DATA_TYPE)){
+
+                         DataType dataType = dataManager.getDataType();
+                         List<Value> values = dataType.getSelectedValues();
+                         if (values == null){
+                             values = new ArrayList<>();
+                         }
+                         if (item.isChecked()){
+                             if (values.size() > 1){
+
+                                 for (Value value : values){
+                                     if (value.getValue().equals(item.getValue().getValue()) && value.getTitle().equals(item.getValue().getTitle())){
+                                         values.remove(value);
+
+                                         item.setChecked(!item.isChecked());
+                                         optionAdapter.notifyAdapterItemChanged(position);
+
+                                         break;
+                                     }
+                                 }
+                             }
+                         } else {
+                             values.add(item.getValue());
+
+                             item.setChecked(!item.isChecked());
+                             optionAdapter.notifyAdapterItemChanged(position);
+                         }
+                         dataType.setSelectedValues(values);
+                         dataManager.setDataType(dataType);
+
+
+                     } else {
+
+                         utils.setSelectedPickerIndex(mContext, pickerType, position);
+                         utils.setIndexSelected(mContext, pickerType, true);
+
+                         if (picker.getPicker().equals(PICKER_REQUEST)){
+
+                             DataType dataType = dataManager.getDataType();
+                             if (dataType.getPreSelectedTypeIndex() != position){
+                                 dataType.setSelectedValues(null);
+                             }
+                             dataType.setPreSelectedTypeIndex(dataType.getSelectedTypeIndex());
+                             dataType.setSelectedTypeIndex(position);
+
+                             dataManager.setDataType(dataType);
+                         }
+
+                         finish();
+                     }
 
                 }
 
@@ -119,6 +167,14 @@ public class PasscodePickActivity extends BaseActivity {
 
         if (picker.getValues() != null && picker.getValues().size() != 0){
             showOptions();
+        } else {
+            if (picker.getPicker().equals(PICKER_DATA_TYPE)){
+
+                List<Value> values = dataManager.getDataType().getType(utils.getPickerSelectedIndex(this, PICKER_REQUEST));
+                if (values != null && values.size() > 0){
+                    showOptions(values);
+                }
+            }
         }
     }
 
@@ -205,13 +261,13 @@ public class PasscodePickActivity extends BaseActivity {
 
                     item.setChecked(true);
                     item.setValue(value);
-                    adapter.notifyAdapterItemChanged(position);
+                    optionAdapter.notifyAdapterItemChanged(position);
 
                     updateTimePicker(position, value);
 
-                    OptionItem prevItem = adapter.getAdapterItem(selectedIndex);
+                    OptionItem prevItem = optionAdapter.getAdapterItem(selectedIndex);
                     prevItem.setChecked(false);
-                    adapter.notifyAdapterItemChanged(selectedIndex);
+                    optionAdapter.notifyAdapterItemChanged(selectedIndex);
 
                     utils.setSelectedPickerIndex(mContext, pickerType, position);
                     utils.setIndexSelected(mContext, pickerType, true);
@@ -245,13 +301,13 @@ public class PasscodePickActivity extends BaseActivity {
 
                     item.setChecked(true);
                     item.setValue(value);
-                    adapter.notifyAdapterItemChanged(position);
+                    optionAdapter.notifyAdapterItemChanged(position);
 
                     updateTimePicker(position, value);
 
-                    OptionItem prevItem = adapter.getAdapterItem(selectedIndex);
+                    OptionItem prevItem = optionAdapter.getAdapterItem(selectedIndex);
                     prevItem.setChecked(false);
-                    adapter.notifyAdapterItemChanged(selectedIndex);
+                    optionAdapter.notifyAdapterItemChanged(selectedIndex);
 
                     utils.setSelectedPickerIndex(mContext, pickerType, position);
                     utils.setIndexSelected(mContext, pickerType, true);
@@ -277,17 +333,51 @@ public class PasscodePickActivity extends BaseActivity {
 
     private void showOptions(){
 
-        if (adapter == null){
-            adapter = new FastItemAdapter<OptionItem>();
+        if (optionAdapter == null){
+            optionAdapter = new FastItemAdapter<OptionItem>();
         } else {
-            adapter.clear();
+            optionAdapter.clear();
         }
 
         for (int i = 0 ; i < picker.getValues().size() ; i ++){
 
-            adapter.add(new OptionItem(picker.getValues().get(i), selectedIndex == i));
+            optionAdapter.add(new OptionItem(picker.getValues().get(i), selectedIndex == i));
 
         }
+    }
+
+    private void showOptions(List<Value> values){
+
+        if (optionAdapter == null){
+            optionAdapter = new FastItemAdapter<OptionItem>();
+        } else {
+            optionAdapter.clear();
+        }
+
+        if (selectedIndex >= values.size()){
+            selectedIndex = 0;
+        }
+
+        for (Value value : values){
+
+            optionAdapter.add(new OptionItem(value, isSelected(value)));
+
+        }
+
+    }
+
+    private boolean isSelected(Value value){
+
+        if (dataManager.getDataType().getSelectedValues() != null && dataManager.getDataType().getSelectedValues().size() > 0){
+
+            for (Value value1 : dataManager.getDataType().getSelectedValues()){
+                if (value1.getValue().equals(value.getValue()) && value1.getTitle().equals(value.getTitle())){
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     @Click(R.id.ivBack)

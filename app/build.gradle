@@ -11,7 +11,7 @@ android {
         applicationId "com.curtisdigital.authoriti"
         minSdkVersion 17
         targetSdkVersion 26
-        versionCode 51
+        versionCode 56
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
@@ -83,7 +83,7 @@ dependencies {
 
     compile 'com.github.simbiose:Encryption:2.0.1'
 
-    compile 'com.acuant.mobilesdk:acuantMobileSDK:4.8'
+    compile 'com.acuant.mobilesdk:acuantMobileSDK:5.0'
     compile ('com.microblink:pdf417.mobi:6.4.0@aar')
     compile ('com.google.code.gson:gson:2.8')
     compile ('com.squareup.okhttp3:okhttp:3.8.0')
@@ -100,5 +100,7 @@ dependencies {
 
     compile 'com.multidots:fingerprint-auth:1.0.1'
     compile 'com.sjl:Foredroid:1.0.2'
+
+    compile 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.1.0'
 
 }

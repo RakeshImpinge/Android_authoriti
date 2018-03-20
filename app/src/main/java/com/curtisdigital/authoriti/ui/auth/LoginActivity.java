@@ -3,7 +3,10 @@ package com.curtisdigital.authoriti.ui.auth;
 import android.content.Intent;
 import android.hardware.fingerprint.FingerprintManager;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.widget.NestedScrollView;
+import android.support.v4.widget.Space;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -25,6 +28,9 @@ import com.curtisdigital.authoriti.utils.ViewUtils;
 import com.multidots.fingerprintauth.AuthErrorCodes;
 import com.tozny.crypto.android.AesCbcWithIntegrity;
 
+
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
 import org.androidannotations.annotations.AfterTextChange;
 import org.androidannotations.annotations.AfterViews;
@@ -75,6 +81,12 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
     @ViewById(R.id.checkbox)
     CheckBox checkBox;
 
+    @ViewById(R.id.scrollView)
+    NestedScrollView scrollView;
+
+    @ViewById(R.id.space)
+    Space space;
+
     List<AccountID> list;
     private PopupWindow pw;
     private ListView lv;
@@ -104,6 +116,22 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
             checkFingerPrintAuth();
         }
 
+        KeyboardVisibilityEvent.setEventListener(this, new KeyboardVisibilityEventListener() {
+            @Override
+            public void onVisibilityChanged(boolean isOpen) {
+
+                if (isOpen){
+
+                    space.setVisibility(View.VISIBLE);
+                    scrollView.scrollTo(0, (int) ViewUtils.convertDpToPixel(100, mContext));
+
+                } else {
+
+                    space.setVisibility(View.GONE);
+                    scrollView.scrollTo(0, 0);
+                }
+            }
+        });
 
     }
 
@@ -207,6 +235,8 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
         }
 
         if (!TextUtils.isEmpty(etAccount.getText()) && !TextUtils.isEmpty(etPassword.getText())){
+
+            hideKeyboard();
 
             if (dataManager.getUser() != null && dataManager.getUser().getAccountIDs() != null && dataManager.getUser().getAccountIDs().size() > 0){
 

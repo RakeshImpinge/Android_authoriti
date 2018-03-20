@@ -34,10 +34,14 @@
 
         <activity android:name=".MainActivity_"/>
         <activity android:name=".ui.auth.LoginActivity_"
-            android:theme="@style/AppTheme.FullScreen"/>
-        <activity android:name=".ui.auth.InviteCodeActivity_"/>
-        <activity android:name=".ui.auth.ChaseActivity_"/>
-        <activity android:name=".ui.auth.StartupActivity_"/>
+            android:theme="@style/AppTheme.FullScreen"
+            android:windowSoftInputMode="adjustResize"/>
+        <activity android:name=".ui.auth.InviteCodeActivity_"
+            android:windowSoftInputMode="adjustResize"/>
+        <activity android:name=".ui.auth.ChaseActivity_"
+            android:windowSoftInputMode="adjustResize"/>
+        <activity android:name=".ui.auth.StartupActivity_"
+            android:windowSoftInputMode="adjustResize"/>
         <activity android:name=".ui.auth.ScanActivity_"/>
         <activity android:name=".ui.auth.AccountManagerActivity_"/>
         <activity android:name=".ui.auth.AccountConfirmActivity_"/>
@@ -45,6 +49,7 @@
         <activity android:name=".ui.code.CodeGenerateActivity_"/>
         <activity android:name=".ui.help.HelpActivity_"/>
         <activity android:name=".ui.auth.ResetPasswordActivity_"/>
+        <activity android:name=".ui.code.CodePermissionActivity_"/>
 
         <meta-data
             android:name="io.fabric.ApiKey"

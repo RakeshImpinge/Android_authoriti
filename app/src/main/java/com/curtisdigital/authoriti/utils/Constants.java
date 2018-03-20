@@ -9,6 +9,7 @@ public interface Constants {
     // Server Url
     String API_BASE_URL = "https://validate.authroriti.crts.io";
 //    String API_BASE_URL = "https://authoriti-test.crts.io";
+//    String API_BASE_URL = "https://authoriti-qa.crts.io";
 
     // BroadCast Id
     String BROADCAST_CHANGE_MENU        = "BROADCAST_CHANGE_MENU";
@@ -28,6 +29,9 @@ public interface Constants {
     String PICKER_LOCATION_COUNTRY      = "location_country";
     String PICKER_LOCATION_STATE        = "location_state";
     String PICKER_TIME                  = "time";
+    String PICKER_GEO                   = "geo";
+    String PICKER_REQUEST               = "requestor";
+    String PICKER_DATA_TYPE             = "data_type";
 
     String TIME_15_MINS                 = "15 Mins";
     String TIME_1_HOUR                  = "1 Hour";

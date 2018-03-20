@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.curtisdigital.authoriti.R;
+import com.curtisdigital.authoriti.api.model.DataType;
 import com.curtisdigital.authoriti.api.model.Picker;
 import com.curtisdigital.authoriti.api.model.Value;
 import com.curtisdigital.authoriti.ui.pick.PasscodePickActivity_;
@@ -15,8 +16,11 @@ import com.curtisdigital.authoriti.utils.AuthoritiUtils_;
 import com.daimajia.swipe.SwipeLayout;
 import com.mikepenz.fastadapter.items.AbstractItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import static com.curtisdigital.authoriti.utils.Constants.PICKER_DATA_TYPE;
+import static com.curtisdigital.authoriti.utils.Constants.PICKER_REQUEST;
 import static com.curtisdigital.authoriti.utils.Constants.PICKER_TIME;
 
 /**
@@ -54,6 +58,7 @@ public class CodeItem extends AbstractItem<CodeItem, CodeItem.ViewHolder>{
         final Context context = holder.itemView.getContext();
 
         final AuthoritiUtils_ utils = AuthoritiUtils_.getInstance_(context);
+        final AuthoritiData_ dataManager = AuthoritiData_.getInstance_(context);
 
         holder.tvTitle.setText(picker.getLabel() + " : ");
 
@@ -73,47 +78,123 @@ public class CodeItem extends AbstractItem<CodeItem, CodeItem.ViewHolder>{
 
         } else {
 
-            if (picker.isEnableDefault() && picker.getDefaultIndex() != -1 && picker.getDefaultIndex() < picker.getValues().size()){
+            if (picker.getPicker().equals(PICKER_DATA_TYPE)){
 
-                holder.markDefault.setVisibility(View.VISIBLE);
+                // TODO
 
-                selectedIndex = utils.getPickerDefaultIndex(context, picker.getPicker());
+                List<Value> defaultValues = picker.getDefaultValues();
+                if (picker.isEnableDefault() && defaultValues != null && defaultValues.size() > 0){
 
-            } else {
-
-                holder.markDefault.setVisibility(View.INVISIBLE);
-
-                selectedIndex = utils.getPickerSelectedIndex(context, picker.getPicker());
-
-            }
-        }
-
-
-        if (picker.getValues() != null && picker.getValues().size() != 0){
-
-            Value value = picker.getValues().get(selectedIndex);
-
-            if (value != null){
-
-                if (picker.getPicker().equals(PICKER_TIME) && value.getValue() != null && value.getValue().length() > 0){
-
-                    if (!value.getValue().equals("")){
-
-                        if (!value.getValue().equals("")){
-
-                            long diff = Long.parseLong(value.getValue());
-
-                            holder.tvSubTitle.setText(value.getTitle() + " - " + utils.getDateTime(diff));
-                        }
-                    }
-
+                    holder.markDefault.setVisibility(View.VISIBLE);
 
                 } else {
 
-                    holder.tvSubTitle.setText(value.getTitle());
-
+                    holder.markDefault.setVisibility(View.INVISIBLE);
                 }
 
+            } else {
+
+                if (picker.isEnableDefault() && picker.getDefaultIndex() != -1 && picker.getDefaultIndex() < picker.getValues().size()){
+
+                    holder.markDefault.setVisibility(View.VISIBLE);
+
+                    selectedIndex = utils.getPickerDefaultIndex(context, picker.getPicker());
+
+                } else {
+
+                    holder.markDefault.setVisibility(View.INVISIBLE);
+
+                    selectedIndex = utils.getPickerSelectedIndex(context, picker.getPicker());
+
+                }
+            }
+
+        }
+
+        if (picker.getPicker().equals(PICKER_DATA_TYPE)){
+
+            List<Value> defaultValues = picker.getDefaultValues();
+            List<Value> selectedValues = dataManager.getDataType().getSelectedValues();
+
+            if (picker.isEnableDefault() && defaultValues != null && defaultValues.size() > 0){
+
+                StringBuilder subTitle = new StringBuilder();
+                for (int i = 0 ; i < defaultValues.size() ; i ++){
+                    Value value = defaultValues.get(i);
+                    if (i != defaultValues.size() - 1){
+                        subTitle.append(value.getTitle()).append(", ");
+                    } else {
+                        subTitle.append(value.getTitle());
+                    }
+                }
+
+                holder.tvSubTitle.setText(subTitle.toString());
+
+            } else {
+
+                if (dataManager.getDataType().getSelectedValues() != null && dataManager.getDataType().getSelectedValues().size() > 0){
+
+                    StringBuilder subTitle = new StringBuilder();
+                    for (int i = 0 ; i < dataManager.getDataType().getSelectedValues().size() ; i ++){
+                        Value value = dataManager.getDataType().getSelectedValues().get(i);
+                        if (i != dataManager.getDataType().getSelectedValues().size() - 1){
+                            subTitle.append(value.getTitle()).append(", ");
+                        } else {
+                            subTitle.append(value.getTitle());
+                        }
+                    }
+
+                    holder.tvSubTitle.setText(subTitle.toString());
+
+                } else {
+
+                    List<Value> values = dataManager.getDataType().getType(utils.getPickerSelectedIndex(context, PICKER_REQUEST));
+
+                    DataType dataType = dataManager.getDataType();
+                    Value value = values.get(0);
+                    List<Value> initValues = new ArrayList<>();
+                    initValues.add(value);
+                    dataType.setSelectedValues(initValues);
+                    dataManager.setDataType(dataType);
+
+                    holder.tvSubTitle.setText(value.getTitle());
+                }
+
+            }
+
+        } else {
+
+            if (picker.getValues() != null && picker.getValues().size() != 0){
+
+                Value value = picker.getValues().get(selectedIndex);
+
+                if (value != null){
+
+                    if (picker.getPicker().equals(PICKER_TIME) && value.getValue() != null && value.getValue().length() > 0){
+
+                        if (!value.getValue().equals("")){
+
+                            if (!value.getValue().equals("")){
+
+                                long diff = Long.parseLong(value.getValue());
+
+                                holder.tvSubTitle.setText(value.getTitle() + " - " + utils.getDateTime(diff));
+                            }
+                        }
+
+
+                    } else {
+
+                        holder.tvSubTitle.setText(value.getTitle());
+
+                    }
+
+                } else {
+                    holder.tvSubTitle.setText("");
+                }
+            } else {
+
+                holder.tvSubTitle.setText("");
 
             }
         }
@@ -124,7 +205,14 @@ public class CodeItem extends AbstractItem<CodeItem, CodeItem.ViewHolder>{
 
                 holder.markDefault.setVisibility(View.VISIBLE);
                 holder.swipeLayout.close(true);
-                utils.setDefaultPickerItemIndex(context, picker.getPicker(), selectedIndex);
+
+                if (picker.getPicker().equals(PICKER_DATA_TYPE)){
+
+                    utils.setDefaultValuesForDataTypePicker(context, dataManager.getDataType().getSelectedValues());
+
+                } else {
+                    utils.setDefaultPickerItemIndex(context, picker.getPicker(), selectedIndex);
+                }
 
             }
         });

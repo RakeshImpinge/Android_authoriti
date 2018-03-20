@@ -1,7 +1,9 @@
 package com.curtisdigital.authoriti.ui.auth;
 
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.widget.Space;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -11,6 +13,9 @@ import com.curtisdigital.authoriti.core.BaseActivity;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.curtisdigital.authoriti.utils.AuthoritiUtils;
 import com.tozny.crypto.android.AesCbcWithIntegrity;
+
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
 import org.androidannotations.annotations.AfterTextChange;
 import org.androidannotations.annotations.AfterViews;
@@ -54,16 +59,31 @@ public class ResetPasswordActivity extends BaseActivity {
     @ViewById(R.id.etConfirmPassword)
     EditText etConfirmPassword;
 
+    @ViewById(R.id.space)
+    Space space;
 
     @AfterViews
     void callAfterViewInjection(){
 
-        setupUI(findViewById(R.id.id_reset_password_activity));
+//        setupUI(findViewById(R.id.id_reset_password_activity));
 
         tiCurrentPassword.setError(null);
         tiNewPassword.setError(null);
         tiConfirmPassword.setError(null);
 
+        KeyboardVisibilityEvent.setEventListener(this, new KeyboardVisibilityEventListener() {
+            @Override
+            public void onVisibilityChanged(boolean isOpen) {
+
+                if (isOpen){
+
+                    space.setVisibility(View.VISIBLE);
+
+                } else {
+                    space.setVisibility(View.GONE);
+                }
+            }
+        });
 
     }
 
