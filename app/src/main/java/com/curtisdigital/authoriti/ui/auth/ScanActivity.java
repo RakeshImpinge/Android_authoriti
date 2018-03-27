@@ -361,7 +361,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
                     ", Social Security - " + licenseCard.getSocialSecurity() +
                     ", TID - " + licenseCard.getTransactionId();
 
-            saveDLInfo(builder);
+            saveDLInfo(builder, "DL authentication");
 
             if (isNext){
 
@@ -387,10 +387,10 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
     }
 
-    private void saveDLInfo(String metaData){
+    private void saveDLInfo(String metaData, String type){
 
         Event event = new Event();
-        event.setEvent("DL authentication");
+        event.setEvent(type);
         Date now = new Date();
         event.setTime(now.toString());
         event.setMetaData(metaData);
@@ -494,6 +494,35 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
             }
         });
+    }
+
+    private void saveFrontImageMetrics(HashMap<String, Object> imageMetrics){
+
+        if (imageMetrics != null){
+
+            String builder = "";
+
+            if(imageMetrics.get("IS_SHARP") != null){
+                boolean isSHarp = Boolean.parseBoolean(imageMetrics.get("IS_SHARP").toString());
+                builder = builder + "IS_SHARP - " + String.valueOf(isSHarp);
+            }
+            if(imageMetrics.get("SHARPNESS_GRADE") != null){
+                float sharpnessGrade = 	Float.parseFloat(imageMetrics.get("SHARPNESS_GRADE").toString());
+                builder = builder + ", SHARPNESS_GRADE - " + String.valueOf(sharpnessGrade);
+            }
+
+            if(imageMetrics.get("HAS_GLARE") != null) {
+                boolean hasGlare = Boolean.parseBoolean(imageMetrics.get("HAS_GLARE").toString());
+                builder = builder + ", HAS_GLARE - " + String.valueOf(hasGlare);
+            }
+            if(imageMetrics.get("GLARE_GRADE") != null){
+                float glareGrade = Float.parseFloat(imageMetrics.get("GLARE_GRADE").toString());
+                builder = builder + ", GLARE_GRADE - " + String.valueOf(glareGrade);
+            }
+
+            Log.e("Image Metrics", builder);
+            saveDLInfo(builder, "Front Image Metrics");
+        }
     }
 
     private void checkProcess(){
@@ -725,6 +754,8 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
                 capturedFront = true;
 
             }
+
+            saveFrontImageMetrics(imageMetrics);
 
         } else {
 
