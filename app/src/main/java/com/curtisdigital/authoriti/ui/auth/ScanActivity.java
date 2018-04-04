@@ -205,15 +205,15 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
     private void showCameraInterface(){
 
-        if (!isBack){
+//        if (!isBack){
+//
+//            acuantAndroidMobileSdkControllerInstance.showManualCameraInterface(this, CardType.DRIVERS_LICENSE, cardRegion, true);
+//        } else {
+//
+//            acuantAndroidMobileSdkControllerInstance.showCameraInterfacePDF417(this, CardType.DRIVERS_LICENSE, cardRegion);
+//        }
 
-            acuantAndroidMobileSdkControllerInstance.showManualCameraInterface(this, CardType.DRIVERS_LICENSE, cardRegion, true);
-        } else {
-
-            acuantAndroidMobileSdkControllerInstance.showCameraInterfacePDF417(this, CardType.DRIVERS_LICENSE, cardRegion);
-        }
-
-//        acuantAndroidMobileSdkControllerInstance.showManualCameraInterface(this, CardType.DRIVERS_LICENSE, cardRegion, isBack);
+        acuantAndroidMobileSdkControllerInstance.showManualCameraInterface(this, CardType.DRIVERS_LICENSE, cardRegion, isBack);
 
 
     }
@@ -584,6 +584,8 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
     }
 
     private void processCardValidation(){
+
+        isFacial = false;
 
         ProcessImageRequestOptions options = ProcessImageRequestOptions.getInstance();
         options.autoDetectState = true;
