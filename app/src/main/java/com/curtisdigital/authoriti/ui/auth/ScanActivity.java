@@ -1,6 +1,7 @@
 package com.curtisdigital.authoriti.ui.auth;
 
 import android.app.Activity;
+
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -10,6 +11,7 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.ImageView;
@@ -24,7 +26,6 @@ import com.acuant.mobilesdk.ConnectWebserviceListener;
 import com.acuant.mobilesdk.DriversLicenseCard;
 import com.acuant.mobilesdk.FacialData;
 import com.acuant.mobilesdk.FacialRecognitionListener;
-import com.acuant.mobilesdk.LicenseActivationDetails;
 import com.acuant.mobilesdk.LicenseDetails;
 import com.acuant.mobilesdk.Permission;
 import com.acuant.mobilesdk.ProcessImageRequestOptions;
@@ -94,6 +95,8 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
     private boolean isSkip = false;
     private boolean isNext = false;
+
+    private DriversLicenseCard licenseCard;
 
 
     @AfterViews
@@ -202,15 +205,16 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
     private void showCameraInterface(){
 
-        if (!isBack){
+//        if (!isBack){
+//
+//            acuantAndroidMobileSdkControllerInstance.showManualCameraInterface(this, CardType.DRIVERS_LICENSE, cardRegion, true);
+//        } else {
+//
+//            acuantAndroidMobileSdkControllerInstance.showCameraInterfacePDF417(this, CardType.DRIVERS_LICENSE, cardRegion);
+//        }
 
-            acuantAndroidMobileSdkControllerInstance.showManualCameraInterface(this, CardType.DRIVERS_LICENSE, cardRegion, true);
-        } else {
+        acuantAndroidMobileSdkControllerInstance.showManualCameraInterface(this, CardType.DRIVERS_LICENSE, cardRegion, isBack);
 
-            acuantAndroidMobileSdkControllerInstance.showCameraInterfacePDF417(this, CardType.DRIVERS_LICENSE, cardRegion);
-        }
-
-//        acuantAndroidMobileSdkControllerInstance.showManualCameraInterface(this, CardType.DRIVERS_LICENSE, cardRegion, isBack);
 
     }
 
@@ -243,7 +247,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
         } else {
 
-            DriversLicenseCard licenseCard = (DriversLicenseCard) card;
+            licenseCard = (DriversLicenseCard) card;
             Log.e("First Name ", licenseCard.getNameFirst());
             Log.e("Middle Name", licenseCard.getNameMiddle());
             Log.e("Last Name ", licenseCard.getNameLast());
@@ -361,7 +365,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
                     ", Social Security - " + licenseCard.getSocialSecurity() +
                     ", TID - " + licenseCard.getTransactionId();
 
-            saveDLInfo(builder);
+            saveDLInfo(builder, "DL authentication");
 
             if (isNext){
 
@@ -387,10 +391,10 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
     }
 
-    private void saveDLInfo(String metaData){
+    private void saveDLInfo(String metaData, String type){
 
         Event event = new Event();
-        event.setEvent("DL authentication");
+        event.setEvent(type);
         Date now = new Date();
         event.setTime(now.toString());
         event.setMetaData(metaData);
@@ -462,7 +466,8 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
             } else {
 
-                showAlert("", "Could not verify your Face, Please try again.");
+//                showAlert("", "Could not verify your Face, Please try again.");
+                Snackbar.make(findViewById(R.id.id_scan_activity), "Could not verify your Face, Please try again.", 3000).show();
             }
         }
 
@@ -483,7 +488,29 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
         requestDLSave.setEvents(events);
         requestDLSave.setToken("");
 
-        AuthoritiAPI.APIService().saveDLInfo(requestDLSave).enqueue(new Callback<JsonObject>() {
+        MultipartBody.Part front = null;
+        if (frontBitmap != null){
+
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            frontBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            final byte[] bitmapData = stream.toByteArray();
+            RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), bitmapData);
+            front = MultipartBody.Part.createFormData("front", "front.jpg", reqFile);
+
+        }
+
+        MultipartBody.Part back = null;
+        if (backBitmap != null){
+
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            backBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            final byte[] bitmapData = stream.toByteArray();
+            RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), bitmapData);
+            back = MultipartBody.Part.createFormData("back", "back.jpg", reqFile);
+
+        }
+
+        AuthoritiAPI.APIService().saveDLInfo(RequestBody.create(MediaType.parse("text/plain"),RequestDLSave.toJSON(requestDLSave)), front, back).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
 
@@ -494,6 +521,35 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
             }
         });
+    }
+
+    private void saveFrontImageMetrics(HashMap<String, Object> imageMetrics){
+
+        if (imageMetrics != null){
+
+            String builder = "";
+
+            if(imageMetrics.get("IS_SHARP") != null){
+                boolean isSHarp = Boolean.parseBoolean(imageMetrics.get("IS_SHARP").toString());
+                builder = builder + "IS_SHARP - " + String.valueOf(isSHarp);
+            }
+            if(imageMetrics.get("SHARPNESS_GRADE") != null){
+                float sharpnessGrade = 	Float.parseFloat(imageMetrics.get("SHARPNESS_GRADE").toString());
+                builder = builder + ", SHARPNESS_GRADE - " + String.valueOf(sharpnessGrade);
+            }
+
+            if(imageMetrics.get("HAS_GLARE") != null) {
+                boolean hasGlare = Boolean.parseBoolean(imageMetrics.get("HAS_GLARE").toString());
+                builder = builder + ", HAS_GLARE - " + String.valueOf(hasGlare);
+            }
+            if(imageMetrics.get("GLARE_GRADE") != null){
+                float glareGrade = Float.parseFloat(imageMetrics.get("GLARE_GRADE").toString());
+                builder = builder + ", GLARE_GRADE - " + String.valueOf(glareGrade);
+            }
+
+            Log.e("Image Metrics", builder);
+            saveDLInfo(builder, "Front Image Metrics");
+        }
     }
 
     private void checkProcess(){
@@ -529,6 +585,8 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
     private void processCardValidation(){
 
+        isFacial = false;
+
         ProcessImageRequestOptions options = ProcessImageRequestOptions.getInstance();
         options.autoDetectState = true;
         options.stateID = -1;
@@ -552,16 +610,20 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
     }
 
-    private void processFaceValidation(Bitmap face){
+    private void processFaceValidation(final Bitmap face){
 
         isFacial = true;
 
-        ProcessImageRequestOptions options = ProcessImageRequestOptions.getInstance();
+        final ProcessImageRequestOptions options = ProcessImageRequestOptions.getInstance();
         options.acuantCardType = CardType.FACIAL_RECOGNITION;
 
-        displayProgressDialog("Processing...");
-        acuantAndroidMobileSdkControllerInstance.callProcessImageServices(frontBitmap, face, null, this, options);
+        if (licenseCard != null){
+            acuantAndroidMobileSdkControllerInstance.callProcessImageServices(face, licenseCard.getFaceImage(), null, ScanActivity.this, options);
+        } else {
+            acuantAndroidMobileSdkControllerInstance.callProcessImageServices(face, null, null, ScanActivity.this, options);
+        }
 
+        displayProgressDialog(this,"Processing...");
     }
 
     private void resetPdf417String() {
@@ -725,6 +787,8 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
                 capturedFront = true;
 
             }
+
+            saveFrontImageMetrics(imageMetrics);
 
         } else {
 
@@ -930,13 +994,13 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
         } else {
 
-//            if (faceBitmap != null){
-//
-//                processFaceValidation(faceBitmap);
-//
-//            }
+            if (faceBitmap != null){
 
-            AccountManagerActivity_.intent(mContext).start();
+                processFaceValidation(faceBitmap);
+
+            }
+
+//            AccountManagerActivity_.intent(mContext).start();
 
         }
 
@@ -953,4 +1017,5 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
         Log.e("Facial Recognition ", "Timeout");
     }
+
 }

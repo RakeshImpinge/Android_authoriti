@@ -11,7 +11,7 @@ android {
         applicationId "com.curtisdigital.authoriti"
         minSdkVersion 17
         targetSdkVersion 26
-        versionCode 57
+        versionCode 62
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
@@ -83,7 +83,8 @@ dependencies {
 
     compile 'com.github.simbiose:Encryption:2.0.1'
 
-    compile 'com.acuant.mobilesdk:acuantMobileSDK:5.0'
+//    compile 'com.acuant.mobilesdk:acuantMobileSDK:5.0'
+    compile project(':acuantMobileSDK')
     compile ('com.microblink:pdf417.mobi:6.4.0@aar')
     compile ('com.google.code.gson:gson:2.8')
     compile ('com.squareup.okhttp3:okhttp:3.8.0')

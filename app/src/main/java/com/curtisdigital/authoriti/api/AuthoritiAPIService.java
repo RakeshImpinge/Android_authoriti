@@ -60,9 +60,6 @@ public interface AuthoritiAPIService {
     @DELETE("api/v1/users")
     Call<JsonObject> wipe(@Header("Authorization") String token);
 
-    @POST("api/v1/log")
-    Call<JsonObject> saveDLInfo(@Body RequestDLSave request);
-
     @Multipart
     @POST("api/v1/log")
     Call<JsonObject> saveDLInfo(@Part("log") RequestBody log,
