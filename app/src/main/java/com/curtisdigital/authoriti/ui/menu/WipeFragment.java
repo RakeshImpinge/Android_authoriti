@@ -53,7 +53,7 @@ public class WipeFragment extends BaseFragment {
 
     private void deleteAccount(){
 
-        dataManager.wipeSetting();
+        dataManager.wipeSetting(mContext);
 
     }
 

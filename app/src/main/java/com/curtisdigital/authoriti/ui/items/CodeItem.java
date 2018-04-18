@@ -6,16 +6,15 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.curtisdigital.authoriti.R;
-import com.curtisdigital.authoriti.api.model.DataType;
 import com.curtisdigital.authoriti.api.model.Picker;
 import com.curtisdigital.authoriti.api.model.Value;
 import com.curtisdigital.authoriti.ui.pick.PasscodePickActivity_;
 import com.curtisdigital.authoriti.utils.AuthoritiData_;
-import com.curtisdigital.authoriti.utils.AuthoritiUtils;
 import com.curtisdigital.authoriti.utils.AuthoritiUtils_;
 import com.daimajia.swipe.SwipeLayout;
 import com.mikepenz.fastadapter.items.AbstractItem;
 
+import java.nio.file.LinkOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,17 +63,58 @@ public class CodeItem extends AbstractItem<CodeItem, CodeItem.ViewHolder>{
 
         if (utils.presentSelectedIndex(context, picker.getPicker())){
 
-            selectedIndex = utils.getPickerSelectedIndex(context, picker.getPicker());
+            if (picker.getPicker().equals(PICKER_DATA_TYPE)){
 
-            if (selectedIndex == utils.getPickerDefaultIndex(context, picker.getPicker())){
+                List<Value> values = dataManager.getSelectedValuesForDataType(utils.getPickerSelectedIndex(context, PICKER_REQUEST));
+                List<Value> values1 = dataManager.getDefaultValuesForDataType(context, utils.getPickerSelectedIndex(context, PICKER_REQUEST));
 
-                holder.markDefault.setVisibility(View.VISIBLE);
+                boolean matched = true;
+                if (values != null && values.size() > 0 && values1 != null && values1.size() > 0){
+
+                    List<Value> temp1;
+                    List<Value> temp2;
+                    if (values.size() > values1.size()){
+                        temp1 = values;
+                        temp2 = values1;
+                    } else {
+                        temp1 = values1;
+                        temp2 = values;
+                    }
+
+                    for (Value value : temp1){
+
+                        matched = matched && temp2.contains(value);
+
+                    }
+                } else {
+                    matched = false;
+                }
+
+                if (picker.isEnableDefault() && matched){
+
+                    holder.markDefault.setVisibility(View.VISIBLE);
+
+                } else {
+
+                    holder.markDefault.setVisibility(View.INVISIBLE);
+                }
+
 
             } else {
 
-                holder.markDefault.setVisibility(View.INVISIBLE);
+                selectedIndex = utils.getPickerSelectedIndex(context, picker.getPicker());
 
+                if (selectedIndex == utils.getPickerDefaultIndex(context, picker.getPicker())){
+
+                    holder.markDefault.setVisibility(View.VISIBLE);
+
+                } else {
+
+                    holder.markDefault.setVisibility(View.INVISIBLE);
+
+                }
             }
+
 
         } else {
 
@@ -82,7 +122,7 @@ public class CodeItem extends AbstractItem<CodeItem, CodeItem.ViewHolder>{
 
                 // TODO
 
-                List<Value> defaultValues = picker.getDefaultValues();
+                List<Value> defaultValues = dataManager.getDefaultValuesForDataType(context, utils.getPickerSelectedIndex(context, PICKER_REQUEST));
                 if (picker.isEnableDefault() && defaultValues != null && defaultValues.size() > 0){
 
                     holder.markDefault.setVisibility(View.VISIBLE);
@@ -113,10 +153,9 @@ public class CodeItem extends AbstractItem<CodeItem, CodeItem.ViewHolder>{
 
         if (picker.getPicker().equals(PICKER_DATA_TYPE)){
 
-            List<Value> defaultValues = picker.getDefaultValues();
-            List<Value> selectedValues = dataManager.getDataType().getSelectedValues();
+            List<Value> defaultValues = dataManager.getDefaultValuesForDataType(context, utils.getPickerSelectedIndex(context, PICKER_REQUEST));
 
-            if (picker.isEnableDefault() && defaultValues != null && defaultValues.size() > 0){
+            if (!utils.presentSelectedIndex(context, picker.getPicker()) && picker.isEnableDefault() && defaultValues != null && defaultValues.size() > 0){
 
                 StringBuilder subTitle = new StringBuilder();
                 for (int i = 0 ; i < defaultValues.size() ; i ++){
@@ -130,14 +169,18 @@ public class CodeItem extends AbstractItem<CodeItem, CodeItem.ViewHolder>{
 
                 holder.tvSubTitle.setText(subTitle.toString());
 
+                dataManager.setSelectedValuesForDataType(utils.getPickerSelectedIndex(context, PICKER_REQUEST), defaultValues);
+
             } else {
 
-                if (dataManager.getDataType().getSelectedValues() != null && dataManager.getDataType().getSelectedValues().size() > 0){
+                List<Value> values = dataManager.getSelectedValuesForDataType(utils.getPickerSelectedIndex(context, PICKER_REQUEST));
+
+                if (values != null && values.size() > 0){
 
                     StringBuilder subTitle = new StringBuilder();
-                    for (int i = 0 ; i < dataManager.getDataType().getSelectedValues().size() ; i ++){
-                        Value value = dataManager.getDataType().getSelectedValues().get(i);
-                        if (i != dataManager.getDataType().getSelectedValues().size() - 1){
+                    for (int i = 0 ; i < values.size() ; i ++){
+                        Value value = values.get(i);
+                        if (i != values.size() - 1){
                             subTitle.append(value.getTitle()).append(", ");
                         } else {
                             subTitle.append(value.getTitle());
@@ -148,14 +191,13 @@ public class CodeItem extends AbstractItem<CodeItem, CodeItem.ViewHolder>{
 
                 } else {
 
-                    List<Value> values = dataManager.getDataType().getType(utils.getPickerSelectedIndex(context, PICKER_REQUEST));
+                    List<Value> values1 = dataManager.getValuesFromDataType(utils.getPickerSelectedIndex(context, PICKER_REQUEST));
 
-                    DataType dataType = dataManager.getDataType();
-                    Value value = values.get(0);
+                    Value value = values1.get(0);
                     List<Value> initValues = new ArrayList<>();
                     initValues.add(value);
-                    dataType.setSelectedValues(initValues);
-                    dataManager.setDataType(dataType);
+
+                    dataManager.setSelectedValuesForDataType(utils.getPickerSelectedIndex(context, PICKER_REQUEST), initValues);
 
                     holder.tvSubTitle.setText(value.getTitle());
                 }
@@ -208,11 +250,11 @@ public class CodeItem extends AbstractItem<CodeItem, CodeItem.ViewHolder>{
 
                 if (picker.getPicker().equals(PICKER_DATA_TYPE)){
 
-                    utils.setDefaultValuesForDataTypePicker(context, dataManager.getDataType().getSelectedValues());
+                    dataManager.saveDefaultValuesForDataType(context, utils.getPickerSelectedIndex(context, PICKER_REQUEST), dataManager.getSelectedValuesForDataType(utils.getPickerSelectedIndex(context, PICKER_REQUEST)));
 
-                } else {
-                    utils.setDefaultPickerItemIndex(context, picker.getPicker(), selectedIndex);
                 }
+
+                utils.setDefaultPickerItemIndex(context, picker.getPicker(), selectedIndex);
 
             }
         });

@@ -280,7 +280,7 @@ public class CodeGenerateActivity extends BaseActivity {
 
     private String dataTypePayload(){
 
-        List<Value> values = dataManager.getDataType().getType(utils.getPickerSelectedIndex(this, PICKER_REQUEST));
+        List<Value> values = dataManager.getValuesFromDataType(utils.getPickerSelectedIndex(this, PICKER_REQUEST));
 
         StringBuilder bitMask = new StringBuilder();
 
@@ -304,7 +304,7 @@ public class CodeGenerateActivity extends BaseActivity {
 
     private boolean checkDataType(Value value){
 
-        List<Value> selectedValues = dataManager.getDataType().getSelectedValues();
+        List<Value> selectedValues = dataManager.getSelectedValuesForDataType(utils.getPickerSelectedIndex(this, PICKER_REQUEST));
         if (selectedValues != null){
 
             for (Value value1 : selectedValues){

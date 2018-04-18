@@ -1,6 +1,9 @@
 package com.curtisdigital.authoriti.api.model;
 
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
 
 /**
  * Created by movdev on 3/1/18.
@@ -12,14 +15,21 @@ public class SchemaGroup {
     private Scheme scheme;
 
     @SerializedName("data_type")
-    private DataType dataType;
+    private JsonObject dataType;
+
+    @SerializedName("data_type_keys")
+    private List<String> dataTypeKeys;
 
 
     public Scheme getScheme() {
         return scheme;
     }
 
-    public DataType getDataType() {
+    public JsonObject getDataType() {
         return dataType;
+    }
+
+    public List<String> getDataTypeKeys() {
+        return dataTypeKeys;
     }
 }

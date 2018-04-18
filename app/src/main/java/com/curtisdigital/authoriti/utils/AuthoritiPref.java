@@ -28,4 +28,5 @@ public interface AuthoritiPref {
     String requestPickerJson();
     String dataTypePickerJson();
     String dataTypeJson();
+    String dataTypeKeysJson();
 }
