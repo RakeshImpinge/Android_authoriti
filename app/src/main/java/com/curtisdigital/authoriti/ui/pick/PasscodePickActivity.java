@@ -11,7 +11,6 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.curtisdigital.authoriti.R;
-import com.curtisdigital.authoriti.api.model.DataType;
 import com.curtisdigital.authoriti.api.model.Picker;
 import com.curtisdigital.authoriti.api.model.Value;
 import com.curtisdigital.authoriti.core.BaseActivity;
@@ -110,8 +109,7 @@ public class PasscodePickActivity extends BaseActivity {
 
                      if (picker.getPicker().equals(PICKER_DATA_TYPE)){
 
-                         DataType dataType = dataManager.getDataType();
-                         List<Value> values = dataType.getSelectedValues();
+                         List<Value> values = dataManager.getSelectedValuesForDataType(utils.getPickerSelectedIndex(PasscodePickActivity.this, PICKER_REQUEST));
                          if (values == null){
                              values = new ArrayList<>();
                          }
@@ -125,36 +123,29 @@ public class PasscodePickActivity extends BaseActivity {
                                          item.setChecked(!item.isChecked());
                                          optionAdapter.notifyAdapterItemChanged(position);
 
+                                         dataManager.setSelectedValuesForDataType(utils.getPickerSelectedIndex(PasscodePickActivity.this, PICKER_REQUEST), values);
+                                         utils.setIndexSelected(mContext, pickerType, true);
+
                                          break;
                                      }
                                  }
                              }
                          } else {
+
                              values.add(item.getValue());
 
                              item.setChecked(!item.isChecked());
                              optionAdapter.notifyAdapterItemChanged(position);
+
+                             dataManager.setSelectedValuesForDataType(utils.getPickerSelectedIndex(PasscodePickActivity.this, PICKER_REQUEST), values);
+                             utils.setIndexSelected(mContext, pickerType, true);
                          }
-                         dataType.setSelectedValues(values);
-                         dataManager.setDataType(dataType);
 
 
                      } else {
 
                          utils.setSelectedPickerIndex(mContext, pickerType, position);
                          utils.setIndexSelected(mContext, pickerType, true);
-
-                         if (picker.getPicker().equals(PICKER_REQUEST)){
-
-                             DataType dataType = dataManager.getDataType();
-                             if (dataType.getPreSelectedTypeIndex() != position){
-                                 dataType.setSelectedValues(null);
-                             }
-                             dataType.setPreSelectedTypeIndex(dataType.getSelectedTypeIndex());
-                             dataType.setSelectedTypeIndex(position);
-
-                             dataManager.setDataType(dataType);
-                         }
 
                          finish();
                      }
@@ -170,7 +161,7 @@ public class PasscodePickActivity extends BaseActivity {
         } else {
             if (picker.getPicker().equals(PICKER_DATA_TYPE)){
 
-                List<Value> values = dataManager.getDataType().getType(utils.getPickerSelectedIndex(this, PICKER_REQUEST));
+                List<Value> values = dataManager.getValuesFromDataType(utils.getPickerSelectedIndex(this, PICKER_REQUEST));
                 if (values != null && values.size() > 0){
                     showOptions(values);
                 }
@@ -368,9 +359,11 @@ public class PasscodePickActivity extends BaseActivity {
 
     private boolean isSelected(Value value){
 
-        if (dataManager.getDataType().getSelectedValues() != null && dataManager.getDataType().getSelectedValues().size() > 0){
+        List<Value> values = dataManager.getSelectedValuesForDataType(utils.getPickerSelectedIndex(this, PICKER_REQUEST));
 
-            for (Value value1 : dataManager.getDataType().getSelectedValues()){
+        if (values != null && values.size() > 0){
+
+            for (Value value1 : values){
                 if (value1.getValue().equals(value.getValue()) && value1.getTitle().equals(value.getTitle())){
                     return true;
                 }

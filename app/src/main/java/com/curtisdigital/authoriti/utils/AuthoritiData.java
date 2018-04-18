@@ -1,22 +1,29 @@
 package com.curtisdigital.authoriti.utils;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import com.curtisdigital.authoriti.api.model.AccountID;
 import com.curtisdigital.authoriti.api.model.AuthLogIn;
-import com.curtisdigital.authoriti.api.model.DataType;
 import com.curtisdigital.authoriti.api.model.Order;
 import com.curtisdigital.authoriti.api.model.Picker;
 import com.curtisdigital.authoriti.api.model.Purpose;
 import com.curtisdigital.authoriti.api.model.Scheme;
 import com.curtisdigital.authoriti.api.model.User;
+import com.curtisdigital.authoriti.api.model.Value;
 import com.curtisdigital.authoriti.utils.crypto.Crypto;
 import com.curtisdigital.authoriti.utils.crypto.CryptoKeyPair;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -53,6 +60,8 @@ public class AuthoritiData {
     private boolean geoIndexSelected;
     private boolean requestIndexSelected;
     private boolean dataTypeIndexSelected;
+
+    private HashMap<String, List<Value>> selectedValuesForDataType;
 
     public void setInactiveTime(String timeStamp){
 
@@ -108,7 +117,7 @@ public class AuthoritiData {
         return gson.fromJson(pref.schemeJson().get(), Scheme.class);
     }
 
-    public void setDataType(DataType dataType){
+    public void setDataType(JsonObject dataType){
         if (dataType != null){
             Gson gson = new Gson();
             pref.edit().dataTypeJson().put(gson.toJson(dataType)).apply();
@@ -117,9 +126,137 @@ public class AuthoritiData {
         }
     }
 
-    public DataType getDataType(){
+    public JsonObject getDataType(){
         Gson gson = new Gson();
-        return gson.fromJson(pref.dataTypeJson().get(), DataType.class);
+        return gson.fromJson(pref.dataTypeJson().get(), JsonObject.class);
+    }
+
+    public void setDataTypeKeys(List<String> keys){
+        if (keys != null){
+            Gson gson = new Gson();
+            pref.edit().dataTypeKeysJson().put(gson.toJson(keys)).apply();
+        } else {
+            pref.edit().dataTypeKeysJson().remove().apply();
+        }
+    }
+
+    public List<String>getDataTypeKeys(){
+        Gson gson = new Gson();
+        Type type = new TypeToken<List<String>>(){}.getType();
+        return gson.fromJson(pref.dataTypeKeysJson().get(), type);
+    }
+
+    public List<Value> getValuesFromDataType(int index){
+
+        List<Value> values = new ArrayList<>();
+
+        List<String> keys = getDataTypeKeys();
+        if (keys != null && keys.size() > index){
+
+            String key = keys.get(index);
+
+            JsonObject jsonObject = getDataType();
+            if (jsonObject != null){
+
+                if (jsonObject.get(key) != null){
+
+                    JsonArray jsonArray = jsonObject.get(key).getAsJsonArray();
+                    Gson gson = new Gson();
+                    Type type = new TypeToken<List<Value>>(){}.getType();
+
+                    values = gson.fromJson(jsonArray, type);
+
+                }
+            }
+        }
+
+        return values;
+    }
+
+    public void setSelectedValuesForDataType(int index, List<Value> values){
+
+        List<String> keys = getDataTypeKeys();
+        if (keys != null && keys.size() > index) {
+
+            String key = keys.get(index);
+
+            if (selectedValuesForDataType == null){
+                selectedValuesForDataType = new HashMap<>();
+            }
+
+            if (selectedValuesForDataType.containsKey(key)){
+                selectedValuesForDataType.remove(key);
+            }
+
+            selectedValuesForDataType.put(key, values);
+        }
+    }
+
+    public void initSelectedValuesForDataType(){
+        if (selectedValuesForDataType == null){
+            selectedValuesForDataType = new HashMap<>();
+        }
+        selectedValuesForDataType.clear();
+    }
+
+    public List<Value> getSelectedValuesForDataType(int index){
+
+        List<Value> values = new ArrayList<>();
+
+        List<String> keys = getDataTypeKeys();
+        if (keys != null && keys.size() > index) {
+
+            String key = keys.get(index);
+
+            if (selectedValuesForDataType != null && selectedValuesForDataType.containsKey(key)){
+                values = selectedValuesForDataType.get(key);
+            }
+
+        }
+
+        return values;
+    }
+
+    public void saveDefaultValuesForDataType(Context context, int index, List<Value> values){
+
+        List<String> keys = getDataTypeKeys();
+        if (keys != null && keys.size() > index) {
+
+            String key = keys.get(index);
+
+            Gson gson = new Gson();
+            String jsonValues = gson.toJson(values);
+
+
+            SharedPreferences preferences = context.getSharedPreferences("Authoriti", Context.MODE_PRIVATE);
+            preferences.edit().putString(key, jsonValues).apply();
+
+        }
+    }
+
+    public List<Value> getDefaultValuesForDataType(Context context, int index){
+
+        List<Value> values = new ArrayList<>();
+
+        List<String> keys = getDataTypeKeys();
+        if (keys != null && keys.size() > index) {
+
+            String key = keys.get(index);
+
+            SharedPreferences preferences = context.getSharedPreferences("Authoriti", Context.MODE_PRIVATE);
+            String jsonValue = preferences.getString(key, "");
+
+            if (!jsonValue.equals("")){
+
+                Gson gson = new Gson();
+                Type type = new TypeToken<List<Value>>(){}.getType();
+
+                values = gson.fromJson(jsonValue, type);
+            }
+
+        }
+
+        return values;
     }
 
     public Picker getAccountPicker(){
@@ -326,7 +463,7 @@ public class AuthoritiData {
         this.timeIndexSelected = timeIndexSelected;
     }
 
-    public void wipeSetting(){
+    public void wipeSetting(Context context){
 
         setUser(null);
 
@@ -361,6 +498,10 @@ public class AuthoritiData {
         setGeoIndexSelected(false);
         setRequestIndexSelected(false);
         setDataTypeIndexSelected(false);
+
+        SharedPreferences preferences = context.getSharedPreferences("Authoriti", Context.MODE_PRIVATE);
+        preferences.edit().clear().apply();
+
 
     }
 

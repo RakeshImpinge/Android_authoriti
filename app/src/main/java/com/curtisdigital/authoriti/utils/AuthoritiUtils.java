@@ -177,6 +177,17 @@ public class AuthoritiUtils implements Constants{
         dataManager.setSelectedGeoIndex(getPickerDefaultIndex(context, PICKER_GEO) < 0 ? 0 : getPickerDefaultIndex(context, PICKER_GEO));
         dataManager.setSelectedRequestIndex(getPickerDefaultIndex(context, PICKER_REQUEST) < 0 ? 0 : getPickerDefaultIndex(context, PICKER_REQUEST));
         dataManager.setSelectedDataTypeIndex(getPickerDefaultIndex(context, PICKER_DATA_TYPE) < 0 ? 0 : getPickerDefaultIndex(context, PICKER_DATA_TYPE));
+
+        setIndexSelected(context, PICKER_ACCOUNT, false);
+        setIndexSelected(context, PICKER_INDUSTRY, false);
+        setIndexSelected(context, PICKER_LOCATION_STATE, false);
+        setIndexSelected(context, PICKER_TIME, false);
+        setIndexSelected(context, PICKER_GEO, false);
+        setIndexSelected(context, PICKER_REQUEST, false);
+        setIndexSelected(context, PICKER_DATA_TYPE, false);
+
+        dataManager.initSelectedValuesForDataType();
+
     }
 
     public void setDefaultPickerItemIndex(Context context, String identifier, int index){
@@ -224,7 +235,6 @@ public class AuthoritiUtils implements Constants{
             case PICKER_DATA_TYPE:
                 picker = dataManager.getDataTypePicker();
                 picker.setEnableDefault(true);
-                picker.setDefaultIndex(index);
                 dataManager.setDataTypePicker(picker);
                 break;
             default:
@@ -232,14 +242,6 @@ public class AuthoritiUtils implements Constants{
                 break;
         }
 
-    }
-
-    public void setDefaultValuesForDataTypePicker(Context context, List<Value> values){
-        AuthoritiData dataManager = AuthoritiData_.getInstance_(context);
-        Picker picker = dataManager.getDataTypePicker();
-        picker.setEnableDefault(true);
-        picker.setDefaultValues(values);
-        dataManager.setDataTypePicker(picker);
     }
 
     public void setIndexSelected(Context context, String identifier, boolean selected){
@@ -300,6 +302,7 @@ public class AuthoritiUtils implements Constants{
                 break;
             case PICKER_DATA_TYPE:
                 selected = dataManager.isDataTypeIndexSelected();
+                break;
             default:
                 selected = false;
                 break;
