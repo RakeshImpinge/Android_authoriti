@@ -123,12 +123,24 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
                 if (isOpen){
 
                     space.setVisibility(View.VISIBLE);
-                    scrollView.scrollTo(0, (int) ViewUtils.convertDpToPixel(100, mContext));
+
+                    scrollView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            scrollView.scrollTo(0, (int) ViewUtils.convertDpToPixel(100, mContext));
+                        }
+                    });
 
                 } else {
 
                     space.setVisibility(View.GONE);
-                    scrollView.scrollTo(0, 0);
+
+                    scrollView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            scrollView.scrollTo(0, 0);
+                        }
+                    });
                 }
             }
         });

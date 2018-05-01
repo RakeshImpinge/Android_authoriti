@@ -1,6 +1,7 @@
 package com.curtisdigital.authoriti.ui.auth;
 
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.Space;
 import android.text.TextUtils;
 import android.view.View;
@@ -12,6 +13,7 @@ import com.curtisdigital.authoriti.api.model.User;
 import com.curtisdigital.authoriti.core.BaseActivity;
 import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.curtisdigital.authoriti.utils.AuthoritiUtils;
+import com.curtisdigital.authoriti.utils.ViewUtils;
 import com.tozny.crypto.android.AesCbcWithIntegrity;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
@@ -59,6 +61,9 @@ public class ResetPasswordActivity extends BaseActivity {
     @ViewById(R.id.etConfirmPassword)
     EditText etConfirmPassword;
 
+    @ViewById(R.id.scrollView)
+    NestedScrollView scrollView;
+
     @ViewById(R.id.space)
     Space space;
 
@@ -79,8 +84,23 @@ public class ResetPasswordActivity extends BaseActivity {
 
                     space.setVisibility(View.VISIBLE);
 
+                    scrollView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            scrollView.scrollTo(0, (int) ViewUtils.convertDpToPixel(150, mContext));
+                        }
+                    });
+
                 } else {
+
                     space.setVisibility(View.GONE);
+
+                    scrollView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            scrollView.scrollTo(0, 0);
+                        }
+                    });
                 }
             }
         });
