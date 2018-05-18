@@ -157,6 +157,7 @@ public class InviteCodeActivity extends BaseActivity{
         } else {
 
             dataManager.inviteCode = etCode.getText().toString();
+            dataManager.showSkip = responseInviteCode.isSkipDLV();
 
             if (responseInviteCode.getCustomer() != null){
 

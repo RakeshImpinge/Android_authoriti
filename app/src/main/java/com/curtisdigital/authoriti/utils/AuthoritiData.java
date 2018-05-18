@@ -38,6 +38,7 @@ public class AuthoritiData {
 
     // Auth Processing Temp Data
     public String inviteCode;
+    public boolean showSkip;
     public String password;
     public byte[] iv = {-100, 34, 63, 23, -111, 30, -11, -45, 40, 96, -100, 73, 63, 12, -124, 23};
     public List<AccountID> accountIDs;

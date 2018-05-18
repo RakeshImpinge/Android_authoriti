@@ -14,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -36,9 +37,11 @@ import com.curtisdigital.authoriti.api.AuthoritiAPI;
 import com.curtisdigital.authoriti.api.model.Event;
 import com.curtisdigital.authoriti.api.model.request.RequestDLSave;
 import com.curtisdigital.authoriti.core.BaseActivity;
+import com.curtisdigital.authoriti.utils.AuthoritiData;
 import com.google.gson.JsonObject;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
@@ -98,6 +101,8 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
     private DriversLicenseCard licenseCard;
 
+    @Bean
+    AuthoritiData dataManager;
 
     @AfterViews
     void callAfterViewInjection(){
@@ -226,17 +231,15 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
     private void updateSkipButton(){
 
-//        if (capturedFront && capturedBack){
-//
-//            tvSkip.setAlpha(1.0f);
-//            tvSkip.setEnabled(true);
-//
-//        } else {
-//
-//            tvSkip.setAlpha(0.5f);
-//            tvSkip.setEnabled(false);
-//
-//        }
+        if (dataManager.showSkip){
+
+            tvSkip.setVisibility(View.VISIBLE);
+
+        } else {
+
+            tvSkip.setVisibility(View.INVISIBLE);
+
+        }
     }
 
     private void showCardDetails(Card card){
@@ -761,7 +764,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
 
         }
 
-        updateSkipButton();
+//        updateSkipButton();
 
     }
 

@@ -14,6 +14,9 @@ public class ResponseInviteCode {
     @SerializedName("customer")
     private String customer;
 
+    @SerializedName("skipDLV")
+    private boolean skipDLV;
+
     public boolean isValid() {
         return valid;
     }
@@ -28,5 +31,13 @@ public class ResponseInviteCode {
 
     public void setCustomer(String customer) {
         this.customer = customer;
+    }
+
+    public boolean isSkipDLV() {
+        return skipDLV;
+    }
+
+    public void setSkipDLV(boolean skipDLV) {
+        this.skipDLV = skipDLV;
     }
 }
