@@ -812,7 +812,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener, Ca
             }
         }
 
-        updateSkipButton();
+//        updateSkipButton();
     }
 
     @Override
