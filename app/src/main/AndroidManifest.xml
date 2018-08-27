@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.curtisdigital.authoriti"
-    android:versionName="1.0.65"
-    android:versionCode="2">
+    package="net.authoriti.authoritiapp"
+    android:versionCode="2"
+    android:versionName="1.0.65">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -23,7 +23,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
 
-        <activity android:name=".SplashActivity_"
+        <activity
+            android:name=".SplashActivity_"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,32 +33,36 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".MainActivity_"/>
-        <activity android:name=".ui.auth.LoginActivity_"
+        <activity android:name=".MainActivity_" />
+        <activity
+            android:name=".ui.auth.LoginActivity_"
             android:theme="@style/AppTheme.FullScreen"
-            android:windowSoftInputMode="adjustResize"/>
-        <activity android:name=".ui.auth.InviteCodeActivity_"
-            android:windowSoftInputMode="adjustResize"/>
-        <activity android:name=".ui.auth.ChaseActivity_"
-            android:windowSoftInputMode="adjustResize"/>
-        <activity android:name=".ui.auth.StartupActivity_"
-            android:windowSoftInputMode="adjustResize"/>
-        <activity android:name=".ui.auth.ScanActivity_"/>
-        <activity android:name=".ui.auth.AccountManagerActivity_"/>
-        <activity android:name=".ui.auth.AccountConfirmActivity_"/>
-        <activity android:name=".ui.pick.PasscodePickActivity_"/>
-        <activity android:name=".ui.code.CodeGenerateActivity_"/>
-        <activity android:name=".ui.help.HelpActivity_"/>
-        <activity android:name=".ui.auth.ResetPasswordActivity_"/>
-        <activity android:name=".ui.code.CodePermissionActivity_"/>
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.auth.InviteCodeActivity_"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.auth.ChaseActivity_"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.auth.StartupActivity_"
+            android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".ui.auth.ScanActivity_" />
+        <activity android:name=".ui.auth.AccountManagerActivity_" />
+        <activity android:name=".ui.auth.AccountConfirmActivity_" />
+        <activity android:name=".ui.pick.PasscodePickActivity_" />
+        <activity android:name=".ui.code.CodeGenerateActivity_" />
+        <activity android:name=".ui.help.HelpActivity_" />
+        <activity android:name=".ui.auth.ResetPasswordActivity_" />
+        <activity android:name=".ui.code.CodePermissionActivity_" />
 
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="a2bac8382233b9fab9a9b00a0a2d2ad3a17022a2" />
 
-        <activity android:name="com.acuant.mobilesdk.detect.CameraCardDetectManual"/>
-        <activity android:name="com.acuant.mobilesdk.detect.PDF417.CameraPDF417"/>
-        <activity android:name="com.acuant.mobilesdk.detect.Camera2CardDetectManual"/>
+        <activity android:name="com.acuant.mobilesdk.detect.CameraCardDetectManual" />
+        <activity android:name="com.acuant.mobilesdk.detect.PDF417.CameraPDF417" />
+        <activity android:name="com.acuant.mobilesdk.detect.Camera2CardDetectManual" />
         <activity android:name="com.acuant.mobilesdk.detect.Camera2FacialRecognitionManual" />
 
     </application>
