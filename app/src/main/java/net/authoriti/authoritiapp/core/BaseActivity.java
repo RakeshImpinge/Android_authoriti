@@ -25,7 +25,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
  * Created by mac on 11/25/17.
  */
 
-public class BaseActivity extends AppCompatActivity implements Constants{
+public class BaseActivity extends AppCompatActivity implements Constants {
 
     private AppCompatActivity mActivity;
     protected Context mContext;
@@ -39,6 +39,7 @@ public class BaseActivity extends AppCompatActivity implements Constants{
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         mActivity = this;
         mContext = this;
+
     }
 
     @UiThread
@@ -48,7 +49,7 @@ public class BaseActivity extends AppCompatActivity implements Constants{
         progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progress.setIndeterminate(true);
         progress.setCancelable(false);
-        if (!isFinishing()){
+        if (!isFinishing()) {
             progress.show();
         }
     }
@@ -60,7 +61,7 @@ public class BaseActivity extends AppCompatActivity implements Constants{
         progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progress.setIndeterminate(true);
         progress.setCancelable(false);
-        if (!isFinishing()){
+        if (!isFinishing()) {
             progress.show();
         }
     }
@@ -81,11 +82,12 @@ public class BaseActivity extends AppCompatActivity implements Constants{
 
     @UiThread
     protected void showAlert(String title, String message) {
-        if(!isFinishing()) {
+        if (!isFinishing()) {
             AlertDialog alertDialog = new AlertDialog.Builder(mActivity).create();
             alertDialog.setTitle(title);
             alertDialog.setMessage(message);
-            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK", new DialogInterface.OnClickListener() {
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK", new DialogInterface
+                    .OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
 
                 }
@@ -101,11 +103,12 @@ public class BaseActivity extends AppCompatActivity implements Constants{
 
     @UiThread
     protected void showAlert(Context context, String title, String message) {
-        if(!isFinishing()) {
+        if (!isFinishing()) {
             AlertDialog alertDialog = new AlertDialog.Builder(context).create();
             alertDialog.setTitle(title);
             alertDialog.setMessage(message);
-            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK", new DialogInterface.OnClickListener() {
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK", new DialogInterface
+                    .OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
 
                 }
@@ -121,14 +124,15 @@ public class BaseActivity extends AppCompatActivity implements Constants{
 
     @UiThread
     protected void hideKeyboard() {
-        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context
+                .INPUT_METHOD_SERVICE);
         if (getCurrentFocus() != null) {
             imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }
     }
 
     @UiThread
-    protected void setupUI(final View view){
+    protected void setupUI(final View view) {
         // Set up touch listener for non-text box views to hide keyboard.
         if (!(view instanceof EditText)) {
             view.setOnTouchListener(new View.OnTouchListener() {
@@ -149,7 +153,8 @@ public class BaseActivity extends AppCompatActivity implements Constants{
         }
     }
 
-    @Override protected void attachBaseContext(Context newBase) {
+    @Override
+    protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 }

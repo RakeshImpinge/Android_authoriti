@@ -20,21 +20,22 @@ import java.util.List;
  * Created by movdev on 3/1/18.
  */
 
-public class PurposeItem extends AbstractItem<PurposeItem, PurposeItem.ViewHolder>{
+public class PurposeItem extends AbstractItem<PurposeItem, PurposeItem.ViewHolder> {
 
     private Purpose purpose;
     private int index;
     private boolean isDefault;
     private PurposeItemListener listener;
 
-    public PurposeItem(Purpose purpose, int index, boolean isDefault, PurposeItemListener listener){
+    public PurposeItem(Purpose purpose, int index, boolean isDefault, PurposeItemListener
+            listener) {
         this.purpose = purpose;
         this.index = index;
         this.isDefault = isDefault;
         this.listener = listener;
     }
 
-    public void setDefault(boolean isDefault){
+    public void setDefault(boolean isDefault) {
         this.isDefault = isDefault;
     }
 
@@ -60,24 +61,20 @@ public class PurposeItem extends AbstractItem<PurposeItem, PurposeItem.ViewHolde
         final Context context = holder.itemView.getContext();
         final AuthoritiData dataManager = AuthoritiData_.getInstance_(context);
 
-        if (isDefault){
+        if (isDefault) {
             holder.markDefault.setVisibility(View.VISIBLE);
         } else {
             holder.markDefault.setVisibility(View.INVISIBLE);
         }
 
         holder.tvTitle.setText(purpose.getLabel());
-
         holder.tvDefault.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 holder.swipeLayout.close(true);
-
-                if (listener != null){
+                if (listener != null) {
                     listener.setPurposeAsDefault(index);
                 }
-
             }
         });
 
@@ -118,7 +115,7 @@ public class PurposeItem extends AbstractItem<PurposeItem, PurposeItem.ViewHolde
         holder.swipeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (dataManager.getScheme() != null){
+                if (dataManager.getScheme() != null) {
                     CodePermissionActivity_.intent(context).purposeIndex(index).start();
                 }
             }
@@ -126,7 +123,7 @@ public class PurposeItem extends AbstractItem<PurposeItem, PurposeItem.ViewHolde
 
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder{
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView tvTitle;
         SwipeLayout swipeLayout;
@@ -144,7 +141,7 @@ public class PurposeItem extends AbstractItem<PurposeItem, PurposeItem.ViewHolde
         }
     }
 
-    public interface PurposeItemListener{
+    public interface PurposeItemListener {
 
         void setPurposeAsDefault(int index);
     }

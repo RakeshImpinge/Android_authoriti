@@ -75,7 +75,6 @@ public class MainActivity extends BaseActivity {
     @Bean
     AuthoritiData dataManager;
 
-
     @ViewById(R.id.toolbar)
     Toolbar toolbar;
 
@@ -241,13 +240,9 @@ public class MainActivity extends BaseActivity {
                 btnAdd.setVisibility(View.INVISIBLE);
             }
 
-            ivHelp.setVisibility(View.INVISIBLE);
 
         } else {
-
             btnAdd.setVisibility(View.INVISIBLE);
-            ivHelp.setVisibility(View.VISIBLE);
-
         }
         changeFragment(fragment);
     }
@@ -312,16 +307,12 @@ public class MainActivity extends BaseActivity {
     }
 
     private void loadPurposes() {
-
         AuthoritiAPI.APIService().getPurposes().enqueue(new Callback<List<Purpose>>() {
             @Override
             public void onResponse(Call<List<Purpose>> call, Response<List<Purpose>> response) {
                 dismissProgressDialog();
-
                 if (response.code() == 200 && response.body() != null) {
-
                     dataManager.setPurposes(response.body());
-
                 }
             }
 
@@ -333,15 +324,11 @@ public class MainActivity extends BaseActivity {
     }
 
     private void loadScheme() {
-
         AuthoritiAPI.APIService().getSchemeGroup().enqueue(new Callback<SchemaGroup>() {
             @Override
             public void onResponse(Call<SchemaGroup> call, Response<SchemaGroup> response) {
-
                 dismissProgressDialog();
-
                 if (response.code() == 200 && response.body() != null) {
-
                     if (dataManager.getScheme() == null) {
                         dataManager.setScheme(response.body().getScheme());
                         firstUpdateSchema();
@@ -349,15 +336,12 @@ public class MainActivity extends BaseActivity {
                         dataManager.setScheme(response.body().getScheme());
                         updateSchema();
                     }
-
                     if (response.body().getDataType() != null) {
                         dataManager.setDataType(response.body().getDataType());
                     }
-
                     if (response.body().getDataTypeKeys() != null) {
                         dataManager.setDataTypeKeys(response.body().getDataTypeKeys());
                     }
-
                 }
             }
 

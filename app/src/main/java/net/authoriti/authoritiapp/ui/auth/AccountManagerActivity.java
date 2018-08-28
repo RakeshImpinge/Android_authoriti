@@ -19,6 +19,7 @@ import net.authoriti.authoritiapp.api.model.request.RequestSignUp;
 import net.authoriti.authoritiapp.api.model.response.ResponseSignUp;
 import net.authoriti.authoritiapp.core.SecurityActivity;
 import net.authoriti.authoritiapp.ui.alert.AccountAddDialog;
+import net.authoriti.authoritiapp.ui.help.HelpActivity_;
 import net.authoriti.authoritiapp.ui.items.AccountAddItem;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
 import net.authoriti.authoritiapp.utils.AuthoritiUtils;
@@ -235,6 +236,12 @@ public class AccountManagerActivity extends SecurityActivity implements Security
         showAccountAddDialog();
 
     }
+
+    @Click(R.id.ivHelp)
+    void helpButtonClicked() {
+        HelpActivity_.intent(mContext).start();
+    }
+
 
     @Click(R.id.cvFinish)
     void finishButtonClicked() {

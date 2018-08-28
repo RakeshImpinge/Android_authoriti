@@ -6,6 +6,7 @@ import android.widget.TextView;
 
 import net.authoriti.authoritiapp.R;
 import net.authoriti.authoritiapp.api.model.AccountID;
+
 import com.mikepenz.fastadapter.items.AbstractItem;
 
 import java.util.List;
@@ -14,18 +15,19 @@ import java.util.List;
  * Created by mac on 1/25/18.
  */
 
-public class AccountConfirmItem extends AbstractItem<AccountConfirmItem, AccountConfirmItem.ViewHolder> {
+public class AccountConfirmItem extends AbstractItem<AccountConfirmItem, AccountConfirmItem
+        .ViewHolder> {
 
     private AccountID accountID;
     private boolean setDefault;
 
-    public AccountConfirmItem(AccountID accountID, boolean setDefault){
+    public AccountConfirmItem(AccountID accountID, boolean setDefault) {
 
         this.accountID = accountID;
         this.setDefault = setDefault;
     }
 
-    public AccountID getAccountID(){
+    public AccountID getAccountID() {
         return this.accountID;
     }
 
@@ -50,10 +52,10 @@ public class AccountConfirmItem extends AbstractItem<AccountConfirmItem, Account
 
         holder.tvTitle.setText(accountID.getType());
 
-        if (accountID.isConfirmed()){
+        if (accountID.isConfirmed()) {
 
             holder.markDefault.setBackgroundResource(R.drawable.bg_green_dot);
-            if (setDefault){
+            if (setDefault) {
                 holder.markDefault.setVisibility(View.VISIBLE);
             } else {
                 holder.markDefault.setVisibility(View.INVISIBLE);
@@ -71,7 +73,7 @@ public class AccountConfirmItem extends AbstractItem<AccountConfirmItem, Account
 
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder{
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView tvTitle;
         TextView tvSubTitle;

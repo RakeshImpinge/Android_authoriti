@@ -38,6 +38,7 @@ import net.authoriti.authoritiapp.api.AuthoritiAPI;
 import net.authoriti.authoritiapp.api.model.Event;
 import net.authoriti.authoritiapp.api.model.request.RequestDLSave;
 import net.authoriti.authoritiapp.core.BaseActivity;
+import net.authoriti.authoritiapp.ui.help.HelpActivity_;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
 
 import com.google.gson.JsonObject;
@@ -684,6 +685,12 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
     void backButtonClicked() {
         finish();
     }
+
+    @Click(R.id.ivHelp)
+    void helpButtonClicked() {
+        HelpActivity_.intent(mContext).start();
+    }
+
 
     @Click(R.id.tvSkip)
     void skipButtonClicked() {

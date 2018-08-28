@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_purpose_id"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorHeaderBackground"
+    android:gravity="center">
+
+
+    <LinearLayout
+        android:id="@+id/surface"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvTitle"
+            fontPath="@string/font_oswaldo_light"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="3dp"
+            android:layout_weight="1"
+            android:text=""
+            android:textColor="@color/colorTextPrimary"
+            android:textSize="18sp"
+            tools:ignore="MissingPrefix" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

@@ -20,6 +20,7 @@ import net.authoriti.authoritiapp.api.model.request.RequestSignUp;
 import net.authoriti.authoritiapp.api.model.response.ResponseSignUpChase;
 import net.authoriti.authoritiapp.core.BaseActivity;
 import net.authoriti.authoritiapp.core.SecurityActivity;
+import net.authoriti.authoritiapp.ui.help.HelpActivity_;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
 import net.authoriti.authoritiapp.utils.AuthoritiUtils;
 import net.authoriti.authoritiapp.utils.ViewUtils;
@@ -313,6 +314,12 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
     void backButtonClicked() {
         finish();
     }
+
+    @Click(R.id.ivHelp)
+    void helpButtonClicked() {
+        HelpActivity_.intent(mContext).start();
+    }
+
 
     @Click(R.id.cvNext)
     void nextButtonClicked() {

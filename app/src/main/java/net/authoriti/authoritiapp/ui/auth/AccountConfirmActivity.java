@@ -16,9 +16,11 @@ import net.authoriti.authoritiapp.api.model.AuthLogIn;
 import net.authoriti.authoritiapp.api.model.User;
 import net.authoriti.authoritiapp.core.SecurityActivity;
 import net.authoriti.authoritiapp.ui.alert.AccountConfirmDialog;
+import net.authoriti.authoritiapp.ui.help.HelpActivity_;
 import net.authoriti.authoritiapp.ui.items.AccountConfirmItem;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
 import net.authoriti.authoritiapp.utils.AuthoritiUtils;
+
 import com.google.gson.JsonObject;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.IAdapter;
@@ -42,7 +44,8 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
  */
 
 @EActivity(R.layout.activity_account_confirm)
-public class AccountConfirmActivity extends SecurityActivity implements SecurityActivity.TouchIDEnableAlertListener, AccountConfirmDialog.AccountConfirmDialogListener {
+public class AccountConfirmActivity extends SecurityActivity implements SecurityActivity
+        .TouchIDEnableAlertListener, AccountConfirmDialog.AccountConfirmDialogListener {
 
     @Bean
     AuthoritiUtils utils;
@@ -65,7 +68,7 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
     private boolean saveSuccess = false;
 
     @AfterViews
-    void callAfterViewInjection(){
+    void callAfterViewInjection() {
 
         adapter = new FastItemAdapter<AccountConfirmItem>();
         rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
@@ -73,11 +76,12 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
 
         adapter.withOnClickListener(new FastAdapter.OnClickListener<AccountConfirmItem>() {
             @Override
-            public boolean onClick(View v, IAdapter<AccountConfirmItem> adapter, AccountConfirmItem item, int position) {
+            public boolean onClick(View v, IAdapter<AccountConfirmItem> adapter,
+                                   AccountConfirmItem item, int position) {
 
                 selectedAccountId = item.getAccountID();
                 selectedPosition = position;
-                if (selectedAccountId.isConfirmed()){
+                if (selectedAccountId.isConfirmed()) {
                     showAlert("", "This account has already confirmed.");
 
                 } else {
@@ -91,31 +95,32 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
         showAccounts();
     }
 
-    private void showAccounts(){
+    private void showAccounts() {
 
-        if (adapter != null){
+        if (adapter != null) {
             adapter.clear();
         } else {
             adapter = new FastItemAdapter<>();
         }
 
         User user = dataManager.getUser();
-        if (user.getAccountIDs() != null && user.getAccountIDs().size() > 0){
-            for (int i = 0 ; i < user.getAccountIDs().size() ; i ++){
-                adapter.add(new AccountConfirmItem(user.getAccountIDs().get(i),dataManager.defaultAccountSelected && i == dataManager.defaultAccountIndex));
+        if (user.getAccountIDs() != null && user.getAccountIDs().size() > 0) {
+            for (int i = 0; i < user.getAccountIDs().size(); i++) {
+                adapter.add(new AccountConfirmItem(user.getAccountIDs().get(i), dataManager
+                        .defaultAccountSelected && i == dataManager.defaultAccountIndex));
             }
         }
 
-        if (user.getUnconfirmedAccountIDs() != null && user.getUnconfirmedAccountIDs().size() > 0){
-            for (int i = 0 ; i < user.getUnconfirmedAccountIDs().size() ; i ++){
-                adapter.add(new AccountConfirmItem(user.getUnconfirmedAccountIDs().get(i),false));
+        if (user.getUnconfirmedAccountIDs() != null && user.getUnconfirmedAccountIDs().size() > 0) {
+            for (int i = 0; i < user.getUnconfirmedAccountIDs().size(); i++) {
+                adapter.add(new AccountConfirmItem(user.getUnconfirmedAccountIDs().get(i), false));
             }
         }
     }
 
-    private void showAccountConfirmDialog(){
+    private void showAccountConfirmDialog() {
 
-        if (accountConfirmDialog == null){
+        if (accountConfirmDialog == null) {
 
             accountConfirmDialog = new AccountConfirmDialog(this);
             accountConfirmDialog.setListener(this);
@@ -126,50 +131,53 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
 
         }
 
-        if (!isFinishing() && !accountConfirmDialog.isShowing()){
+        if (!isFinishing() && !accountConfirmDialog.isShowing()) {
 
             accountConfirmDialog.show();
         }
     }
 
-    private void hideAccountConfirmDialog(){
+    private void hideAccountConfirmDialog() {
 
-        if (accountConfirmDialog != null){
+        if (accountConfirmDialog != null) {
 
             accountConfirmDialog.dismiss();
             accountConfirmDialog = null;
         }
     }
 
-    private void saveAccountName(final String id, final boolean setDefault){
+    private void saveAccountName(final String id, final boolean setDefault) {
 
         String token = "Bearer " + dataManager.getUser().getToken();
         displayProgressDialog("");
 
-        AuthoritiAPI.APIService().confirmAccountValue(token, id).enqueue(new Callback<JsonObject>() {
+        AuthoritiAPI.APIService().confirmAccountValue(token, id).enqueue(new Callback<JsonObject>
+                () {
 
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
 
                 dismissProgressDialog();
 
-                if (response.code() == 200 && response.body() != null){
+                if (response.code() == 200 && response.body() != null) {
                     JsonObject jsonObject = response.body();
-                    if (jsonObject.get("status") != null){
-                        if (jsonObject.get("status").getAsString().equals("Success")){
+                    if (jsonObject.get("status") != null) {
+                        if (jsonObject.get("status").getAsString().equals("Success")) {
 
-                            Snackbar.make(findViewById(R.id.id_account_confirm_activity), "Add Account Successfully", 1000).show();
+                            Snackbar.make(findViewById(R.id.id_account_confirm_activity), "Add " +
+                                    "Account Successfully", 1000).show();
 
                             updateAccount(id, setDefault);
 
                         } else {
-                            showAlert("","Failed to confirm your account number. Try again later.");
+                            showAlert("", "Failed to confirm your account number. Try again later" +
+                                    ".");
                         }
                     } else {
-                        showAlert("","Failed to confirm your account number. Try again later.");
+                        showAlert("", "Failed to confirm your account number. Try again later.");
                     }
                 } else {
-                    showAlert("","Failed to confirm your account number. Try again later.");
+                    showAlert("", "Failed to confirm your account number. Try again later.");
                 }
 
             }
@@ -178,22 +186,22 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
             public void onFailure(Call<JsonObject> call, Throwable t) {
 
                 dismissProgressDialog();
-                showAlert("","Failed to confirm your account number. Try again later.");
+                showAlert("", "Failed to confirm your account number. Try again later.");
 
             }
         });
     }
 
-    private void updateAccount(String id, boolean setDefault){
+    private void updateAccount(String id, boolean setDefault) {
 
         AccountID accountID = new AccountID(selectedAccountId.getType(), id);
         User user = dataManager.getUser();
         user.getAccountIDs().add(accountID);
 
-        for (int i = 0 ; i < user.getUnconfirmedAccountIDs().size() ; i ++){
+        for (int i = 0; i < user.getUnconfirmedAccountIDs().size(); i++) {
 
             AccountID accountID1 = user.getUnconfirmedAccountIDs().get(i);
-            if (accountID1.getType().equals(selectedAccountId.getType())){
+            if (accountID1.getType().equals(selectedAccountId.getType())) {
                 user.getUnconfirmedAccountIDs().remove(accountID1);
             }
 
@@ -202,7 +210,7 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
 
         dataManager.setUser(user);
 
-        if (setDefault){
+        if (setDefault) {
             dataManager.defaultAccountSelected = true;
             dataManager.defaultAccountIndex = dataManager.getUser().getAccountIDs().size() - 1;
         }
@@ -211,14 +219,14 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
 
     }
 
-    private void updateLoginState(){
+    private void updateLoginState() {
 
         AuthLogIn logIn = new AuthLogIn();
         logIn.setLogin(true);
         dataManager.setAuthLogin(logIn);
     }
 
-    private void goHome(){
+    private void goHome() {
 
         dataManager.setScheme(null);
 
@@ -227,11 +235,11 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
         startActivity(intent);
     }
 
-    private void enableFingerPrintAndGoHome(){
+    private void enableFingerPrintAndGoHome() {
 
         removeListener();
 
-        if (dataManager != null && dataManager.getUser() != null){
+        if (dataManager != null && dataManager.getUser() != null) {
 
             User user = dataManager.getUser();
             user.setFingerPrintAuthEnabled(true);
@@ -244,13 +252,18 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
     }
 
     @Click(R.id.ivBack)
-    void backButtonClicked(){
+    void backButtonClicked() {
         finish();
+    }
+
+    @Click(R.id.ivHelp)
+    void helpButtonClicked() {
+        HelpActivity_.intent(mContext).start();
     }
 
 
     @Click(R.id.cvFinish)
-    void finishButtonClicked(){
+    void finishButtonClicked() {
 
         saveSuccess = true;
         mFingerPrintAuthHelper.startAuth();
@@ -260,21 +273,14 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
 
     }
 
-    private void checkFingerPrintAuth(){
-
-
-        if (isBelowMarshmallow || fingerPrintHardwareNotDetected){
-
+    private void checkFingerPrintAuth() {
+        if (isBelowMarshmallow || fingerPrintHardwareNotDetected) {
             updateLoginState();
             goHome();
-
         } else {
-
             setListener(this);
             showTouchIDEnableAlert();
-
         }
-
     }
 
     @Override
@@ -282,7 +288,7 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
 
         hideTouchIDEnabledAlert();
 
-        if (fingerPrintNotRegistered){
+        if (fingerPrintNotRegistered) {
 
             Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
             startActivity(intent);

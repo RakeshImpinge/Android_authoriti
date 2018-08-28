@@ -52,13 +52,13 @@ public class CodeGenerateFragment extends BaseFragment {
     RecyclerView rvPermission;
 
     @AfterViews
-    void callAfterViewInjection(){
+    void callAfterViewInjection() {
 
         adapter = new FastItemAdapter<CodeItem>();
         rvPermission.setLayoutManager(new LinearLayoutManager(mContext));
         rvPermission.setAdapter(adapter);
 
-        if (dataManager.getScheme() == null){
+        if (dataManager.getScheme() == null) {
             loadScheme();
         } else {
             showPickers();
@@ -66,7 +66,7 @@ public class CodeGenerateFragment extends BaseFragment {
 
     }
 
-    private void loadScheme(){
+    private void loadScheme() {
 
         displayProgressDialog("Loading...");
 
@@ -76,7 +76,7 @@ public class CodeGenerateFragment extends BaseFragment {
 
                 dismissProgressDialog();
 
-                if (response.code() == 200 && response.body() != null){
+                if (response.code() == 200 && response.body() != null) {
 
                     dataManager.setScheme(response.body().getScheme());
                     updatePickers();
@@ -92,7 +92,7 @@ public class CodeGenerateFragment extends BaseFragment {
         });
     }
 
-    private void updatePickers(){
+    private void updatePickers() {
 
         if (dataManager.getScheme() != null && dataManager.getScheme().getPickers() != null) {
 
@@ -107,20 +107,23 @@ public class CodeGenerateFragment extends BaseFragment {
 
                     case PICKER_ACCOUNT:
 
-                        if (dataManager.getUser() != null && dataManager.getUser().getAccountIDs() != null && dataManager.getUser().getAccountIDs().size() > 0){
+                        if (dataManager.getUser() != null && dataManager.getUser().getAccountIDs
+                                () != null && dataManager.getUser().getAccountIDs().size() > 0) {
 
-                            Picker picker1 = new Picker(picker.getPicker(), picker.getBytes(), picker.getValues(), picker.getTitle(), picker.getLabel());
+                            Picker picker1 = new Picker(picker.getPicker(), picker.getBytes(),
+                                    picker.getValues(), picker.getTitle(), picker.getLabel());
 
                             List<Value> values = new ArrayList<>();
-                            for (AccountID accountID : dataManager.getUser().getAccountIDs()){
+                            for (AccountID accountID : dataManager.getUser().getAccountIDs()) {
 
-                                Value value = new Value(accountID.getIdentifier(), accountID.getType());
+                                Value value = new Value(accountID.getIdentifier(), accountID
+                                        .getType());
                                 values.add(value);
 
                             }
                             picker1.setValues(values);
 
-                            if (dataManager.defaultAccountSelected){
+                            if (dataManager.defaultAccountSelected) {
 
                                 picker1.setEnableDefault(true);
                                 picker1.setDefaultIndex(dataManager.defaultAccountIndex);
@@ -153,7 +156,8 @@ public class CodeGenerateFragment extends BaseFragment {
                         break;
 
                     case PICKER_TIME:
-                        dataManager.setTimePicker(AuthoritiUtils_.getInstance_(mContext).getDefaultTimePicker(picker));
+                        dataManager.setTimePicker(AuthoritiUtils_.getInstance_(mContext)
+                                .getDefaultTimePicker(picker));
                         break;
 
                 }
@@ -166,38 +170,39 @@ public class CodeGenerateFragment extends BaseFragment {
         }
     }
 
-    private void showPickers(){
+    private void showPickers() {
 
-        if (adapter == null){
+        if (adapter == null) {
             adapter = new FastItemAdapter<CodeItem>();
         } else {
             adapter.clear();
         }
 
-        if (dataManager.getPickerOrder() != null && dataManager.getPickerOrder().getPickers() != null && dataManager.getPickerOrder().getPickers().size() > 0){
+        if (dataManager.getPickerOrder() != null && dataManager.getPickerOrder().getPickers() !=
+                null && dataManager.getPickerOrder().getPickers().size() > 0) {
 
-            for (String picker : dataManager.getPickerOrder().getPickers()){
+            for (String picker : dataManager.getPickerOrder().getPickers()) {
 
-                switch (picker){
+                switch (picker) {
 
                     case PICKER_ACCOUNT:
-                        if (dataManager.getAccountPicker() != null){
+                        if (dataManager.getAccountPicker() != null) {
                             adapter.add(new CodeItem(dataManager.getAccountPicker()));
                         }
                         break;
 
                     case PICKER_INDUSTRY:
-                        if (dataManager.getIndustryPicker() != null){
+                        if (dataManager.getIndustryPicker() != null) {
                             adapter.add(new CodeItem(dataManager.getIndustryPicker()));
                         }
                         break;
                     case PICKER_LOCATION_STATE:
-                        if (dataManager.getLocationPicker() != null){
+                        if (dataManager.getLocationPicker() != null) {
                             adapter.add(new CodeItem(dataManager.getLocationPicker()));
                         }
                         break;
                     case PICKER_TIME:
-                        if (dataManager.getTimePicker() != null){
+                        if (dataManager.getTimePicker() != null) {
                             adapter.add(new CodeItem(dataManager.getTimePicker()));
                         }
                         break;
@@ -210,7 +215,7 @@ public class CodeGenerateFragment extends BaseFragment {
     }
 
     @Click(R.id.cvGenerate)
-    void generateButtonClicked(){
+    void generateButtonClicked() {
         CodeGenerateActivity_.intent(mContext).start();
     }
 
@@ -219,9 +224,9 @@ public class CodeGenerateFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
 
-        if (dataManager.getScheme() != null && adapter != null){
+        if (dataManager.getScheme() != null && adapter != null) {
 
-            if(mActivity != null && !mActivity.isFinishing()){
+            if (mActivity != null && !mActivity.isFinishing()) {
 
                 showPickers();
 

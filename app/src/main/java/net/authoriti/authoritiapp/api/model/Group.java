@@ -2,44 +2,20 @@ package net.authoriti.authoritiapp.api.model;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
-
 /**
  * Created by movdev on 3/1/18.
  */
 
-public class Purpose {
+public class Group {
 
     @SerializedName("label")
     private String label;
 
-    @SerializedName("groups")
-    private List<Group> groups;
-
     @SerializedName("schema")
     private int schemaIndex;
 
-    @SerializedName("picker")
     private String pickerName;
-
-    @SerializedName("value")
     private String value;
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public int getSchemaIndex() {
-        return schemaIndex;
-    }
-
-    public void setSchemaIndex(int schemaIndex) {
-        this.schemaIndex = schemaIndex;
-    }
 
     public String getPickerName() {
         return pickerName;
@@ -57,11 +33,20 @@ public class Purpose {
         this.value = value;
     }
 
-    public List<Group> getGroups() {
-        return groups;
+
+    public String getLabel() {
+        return label;
     }
 
-    public void setGroups(List<Group> groups) {
-        this.groups = groups;
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public int getSchemaIndex() {
+        return schemaIndex;
+    }
+
+    public void setSchemaIndex(int schemaIndex) {
+        this.schemaIndex = schemaIndex;
     }
 }

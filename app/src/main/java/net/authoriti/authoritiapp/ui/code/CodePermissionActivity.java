@@ -6,12 +6,14 @@ import android.view.View;
 import android.widget.EditText;
 
 import net.authoriti.authoritiapp.R;
+import net.authoriti.authoritiapp.api.model.Group;
 import net.authoriti.authoritiapp.api.model.Order;
 import net.authoriti.authoritiapp.api.model.Purpose;
 import net.authoriti.authoritiapp.core.BaseActivity;
 import net.authoriti.authoritiapp.ui.items.CodeItem;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
 import net.authoriti.authoritiapp.utils.AuthoritiUtils;
+
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 
 import org.androidannotations.annotations.AfterViews;
@@ -28,12 +30,15 @@ import org.androidannotations.annotations.ViewById;
 @EActivity(R.layout.activity_code_permission)
 public class CodePermissionActivity extends BaseActivity {
 
-    private Purpose purpose;
+    private Group group;
     FastItemAdapter<CodeItem> adapter;
     private Order order;
 
     @Extra
     int purposeIndex;
+
+    @Extra
+    int purposeIndexItem;
 
     @Bean
     AuthoritiData dataManager;
@@ -51,83 +56,86 @@ public class CodePermissionActivity extends BaseActivity {
     EditText etCode;
 
     @AfterViews
-    void callAfterViewInjection(){
-
+    void callAfterViewInjection() {
         adapter = new FastItemAdapter<CodeItem>();
         rvPermission.setLayoutManager(new LinearLayoutManager(mContext));
         rvPermission.setAdapter(adapter);
-
-        purpose = dataManager.getPurposes().get(purposeIndex);
-
-        if (purpose.getSchemaIndex() == 1){
+        group = dataManager.getPurposes().get(purposeIndex).getGroups().get(purposeIndexItem);
+        if (group.getSchemaIndex() == 1) {
             order = dataManager.getPickerOrder();
         } else {
             order = dataManager.getPickerOrder2();
             codeView.setVisibility(View.VISIBLE);
         }
-
     }
 
-    private void showSchema(){
+    private void showSchema() {
 
-        if (adapter == null){
+        if (adapter == null) {
             adapter = new FastItemAdapter<CodeItem>();
         } else {
             adapter.clear();
         }
 
-        if (order != null && order.getPickers() != null && order.getPickers().size() > 0){
+        if (order != null && order.getPickers() != null && order.getPickers().size() > 0) {
 
-            for (String picker : order.getPickers()){
+            for (String picker : order.getPickers()) {
 
-                switch (picker){
+                switch (picker) {
 
                     case PICKER_ACCOUNT:
-                        if (dataManager.getAccountPicker() != null){
-                            if (purpose.getPickerName() == null || !purpose.getPickerName().equals(PICKER_ACCOUNT)){
+                        if (dataManager.getAccountPicker() != null) {
+                            if (group.getPickerName() == null || !group.getPickerName()
+                                    .equals(PICKER_ACCOUNT)) {
                                 adapter.add(new CodeItem(dataManager.getAccountPicker()));
                             }
                         }
                         break;
 
                     case PICKER_INDUSTRY:
-                        if (dataManager.getIndustryPicker() != null){
-                            if (purpose.getPickerName() == null || !purpose.getPickerName().equals(PICKER_INDUSTRY)){
+                        if (dataManager.getIndustryPicker() != null) {
+                            if (group.getPickerName() == null || !group.getPickerName()
+                                    .equals(PICKER_INDUSTRY)) {
                                 adapter.add(new CodeItem(dataManager.getIndustryPicker()));
                             }
                         }
                         break;
                     case PICKER_LOCATION_STATE:
-                        if (dataManager.getLocationPicker() != null){
-                            if (purpose.getPickerName() == null || !purpose.getPickerName().equals(PICKER_LOCATION_STATE)){
+                        if (dataManager.getLocationPicker() != null) {
+                            if (group.getPickerName() == null || !group.getPickerName()
+                                    .equals(PICKER_LOCATION_STATE)) {
                                 adapter.add(new CodeItem(dataManager.getLocationPicker()));
                             }
                         }
                         break;
                     case PICKER_TIME:
-                        if (dataManager.getTimePicker() != null){
-                            if (purpose.getPickerName() == null || !purpose.getPickerName().equals(PICKER_TIME)){
+                        if (dataManager.getTimePicker() != null) {
+                            if (group.getPickerName() == null || !group.getPickerName()
+                                    .equals(PICKER_TIME)) {
                                 adapter.add(new CodeItem(dataManager.getTimePicker()));
                             }
                         }
                         break;
                     case PICKER_GEO:
-                        if (dataManager.getGeoPicker() != null){
-                            if (purpose.getPickerName() == null || !purpose.getPickerName().equals(PICKER_GEO)){
+                        if (dataManager.getGeoPicker() != null) {
+                            if (group.getPickerName() == null || !group.getPickerName()
+                                    .equals(PICKER_GEO)) {
                                 adapter.add(new CodeItem(dataManager.getGeoPicker()));
                             }
                         }
                         break;
                     case PICKER_REQUEST:
-                        if (dataManager.getRequestPicker() != null){
-                            if (purpose.getPickerName() == null || !purpose.getPickerName().equals(PICKER_REQUEST)){
+                        if (dataManager.getRequestPicker() != null) {
+                            if (group.getPickerName() == null || !group.getPickerName()
+                                    .equals(PICKER_REQUEST)) {
                                 adapter.add(new CodeItem(dataManager.getRequestPicker()));
                             }
                         }
                         break;
                     case PICKER_DATA_TYPE:
-                        if (dataManager.getDataTypePicker() != null){
-                            if (purpose.getPickerName() == null || !purpose.getPickerName().equals(PICKER_DATA_TYPE)){
+                        if (dataManager.getDataTypePicker() != null) {
+                            if (group.getPickerName() == null || !group.getPickerName()
+                                    .equals(PICKER_DATA_TYPE)) {
                                 adapter.add(new CodeItem(dataManager.getDataTypePicker()));
                             }
                         }
@@ -141,29 +149,31 @@ public class CodePermissionActivity extends BaseActivity {
     }
 
     @Click(R.id.ivBack)
-    void backButtonClicked(){
+    void backButtonClicked() {
 
         finish();
     }
 
     @Click(R.id.cvGenerate)
-    void generateButtonClicked(){
+    void generateButtonClicked() {
 
-        if (purpose.getSchemaIndex() == 1){
+        if (group.getSchemaIndex() == 1) {
 
             CodeGenerateActivity_.intent(mContext).purposeIndex(purposeIndex).start();
 
-        } else if (purpose.getSchemaIndex() == 2){
+        } else if (group.getSchemaIndex() == 2) {
 
             hideKeyboard();
 
-            if (etCode.getText().length() == 0){
+            if (etCode.getText().length() == 0) {
 
-                showAlert("", "Please enter the code provided by the Company you wish to grant access.");
+                showAlert("", "Please enter the code provided by the Company you wish to grant " +
+                        "access.");
 
             } else {
 
-                CodeGenerateActivity_.intent(mContext).purposeIndex(purposeIndex).codeExtra(etCode.getText().toString()).start();
+                CodeGenerateActivity_.intent(mContext).purposeIndex(purposeIndex).codeExtra
+                        (etCode.getText().toString()).start();
             }
         }
     }
@@ -172,9 +182,9 @@ public class CodePermissionActivity extends BaseActivity {
     public void onResume() {
         super.onResume();
 
-        if (purpose != null && dataManager.getScheme() != null && adapter != null){
+        if (group != null && dataManager.getScheme() != null && adapter != null) {
 
-            if(!isFinishing()){
+            if (!isFinishing()) {
 
                 showSchema();
             }

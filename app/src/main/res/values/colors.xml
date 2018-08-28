@@ -15,5 +15,6 @@
     <color name="colorTextThird">#465156</color>
 
     <color name="colorShadow">#880e2c2e</color>
+    <color name="colorHeaderBackground">#F0F3F7</color>
 
 </resources>

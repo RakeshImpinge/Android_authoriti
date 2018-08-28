@@ -8,6 +8,7 @@ import android.widget.EditText;
 
 import net.authoriti.authoritiapp.R;
 import net.authoriti.authoritiapp.core.BaseActivity;
+import net.authoriti.authoritiapp.ui.help.HelpActivity_;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
 import net.authoriti.authoritiapp.utils.AuthoritiData_;
 import net.authoriti.authoritiapp.utils.AuthoritiUtils;
@@ -116,6 +117,12 @@ public class StartupActivity extends BaseActivity {
     void backButtonClicked() {
         finish();
     }
+
+    @Click(R.id.ivHelp)
+    void helpButtonClicked() {
+        HelpActivity_.intent(mContext).start();
+    }
+
 
     @Click(R.id.cvNext)
     void nextButtonClicked() {

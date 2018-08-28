@@ -11,9 +11,11 @@ import android.widget.Toast;
 import net.authoriti.authoritiapp.R;
 import net.authoriti.authoritiapp.api.model.User;
 import net.authoriti.authoritiapp.core.BaseActivity;
+import net.authoriti.authoritiapp.ui.help.HelpActivity_;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
 import net.authoriti.authoritiapp.utils.AuthoritiUtils;
 import net.authoriti.authoritiapp.utils.ViewUtils;
+
 import com.tozny.crypto.android.AesCbcWithIntegrity;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
@@ -68,7 +70,7 @@ public class ResetPasswordActivity extends BaseActivity {
     Space space;
 
     @AfterViews
-    void callAfterViewInjection(){
+    void callAfterViewInjection() {
 
 //        setupUI(findViewById(R.id.id_reset_password_activity));
 
@@ -80,7 +82,7 @@ public class ResetPasswordActivity extends BaseActivity {
             @Override
             public void onVisibilityChanged(boolean isOpen) {
 
-                if (isOpen){
+                if (isOpen) {
 
                     space.setVisibility(View.VISIBLE);
 
@@ -108,27 +110,31 @@ public class ResetPasswordActivity extends BaseActivity {
     }
 
     @Click(R.id.cvReset)
-    void resetButtonClicked(){
+    void resetButtonClicked() {
 
         hideKeyboard();
 
-        if (TextUtils.isEmpty(etCurrentPassword.getText())){
-            tiCurrentPassword.setError(utils.getSpannableStringForEditTextError("This field is required", this));
+        if (TextUtils.isEmpty(etCurrentPassword.getText())) {
+            tiCurrentPassword.setError(utils.getSpannableStringForEditTextError("This field is " +
+                    "required", this));
         }
 
-        if (TextUtils.isEmpty(etNewPassword.getText())){
-            tiNewPassword.setError(utils.getSpannableStringForEditTextError("This field is required", this));
+        if (TextUtils.isEmpty(etNewPassword.getText())) {
+            tiNewPassword.setError(utils.getSpannableStringForEditTextError("This field is " +
+                    "required", this));
         }
 
-        if (TextUtils.isEmpty(etConfirmPassword.getText())){
-            tiConfirmPassword.setError(utils.getSpannableStringForEditTextError("This field is required", this));
+        if (TextUtils.isEmpty(etConfirmPassword.getText())) {
+            tiConfirmPassword.setError(utils.getSpannableStringForEditTextError("This field is " +
+                    "required", this));
         }
 
-        if (!TextUtils.isEmpty(etCurrentPassword.getText()) && !TextUtils.isEmpty(etNewPassword.getText()) && !TextUtils.isEmpty(etConfirmPassword.getText())){
+        if (!TextUtils.isEmpty(etCurrentPassword.getText()) && !TextUtils.isEmpty(etNewPassword
+                .getText()) && !TextUtils.isEmpty(etConfirmPassword.getText())) {
 
             User user = dataManager.getUser();
 
-            if (user != null && user.getAccountIDs() != null && user.getAccountIDs().size() > 0){
+            if (user != null && user.getAccountIDs() != null && user.getAccountIDs().size() > 0) {
 
                 AesCbcWithIntegrity.SecretKeys keys;
                 String keyStr = dataManager.getUser().getEncryptKey();
@@ -141,31 +147,39 @@ public class ResetPasswordActivity extends BaseActivity {
 
                     try {
 
-                        AesCbcWithIntegrity.CipherTextIvMac civ = new  AesCbcWithIntegrity.CipherTextIvMac(dataManager.getUser().getEncryptPassword());
+                        AesCbcWithIntegrity.CipherTextIvMac civ = new AesCbcWithIntegrity
+                                .CipherTextIvMac(dataManager.getUser().getEncryptPassword());
                         password = AesCbcWithIntegrity.decryptString(civ, keys);
 
-                        if (password.equals(etCurrentPassword.getText().toString())){
+                        if (password.equals(etCurrentPassword.getText().toString())) {
 
-                            if (etNewPassword.getText().toString().equals(etConfirmPassword.getText().toString())){
+                            if (etNewPassword.getText().toString().equals(etConfirmPassword
+                                    .getText().toString())) {
 
-                                user.setEncryptPassword(AesCbcWithIntegrity.encrypt(etNewPassword.getText().toString(), keys).toString());
+                                user.setEncryptPassword(AesCbcWithIntegrity.encrypt(etNewPassword
+                                        .getText().toString(), keys).toString());
                                 dataManager.setUser(user);
 
-                                Toast.makeText(this, "Reset Password Successfully", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this, "Reset Password Successfully", Toast
+                                        .LENGTH_SHORT).show();
 
                                 finish();
 
                             } else {
 
-                                tiNewPassword.setError(utils.getSpannableStringForEditTextError("New password doesn't match", this));
-                                tiConfirmPassword.setError(utils.getSpannableStringForEditTextError("New password doesn't match", this));
+                                tiNewPassword.setError(utils.getSpannableStringForEditTextError
+                                        ("New password doesn't match", this));
+                                tiConfirmPassword.setError(utils
+                                        .getSpannableStringForEditTextError("New password doesn't" +
+                                                " match", this));
 
                             }
 
 
                         } else {
 
-                            tiCurrentPassword.setError(utils.getSpannableStringForEditTextError("Password doesn't match wth current password", this));
+                            tiCurrentPassword.setError(utils.getSpannableStringForEditTextError
+                                    ("Password doesn't match wth current password", this));
                         }
 
                     } catch (UnsupportedEncodingException e) {
@@ -173,7 +187,6 @@ public class ResetPasswordActivity extends BaseActivity {
                     } catch (GeneralSecurityException e) {
                         e.printStackTrace();
                     }
-
 
 
                 } catch (InvalidKeyException e) {
@@ -185,28 +198,34 @@ public class ResetPasswordActivity extends BaseActivity {
     }
 
     @AfterTextChange(R.id.etCurrentPassword)
-    void currentPasswordChanged(){
-        if (!TextUtils.isEmpty(etCurrentPassword.getText())){
+    void currentPasswordChanged() {
+        if (!TextUtils.isEmpty(etCurrentPassword.getText())) {
             tiCurrentPassword.setError(null);
         }
     }
 
     @AfterTextChange(R.id.etNewPassword)
-    void newPasswordChanged(){
-        if (!TextUtils.isEmpty(etNewPassword.getText())){
+    void newPasswordChanged() {
+        if (!TextUtils.isEmpty(etNewPassword.getText())) {
             tiNewPassword.setError(null);
         }
     }
 
     @AfterTextChange(R.id.etConfirmPassword)
-    void confirmPasswordChanged(){
-        if (!TextUtils.isEmpty(etConfirmPassword.getText())){
+    void confirmPasswordChanged() {
+        if (!TextUtils.isEmpty(etConfirmPassword.getText())) {
             tiConfirmPassword.setError(null);
         }
     }
 
     @Click(R.id.ivBack)
-    void backButtonClicked(){
+    void backButtonClicked() {
         finish();
     }
+
+    @Click(R.id.ivHelp)
+    void helpButtonClicked() {
+        HelpActivity_.intent(mContext).start();
+    }
+
 }

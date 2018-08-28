@@ -1,59 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/tools"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp">
+        android:layout_height="match_parent"
+        android:overScrollMode="never">
 
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="PICK A PURPOSE"
-            android:textSize="18sp"
-            android:textColor="@color/colorTextPrimary"
-            fontPath="@string/font_oswaldo_light"
-            tools:ignore="MissingPrefix" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rvPurpose"
+        <LinearLayout
+            android:id="@+id/linRoot"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:overScrollMode="never"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorHeaderBackground"
+                android:paddingBottom="15dp"
+                android:paddingTop="15dp"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/tvTitle"
+                    fontPath="@string/font_oswaldo_regular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18sp"
+                    android:text="Get a Permission Code™ to:"
+                    android:textColor="@color/colorTextPrimary"
+                    android:textSize="18sp"
+                    tools:ignore="MissingPrefix" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rvPurpose"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:overScrollMode="never" />
 
 
-        <android.support.v7.widget.AppCompatTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginTop="8dp"
-            android:text="Click to change the setting or swipe left or right to set as default"
-            android:textAlignment="center"
-            android:layout_gravity="center"
-            android:textSize="13sp"
-            android:textColor="@color/colorTextPrimary"
-            fontPath="@string/font_oswaldo_light"
-            tools:ignore="MissingPrefix" />
+                <android.support.v7.widget.AppCompatTextView
+                    fontPath="@string/font_oswaldo_light"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:text="Click to change the setting or swipe left or right to set as default"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorTextPrimary"
+                    android:textSize="13sp"
+                    android:visibility="gone"
+                    tools:ignore="MissingPrefix" />
 
-    </LinearLayout>
-
+            </LinearLayout>
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
 </LinearLayout>

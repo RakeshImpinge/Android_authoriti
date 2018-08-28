@@ -11,6 +11,7 @@ import net.authoriti.authoritiapp.R;
 import net.authoriti.authoritiapp.api.AuthoritiAPI;
 import net.authoriti.authoritiapp.api.model.response.ResponseInviteCode;
 import net.authoriti.authoritiapp.core.BaseActivity;
+import net.authoriti.authoritiapp.ui.help.HelpActivity_;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
 import net.authoriti.authoritiapp.utils.AuthoritiUtils;
 import net.authoriti.authoritiapp.utils.ViewUtils;
@@ -117,6 +118,13 @@ public class InviteCodeActivity extends BaseActivity {
             checkInviteCode(false);
         }
     }
+
+
+    @Click(R.id.ivHelp)
+    void helpButtonClicked() {
+        HelpActivity_.intent(mContext).start();
+    }
+
 
     private void checkInviteCode(final boolean isNextClick) {
         if (isNextClick) {
