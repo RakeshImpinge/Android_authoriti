@@ -1,11 +1,16 @@
 package net.authoriti.authoritiapp.ui.auth;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.widget.NestedScrollView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+
+import com.stringcare.library.SC;
 
 import net.authoriti.authoritiapp.R;
 import net.authoriti.authoritiapp.api.AuthoritiAPI;
@@ -14,6 +19,7 @@ import net.authoriti.authoritiapp.core.BaseActivity;
 import net.authoriti.authoritiapp.ui.help.HelpActivity_;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
 import net.authoriti.authoritiapp.utils.AuthoritiUtils;
+import net.authoriti.authoritiapp.utils.Constants;
 import net.authoriti.authoritiapp.utils.ViewUtils;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
@@ -122,9 +128,10 @@ public class InviteCodeActivity extends BaseActivity {
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
-        HelpActivity_.intent(mContext).start();
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(SC.decryptString
+                (Constants.HELP_BASE) + TOPIC_INVITE));
+        startActivity(browserIntent);
     }
-
 
     private void checkInviteCode(final boolean isNextClick) {
         if (isNextClick) {

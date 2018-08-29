@@ -26,6 +26,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by mac on 12/1/17.
@@ -45,7 +46,6 @@ public class AuthoritiData {
     public List<AccountID> accountIDs;
     public boolean defaultAccountSelected;
     public int defaultAccountIndex;
-
 
     private int selectedAccountIndex;
     private int selectedIndustryIndex;
@@ -105,7 +105,7 @@ public class AuthoritiData {
         return gson.fromJson(pref.userJson().get(), User.class);
     }
 
-    public void setScheme(Scheme scheme) {
+    public void setScheme(Map<String, List<Picker>> scheme) {
         if (scheme != null) {
             Gson gson = new Gson();
             pref.edit().schemeJson().put(gson.toJson(scheme)).apply();
@@ -114,10 +114,28 @@ public class AuthoritiData {
         }
     }
 
-    public Scheme getScheme() {
+    public Map<String, List<Picker>> getScheme() {
         Gson gson = new Gson();
-        return gson.fromJson(pref.schemeJson().get(), Scheme.class);
+        String storedHashMapString = pref.schemeJson().get();
+        java.lang.reflect.Type type = new TypeToken<HashMap<String, List<Picker>>>() {
+        }.getType();
+        return gson.fromJson(storedHashMapString, type);
     }
+
+//    public void setScheme(Scheme scheme) {
+//        if (scheme != null) {
+//            Gson gson = new Gson();
+//            pref.edit().schemeJson().put(gson.toJson(scheme)).apply();
+//        } else {
+//            pref.edit().schemeJson().remove().apply();
+//        }
+//    }
+//
+//    public Scheme getScheme() {
+//        Gson gson = new Gson();
+//        return gson.fromJson(pref.schemeJson().get(), Scheme.class);
+//    }
+
 
     public void setDataType(JsonObject dataType) {
         if (dataType != null) {
@@ -222,20 +240,14 @@ public class AuthoritiData {
     }
 
     public void saveDefaultValuesForDataType(Context context, int index, List<Value> values) {
-
         List<String> keys = getDataTypeKeys();
         if (keys != null && keys.size() > index) {
-
             String key = keys.get(index);
-
             Gson gson = new Gson();
             String jsonValues = gson.toJson(values);
-
-
             SharedPreferences preferences = context.getSharedPreferences("Authoriti", Context
                     .MODE_PRIVATE);
             preferences.edit().putString(key, jsonValues).apply();
-
         }
     }
 

@@ -1,5 +1,7 @@
 package net.authoriti.authoritiapp.ui.auth;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.Space;
@@ -14,8 +16,10 @@ import net.authoriti.authoritiapp.core.BaseActivity;
 import net.authoriti.authoritiapp.ui.help.HelpActivity_;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
 import net.authoriti.authoritiapp.utils.AuthoritiUtils;
+import net.authoriti.authoritiapp.utils.Constants;
 import net.authoriti.authoritiapp.utils.ViewUtils;
 
+import com.stringcare.library.SC;
 import com.tozny.crypto.android.AesCbcWithIntegrity;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
@@ -225,7 +229,9 @@ public class ResetPasswordActivity extends BaseActivity {
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
-        HelpActivity_.intent(mContext).start();
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(SC.decryptString
+                (Constants.HELP_BASE) + TOPIC_RESET_PASSWORD));
+        startActivity(browserIntent);
     }
 
 }

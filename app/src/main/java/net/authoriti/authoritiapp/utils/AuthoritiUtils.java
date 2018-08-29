@@ -22,7 +22,7 @@ import java.util.List;
  */
 
 @EBean(scope = EBean.Scope.Singleton)
-public class AuthoritiUtils implements Constants{
+public class AuthoritiUtils implements Constants {
 
     public Spanned fromHtml(String source) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -32,11 +32,11 @@ public class AuthoritiUtils implements Constants{
         }
     }
 
-    public int getPickerSelectedIndex(Context context, String identifier){
+    public int getPickerSelectedIndex(Context context, String identifier) {
 
         int index = 0;
 
-        switch (identifier){
+        switch (identifier) {
             case PICKER_ACCOUNT:
                 index = AuthoritiData_.getInstance_(context).getSelectedAccountIndex();
                 break;
@@ -66,11 +66,11 @@ public class AuthoritiUtils implements Constants{
         return index;
     }
 
-    public int getPickerDefaultIndex(Context context, String identifier){
+    public int getPickerDefaultIndex(Context context, String identifier) {
 
         int index = 0;
 
-        switch (identifier){
+        switch (identifier) {
             case PICKER_ACCOUNT:
                 index = AuthoritiData_.getInstance_(context).getAccountPicker().getDefaultIndex();
                 break;
@@ -81,7 +81,8 @@ public class AuthoritiUtils implements Constants{
                 index = AuthoritiData_.getInstance_(context).getLocationPicker().getDefaultIndex();
                 break;
             case PICKER_TIME:
-                index = AuthoritiData_.getInstance_(context).getTimePicker().getDefaultIndex();;
+                index = AuthoritiData_.getInstance_(context).getTimePicker().getDefaultIndex();
+                ;
                 break;
             case PICKER_GEO:
                 index = AuthoritiData_.getInstance_(context).getGeoPicker().getDefaultIndex();
@@ -100,11 +101,11 @@ public class AuthoritiUtils implements Constants{
         return index;
     }
 
-    public Picker getPicker(Context context, String identifier){
+    public Picker getPicker(Context context, String identifier) {
 
         Picker picker = null;
 
-        switch (identifier){
+        switch (identifier) {
             case PICKER_ACCOUNT:
                 picker = AuthoritiData_.getInstance_(context).getAccountPicker();
                 break;
@@ -134,11 +135,9 @@ public class AuthoritiUtils implements Constants{
         return picker;
     }
 
-    public void setSelectedPickerIndex(Context context, String identifier, int index){
-
+    public void setSelectedPickerIndex(Context context, String identifier, int index) {
         AuthoritiData dataManager = AuthoritiData_.getInstance_(context);
-
-        switch (identifier){
+        switch (identifier) {
             case PICKER_ACCOUNT:
                 dataManager.setSelectedAccountIndex(index);
                 break;
@@ -161,22 +160,28 @@ public class AuthoritiUtils implements Constants{
                 dataManager.setSelectedDataTypeIndex(index);
                 break;
             default:
-
                 break;
         }
 
     }
 
-    public void initSelectedIndex(Context context){
+    public void initSelectedIndex(Context context) {
         AuthoritiData dataManager = AuthoritiData_.getInstance_(context);
 
-        dataManager.setSelectedAccountIndex(getPickerDefaultIndex(context, PICKER_ACCOUNT) < 0 ? 0 : getPickerDefaultIndex(context, PICKER_ACCOUNT));
-        dataManager.setSelectedIndustryIndex(getPickerDefaultIndex(context, PICKER_INDUSTRY) < 0 ? 0 : getPickerDefaultIndex(context, PICKER_INDUSTRY));
-        dataManager.setSelectedCountryIndex(getPickerDefaultIndex(context, PICKER_LOCATION_STATE) < 0 ? 0 : getPickerDefaultIndex(context, PICKER_LOCATION_STATE));
-        dataManager.setSelectedTimeIndex(getPickerDefaultIndex(context, PICKER_TIME) < 0 ? 0 : getPickerDefaultIndex(context, PICKER_TIME));
-        dataManager.setSelectedGeoIndex(getPickerDefaultIndex(context, PICKER_GEO) < 0 ? 0 : getPickerDefaultIndex(context, PICKER_GEO));
-        dataManager.setSelectedRequestIndex(getPickerDefaultIndex(context, PICKER_REQUEST) < 0 ? 0 : getPickerDefaultIndex(context, PICKER_REQUEST));
-        dataManager.setSelectedDataTypeIndex(getPickerDefaultIndex(context, PICKER_DATA_TYPE) < 0 ? 0 : getPickerDefaultIndex(context, PICKER_DATA_TYPE));
+        dataManager.setSelectedAccountIndex(getPickerDefaultIndex(context, PICKER_ACCOUNT) < 0 ?
+                0 : getPickerDefaultIndex(context, PICKER_ACCOUNT));
+        dataManager.setSelectedIndustryIndex(getPickerDefaultIndex(context, PICKER_INDUSTRY) < 0
+                ? 0 : getPickerDefaultIndex(context, PICKER_INDUSTRY));
+        dataManager.setSelectedCountryIndex(getPickerDefaultIndex(context, PICKER_LOCATION_STATE)
+                < 0 ? 0 : getPickerDefaultIndex(context, PICKER_LOCATION_STATE));
+        dataManager.setSelectedTimeIndex(getPickerDefaultIndex(context, PICKER_TIME) < 0 ? 0 :
+                getPickerDefaultIndex(context, PICKER_TIME));
+        dataManager.setSelectedGeoIndex(getPickerDefaultIndex(context, PICKER_GEO) < 0 ? 0 :
+                getPickerDefaultIndex(context, PICKER_GEO));
+        dataManager.setSelectedRequestIndex(getPickerDefaultIndex(context, PICKER_REQUEST) < 0 ?
+                0 : getPickerDefaultIndex(context, PICKER_REQUEST));
+        dataManager.setSelectedDataTypeIndex(getPickerDefaultIndex(context, PICKER_DATA_TYPE) < 0
+                ? 0 : getPickerDefaultIndex(context, PICKER_DATA_TYPE));
 
         setIndexSelected(context, PICKER_ACCOUNT, false);
         setIndexSelected(context, PICKER_INDUSTRY, false);
@@ -190,12 +195,12 @@ public class AuthoritiUtils implements Constants{
 
     }
 
-    public void setDefaultPickerItemIndex(Context context, String identifier, int index){
+    public void setDefaultPickerItemIndex(Context context, String identifier, int index) {
 
         AuthoritiData dataManager = AuthoritiData_.getInstance_(context);
         Picker picker = null;
 
-        switch (identifier){
+        switch (identifier) {
             case PICKER_ACCOUNT:
                 picker = dataManager.getAccountPicker();
                 picker.setEnableDefault(true);
@@ -244,11 +249,11 @@ public class AuthoritiUtils implements Constants{
 
     }
 
-    public void setIndexSelected(Context context, String identifier, boolean selected){
+    public void setIndexSelected(Context context, String identifier, boolean selected) {
 
         AuthoritiData dataManager = AuthoritiData_.getInstance_(context);
 
-        switch (identifier){
+        switch (identifier) {
             case PICKER_ACCOUNT:
                 dataManager.setAccountIndexSelected(selected);
                 break;
@@ -276,12 +281,12 @@ public class AuthoritiUtils implements Constants{
 
     }
 
-    public boolean presentSelectedIndex(Context context, String identifier){
+    public boolean presentSelectedIndex(Context context, String identifier) {
 
         boolean selected;
         AuthoritiData dataManager = AuthoritiData_.getInstance_(context);
 
-        switch (identifier){
+        switch (identifier) {
             case PICKER_ACCOUNT:
                 selected = dataManager.isAccountIndexSelected();
                 break;
@@ -312,7 +317,7 @@ public class AuthoritiUtils implements Constants{
 
     }
 
-    public Picker getDefaultTimePicker(Picker picker){
+    public Picker getDefaultTimePicker(Picker picker) {
 
         Picker timePicker = new Picker();
 
@@ -335,7 +340,7 @@ public class AuthoritiUtils implements Constants{
         return timePicker;
     }
 
-    public void addValueToAccountPicker(Context context, Value value){
+    public void addValueToAccountPicker(Context context, Value value) {
 
         Picker picker = AuthoritiData_.getInstance_(context).getAccountPicker();
         picker.getValues().add(value);
@@ -343,25 +348,26 @@ public class AuthoritiUtils implements Constants{
         AuthoritiData_.getInstance_(context).setAccountPicker(picker);
     }
 
-    public SpannableString getSpannableStringForEditTextError(String error, Context context){
-        Typeface typeface = Typeface.createFromAsset(context.getAssets(), "fonts/Oswald_Regular.ttf");
+    public SpannableString getSpannableStringForEditTextError(String error, Context context) {
+        Typeface typeface = Typeface.createFromAsset(context.getAssets(), "fonts/Oswald_Regular" +
+                ".ttf");
         TypefaceSpan typefaceSpan = new CustomTypefaceSpan("", typeface);
         SpannableString spannableString = new SpannableString(error);
         spannableString.setSpan(typefaceSpan, 0, error.length(), 0);
         return spannableString;
     }
 
-    public String getDateTime(long minutes){
+    public String getDateTime(long minutes) {
 
         String dateTime = "";
 
         int day = (int) (minutes / (24 * 60));
-        int hour = (int) (minutes % (24 * 60)/ 60);
+        int hour = (int) (minutes % (24 * 60) / 60);
         int min = (int) (minutes % (24 * 60) % 60);
 
-        if (day > 0){
+        if (day > 0) {
 
-            if (day == 1){
+            if (day == 1) {
 
                 dateTime = day + " Day ";
 
@@ -371,9 +377,9 @@ public class AuthoritiUtils implements Constants{
             }
         }
 
-        if (hour > 0){
+        if (hour > 0) {
 
-            if (hour == 1){
+            if (hour == 1) {
 
                 dateTime = dateTime + hour + " Hour ";
 
@@ -384,9 +390,9 @@ public class AuthoritiUtils implements Constants{
             }
         }
 
-        if (min > 0){
+        if (min > 0) {
 
-            if (min == 1){
+            if (min == 1) {
 
                 dateTime = dateTime + min + " Minute";
 

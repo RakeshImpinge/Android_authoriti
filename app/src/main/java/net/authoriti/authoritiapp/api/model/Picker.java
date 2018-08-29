@@ -18,6 +18,10 @@ public class Picker {
     private String picker;
 
     @Expose
+    @SerializedName("ui")
+    private Boolean ui;
+
+    @Expose
     @SerializedName("bytes")
     private int bytes;
 
@@ -36,11 +40,11 @@ public class Picker {
     private boolean enableDefault = false;
     private int defaultIndex = -1;
 
-    public Picker(){
+    public Picker() {
 
     }
 
-    public Picker(String picker, int bytes, List<Value> values, String title, String label){
+    public Picker(String picker, int bytes, List<Value> values, String title, String label) {
 
         this.picker = picker;
         this.bytes = bytes;
@@ -108,4 +112,14 @@ public class Picker {
         this.label = label;
     }
 
+    public Boolean getUi() {
+        if (ui == null) {
+            ui = true;
+        }
+        return ui;
+    }
+
+    public void setUi(Boolean ui) {
+        this.ui = ui;
+    }
 }

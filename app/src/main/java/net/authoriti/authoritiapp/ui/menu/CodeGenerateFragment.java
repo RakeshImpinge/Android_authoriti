@@ -67,23 +67,16 @@ public class CodeGenerateFragment extends BaseFragment {
     }
 
     private void loadScheme() {
-
         displayProgressDialog("Loading...");
-
         AuthoritiAPI.APIService().getSchemeGroup().enqueue(new Callback<SchemaGroup>() {
             @Override
             public void onResponse(Call<SchemaGroup> call, Response<SchemaGroup> response) {
-
                 dismissProgressDialog();
-
                 if (response.code() == 200 && response.body() != null) {
-
-                    dataManager.setScheme(response.body().getScheme());
+                    dataManager.setScheme(response.body().getSchema());
                     updatePickers();
-
                 }
             }
-
             @Override
             public void onFailure(Call<SchemaGroup> call, Throwable t) {
 
@@ -94,80 +87,80 @@ public class CodeGenerateFragment extends BaseFragment {
 
     private void updatePickers() {
 
-        if (dataManager.getScheme() != null && dataManager.getScheme().getPickers() != null) {
-
-            Order order = new Order();
-            List<String> pickers = new ArrayList<>();
-
-            for (Picker picker : dataManager.getScheme().getPickers()) {
-
-                pickers.add(picker.getPicker());
-
-                switch (picker.getPicker()) {
-
-                    case PICKER_ACCOUNT:
-
-                        if (dataManager.getUser() != null && dataManager.getUser().getAccountIDs
-                                () != null && dataManager.getUser().getAccountIDs().size() > 0) {
-
-                            Picker picker1 = new Picker(picker.getPicker(), picker.getBytes(),
-                                    picker.getValues(), picker.getTitle(), picker.getLabel());
-
-                            List<Value> values = new ArrayList<>();
-                            for (AccountID accountID : dataManager.getUser().getAccountIDs()) {
-
-                                Value value = new Value(accountID.getIdentifier(), accountID
-                                        .getType());
-                                values.add(value);
-
-                            }
-                            picker1.setValues(values);
-
-                            if (dataManager.defaultAccountSelected) {
-
-                                picker1.setEnableDefault(true);
-                                picker1.setDefaultIndex(dataManager.defaultAccountIndex);
-
-                                dataManager.defaultAccountSelected = false;
-
-                            }
-
-                            dataManager.setAccountPicker(picker1);
-
-
-                        } else {
-
-                            dataManager.setAccountPicker(picker);
-
-                        }
-
-                        break;
-
-                    case PICKER_INDUSTRY:
-                        dataManager.setIndustryPicker(picker);
-                        break;
-
-                    case PICKER_LOCATION_STATE:
-                        dataManager.setLocationPicker(picker);
-                        break;
-
-                    case PICKER_LOCATION_COUNTRY:
-                        dataManager.setCountryPicker(picker);
-                        break;
-
-                    case PICKER_TIME:
-                        dataManager.setTimePicker(AuthoritiUtils_.getInstance_(mContext)
-                                .getDefaultTimePicker(picker));
-                        break;
-
-                }
-            }
-
-            order.setPickers(pickers);
-            dataManager.setPickerOrder(order);
-
-            showPickers();
-        }
+//        if (dataManager.getScheme() != null && dataManager.getScheme().getPickers() != null) {
+//
+//            Order order = new Order();
+//            List<String> pickers = new ArrayList<>();
+//
+//            for (Picker picker : dataManager.getScheme().getPickers()) {
+//
+//                pickers.add(picker.getPicker());
+//
+//                switch (picker.getPicker()) {
+//
+//                    case PICKER_ACCOUNT:
+//
+//                        if (dataManager.getUser() != null && dataManager.getUser().getAccountIDs
+//                                () != null && dataManager.getUser().getAccountIDs().size() > 0) {
+//
+//                            Picker picker1 = new Picker(picker.getPicker(), picker.getBytes(),
+//                                    picker.getValues(), picker.getTitle(), picker.getLabel());
+//
+//                            List<Value> values = new ArrayList<>();
+//                            for (AccountID accountID : dataManager.getUser().getAccountIDs()) {
+//
+//                                Value value = new Value(accountID.getIdentifier(), accountID
+//                                        .getType());
+//                                values.add(value);
+//
+//                            }
+//                            picker1.setValues(values);
+//
+//                            if (dataManager.defaultAccountSelected) {
+//
+//                                picker1.setEnableDefault(true);
+//                                picker1.setDefaultIndex(dataManager.defaultAccountIndex);
+//
+//                                dataManager.defaultAccountSelected = false;
+//
+//                            }
+//
+//                            dataManager.setAccountPicker(picker1);
+//
+//
+//                        } else {
+//
+//                            dataManager.setAccountPicker(picker);
+//
+//                        }
+//
+//                        break;
+//
+//                    case PICKER_INDUSTRY:
+//                        dataManager.setIndustryPicker(picker);
+//                        break;
+//
+//                    case PICKER_LOCATION_STATE:
+//                        dataManager.setLocationPicker(picker);
+//                        break;
+//
+//                    case PICKER_LOCATION_COUNTRY:
+//                        dataManager.setCountryPicker(picker);
+//                        break;
+//
+//                    case PICKER_TIME:
+//                        dataManager.setTimePicker(AuthoritiUtils_.getInstance_(mContext)
+//                                .getDefaultTimePicker(picker));
+//                        break;
+//
+//                }
+//            }
+//
+//            order.setPickers(pickers);
+//            dataManager.setPickerOrder(order);
+//
+//            showPickers();
+//        }
     }
 
     private void showPickers() {
