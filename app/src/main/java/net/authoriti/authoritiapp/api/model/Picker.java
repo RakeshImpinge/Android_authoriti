@@ -3,6 +3,7 @@ package net.authoriti.authoritiapp.api.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
  * Created by mac on 12/1/17.
  */
 
-public class Picker {
+public class Picker implements Serializable {
 
     @Expose
     @SerializedName("picker")

@@ -77,9 +77,7 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
     }
 
     private void loadPurposes() {
-
         displayProgressDialog("Loading...");
-
         AuthoritiAPI.APIService().getPurposes().enqueue(new Callback<List<Purpose>>() {
             @Override
             public void onResponse(Call<List<Purpose>> call, Response<List<Purpose>> response) {
@@ -112,8 +110,6 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
 //                adapter.add(new GroupItem(dataManager.getPurposes().get(i), i, isDefault,
 // this));
 //            }
-
-
             groupItems.clear();
             for (int i = 0; i < dataManager.getPurposes().size(); i++) {
                 if (i != 0) {

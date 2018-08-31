@@ -18,6 +18,7 @@ import net.authoriti.authoritiapp.ui.alert.AccountConfirmDialog;
 import net.authoriti.authoritiapp.ui.items.AccountConfirmItem;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
 import net.authoriti.authoritiapp.utils.AuthoritiUtils;
+
 import com.google.gson.JsonObject;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.IAdapter;
@@ -42,7 +43,8 @@ import retrofit2.Response;
  */
 
 @EFragment(R.layout.fragment_account_chase)
-public class AccountChaseFragment extends BaseFragment implements AccountConfirmDialog.AccountConfirmDialogListener {
+public class AccountChaseFragment extends BaseFragment implements AccountConfirmDialog
+        .AccountConfirmDialogListener {
 
     @Bean
     AuthoritiUtils utils;
@@ -63,7 +65,7 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
     int selectedPosition;
 
     @AfterViews
-    void callAfterViewInjection(){
+    void callAfterViewInjection() {
 
         adapter = new FastItemAdapter<AccountConfirmItem>();
         rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
@@ -71,134 +73,123 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
 
         adapter.withOnClickListener(new FastAdapter.OnClickListener<AccountConfirmItem>() {
             @Override
-            public boolean onClick(View v, IAdapter<AccountConfirmItem> adapter, AccountConfirmItem item, int position) {
-
+            public boolean onClick(View v, IAdapter<AccountConfirmItem> adapter,
+                                   AccountConfirmItem item, int position) {
                 selectedAccountId = item.getAccountID();
                 selectedPosition = position;
-                if (selectedAccountId.isConfirmed()){
+                if (selectedAccountId.isConfirmed()) {
                     showAlert("", "This account has already confirmed.");
-
                 } else {
-
                     showAccountConfirmDialog();
                 }
-
                 return false;
             }
         });
         showAccounts();
     }
 
-    private void showAccounts(){
-
-        if (adapter != null){
+    private void showAccounts() {
+        if (adapter != null) {
             adapter.clear();
         } else {
             adapter = new FastItemAdapter<>();
         }
-
         User user = dataManager.getUser();
-        if (user.getAccountIDs() != null && user.getAccountIDs().size() > 0){
-            for (int i = 0 ; i < user.getAccountIDs().size() ; i ++){
-                adapter.add(new AccountConfirmItem(user.getAccountIDs().get(i),dataManager.getAccountPicker().isEnableDefault() && i == dataManager.getAccountPicker().getDefaultIndex()));
+        if (user.getAccountIDs() != null && user.getAccountIDs().size() > 0) {
+            for (int i = 0; i < user.getAccountIDs().size(); i++) {
+                adapter.add(new AccountConfirmItem(user.getAccountIDs().get(i), dataManager
+                        .getAccountPicker() != null && dataManager.getAccountPicker()
+                        .isEnableDefault() && i == dataManager.getAccountPicker().getDefaultIndex
+                        ()));
             }
         }
 
-        if (user.getUnconfirmedAccountIDs() != null && user.getUnconfirmedAccountIDs().size() > 0){
-            for (int i = 0 ; i < user.getUnconfirmedAccountIDs().size() ; i ++){
-                adapter.add(new AccountConfirmItem(user.getUnconfirmedAccountIDs().get(i),false));
+        if (user.getUnconfirmedAccountIDs() != null && user.getUnconfirmedAccountIDs().size() > 0) {
+            for (int i = 0; i < user.getUnconfirmedAccountIDs().size(); i++) {
+                adapter.add(new AccountConfirmItem(user.getUnconfirmedAccountIDs().get(i), false));
             }
         }
     }
 
-    private void saveAccountName(final String id, final boolean setDefault){
-
+    private void saveAccountName(final String id, final boolean setDefault) {
         String token = "Bearer " + dataManager.getUser().getToken();
         displayProgressDialog("");
-
-        AuthoritiAPI.APIService().confirmAccountValue(token, id).enqueue(new Callback<JsonObject>() {
-
+        AuthoritiAPI.APIService().confirmAccountValue(token, id).enqueue(new Callback<JsonObject>
+                () {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-
                 dismissProgressDialog();
-
-                if (response.code() == 200 && response.body() != null){
+                if (response.code() == 200 && response.body() != null) {
                     JsonObject jsonObject = response.body();
-                    if (jsonObject.get("status") != null){
-                        if (jsonObject.get("status").getAsString().equals("Success")){
-
+                    if (jsonObject.get("status") != null) {
+                        if (jsonObject.get("status").getAsString().equals("Success")) {
                             Snackbar.make(view, "Add Account Successfully", 1000).show();
-
                             updateAccount(id, setDefault);
-
                         } else {
-                            showAlert("","Failed to confirm your account number. Try again later.");
+                            showAlert("", "Failed to confirm your account number. Try again later" +
+                                    ".");
                         }
                     } else {
-                        showAlert("","Failed to confirm your account number. Try again later.");
+                        showAlert("", "Failed to confirm your account number. Try again later.");
                     }
                 } else {
-                    showAlert("","Failed to confirm your account number. Try again later.");
+                    showAlert("", "Failed to confirm your account number. Try again later.");
                 }
-
             }
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
 
                 dismissProgressDialog();
-                showAlert("","Failed to confirm your account number. Try again later.");
+                showAlert("", "Failed to confirm your account number. Try again later.");
 
             }
         });
     }
 
-    private void updateAccount(String id, boolean setDefault){
+    private void updateAccount(String id, boolean setDefault) {
 
         AccountID accountID = new AccountID(selectedAccountId.getType(), id);
         User user = dataManager.getUser();
         user.getAccountIDs().add(accountID);
 
-        for (int i = 0 ; i < user.getUnconfirmedAccountIDs().size() ; i ++){
+        for (int i = 0; i < user.getUnconfirmedAccountIDs().size(); i++) {
 
             AccountID accountID1 = user.getUnconfirmedAccountIDs().get(i);
-            if (accountID1.getType().equals(selectedAccountId.getType())){
+            if (accountID1.getType().equals(selectedAccountId.getType())) {
                 user.getUnconfirmedAccountIDs().remove(accountID1);
             }
 
         }
 
         dataManager.setUser(user);
-
-        Picker accountPicker = dataManager.getAccountPicker();
-        List<Value> values = accountPicker.getValues();
-        Value value = new Value(id, selectedAccountId.getType());
-        values.add(value);
-
-        if (setDefault){
-
-            accountPicker.setEnableDefault(true);
-            accountPicker.setDefaultIndex(values.size() - 1);
-
-        }
-
-        dataManager.setAccountPicker(accountPicker);
+//        Picker accountPicker = dataManager.getAccountPicker();
+//        List<Value> values = accountPicker.getValues();
+//        Value value = new Value(id, selectedAccountId.getType());
+//        values.add(value);
+//        if (setDefault) {
+//
+//            accountPicker.setEnableDefault(true);
+//            accountPicker.setDefaultIndex(values.size() - 1);
+//
+//        }
+//
+//        dataManager.setAccountPicker(accountPicker);
 
         showAccounts();
 
     }
 
     @Click(R.id.cvFinish)
-    void generateButtonClicked(){
+    void generateButtonClicked() {
         Intent intent = new Intent(BROADCAST_CHANGE_MENU);
         intent.putExtra(MENU_ID, MENU_CODE);
         LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
-    private void showAccountConfirmDialog(){
+    private void showAccountConfirmDialog() {
 
-        if (accountConfirmDialog == null){
+        if (accountConfirmDialog == null) {
 
             accountConfirmDialog = new AccountConfirmDialog(mActivity);
             accountConfirmDialog.setListener(this);
@@ -209,15 +200,15 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
 
         }
 
-        if (!mActivity.isFinishing() && !accountConfirmDialog.isShowing()){
+        if (!mActivity.isFinishing() && !accountConfirmDialog.isShowing()) {
 
             accountConfirmDialog.show();
         }
     }
 
-    private void hideAccountConfirmDialog(){
+    private void hideAccountConfirmDialog() {
 
-        if (accountConfirmDialog != null){
+        if (accountConfirmDialog != null) {
 
             accountConfirmDialog.dismiss();
             accountConfirmDialog = null;

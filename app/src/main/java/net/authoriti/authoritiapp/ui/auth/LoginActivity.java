@@ -151,18 +151,12 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
     }
 
     private void checkDefault() {
-
         if (dataManager.getUser() != null && dataManager.getAccountPicker() != null) {
-
             picker = dataManager.getAccountPicker();
-
             if (picker.isEnableDefault()) {
-
                 selectedPosition = picker.getDefaultIndex();
-
             }
         }
-
     }
 
     private void setSpinner() {
