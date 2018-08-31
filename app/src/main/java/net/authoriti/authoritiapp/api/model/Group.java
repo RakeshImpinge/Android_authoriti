@@ -33,7 +33,6 @@ public class Group {
         this.value = value;
     }
 
-
     public String getLabel() {
         return label;
     }

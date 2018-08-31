@@ -257,26 +257,18 @@ public class CodeGenerateActivity extends BaseActivity {
     }
 
     private String accountPayload(){
-
         return String.valueOf(purpose.getSchemaIndex());
     }
 
     private String industryPayload(){
-
         if (purpose.getPickerName() != null && purpose.getValue() != null){
-
             return purpose.getValue();
-
         } else {
-
             if (dataManager.getIndustryPicker() != null){
-
                 return getIndividualPayload(dataManager.getIndustryPicker());
-
             } else {
                 return "";
             }
-
         }
     }
 
@@ -395,7 +387,7 @@ public class CodeGenerateActivity extends BaseActivity {
         Log.e("HOUR", String.valueOf(newCalendar.get(Calendar.HOUR_OF_DAY)));
 
         newCalendar.setTimeZone(TimeZone.getTimeZone("UTC"));
-        
+
         Log.e("HOUR", String.valueOf(newCalendar.get(Calendar.HOUR_OF_DAY)));
 
         Crypto crypto = new Crypto();

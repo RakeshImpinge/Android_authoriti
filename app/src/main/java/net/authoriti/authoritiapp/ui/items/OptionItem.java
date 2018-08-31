@@ -69,39 +69,24 @@ public class OptionItem extends AbstractItem<OptionItem, OptionItem.ViewHolder> 
         AuthoritiUtils utils = AuthoritiUtils_.getInstance_(context);
 
         holder.tvOption.setText(value.getTitle());
-
         if (checked) {
-
             holder.ivCheck.setVisibility(View.VISIBLE);
-
         } else {
-
             holder.ivCheck.setVisibility(View.INVISIBLE);
-
         }
-
 
         if (value.isCustomDate() && checked) {
-
             holder.llDate.setVisibility(View.VISIBLE);
-
             if (!value.getValue().equals("")) {
-
                 long diff = Long.parseLong(value.getValue());
-
                 holder.tvDate.setText(utils.getDateTime(diff));
             }
-
         } else {
-
             holder.llDate.setVisibility(View.INVISIBLE);
-
         }
-
-
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView tvOption;
         ImageView ivCheck;

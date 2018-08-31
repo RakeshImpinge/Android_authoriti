@@ -21,6 +21,7 @@ import net.authoriti.authoritiapp.ui.alert.AccountAddDialog;
 import net.authoriti.authoritiapp.ui.items.AccountAddItem;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
 import net.authoriti.authoritiapp.utils.AuthoritiUtils;
+
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 
 import org.androidannotations.annotations.AfterViews;
@@ -42,7 +43,8 @@ import retrofit2.Response;
  */
 
 @EFragment(R.layout.fragment_account)
-public class AccountFragment extends BaseFragment implements AccountAddItem.AccountAddItemListener, AccountAddDialog.AccountAddDialogListener {
+public class AccountFragment extends BaseFragment implements AccountAddItem
+        .AccountAddItemListener, AccountAddDialog.AccountAddDialogListener {
 
 
     @Bean
@@ -59,18 +61,19 @@ public class AccountFragment extends BaseFragment implements AccountAddItem.Acco
     BroadcastReceiver broadcastReceiver;
 
     @AfterViews
-    void callAfterViewInjection(){
+    void callAfterViewInjection() {
 
         broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals(BROADCAST_ADD_BUTTON_CLICKED)){
+                if (intent.getAction().equals(BROADCAST_ADD_BUTTON_CLICKED)) {
                     showAccountAddDialog();
                 }
             }
         };
 
-        LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastReceiver, new IntentFilter(BROADCAST_ADD_BUTTON_CLICKED));
+        LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastReceiver, new
+                IntentFilter(BROADCAST_ADD_BUTTON_CLICKED));
 
         adapter = new FastItemAdapter<AccountAddItem>();
         rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
@@ -86,28 +89,26 @@ public class AccountFragment extends BaseFragment implements AccountAddItem.Acco
         LocalBroadcastManager.getInstance(mContext).unregisterReceiver(broadcastReceiver);
     }
 
-    private void showAccounts(){
-
-        if (dataManager.getUser().getAccountIDs() != null){
-
-            if (adapter != null){
+    private void showAccounts() {
+        if (dataManager.getUser().getAccountIDs() != null) {
+            if (adapter != null) {
                 adapter.clear();
             } else {
                 adapter = new FastItemAdapter<>();
             }
 
-            for (int i = 0 ; i < dataManager.getUser().getAccountIDs().size() ; i ++){
-
+            for (int i = 0; i < dataManager.getUser().getAccountIDs().size(); i++) {
                 AccountID accountID = dataManager.getUser().getAccountIDs().get(i);
-                adapter.add(new AccountAddItem(accountID, dataManager.getAccountPicker().isEnableDefault() && i == dataManager.getAccountPicker().getDefaultIndex(), this));
-
-
+                boolean isDefault = (dataManager.getAccountPicker() != null && dataManager
+                        .getAccountPicker().isEnableDefault() && i == dataManager
+                        .getAccountPicker().getDefaultIndex());
+                adapter.add(new AccountAddItem(accountID, isDefault, this));
             }
         }
 
     }
 
-    private void saveAccount(final String name, final String id, final boolean setDefault){
+    private void saveAccount(final String name, final String id, final boolean setDefault) {
 
         RequestUserUpdate request = new RequestUserUpdate();
         AccountID accountID = new AccountID(name, id);
@@ -116,16 +117,15 @@ public class AccountFragment extends BaseFragment implements AccountAddItem.Acco
         request.setAccountIDs(accountIDs);
 
         String token = "Bearer " + dataManager.getUser().getToken();
-
         displayProgressDialog("");
-
-        AuthoritiAPI.APIService().updateUser(token, request).enqueue(new Callback<ResponseSignUp>() {
+        AuthoritiAPI.APIService().updateUser(token, request).enqueue(new Callback<ResponseSignUp>
+                () {
             @Override
             public void onResponse(Call<ResponseSignUp> call, Response<ResponseSignUp> response) {
 
                 dismissProgressDialog();
 
-                if (response.code() == 200 && response.body() != null){
+                if (response.code() == 200 && response.body() != null) {
 
                     addAccount(name, id, setDefault);
 
@@ -149,32 +149,27 @@ public class AccountFragment extends BaseFragment implements AccountAddItem.Acco
 
     }
 
-    private void addAccount(String name, String id, boolean setDefault){
+    private void addAccount(String name, String id, boolean setDefault) {
 
         User user = dataManager.getUser();
         List<AccountID> accountIDs = user.getAccountIDs();
         accountIDs.add(new AccountID(name, id));
         dataManager.setUser(user);
 
-
-        Picker accountPicker = dataManager.getAccountPicker();
-        List<Value> values = accountPicker.getValues();
-        Value value = new Value(id, name);
-        values.add(value);
-
-        if (setDefault){
-
-            accountPicker.setEnableDefault(true);
-            accountPicker.setDefaultIndex(values.size() - 1);
-
-        }
-
-        dataManager.setAccountPicker(accountPicker);
+//        Picker accountPicker = dataManager.getAccountPicker();
+//        List<Value> values = accountPicker.getValues();
+//        Value value = new Value(id, name);
+//        values.add(value);
+//        if (setDefault) {
+//            accountPicker.setEnableDefault(true);
+//            accountPicker.setDefaultIndex(values.size() - 1);
+//        }
+//        dataManager.setAccountPicker(accountPicker);
 
         showAccounts();
     }
 
-    private void deleteAccount(int position){
+    private void deleteAccount(int position) {
 
         User user = dataManager.getUser();
         List<AccountID> accountIDs = user.getAccountIDs();
@@ -185,15 +180,16 @@ public class AccountFragment extends BaseFragment implements AccountAddItem.Acco
         List<Value> values = accountPicker.getValues();
         values.remove(position);
 
-        if (accountPicker.isEnableDefault()){
+        if (accountPicker.isEnableDefault()) {
 
-            if (accountPicker.getDefaultIndex() == position){
+            if (accountPicker.getDefaultIndex() == position) {
 
                 accountPicker.setEnableDefault(false);
 
             } else {
 
-                if (accountPicker.getDefaultIndex() != 0 && accountPicker.getDefaultIndex() == values.size()){
+                if (accountPicker.getDefaultIndex() != 0 && accountPicker.getDefaultIndex() ==
+                        values.size()) {
 
                     accountPicker.setDefaultIndex(accountPicker.getDefaultIndex() - 1);
                 }
@@ -209,9 +205,9 @@ public class AccountFragment extends BaseFragment implements AccountAddItem.Acco
     }
 
 
-    private void showAccountAddDialog(){
+    private void showAccountAddDialog() {
 
-        if (accountAddDialog == null){
+        if (accountAddDialog == null) {
 
             accountAddDialog = new AccountAddDialog(mActivity);
             accountAddDialog.setListener(this);
@@ -221,16 +217,16 @@ public class AccountFragment extends BaseFragment implements AccountAddItem.Acco
             accountAddDialog.init();
         }
 
-        if (!mActivity.isFinishing() && !accountAddDialog.isShowing()){
+        if (!mActivity.isFinishing() && !accountAddDialog.isShowing()) {
 
             accountAddDialog.show();
         }
 
     }
 
-    private void hideAccountAddDialog(){
+    private void hideAccountAddDialog() {
 
-        if (accountAddDialog != null){
+        if (accountAddDialog != null) {
 
             accountAddDialog.dismiss();
             accountAddDialog = null;
@@ -239,7 +235,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem.Acco
     }
 
     @Click(R.id.cvFinish)
-    void finishButtonClicked(){
+    void finishButtonClicked() {
 
         Intent intent = new Intent(BROADCAST_CHANGE_MENU);
         intent.putExtra(MENU_ID, MENU_CODE);
@@ -250,7 +246,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem.Acco
     @Override
     public void itemDelete(int position) {
 
-        if (dataManager.getUser().getAccountIDs().size() == 1){
+        if (dataManager.getUser().getAccountIDs().size() == 1) {
             showAlert("", "You have to at least 1 account ID.");
 
         } else {

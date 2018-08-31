@@ -5,12 +5,16 @@ import android.net.Uri;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
 import net.authoriti.authoritiapp.R;
+import net.authoriti.authoritiapp.api.model.AccountID;
+import net.authoriti.authoritiapp.api.model.DefaultValue;
 import net.authoriti.authoritiapp.api.model.Group;
 import net.authoriti.authoritiapp.api.model.Picker;
+import net.authoriti.authoritiapp.api.model.Value;
 import net.authoriti.authoritiapp.core.BaseActivity;
 import net.authoriti.authoritiapp.ui.items.CodeEditItem;
 import net.authoriti.authoritiapp.ui.items.CodeItem;
@@ -28,7 +32,10 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by movdev on 3/1/18.
@@ -62,6 +69,11 @@ public class CodePermissionActivity extends BaseActivity {
     @ViewById(R.id.etCode)
     EditText etCode;
 
+    HashMap<String, DefaultValue> defaultPickerMap = new HashMap<>();
+
+    public static int INTENT_REQUEST_PICK_VALUE = 1;
+
+
     @AfterViews
     void callAfterViewInjection() {
         adapter = new FastItemAdapter<CodeItem>();
@@ -71,6 +83,7 @@ public class CodePermissionActivity extends BaseActivity {
         rvEditFields.setLayoutManager(new LinearLayoutManager(mContext));
         rvEditFields.setAdapter(adapter_input);
         group = dataManager.getPurposes().get(purposeIndex).getGroups().get(purposeIndexItem);
+        defaultPickerMap = dataManager.getDefaultValues().get("" + group.getSchemaIndex());
 
         showSchema();
     }
@@ -79,12 +92,27 @@ public class CodePermissionActivity extends BaseActivity {
         adapter.clear();
         adapter_input.clear();
         List<Picker> pickersList = dataManager.getScheme().get("" + group.getSchemaIndex());
-        for (Picker picker : pickersList) {
+        for (int i = 0; i < pickersList.size(); i++) {
+            Picker picker = pickersList.get(i);
+            // Adding default values of Picker is of Time
+            if (picker.getPicker().equals(PICKER_TIME)) {
+                picker = utils.getDefaultTimePicker(picker);
+            }
+            // Adding default values of Picker is of Account Type
+            else if (picker.getPicker().equals(PICKER_ACCOUNT)) {
+                List<Value> values = new ArrayList<>();
+                for (AccountID accountID : dataManager.getUser().getAccountIDs()) {
+                    Value value = new Value(accountID.getIdentifier(), accountID
+                            .getType());
+                    values.add(value);
+                }
+                picker.setValues(values);
+            }
             if (picker.getUi()) {
                 if (picker.getPicker().equals(PICKER_DATA_INPUT_TYPE)) {
                     adapter_input.add(new CodeEditItem(picker));
                 } else {
-                    adapter.add(new CodeItem(picker));
+                    adapter.add(new CodeItem(picker, defaultPickerMap, group.getSchemaIndex()));
                 }
             }
         }
@@ -185,12 +213,27 @@ public class CodePermissionActivity extends BaseActivity {
         if (errorMessage.length() != 0) {
             showAlert("", errorMessage);
         } else {
-            CodeGenerateActivity_.intent(mContext).purposeIndex(purposeIndex).codeExtra("").start();
+            showAlert("", "In progress");
+//            CodeGenerateActivity_.intent(mContext).purposeIndex(purposeIndex).codeExtra("")
+// .start();
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        adapter.notifyAdapterDataSetChanged();
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            defaultPickerMap = (HashMap<String, DefaultValue>) data.getExtras().get
+                    ("selected_values");
+            showSchema();
+        }
     }
 }
+

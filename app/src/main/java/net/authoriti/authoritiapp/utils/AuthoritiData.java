@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 import net.authoriti.authoritiapp.api.model.AccountID;
 import net.authoriti.authoritiapp.api.model.AuthLogIn;
+import net.authoriti.authoritiapp.api.model.DefaultValue;
 import net.authoriti.authoritiapp.api.model.Order;
 import net.authoriti.authoritiapp.api.model.Picker;
 import net.authoriti.authoritiapp.api.model.Purpose;
@@ -122,19 +123,33 @@ public class AuthoritiData {
         return gson.fromJson(storedHashMapString, type);
     }
 
-//    public void setScheme(Scheme scheme) {
-//        if (scheme != null) {
-//            Gson gson = new Gson();
-//            pref.edit().schemeJson().put(gson.toJson(scheme)).apply();
-//        } else {
-//            pref.edit().schemeJson().remove().apply();
-//        }
-//    }
-//
-//    public Scheme getScheme() {
-//        Gson gson = new Gson();
-//        return gson.fromJson(pref.schemeJson().get(), Scheme.class);
-//    }
+    public void setDefaultValues(Map<String, HashMap<String, DefaultValue>> scheme) {
+        if (scheme != null) {
+            Gson gson = new Gson();
+            pref.edit().schemeDefaultJson().put(gson.toJson(scheme)).apply();
+        } else {
+            pref.edit().schemeDefaultJson().remove().apply();
+        }
+    }
+
+    public void updateDefaultValues(int schemaIndex, String picker, DefaultValue defaultValue) {
+        Map<String, HashMap<String, DefaultValue>> defaultValueListHashMap = getDefaultValues();
+        HashMap<String, DefaultValue> defaultValueHashMap = defaultValueListHashMap.get("" +
+                schemaIndex);
+        defaultValueHashMap.put(picker, defaultValue);
+        defaultValueListHashMap.put("" + schemaIndex, defaultValueHashMap);
+        setDefaultValues(defaultValueListHashMap);
+    }
+
+
+    public Map<String, HashMap<String, DefaultValue>> getDefaultValues() {
+        Gson gson = new Gson();
+        String storedHashMapString = pref.schemeDefaultJson().get();
+        java.lang.reflect.Type type = new TypeToken<HashMap<String, HashMap<String,
+                DefaultValue>>>() {
+        }.getType();
+        return gson.fromJson(storedHashMapString, type);
+    }
 
 
     public void setDataType(JsonObject dataType) {
@@ -167,31 +182,26 @@ public class AuthoritiData {
         return gson.fromJson(pref.dataTypeKeysJson().get(), type);
     }
 
-    public List<Value> getValuesFromDataType(int index) {
-
+    public List<Value> getValuesFromDataType(int schemaIndex) {
         List<Value> values = new ArrayList<>();
-
-        List<String> keys = getDataTypeKeys();
-        if (keys != null && keys.size() > index) {
-
-            String key = keys.get(index);
-
-            JsonObject jsonObject = getDataType();
-            if (jsonObject != null) {
-
-                if (jsonObject.get(key) != null) {
-
-                    JsonArray jsonArray = jsonObject.get(key).getAsJsonArray();
-                    Gson gson = new Gson();
-                    Type type = new TypeToken<List<Value>>() {
-                    }.getType();
-
-                    values = gson.fromJson(jsonArray, type);
-
-                }
+        JsonObject jsonObject = getDataType();
+        String key = "";
+        if (schemaIndex == 6) {
+            key = "x";
+        } else if (schemaIndex < 10) {
+            key = "0" + schemaIndex;
+        } else {
+            key = "" + schemaIndex;
+        }
+        if (jsonObject != null) {
+            if (jsonObject.get(key) != null) {
+                JsonArray jsonArray = jsonObject.get(key).getAsJsonArray();
+                Gson gson = new Gson();
+                Type type = new TypeToken<List<Value>>() {
+                }.getType();
+                values = gson.fromJson(jsonArray, type);
             }
         }
-
         return values;
     }
 
@@ -521,8 +531,6 @@ public class AuthoritiData {
         SharedPreferences preferences = context.getSharedPreferences("Authoriti", Context
                 .MODE_PRIVATE);
         preferences.edit().clear().apply();
-
-
     }
 
     public CryptoKeyPair getCryptoKeyPair(String password, String salt) {

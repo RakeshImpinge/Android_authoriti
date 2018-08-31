@@ -12,6 +12,7 @@ public interface AuthoritiPref {
     String loginJson();
     String userJson();
     String schemeJson();
+    String schemeDefaultJson();
     String accountPickerJson();
     String industryPickerJson();
     String locationPickerJson();

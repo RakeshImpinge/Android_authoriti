@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -20,6 +21,7 @@ import android.widget.ImageButton;
 import net.authoriti.authoritiapp.api.AuthoritiAPI;
 import net.authoriti.authoritiapp.api.model.AccountID;
 import net.authoriti.authoritiapp.api.model.AuthLogIn;
+import net.authoriti.authoritiapp.api.model.DefaultValue;
 import net.authoriti.authoritiapp.api.model.Order;
 import net.authoriti.authoritiapp.api.model.Picker;
 import net.authoriti.authoritiapp.api.model.Purpose;
@@ -52,7 +54,9 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -96,8 +100,6 @@ public class MainActivity extends BaseActivity {
 
             if (dataManager.getInactiveTime() != null && !dataManager.getInactiveTime().equals
                     ("")) {
-
-
                 long currentTime = System.currentTimeMillis() / 1000;
                 Log.e("Active TimeStamp", String.valueOf(currentTime));
 
@@ -331,29 +333,69 @@ public class MainActivity extends BaseActivity {
             public void onResponse(Call<SchemaGroup> call, Response<SchemaGroup> response) {
                 dismissProgressDialog();
                 if (response.code() == 200 && response.body() != null) {
-                    if (dataManager.getScheme() == null) {
-                        dataManager.setScheme(response.body().getSchema());
-                        firstUpdateSchema();
-                    } else {
-                        dataManager.setScheme(response.body().getSchema());
-                        updateSchema();
-                    }
                     if (response.body().getDataType() != null) {
                         dataManager.setDataType(response.body().getDataType());
                     }
                     if (response.body().getDataTypeKeys() != null) {
                         dataManager.setDataTypeKeys(response.body().getDataTypeKeys());
                     }
+                    if (dataManager.getScheme() == null) {
+                        dataManager.setScheme(response.body().getSchema());
+                        addDefaultvalues();
+                    } else {
+                        dataManager.setScheme(response.body().getSchema());
+                    }
+
                 }
             }
 
             @Override
             public void onFailure(Call<SchemaGroup> call, Throwable t) {
-
                 dismissProgressDialog();
             }
         });
     }
+
+    private void addDefaultvalues() {
+        try {
+            Map<String, List<Picker>> schemaHashList = dataManager.getScheme();
+            List<String> keyList = new ArrayList<String>(schemaHashList.keySet());
+
+            Map<String, HashMap<String, DefaultValue>> defaultSelectedList = new HashMap<>();
+            for (String key : keyList) {
+                List<Picker> pickers = schemaHashList.get(key);
+                HashMap<String, DefaultValue> defaultValuesHashMap = new HashMap();
+                for (Picker picker : pickers) {
+                    DefaultValue defValue;
+                    // Adding default values of Picker is of Time
+                    if (picker.getPicker().equals(PICKER_TIME)) {
+                        defValue = new DefaultValue(TIME_15_MINS, TIME_15_MINS, false);
+                    } else if (picker.getPicker().equals(PICKER_ACCOUNT)) {
+                        defValue = new DefaultValue(dataManager.getUser().getAccountIDs().get(0)
+                                .getType(), dataManager.getUser().getAccountIDs().get(0)
+                                .getIdentifier(), false);
+                    } else if (picker.getPicker().equals(PICKER_DATA_TYPE)) {
+                        List<Value> list = dataManager.getValuesFromDataType(Integer.valueOf(key));
+                        defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
+                                false);
+                    } else if (picker.getValues() != null && picker.getValues().size() > 0) {
+                        defValue = new DefaultValue(picker.getValues().get(0).getTitle(), picker
+                                .getValues()
+                                .get(0).getValue(), false);
+                    } else {
+                        defValue = new DefaultValue("", "", false);
+                    }
+                    defaultValuesHashMap.put(picker.getPicker(), defValue);
+                }
+                defaultSelectedList.put("" + key.trim(), defaultValuesHashMap);
+            }
+            Log.e("defaultSelectedList", defaultSelectedList.toString());
+            dataManager.setDefaultValues(defaultSelectedList);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private void firstUpdateSchema() {
 
@@ -687,5 +729,6 @@ public class MainActivity extends BaseActivity {
 //
 //        }
     }
+
 
 }

@@ -3,11 +3,13 @@ package net.authoriti.authoritiapp.api.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  * Created by mac on 12/1/17.
  */
 
-public class Value {
+public class Value implements Serializable{
 
     @Expose
     @SerializedName("value")

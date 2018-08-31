@@ -10,6 +10,8 @@ import android.widget.TextView;
 import net.authoriti.authoritiapp.R;
 import net.authoriti.authoritiapp.api.model.GroupItem;
 import net.authoriti.authoritiapp.ui.code.CodePermissionActivity_;
+import net.authoriti.authoritiapp.utils.AuthoritiData;
+import net.authoriti.authoritiapp.utils.AuthoritiData_;
 
 import java.util.List;
 
@@ -24,10 +26,12 @@ public class PurposeAdaper extends RecyclerView.Adapter {
 
     private List<GroupItem> mData;
     private Context mContext;
+    AuthoritiData dataManager;
 
     public PurposeAdaper(Context context, List<GroupItem> data) {
         this.mContext = context;
         this.mData = data;
+        dataManager = AuthoritiData_.getInstance_(context);
     }
 
     @Override
@@ -57,7 +61,10 @@ public class PurposeAdaper extends RecyclerView.Adapter {
             mHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    CodePermissionActivity_.intent(mContext).purposeIndex(item.getIndexGroup()).purposeIndexItem(item.getIndexItem()).start();
+                    if (dataManager.getScheme() != null && dataManager.getDefaultValues() != null) {
+                        CodePermissionActivity_.intent(mContext).purposeIndex(item.getIndexGroup())
+                                .purposeIndexItem(item.getIndexItem()).start();
+                    }
                 }
             });
         }

@@ -2,6 +2,7 @@ package net.authoriti.authoritiapp.ui.auth;
 
 import android.app.Activity;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -9,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -40,8 +42,10 @@ import net.authoriti.authoritiapp.api.model.request.RequestDLSave;
 import net.authoriti.authoritiapp.core.BaseActivity;
 import net.authoriti.authoritiapp.ui.help.HelpActivity_;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
+import net.authoriti.authoritiapp.utils.Constants;
 
 import com.google.gson.JsonObject;
+import com.stringcare.library.SC;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -688,7 +692,9 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
-        HelpActivity_.intent(mContext).start();
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(SC.decryptString
+                (Constants.HELP_BASE) + (Constants.TOPIC_DLV)));
+        startActivity(browserIntent);
     }
 
 
