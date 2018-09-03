@@ -182,10 +182,29 @@ public class PasscodePickActivity extends BaseActivity {
                         optionAdapter.notifyAdapterDataSetChanged();
 
                     } else {
-                        defaultValue.setTitle(picker.getValues().get(position).getTitle());
-                        defaultValue.setDefault(false);
-                        defaultValue.setValue(picker.getValues().get(position).getValue());
-                        defaultPickerMap.put(pickerType, defaultValue);
+                        if (pickerType.equals(PICKER_REQUEST) && defaultPickerMap.containsKey
+                                (PICKER_DATA_TYPE)) {
+
+                            defaultValue.setTitle(picker.getValues().get(position).getTitle());
+                            defaultValue.setDefault(false);
+                            defaultValue.setValue(picker.getValues().get(position).getValue());
+                            defaultPickerMap.put(pickerType, defaultValue);
+
+                            List<Value> values = dataManager.getValuesFromDataType(Integer
+                                    .valueOf(picker
+                                            .getValues().get(position).getValue()));
+
+                            DefaultValue defaultValueDataType = new DefaultValue(values.get(0)
+                                    .getTitle(), values.get(0).getValue(), false);
+                            defaultPickerMap.put(PICKER_DATA_TYPE, defaultValueDataType);
+
+                        } else {
+                            defaultValue.setTitle(picker.getValues().get(position).getTitle());
+                            defaultValue.setDefault(false);
+                            defaultValue.setValue(picker.getValues().get(position).getValue());
+                            defaultPickerMap.put(pickerType, defaultValue);
+                        }
+
                         Intent intent = new Intent();
                         intent.putExtra("selected_values", defaultPickerMap);
                         setResult(RESULT_OK, intent);
@@ -213,7 +232,13 @@ public class PasscodePickActivity extends BaseActivity {
             }
             picker.setValues(values);
         } else if (pickerType.equals(PICKER_DATA_TYPE)) {
-            List<Value> values = dataManager.getValuesFromDataType(schemaIndex);
+            List<Value> values;
+            if (defaultPickerMap.containsKey(PICKER_REQUEST)) {
+                values = dataManager.getValuesFromDataType(Integer.valueOf(defaultPickerMap.get
+                        (PICKER_REQUEST).getValue().toString()));
+            } else {
+                values = dataManager.getValuesFromDataType(schemaIndex);
+            }
             picker.setValues(values);
         }
     }
@@ -227,18 +252,13 @@ public class PasscodePickActivity extends BaseActivity {
                 DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-
                         newCalendar.set(year, month, dayOfMonth);
-
                         Date date = newCalendar.getTime();
                         Date now = new Date();
-
                         long diff = date.getTime() - now.getTime();
                         long minutes = TimeUnit.MILLISECONDS.toMinutes(diff);
-
                         Value value = item.getValue();
                         value.setCustomDate(true);
-
                         Log.e("Diff - ", String.valueOf(diff));
 
                         if (newCalendar.getTimeInMillis() > calendar.getTimeInMillis()) {
