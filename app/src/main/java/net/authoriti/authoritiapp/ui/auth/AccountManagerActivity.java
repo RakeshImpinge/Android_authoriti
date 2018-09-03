@@ -15,6 +15,7 @@ import net.authoriti.authoritiapp.api.AuthoritiAPI;
 import net.authoriti.authoritiapp.api.model.AccountID;
 import net.authoriti.authoritiapp.api.model.AuthLogIn;
 import net.authoriti.authoritiapp.api.model.User;
+import net.authoriti.authoritiapp.api.model.Value;
 import net.authoriti.authoritiapp.api.model.request.RequestSignUp;
 import net.authoriti.authoritiapp.api.model.response.ResponseSignUp;
 import net.authoriti.authoritiapp.core.SecurityActivity;
@@ -72,7 +73,6 @@ public class AccountManagerActivity extends SecurityActivity implements Security
 
     FastItemAdapter<AccountAddItem> adapter;
 
-    private boolean markDefault;
 
     private AccountAddDialog accountAddDialog;
 
@@ -99,29 +99,19 @@ public class AccountManagerActivity extends SecurityActivity implements Security
     }
 
     private void updateFinishButton() {
-
         if (dataManager.accountIDs != null && dataManager.accountIDs.size() > 0) {
-
             cvFinish.setEnabled(true);
             cvFinish.setAlpha(1.0f);
-
         } else {
-
             cvFinish.setEnabled(false);
             cvFinish.setAlpha(0.1f);
-
         }
     }
 
     private void saveAccount(String name, String id, boolean setDefault) {
-
         if (setDefault) {
-
-            markDefault = true;
-
             dataManager.defaultAccountSelected = true;
             dataManager.defaultAccountIndex = dataManager.accountIDs.size();
-
         }
 
         if (dataManager.accountIDs == null) {
@@ -147,7 +137,6 @@ public class AccountManagerActivity extends SecurityActivity implements Security
         }
 
         for (int i = 0; i < dataManager.accountIDs.size(); i++) {
-
             adapter.add(new AccountAddItem(dataManager.accountIDs.get(i), dataManager
                     .defaultAccountSelected && i == dataManager.defaultAccountIndex, this));
         }
@@ -211,12 +200,21 @@ public class AccountManagerActivity extends SecurityActivity implements Security
                 user.setEncryptPassword(AesCbcWithIntegrity.encrypt(dataManager.password, keys)
                         .toString());
 
+                if (dataManager.defaultAccountSelected) {
+                    dataManager.setDefaultAccountID(new Value(user.getAccountIDs().get
+                            (dataManager.defaultAccountIndex)
+                            .getIdentifier(), user.getAccountIDs().get
+                            (dataManager.defaultAccountIndex).getType()
+                    ));
+                }
+                Log.e("getDefaultAccountID", dataManager.getDefaultAccountID().getTitle());
+                Log.e("getDefaultAccountID", dataManager.getDefaultAccountID().getValue());
+
                 dataManager.setUser(user);
 
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
-
 
         } catch (GeneralSecurityException e) {
             e.printStackTrace();
@@ -298,23 +296,13 @@ public class AccountManagerActivity extends SecurityActivity implements Security
 
     @Override
     public void allowButtonClicked() {
-
         hideTouchIDEnabledAlert();
-
-
         if (fingerPrintNotRegistered) {
-
             Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
             startActivity(intent);
-
-
         } else {
-
             enableFingerPrintAndGoHome();
-
         }
-
-
     }
 
     @Override
@@ -378,8 +366,12 @@ public class AccountManagerActivity extends SecurityActivity implements Security
 
     @Override
     public void itemDelete(int position) {
-
         dataManager.accountIDs.remove(position);
+        if (dataManager.defaultAccountSelected &&
+                (dataManager.defaultAccountIndex) == position) {
+            dataManager.defaultAccountSelected = false;
+            dataManager.defaultAccountIndex = -1;
+        }
         showAccount();
         updateFinishButton();
     }

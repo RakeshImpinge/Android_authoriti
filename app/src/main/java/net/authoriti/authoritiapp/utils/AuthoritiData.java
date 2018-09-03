@@ -302,6 +302,24 @@ public class AuthoritiData {
         }
     }
 
+    public void setDefaultAccountID(Value value) {
+        if (value != null) {
+            Gson gson = new Gson();
+            pref.edit().defaultAccountID().put(gson.toJson(value)).apply();
+        } else {
+            pref.edit().defaultAccountID().remove().apply();
+        }
+    }
+
+    public Value getDefaultAccountID() {
+        Gson gson = new Gson();
+        Value value = gson.fromJson(pref.defaultAccountID().get(), Value.class);
+        if (value == null) {
+            value = new Value("", "");
+        }
+        return value;
+    }
+
     public Picker getIndustryPicker() {
         Gson gson = new Gson();
         return gson.fromJson(pref.industryPickerJson().get(), Picker.class);
