@@ -323,32 +323,18 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
 
     @CheckedChange(R.id.checkbox)
     void setDefault(boolean checked) {
-
         if (dataManager.getUser() != null && picker != null) {
-
-
             if (checked) {
-
                 picker.setEnableDefault(true);
                 picker.setDefaultIndex(selectedPosition);
-
                 dataManager.setAccountPicker(picker);
-
-
             } else {
-
                 if (selectedPosition == picker.getDefaultIndex()) {
-
                     picker.setEnableDefault(false);
-
                     dataManager.setAccountPicker(picker);
-
                 }
-
             }
-
         }
-
     }
 
     @Click(R.id.cvSet)
