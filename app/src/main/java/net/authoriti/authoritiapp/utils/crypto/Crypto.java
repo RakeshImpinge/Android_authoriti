@@ -13,6 +13,38 @@ import java.util.TimeZone;
  */
 
 public class Crypto {
+    public class PayloadGenerator {
+        private String accountId;
+
+        private PayloadGenerator(String accountId) {
+            this.accountId = accountId;
+        }
+
+        public void add(String picker, String value) {
+            //TODO: Placeholder code for now
+        }
+
+        public void addTime(int year, int month, int day, int hour, int minute) throws Exception {
+            //TODO: Placeholder code for now
+        }
+
+        public void addInput(String inputType, String value) {
+            //TODO: Placeholder code for now
+        }
+
+        public void addDataType(String requestor, String[] values) {
+            //TODO: Placeholder code for now
+        }
+
+        public String generate() {
+            //TODO: Placeholder code for now
+            return "0000000000";
+        }
+    }
+
+    public PayloadGenerator init(String accountId) {
+        return new PayloadGenerator(accountId);
+    }
 
     public CryptoKeyPair generateKeyPair(String password, String salt) {
         BigInteger[] keys = CryptoUtil.keys(29);
