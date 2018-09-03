@@ -20,10 +20,12 @@ import net.authoriti.authoritiapp.R;
 import net.authoriti.authoritiapp.api.model.AccountID;
 import net.authoriti.authoritiapp.api.model.AuthLogIn;
 import net.authoriti.authoritiapp.api.model.Picker;
+import net.authoriti.authoritiapp.api.model.Value;
 import net.authoriti.authoritiapp.core.SecurityActivity;
 import net.authoriti.authoritiapp.ui.items.SpinnerItem;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
 import net.authoriti.authoritiapp.utils.AuthoritiUtils;
+import net.authoriti.authoritiapp.utils.Constants;
 import net.authoriti.authoritiapp.utils.ViewUtils;
 
 import com.multidots.fingerprintauth.AuthErrorCodes;
@@ -94,11 +96,11 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
     private ListView lv;
     private boolean opened;
     private int selectedPosition = 0;
+    private int defaultPosition = -1;
     private int popupHeight, popupWidth;
 
     private boolean fingerPrintAuthEnabled = false;
 
-    Picker picker;
 
     @AfterViews
     void callAfterViewInjection() {
@@ -151,12 +153,19 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
     }
 
     private void checkDefault() {
-        if (dataManager.getUser() != null && dataManager.getAccountPicker() != null) {
-            picker = dataManager.getAccountPicker();
-            if (picker.isEnableDefault()) {
-                selectedPosition = picker.getDefaultIndex();
+        if (dataManager.getUser() != null && dataManager.getDefaultAccountID() != null) {
+            for (int i = 0; i < dataManager.getUser().getAccountIDs().size(); i++) {
+                if (isDefaultUser(dataManager.getUser().getAccountIDs().get(i), dataManager
+                        .getDefaultAccountID())) {
+                    defaultPosition = i;
+                }
             }
         }
+    }
+
+    private boolean isDefaultUser(AccountID accountID, Value defaultAccountID) {
+        return accountID.getIdentifier().equals(defaultAccountID.getValue())
+                && accountID.getType().equals(defaultAccountID.getTitle());
     }
 
     private void setSpinner() {
@@ -185,20 +194,12 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
     }
 
     private void setAccount() {
-
         if (list != null && list.size() > 0 && selectedPosition < list.size()) {
-
             etAccount.setText(list.get(selectedPosition).getType());
-
-            if (picker != null && picker.isEnableDefault() && picker.getDefaultIndex() ==
-                    selectedPosition) {
-
+            if (defaultPosition == selectedPosition) {
                 checkBox.setChecked(true);
-
             } else {
-
                 checkBox.setChecked(false);
-
             }
         }
     }
@@ -272,6 +273,13 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
 
                         if (password.equals(etPassword.getText().toString())) {
 
+                            // save account as default
+                            Value value = new Value(list.get(selectedPosition).getIdentifier(),
+                                    list.get(selectedPosition).getType());
+                            utils.updateDefaultvalues(getApplicationContext(), Constants
+                                    .PICKER_ACCOUNT, value, true);
+                            dataManager.setDefaultAccountID(value);
+
                             hideKeyboard();
                             updateLoginState();
                             goHome();
@@ -299,9 +307,7 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
     private void checkFingerPrintAuth() {
 
         if (!fingerPrintNotRegistered) {
-
             showTouchIdAlert();
-
         }
 
     }
@@ -323,18 +329,7 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
 
     @CheckedChange(R.id.checkbox)
     void setDefault(boolean checked) {
-        if (dataManager.getUser() != null && picker != null) {
-            if (checked) {
-                picker.setEnableDefault(true);
-                picker.setDefaultIndex(selectedPosition);
-                dataManager.setAccountPicker(picker);
-            } else {
-                if (selectedPosition == picker.getDefaultIndex()) {
-                    picker.setEnableDefault(false);
-                    dataManager.setAccountPicker(picker);
-                }
-            }
-        }
+
     }
 
     @Click(R.id.cvSet)
@@ -405,14 +400,10 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
         super.onAuthSuccess(cryptoObject);
 
         if (fingerPrintAuthEnabled) {
-
             dismissTouchIDAlert();
             updateLoginState();
             goHome();
-
         }
-
-
     }
 
     @Override

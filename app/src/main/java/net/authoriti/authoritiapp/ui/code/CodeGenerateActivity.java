@@ -58,6 +58,9 @@ public class CodeGenerateActivity extends BaseActivity {
     String schemaIndex = "";
 
     @Extra
+    int data_type_length = 0;
+
+    @Extra
     HashMap<String, DefaultValue> defaultPickerMap = new HashMap<>();
 
     @Bean
@@ -119,7 +122,7 @@ public class CodeGenerateActivity extends BaseActivity {
                 }
             } else if (key_root.equals(PICKER_DATA_TYPE)) {
                 String data[] = defaultValue.getValue().split("\\s*,\\s*");
-                payloadGenerator.addDataType(data.length, data);
+                payloadGenerator.addDataType(data_type_length, data);
             } else if (key_root.contains(PICKER_DATA_INPUT_TYPE + "_")) {
                 payloadGenerator.addInput(defaultValue.getTitle(), defaultValue.getValue());
             } else if (key_root.equals(PICKER_REQUEST)) {

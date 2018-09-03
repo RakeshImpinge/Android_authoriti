@@ -215,18 +215,31 @@ public class CodePermissionActivity extends BaseActivity {
                         .picker.getInput(),
                         etCode.getText().toString().trim(),
                         false);
+
                 // Adding input values with key input_(input type) so that hash map not override
-                // values
+                // values & adding default values from edit text
                 defaultPickerMap.put(PICKER_DATA_INPUT_TYPE + "_" + adapter_input.getAdapterItem
                                 (i).picker.getInput(),
                         defaultValue);
             }
         }
 
+        // data_type List length
+        int data_type_length = 0;
+        if (defaultPickerMap.containsKey(PICKER_REQUEST) && defaultPickerMap.containsKey
+                (PICKER_REQUEST)) {
+            data_type_length = dataManager.getValuesFromDataType(Integer.valueOf(defaultPickerMap
+                    .get(PICKER_REQUEST).getValue().toString())).size();
+        } else {
+            data_type_length = dataManager.getValuesFromDataType(Integer.valueOf(group
+                    .getSchemaIndex())).size();
+        }
+
         if (errorMessage.length() != 0) {
             showAlert("", errorMessage);
         } else {
             CodeGenerateActivity_.intent(mContext).schemaIndex("" + group.getSchemaIndex())
+                    .data_type_length(data_type_length)
                     .defaultPickerMap(defaultPickerMap).start();
         }
     }

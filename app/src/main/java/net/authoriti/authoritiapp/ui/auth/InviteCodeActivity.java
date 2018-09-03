@@ -107,8 +107,9 @@ public class InviteCodeActivity extends BaseActivity {
     @Click(R.id.cvNext)
     void nextButtonClicked() {
         if (TextUtils.isEmpty(etCode.getText())) {
-            tiCode.setError(utils.getSpannableStringForEditTextError("This field is required",
-                    this));
+//            tiCode.setError(utils.getSpannableStringForEditTextError("This field is required",
+//                    this));
+            StartupActivity_.intent(mContext).start();
         } else {
             hideKeyboard();
             checkInviteCode(true);

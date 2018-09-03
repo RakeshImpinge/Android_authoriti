@@ -129,28 +129,18 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                 () {
             @Override
             public void onResponse(Call<ResponseSignUp> call, Response<ResponseSignUp> response) {
-
                 dismissProgressDialog();
-
                 if (response.code() == 200 && response.body() != null) {
-
                     addAccount(name, id, setDefault);
-
                 } else {
-
                     showAlert("", "Account Save Failed.");
-
                 }
-
-
             }
 
             @Override
             public void onFailure(Call<ResponseSignUp> call, Throwable t) {
-
                 dismissProgressDialog();
                 showAlert("", "Account Save Failed.");
-
             }
         });
 
