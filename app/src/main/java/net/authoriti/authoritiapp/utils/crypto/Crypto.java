@@ -1,5 +1,10 @@
 package net.authoriti.authoritiapp.utils.crypto;
 
+import org.spongycastle.crypto.PBEParametersGenerator;
+import org.spongycastle.crypto.digests.SHA256Digest;
+import org.spongycastle.crypto.generators.PKCS5S2ParametersGenerator;
+import org.spongycastle.crypto.params.KeyParameter;
+
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
@@ -47,17 +52,31 @@ public class Crypto {
     }
 
     public CryptoKeyPair generateKeyPair(String password, String salt) {
-        BigInteger[] keys = CryptoUtil.keys(29);
-        BigInteger n = keys[0];
-        BigInteger e = keys[1];
-        BigInteger d = keys[2];
+        byte[] saltBytes;
 
-        String nInBase62 = CryptoUtil.intToBase62(n,0);
+        if (salt == null) {
+            saltBytes = CryptoUtil.generateRandomBytes(64);
+            salt = new String(saltBytes);
+        } else {
+            saltBytes = salt.getBytes();
+        }
 
-        String publicKey = nInBase62 + "-" + CryptoUtil.intToBase62(e, 0);
-        String privateKey = nInBase62 + "-" + CryptoUtil.intToBase62(d, 0);
 
-        return new CryptoKeyPair(privateKey, publicKey, "");
+        PKCS5S2ParametersGenerator generator = new PKCS5S2ParametersGenerator(new SHA256Digest());
+        generator.init(PBEParametersGenerator.PKCS5PasswordToUTF8Bytes(password.toCharArray()), saltBytes, 4096);
+        KeyParameter key = (KeyParameter)generator.generateDerivedMacParameters(256);
+
+        byte[] seedBytes = key.getKey();
+
+        BigInteger numPrivateKey = CryptoUtil.intFromBytes(seedBytes).mod(new BigInteger("62").pow(6));
+
+        String privateKey = CryptoUtil.intToBase62(numPrivateKey, -1);
+        String publicKey = new EcDSA().getPublicKey(numPrivateKey);
+
+        System.out.println("private-key: " + privateKey);
+        System.out.println("public-key: " + publicKey);
+
+        return new CryptoKeyPair(privateKey, publicKey, salt);
     }
 
     public String addAccountNumberToPayload(String payload, String accountId) {

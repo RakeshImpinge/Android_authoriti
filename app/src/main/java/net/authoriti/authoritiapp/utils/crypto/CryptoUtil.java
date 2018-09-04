@@ -1,13 +1,21 @@
 package net.authoriti.authoritiapp.utils.crypto;
 
+import org.spongycastle.crypto.PBEParametersGenerator;
+import org.spongycastle.crypto.digests.SHA256Digest;
+import org.spongycastle.crypto.generators.PKCS5S2ParametersGenerator;
+import org.spongycastle.crypto.params.KeyParameter;
+
 import java.math.BigInteger;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.Random;
 
 /**
  * Created by mac on 12/20/17.
  */
 
-class CryptoUtil {
+public class CryptoUtil {
     private static final String CHARACTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final BigInteger BASE = new BigInteger("62");
 
@@ -53,8 +61,10 @@ class CryptoUtil {
             num = num.divide(BASE);
         }
 
-        while (str.length() < length) {
-            str = str.append(CHARACTERS.charAt(0));
+        if (length != -1) {
+            while (str.length() < length) {
+                str = str.append(CHARACTERS.charAt(0));
+            }
         }
 
         return str.reverse().toString();
@@ -119,5 +129,25 @@ class CryptoUtil {
         }
 
         return num;
+    }
+
+    public static byte[] generateRandomBytes(int length) {
+        SecureRandom random = new SecureRandom();
+        byte[] bytes = new byte[length];
+
+        random.nextBytes(bytes);
+
+        return bytes;
+    }
+
+    public static BigInteger intFromBytes(byte[] bytes) {
+        BigInteger value = new BigInteger("0");
+
+        for (byte b: bytes) {
+            value = value.shiftLeft(8);
+            value = value.or(new BigInteger("" +  (b & 0xFF)));
+        }
+
+        return value;
     }
 }
