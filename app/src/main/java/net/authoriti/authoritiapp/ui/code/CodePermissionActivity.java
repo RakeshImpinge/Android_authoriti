@@ -110,6 +110,21 @@ public class CodePermissionActivity extends BaseActivity {
                 }
                 picker.setValues(values);
             }
+
+
+            // updateDefaultValuesFromGroup
+            if (group.getPickerName() != null && !group.getPickerName().equals("")) {
+                if (group.getPickerName().equals(picker.getPicker())) {
+                    int index = getIndexOfValue(picker.getValues(), group.getValue());
+                    if (index != -1) {
+                        DefaultValue defaultValue = new DefaultValue(picker.getValues().get(index)
+                                .getTitle(), picker.getValues().get(index).getValue(), false);
+                        defaultPickerMap.put(group.getPickerName(), defaultValue);
+                    }
+                }
+            }
+
+            // Adding Picker to UI
             if (picker.getUi()) {
                 if (picker.getPicker().equals(PICKER_DATA_INPUT_TYPE)) {
                     adapter_input.add(new CodeEditItem(picker));
@@ -185,6 +200,18 @@ public class CodePermissionActivity extends BaseActivity {
 //            }
 //        }
     }
+
+    public int getIndexOfValue(List<Value> values, String picker_def_value) {
+        int index = -1;
+        for (int k = 0; k < values.size(); k++) {
+            if (values.get(k).getValue().equals(picker_def_value)) {
+                index = k;
+                break;
+            }
+        }
+        return index;
+    }
+
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {

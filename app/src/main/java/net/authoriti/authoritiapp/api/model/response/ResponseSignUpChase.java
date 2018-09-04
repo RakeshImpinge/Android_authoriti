@@ -2,6 +2,9 @@ package net.authoriti.authoritiapp.api.model.response;
 
 import com.google.gson.annotations.SerializedName;
 
+import net.authoriti.authoritiapp.api.model.AccountID;
+import net.authoriti.authoritiapp.api.model.Value;
+
 import java.util.List;
 
 /**
@@ -20,7 +23,7 @@ public class ResponseSignUpChase {
     private String lastName;
 
     @SerializedName("accounts")
-    private List<String> accounts;
+    private List<AccountID> accounts;
 
 
     @SerializedName("accountName")
@@ -53,13 +56,6 @@ public class ResponseSignUpChase {
         this.lastName = lastName;
     }
 
-    public List<String> getAccounts() {
-        return accounts;
-    }
-
-    public void setAccounts(List<String> accounts) {
-        this.accounts = accounts;
-    }
 
     public String getAccountName() {
         return accountName;
@@ -75,5 +71,13 @@ public class ResponseSignUpChase {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public List<AccountID> getAccounts() {
+        return accounts;
+    }
+
+    public void setAccounts(List<AccountID> accounts) {
+        this.accounts = accounts;
     }
 }

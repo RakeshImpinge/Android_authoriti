@@ -107,7 +107,7 @@ public class CodeGenerateActivity extends BaseActivity {
         List<String> keyList = new ArrayList<String>(defaultPickerMap.keySet());
         for (String key_root : keyList) {
             DefaultValue defaultValue = defaultPickerMap.get(key_root);
-            if (key_root.equals(PICKER_ACCOUNT)) {
+            if (key_root.equals(PICKER_ACCOUNT) || defaultValue.getValue().equals("")) {
                 continue;
             } else if (key_root.equals(PICKER_TIME)) {
                 Calendar newCalendar = timeFormat(defaultValue.getValue());

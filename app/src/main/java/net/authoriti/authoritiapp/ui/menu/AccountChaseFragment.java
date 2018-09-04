@@ -77,11 +77,11 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
                                    AccountConfirmItem item, int position) {
                 selectedAccountId = item.getAccountID();
                 selectedPosition = position;
-                if (selectedAccountId.isConfirmed()) {
-                    showAlert("", "This account has already confirmed.");
-                } else {
-                    showAccountConfirmDialog();
-                }
+//                if (selectedAccountId.isConfirmed()) {
+//                    showAlert("", "This account has already confirmed.");
+//                } else {
+//                    showAccountConfirmDialog();
+//                }
                 return false;
             }
         });
@@ -97,10 +97,15 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
         User user = dataManager.getUser();
         if (user.getAccountIDs() != null && user.getAccountIDs().size() > 0) {
             for (int i = 0; i < user.getAccountIDs().size(); i++) {
-                adapter.add(new AccountConfirmItem(user.getAccountIDs().get(i), dataManager
-                        .getAccountPicker() != null && dataManager.getAccountPicker()
-                        .isEnableDefault() && i == dataManager.getAccountPicker().getDefaultIndex
-                        ()));
+                boolean isDefault = false;
+                if (dataManager.getDefaultAccountID().getTitle().equals(user.getAccountIDs().get
+                        (i).getType()) &&
+                        dataManager.getDefaultAccountID().getValue().equals(user.getAccountIDs()
+                                .get(i)
+                                .getIdentifier())) {
+                    isDefault = true;
+                }
+                adapter.add(new AccountConfirmItem(user.getAccountIDs().get(i), isDefault));
             }
         }
 

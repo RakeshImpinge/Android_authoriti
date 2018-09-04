@@ -129,20 +129,12 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
             @Override
             public void onResponse(Call<ResponseSignUpChase> call, Response<ResponseSignUpChase>
                     response) {
-
                 dismissProgressDialog();
-
                 if (response.code() == 200 && response.body() != null) {
-
                     fetchSignUpInfo(response.body());
-
-
                 } else {
-
                     showAlert("", "Sign Up Failed. Try Again Later.");
-
                 }
-
             }
 
             @Override
@@ -163,32 +155,25 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
         user.setPassword(etPassword.getText().toString());
         user.setInviteCode(dataManager.inviteCode);
 
+//        AccountID accountID = new AccountID(responseSignUpChase.getAccountName(), etIdentifier
+//                .getText().toString());
+//        List<AccountID> accountIDs = new ArrayList<>();
+//        accountIDs.add(accountID);
+        user.setAccountIDs(responseSignUpChase.getAccounts());
 
-        AccountID accountID = new AccountID(responseSignUpChase.getAccountName(), etIdentifier
-                .getText().toString());
-        List<AccountID> accountIDs = new ArrayList<>();
-        accountIDs.add(accountID);
-
-        user.setAccountIDs(accountIDs);
-
-        if (responseSignUpChase.getAccounts() != null && responseSignUpChase.getAccounts().size()
-                > 0) {
-
-            List<AccountID> accountIDs1 = new ArrayList<>();
-
-            for (int i = 0; i < responseSignUpChase.getAccounts().size(); i++) {
-
-                AccountID accountID1 = new AccountID();
-                accountID1.setConfirmed(false);
-                accountID1.setType(responseSignUpChase.getAccounts().get(i));
-                accountID1.setIdentifier("");
-
-                accountIDs1.add(accountID1);
-
-            }
-
-            user.setUnconfirmedAccountIDs(accountIDs1);
-        }
+//        if (responseSignUpChase.getAccounts() != null && responseSignUpChase.getAccounts().size()
+//                > 0) {
+//            List<AccountID> accountIDs1 = new ArrayList<>();
+//            for (int i = 0; i < responseSignUpChase.getAccounts().size(); i++) {
+//                AccountID accountID1 = new AccountID();
+//                accountID1.setConfirmed(false);
+//                accountID1.setType(responseSignUpChase.getAccounts().get(i).getType());
+//                accountID1.setIdentifier(responseSignUpChase.getAccounts().get(i).getIdentifier
+// ());
+//                accountIDs1.add(accountID1);
+//            }
+//            user.setUnconfirmedAccountIDs(accountIDs1);
+//        }
 
         try {
 
