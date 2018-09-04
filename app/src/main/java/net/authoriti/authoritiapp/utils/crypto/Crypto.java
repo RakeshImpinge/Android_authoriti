@@ -15,9 +15,11 @@ import java.util.TimeZone;
 public class Crypto {
     public class PayloadGenerator {
         private String accountId;
+        private String schema_version;
 
-        private PayloadGenerator(String accountId) {
+        public PayloadGenerator(String accountId, String schema_version) {
             this.accountId = accountId;
+            this.schema_version = schema_version;
         }
 
         public void add(String picker, String value) {
@@ -42,8 +44,8 @@ public class Crypto {
         }
     }
 
-    public PayloadGenerator init(String accountId) {
-        return new PayloadGenerator(accountId);
+    public PayloadGenerator init(String accountId, String schemaVersion) {
+        return new PayloadGenerator(accountId, schemaVersion);
     }
 
     public CryptoKeyPair generateKeyPair(String password, String salt) {

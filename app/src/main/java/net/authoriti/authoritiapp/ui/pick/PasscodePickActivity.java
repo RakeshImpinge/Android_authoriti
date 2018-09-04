@@ -55,7 +55,6 @@ import java.util.concurrent.TimeUnit;
 public class PasscodePickActivity extends BaseActivity {
 
     private FastItemAdapter<OptionItem> optionAdapter;
-    private int selectedIndex;
 
     @Bean
     AuthoritiUtils utils;
@@ -94,15 +93,6 @@ public class PasscodePickActivity extends BaseActivity {
 
         addValuesToPicker();
 
-        if (utils.presentSelectedIndex(this, picker.getPicker())) {
-            selectedIndex = utils.getPickerSelectedIndex(this, picker.getPicker());
-        } else {
-            if (picker.isEnableDefault() && picker.getDefaultIndex() != -1) {
-                selectedIndex = utils.getPickerDefaultIndex(this, picker.getPicker());
-            } else {
-                selectedIndex = utils.getPickerSelectedIndex(this, picker.getPicker());
-            }
-        }
 
         optionAdapter = new FastItemAdapter<OptionItem>();
         optionAdapter.withSelectable(true);
@@ -174,10 +164,10 @@ public class PasscodePickActivity extends BaseActivity {
                             item.setChecked(true);
                         }
                         defaultValue.setTitle(title.toString().replace("[", "").replace("]", "")
-                                .replace(" ", ""));
+                                .replace(", ", ","));
                         defaultValue.setDefault(false);
                         defaultValue.setValue(value.toString().replace("[", "").replace("]", "")
-                                .replace(" ", ""));
+                                .replace(", ", ","));
                         defaultPickerMap.put(pickerType, defaultValue);
                         optionAdapter.notifyAdapterDataSetChanged();
 

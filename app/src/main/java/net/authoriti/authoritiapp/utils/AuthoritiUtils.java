@@ -27,6 +27,52 @@ import java.util.Map;
 @EBean(scope = EBean.Scope.Singleton)
 public class AuthoritiUtils implements Constants {
 
+    // update default values for new value add
+    public void updateDefaultvalues(Context context, String picker, Value value,
+                                    Boolean
+                                            isDefault) {
+        AuthoritiData dataManager = AuthoritiData_.getInstance_(context);
+        try {
+            Map<String, HashMap<String, DefaultValue>> defaultSelectedList = dataManager
+                    .getDefaultValues();
+            List<String> keyList = new ArrayList<String>(defaultSelectedList.keySet());
+            for (String key_root : keyList) {
+                DefaultValue defaultValue = defaultSelectedList.get(key_root).get(picker);
+                defaultValue.setTitle(value.getTitle());
+                defaultValue.setValue(value.getValue());
+                defaultValue.setDefault(isDefault);
+            }
+            dataManager.setDefaultValues(defaultSelectedList);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Updating saved default values with the first index if the saved value contain
+    // deleted record.
+    public void deleteDefaultvalues(Context context, String picker, Value oldvalue, Value
+            newvalue) {
+        AuthoritiData dataManager = AuthoritiData_.getInstance_(context);
+        try {
+            Map<String, HashMap<String, DefaultValue>> defaultSelectedList = dataManager
+                    .getDefaultValues();
+            List<String> keyList = new ArrayList<String>(defaultSelectedList.keySet());
+            for (String key_root : keyList) {
+                DefaultValue defaultValue = defaultSelectedList.get(key_root).get(picker);
+                if (defaultValue.getValue().equals(oldvalue.getValue()) && defaultValue.getTitle
+                        ().equals(oldvalue.getTitle())) {
+                    defaultValue.setTitle(newvalue.getTitle());
+                    defaultValue.setValue(newvalue.getValue());
+                    defaultValue.setDefault(false);
+                }
+            }
+            dataManager.setDefaultValues(defaultSelectedList);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     public Spanned fromHtml(String source) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             return Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY);
@@ -406,52 +452,6 @@ public class AuthoritiUtils implements Constants {
         }
 
         return dateTime;
-    }
-
-
-    // update default values for new value add
-    public void updateDefaultvalues(Context context, String picker, Value value,
-                                    Boolean
-                                            isDefault) {
-        AuthoritiData dataManager = AuthoritiData_.getInstance_(context);
-        try {
-            Map<String, HashMap<String, DefaultValue>> defaultSelectedList = dataManager
-                    .getDefaultValues();
-            List<String> keyList = new ArrayList<String>(defaultSelectedList.keySet());
-            for (String key_root : keyList) {
-                DefaultValue defaultValue = defaultSelectedList.get(key_root).get(picker);
-                defaultValue.setTitle(value.getTitle());
-                defaultValue.setValue(value.getValue());
-                defaultValue.setDefault(isDefault);
-            }
-            dataManager.setDefaultValues(defaultSelectedList);
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Updating saved default values with the first index if the saved value contain
-    // deleted record.
-    public void deleteDefaultvalues(Context context, String picker, Value oldvalue, Value
-            newvalue) {
-        AuthoritiData dataManager = AuthoritiData_.getInstance_(context);
-        try {
-            Map<String, HashMap<String, DefaultValue>> defaultSelectedList = dataManager
-                    .getDefaultValues();
-            List<String> keyList = new ArrayList<String>(defaultSelectedList.keySet());
-            for (String key_root : keyList) {
-                DefaultValue defaultValue = defaultSelectedList.get(key_root).get(picker);
-                if (defaultValue.getValue().equals(oldvalue.getValue()) && defaultValue.getTitle
-                        ().equals(oldvalue.getTitle())) {
-                    defaultValue.setTitle(newvalue.getTitle());
-                    defaultValue.setValue(newvalue.getValue());
-                    defaultValue.setDefault(false);
-                }
-            }
-            dataManager.setDefaultValues(defaultSelectedList);
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-        }
     }
 
 }
