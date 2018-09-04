@@ -103,7 +103,7 @@ public class CodeGenerateActivity extends BaseActivity {
     private String generateCode() {
         crypto = new Crypto();
         Crypto.PayloadGenerator payloadGenerator = crypto.init(defaultPickerMap.get
-                (PICKER_ACCOUNT).getTitle());
+                (PICKER_ACCOUNT).getTitle(), schemaIndex);
         List<String> keyList = new ArrayList<String>(defaultPickerMap.keySet());
         for (String key_root : keyList) {
             DefaultValue defaultValue = defaultPickerMap.get(key_root);

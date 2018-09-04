@@ -165,8 +165,8 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
     public void onResume() {
         super.onResume();
 
-        if (dataManager.getScheme() != null) {
-            utils.initSelectedIndex(mContext);
-        }
+//        if (dataManager.getScheme() != null) {
+//            utils.initSelectedIndex(mContext);
+//        }
     }
 }
