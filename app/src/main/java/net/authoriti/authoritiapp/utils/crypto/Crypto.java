@@ -1,5 +1,7 @@
 package net.authoriti.authoritiapp.utils.crypto;
 
+import net.authoriti.authoritiapp.utils.Constants;
+
 import org.spongycastle.crypto.PBEParametersGenerator;
 import org.spongycastle.crypto.digests.SHA256Digest;
 import org.spongycastle.crypto.generators.PKCS5S2ParametersGenerator;
@@ -20,21 +22,34 @@ import java.util.TimeZone;
 public class Crypto {
     public class PayloadGenerator {
         private String accountId;
-        private String schema_version;
+        private String schemaVersion;
 
-        public PayloadGenerator(String accountId, String schema_version) {
+        private String payload = "";
+
+        PayloadGenerator(String accountId, String schemaVersion) {
             this.accountId = accountId;
-            this.schema_version = schema_version;
-        }
+            this.schemaVersion = schemaVersion;
+            }
 
         public void add(String picker, String value) {
-            System.out.println("Picker: " + picker + ". Value: " + value);
-            //TODO: Placeholder code for now
+            System.out.println(picker + ": " + value);
+            switch (picker) {
+                case Constants.PICKER_INDUSTRY:
+                case Constants.PICKER_LOCATION_COUNTRY:
+                case Constants.PICKER_LOCATION_STATE:
+//                case Constants.PICKER_ANY_STATE:
+                    payload = payload + value;
+                    break;
+                default:
+                    System.out.println("TODO: handle picker " + picker + ". received value: " + value);
+
+            }
         }
 
         public void addTime(int year, int month, int day, int hour, int minute) throws Exception {
             //TODO: Placeholder code for now
-            System.out.println(year + "-" + month + "-" + day + "-" + hour + "-" + minute);
+//            System.out.println(year + "-" + month + "-" + day + "-" + hour + "-" + minute);
+            System.out.println("time");
         }
 
         public void addInput(String inputType, String value) {
@@ -44,11 +59,15 @@ public class Crypto {
 
         public void addDataType(int requestorLength, String[] values) {
             //TODO: Placeholder code for now
-            System.out.println("RequestorLength: " + requestorLength + "; " + values);
+            System.out.println("RequestorLength: " + requestorLength);
+            for (String value: values) {
+                System.out.println("values: " + value);
+            }
         }
 
         public String generate() {
             //TODO: Placeholder code for now
+            System.out.println("generated-payload: " + payload);
             return "0000000000";
         }
     }
@@ -78,7 +97,6 @@ public class Crypto {
 
         String privateKey = CryptoUtil.intToBase62(numPrivateKey, -1);
         String publicKey = new EcDSA().getPublicKey(numPrivateKey);
-
 
         return new CryptoKeyPair(privateKey, publicKey, salt);
     }
@@ -141,7 +159,11 @@ public class Crypto {
     }
 
     public String sign(String payload, String privateKey) {
-        String signature = CryptoUtil.sign(payload, privateKey);
-        return signature;
+        System.out.println("Payload: " + payload);
+        System.out.println("Private-Key: " + privateKey);
+
+        return payload;
+//        String signature = CryptoUtil.sign(payload, privateKey);
+//        return signature;
     }
 }

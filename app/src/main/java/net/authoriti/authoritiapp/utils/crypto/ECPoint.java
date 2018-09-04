@@ -3,17 +3,27 @@ package net.authoriti.authoritiapp.utils.crypto;
 import java.math.BigInteger;
 
 public class ECPoint {
-    private ECCurve curve;
     private BigInteger x;
     private BigInteger y;
     private BigInteger z;
 
-    public ECPoint(ECCurve curve, BigInteger x, BigInteger y, BigInteger z) {
+    private ECCurve curve;
+
+    ECPoint(ECCurve curve, BigInteger x, BigInteger y, BigInteger z) {
         this.curve = curve;
         this.x = x;
         this.y = y;
         this.z = z;
     }
+
+    public ECPoint add(ECPoint Q2){
+        return this.curve.add(this, Q2);
+    }
+
+    public ECPoint mul(BigInteger m) {
+        return this.curve.mul(m, this);
+    }
+
 
     public BigInteger _x() {
         return x;
@@ -37,16 +47,12 @@ public class ECPoint {
     public BigInteger getY() {
         return this.curve.field_div(
                 this.y,
-                this.z.pow(2).multiply(this.z).mod(this.curve.getP())
+                this.z.pow(3).mod(this.curve.getP())
         );
     }
 
     public ECPoint(ECCurve curve, BigInteger x, BigInteger y) {
         this(curve, x, y, new BigInteger("1"));
-    }
-
-    public ECPoint mul(BigInteger m) {
-        return this.curve.mul(m, this);
     }
 
     @Override

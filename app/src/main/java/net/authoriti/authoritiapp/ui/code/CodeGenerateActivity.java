@@ -132,7 +132,37 @@ public class CodeGenerateActivity extends BaseActivity {
             }
         }
 
-        return payloadGenerator.generate();
+        final String payload = payloadGenerator.generate();
+        String code = null;
+
+        AesCbcWithIntegrity.SecretKeys keys;
+        String keyStr = dataManager.getUser().getEncryptKey();
+
+        try {
+
+            keys = AesCbcWithIntegrity.keys(keyStr);
+            AesCbcWithIntegrity.CipherTextIvMac civ = new AesCbcWithIntegrity.CipherTextIvMac
+                    (dataManager.getUser().getEncryptPrivateKey());
+
+            try {
+
+                String privateKey = AesCbcWithIntegrity.decryptString(civ, keys);
+                code = crypto.sign(payload, privateKey);
+
+                Log.e("Code", code);
+
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (GeneralSecurityException e) {
+                e.printStackTrace();
+            }
+
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
+
+
+        return code;
 
 //        for (Field field : defaultValue.getClass().getDeclaredFields()) {
 //            field.setAccessible(true);
