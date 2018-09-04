@@ -14,15 +14,18 @@ public class Group {
     @SerializedName("schema")
     private int schemaIndex;
 
-    private String pickerName;
+    @SerializedName("picker")
+    private String picker;
+
+    @SerializedName("value")
     private String value;
 
     public String getPickerName() {
-        return pickerName;
+        return picker;
     }
 
-    public void setPickerName(String pickerName) {
-        this.pickerName = pickerName;
+    public void setPickerName(String picker) {
+        this.picker = picker;
     }
 
     public String getValue() {
