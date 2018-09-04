@@ -26,19 +26,23 @@ public class Crypto {
         }
 
         public void add(String picker, String value) {
+            System.out.println("Picker: " + picker + ". Value: " + value);
             //TODO: Placeholder code for now
         }
 
         public void addTime(int year, int month, int day, int hour, int minute) throws Exception {
             //TODO: Placeholder code for now
+            System.out.println(year + "-" + month + "-" + day + "-" + hour + "-" + minute);
         }
 
         public void addInput(String inputType, String value) {
             //TODO: Placeholder code for now
+            System.out.println("InputType: " + inputType + ". Value: " + value);
         }
 
         public void addDataType(int requestorLength, String[] values) {
             //TODO: Placeholder code for now
+            System.out.println("RequestorLength: " + requestorLength + "; " + values);
         }
 
         public String generate() {
