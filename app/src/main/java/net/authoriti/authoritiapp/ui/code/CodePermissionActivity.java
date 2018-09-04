@@ -87,7 +87,6 @@ public class CodePermissionActivity extends BaseActivity {
         group = dataManager.getPurposes().get(purposeIndex).getGroups().get(purposeIndexItem);
         defaultPickerMap = dataManager.getDefaultValues().get("" + group.getSchemaIndex());
 
-
         showSchema();
     }
 
