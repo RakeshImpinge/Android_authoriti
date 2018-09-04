@@ -88,16 +88,28 @@ public class CryptoUtil {
         return result.toString();
     }
 
-    public static String MD5(String md5) {
+    public static String hash(String str) {
+        StringBuilder result = new StringBuilder("");
+        final int sz = str.length();
+        for (int i = 0; i < sz; i++) {
+            char c = str.charAt(i);
+            if (c >= '0' && c <= '9' || c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z') {
+                result.append(c);
+            }
+        }
+        return SHA256(result.toString());
+    }
+
+    static String SHA256(String str) {
         try {
-            java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
-            byte[] array = md.digest(md5.getBytes());
-            StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < array.length; ++i) {
-                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] array = md.digest(str.getBytes());
+            StringBuilder sb = new StringBuilder();
+            for (byte anArray : array) {
+                sb.append(Integer.toHexString((anArray & 0xFF) | 0x100).substring(1, 3));
             }
             return sb.toString();
-        } catch (java.security.NoSuchAlgorithmException e) {
+        } catch (java.security.NoSuchAlgorithmException ignored) {
         }
         return null;
     }

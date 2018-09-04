@@ -112,19 +112,19 @@ public class Crypto {
         return CryptoUtil.intToBase62(x, 10);
     }
 
-    public String addIdentifierToAccountId(String identifier, String accountId) {
-        String acc = CryptoUtil.cleanup(accountId, 4);
-        String _identifier = CryptoUtil.cleanup(identifier.toLowerCase(), identifier.length());
-
-        String id = CryptoUtil.cleanup(CryptoUtil.MD5(_identifier), 4);
-
-        BigInteger a = CryptoUtil.base62ToInt(acc);
-        BigInteger b = CryptoUtil.base62ToInt(id);
-
-        BigInteger c = a.add(b);
-
-        return CryptoUtil.intToBase62(c, 4);
-    }
+//    public String addIdentifierToAccountId(String identifier, String accountId) {
+//        String acc = CryptoUtil.cleanup(accountId, 4);
+//        String _identifier = CryptoUtil.cleanup(identifier.toLowerCase(), identifier.length());
+//
+//        String id = CryptoUtil.cleanup(CryptoUtil.MD5(_identifier), 4);
+//
+//        BigInteger a = CryptoUtil.base62ToInt(acc);
+//        BigInteger b = CryptoUtil.base62ToInt(id);
+//
+//        BigInteger c = a.add(b);
+//
+//        return CryptoUtil.intToBase62(c, 4);
+//    }
 
     public String getTimeString(int year, int month, int day, int hour, int minute) throws
             Exception {
