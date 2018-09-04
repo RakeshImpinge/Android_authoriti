@@ -176,6 +176,10 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
 //
 //        dataManager.setAccountPicker(accountPicker);
 
+        if (setDefault) {
+            dataManager.setDefaultAccountID(new Value(id, selectedAccountId.getType()));
+        }
+
         showAccounts();
 
     }

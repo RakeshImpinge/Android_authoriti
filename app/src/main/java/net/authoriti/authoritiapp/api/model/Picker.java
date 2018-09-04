@@ -38,6 +38,11 @@ public class Picker implements Serializable {
     @SerializedName("title")
     private String title;
 
+
+    @Expose
+    @SerializedName("input")
+    private String input;
+
     private boolean enableDefault = false;
     private int defaultIndex = -1;
 
@@ -122,5 +127,14 @@ public class Picker implements Serializable {
 
     public void setUi(Boolean ui) {
         this.ui = ui;
+    }
+
+
+    public String getInput() {
+        return input;
+    }
+
+    public void setInput(String input) {
+        this.input = input;
     }
 }

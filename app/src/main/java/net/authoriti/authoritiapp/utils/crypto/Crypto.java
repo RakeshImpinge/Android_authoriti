@@ -37,7 +37,7 @@ public class Crypto {
             //TODO: Placeholder code for now
         }
 
-        public void addDataType(String requestor, String[] values) {
+        public void addDataType(int requestorLength, String[] values) {
             //TODO: Placeholder code for now
         }
 
@@ -73,8 +73,6 @@ public class Crypto {
         String privateKey = CryptoUtil.intToBase62(numPrivateKey, -1);
         String publicKey = new EcDSA().getPublicKey(numPrivateKey);
 
-        System.out.println("private-key: " + privateKey);
-        System.out.println("public-key: " + publicKey);
 
         return new CryptoKeyPair(privateKey, publicKey, salt);
     }
@@ -104,13 +102,14 @@ public class Crypto {
         return CryptoUtil.intToBase62(c, 4);
     }
 
-    public String getTimeString(int year, int month, int day, int hour, int minute) throws  Exception {
+    public String getTimeString(int year, int month, int day, int hour, int minute) throws
+            Exception {
         Calendar c = Calendar.getInstance();
         c.set(year, month, day, hour, minute);
         c.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         Calendar d = Calendar.getInstance();
-        d.set(2017, Calendar.NOVEMBER, 1, 0 , 0);
+        d.set(2017, Calendar.NOVEMBER, 1, 0, 0);
         d.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         Date epoch = d.getTime();

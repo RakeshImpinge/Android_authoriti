@@ -48,12 +48,14 @@ public class AuthoritiAPI {
                 .connectTimeout(120, TimeUnit.SECONDS)
                 .writeTimeout(120, TimeUnit.SECONDS)
                 .readTimeout(120, TimeUnit.SECONDS)
-                .connectionSpecs(Collections.singletonList(new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+                .connectionSpecs(Collections.singletonList(new ConnectionSpec.Builder
+                        (ConnectionSpec.MODERN_TLS)
                         .tlsVersions(TlsVersion.TLS_1_1)
                         .allEnabledCipherSuites()
                         .build()))
                 .addInterceptor(new Interceptor() {
-                    @Override public Response intercept(Chain chain) throws IOException {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
                         Request request = chain.request().newBuilder()
                                 .addHeader("X-Platform", "android")
                                 .addHeader("X-App-Version", BuildConfig.VERSION_NAME)
@@ -73,6 +75,8 @@ public class AuthoritiAPI {
         apiService = retrofit.create(AuthoritiAPIService.class);
     }
 
-    public static AuthoritiAPIService APIService() { return apiService; }
+    public static AuthoritiAPIService APIService() {
+        return apiService;
+    }
 
 }

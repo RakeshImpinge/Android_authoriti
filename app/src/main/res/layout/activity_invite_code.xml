@@ -96,8 +96,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
                             android:gravity="center"
-                            android:maxLines="1"
-                            android:text="Please Enter Your Password."
+                            android:maxLines="2"
+                            android:text="Please Enter Your Password - if you don't have a password, just click next"
                             android:textColor="@color/colorPrimary"
                             android:textSize="17sp" />
 
@@ -160,6 +160,7 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground"
+                    android:visibility="gone"
                     app:cardBackgroundColor="@color/colorNeedPasswordButton">
 
                     <android.support.v7.widget.AppCompatTextView

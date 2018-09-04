@@ -7,10 +7,12 @@ import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import net.authoriti.authoritiapp.R;
 import net.authoriti.authoritiapp.api.AuthoritiAPI;
 import net.authoriti.authoritiapp.api.model.AccountID;
+import net.authoriti.authoritiapp.api.model.DefaultValue;
 import net.authoriti.authoritiapp.api.model.Picker;
 import net.authoriti.authoritiapp.api.model.User;
 import net.authoriti.authoritiapp.api.model.Value;
@@ -31,7 +33,9 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -99,9 +103,13 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
 
             for (int i = 0; i < dataManager.getUser().getAccountIDs().size(); i++) {
                 AccountID accountID = dataManager.getUser().getAccountIDs().get(i);
-                boolean isDefault = (dataManager.getAccountPicker() != null && dataManager
-                        .getAccountPicker().isEnableDefault() && i == dataManager
-                        .getAccountPicker().getDefaultIndex());
+
+                boolean isDefault = false;
+                if (dataManager.getDefaultAccountID().getTitle().equals(accountID.getType()) &&
+                        dataManager.getDefaultAccountID().getValue().equals(accountID
+                                .getIdentifier())) {
+                    isDefault = true;
+                }
                 adapter.add(new AccountAddItem(accountID, isDefault, this));
             }
         }
@@ -109,7 +117,6 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
     }
 
     private void saveAccount(final String name, final String id, final boolean setDefault) {
-
         RequestUserUpdate request = new RequestUserUpdate();
         AccountID accountID = new AccountID(name, id);
         List<AccountID> accountIDs = new ArrayList<>();
@@ -122,85 +129,55 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                 () {
             @Override
             public void onResponse(Call<ResponseSignUp> call, Response<ResponseSignUp> response) {
-
                 dismissProgressDialog();
-
                 if (response.code() == 200 && response.body() != null) {
-
                     addAccount(name, id, setDefault);
-
                 } else {
-
                     showAlert("", "Account Save Failed.");
-
                 }
-
-
             }
 
             @Override
             public void onFailure(Call<ResponseSignUp> call, Throwable t) {
-
                 dismissProgressDialog();
                 showAlert("", "Account Save Failed.");
-
             }
         });
 
     }
 
     private void addAccount(String name, String id, boolean setDefault) {
-
         User user = dataManager.getUser();
         List<AccountID> accountIDs = user.getAccountIDs();
         accountIDs.add(new AccountID(name, id));
         dataManager.setUser(user);
-
-//        Picker accountPicker = dataManager.getAccountPicker();
-//        List<Value> values = accountPicker.getValues();
-//        Value value = new Value(id, name);
-//        values.add(value);
-//        if (setDefault) {
-//            accountPicker.setEnableDefault(true);
-//            accountPicker.setDefaultIndex(values.size() - 1);
-//        }
-//        dataManager.setAccountPicker(accountPicker);
-
+        if (setDefault) {
+            dataManager.setDefaultAccountID(new Value(id, name));
+            utils.updateDefaultvalues(getActivity(), PICKER_ACCOUNT, new Value(id, name), true);
+        }
         showAccounts();
     }
 
-    private void deleteAccount(int position) {
 
+    private void deleteAccount(int position) {
         User user = dataManager.getUser();
         List<AccountID> accountIDs = user.getAccountIDs();
+        if (dataManager.getDefaultAccountID().getTitle().equals(accountIDs.get(position).getType
+                ()) && dataManager.getDefaultAccountID().getValue().equals(accountIDs.get(position)
+                .getIdentifier())) {
+
+            // Updating saved default values with the first index if the saved value contain
+            // deleted record.
+            utils.deleteDefaultvalues(getActivity(), PICKER_ACCOUNT,
+                    new Value(accountIDs.get(position)
+                            .getIdentifier(), accountIDs.get(position).getType()),
+                    new Value(accountIDs.get(0).getIdentifier(), accountIDs.get(0).getType()));
+
+            // Saving default saved account to blank
+            dataManager.setDefaultAccountID(new Value("", ""));
+        }
         accountIDs.remove(position);
         dataManager.setUser(user);
-
-        Picker accountPicker = dataManager.getAccountPicker();
-        List<Value> values = accountPicker.getValues();
-        values.remove(position);
-
-        if (accountPicker.isEnableDefault()) {
-
-            if (accountPicker.getDefaultIndex() == position) {
-
-                accountPicker.setEnableDefault(false);
-
-            } else {
-
-                if (accountPicker.getDefaultIndex() != 0 && accountPicker.getDefaultIndex() ==
-                        values.size()) {
-
-                    accountPicker.setDefaultIndex(accountPicker.getDefaultIndex() - 1);
-                }
-
-            }
-
-
-        }
-
-        dataManager.setAccountPicker(accountPicker);
-
         showAccounts();
     }
 
@@ -248,7 +225,6 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
 
         if (dataManager.getUser().getAccountIDs().size() == 1) {
             showAlert("", "You have to at least 1 account ID.");
-
         } else {
             deleteAccount(position);
         }

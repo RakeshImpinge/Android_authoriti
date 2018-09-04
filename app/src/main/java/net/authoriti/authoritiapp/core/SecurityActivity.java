@@ -47,16 +47,11 @@ public class SecurityActivity extends BaseActivity implements FingerPrintAuthCal
     }
 
     public void showTouchIdAlert(){
-
         if (touchIDAlert == null){
-
             touchIDAlert = new TouchIDAlert(this, R.style.FullScreenDialogStyle);
             touchIDAlert.setListener(this);
-
         }
-
         touchIDAlert.show();
-
     }
 
     public void dismissTouchIDAlert(){
