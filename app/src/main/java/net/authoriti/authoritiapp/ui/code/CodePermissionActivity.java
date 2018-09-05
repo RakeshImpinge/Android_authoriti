@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import net.authoriti.authoritiapp.R;
 import net.authoriti.authoritiapp.api.model.AccountID;
@@ -56,6 +57,9 @@ public class CodePermissionActivity extends BaseActivity {
     @Extra
     int purposeIndexItem;
 
+    @Extra
+    HashMap<String, String> defParamFromUrl;
+
     @Bean
     AuthoritiData dataManager;
 
@@ -76,6 +80,8 @@ public class CodePermissionActivity extends BaseActivity {
     public static int INTENT_REQUEST_PICK_VALUE = 1;
 
 
+    int schemaIndex = -1;
+
     @AfterViews
     void callAfterViewInjection() {
         adapter = new FastItemAdapter<CodeItem>();
@@ -86,51 +92,115 @@ public class CodePermissionActivity extends BaseActivity {
         rvEditFields.setAdapter(adapter_input);
         group = dataManager.getPurposes().get(purposeIndex).getGroups().get(purposeIndexItem);
         defaultPickerMap = dataManager.getDefaultValues().get("" + group.getSchemaIndex());
+        schemaIndex = group.getSchemaIndex();
 
         showSchema();
+
+
+        createPickerList();
+        showSchema();
+
     }
 
-    private void showSchema() {
-        adapter.clear();
-        adapter_input.clear();
-        List<Picker> pickersList = dataManager.getScheme().get("" + group.getSchemaIndex());
+    List<Picker> pickersList = new ArrayList<>();
+
+    private void createPickerList() {
+        pickersList = dataManager.getScheme().get("" + group.getSchemaIndex());
         for (int i = 0; i < pickersList.size(); i++) {
-            Picker picker = pickersList.get(i);
+
             // Adding default values of Picker is of Time
-            if (picker.getPicker().equals(PICKER_TIME)) {
-                picker = utils.getDefaultTimePicker(picker);
+            if (pickersList.get(i).getPicker().equals(PICKER_TIME)) {
+                pickersList.set(i, utils.getDefaultTimePicker(pickersList.get(i)));
             }
+
             // Adding default values of Picker is of Account Type
-            else if (picker.getPicker().equals(PICKER_ACCOUNT)) {
+            else if (pickersList.get(i).getPicker().equals(PICKER_ACCOUNT)) {
                 List<Value> values = new ArrayList<>();
                 for (AccountID accountID : dataManager.getUser().getAccountIDs()) {
                     Value value = new Value(accountID.getIdentifier(), accountID
                             .getType());
                     values.add(value);
                 }
-                picker.setValues(values);
+                pickersList.get(i).setValues(values);
             }
 
+            // Adding default values of Picker is of Data Type
+            else if (pickersList.get(i).getPicker().equals(PICKER_DATA_TYPE)) {
+                List<Value> values;
+                if (defaultPickerMap.containsKey(PICKER_REQUEST)) {
+                    values = dataManager.getValuesFromDataType(Integer.valueOf(defaultPickerMap.get
+                            (PICKER_REQUEST).getValue().toString()));
+                } else {
+                    values = dataManager.getValuesFromDataType(schemaIndex);
+                }
+                pickersList.get(i).setValues(values);
+                pickersList.set(i, pickersList.get(i));
+            }
 
             // updateDefaultValuesFromGroup
             if (group.getPickerName() != null && !group.getPickerName().equals("")) {
-                if (group.getPickerName().equals(picker.getPicker())) {
-                    int index = getIndexOfValue(picker.getValues(), group.getValue());
+                if (group.getPickerName().equals(pickersList.get(i).getPicker())) {
+                    int index = getIndexOfValue(pickersList.get(i).getValues(), group.getValue());
                     if (index != -1) {
-                        DefaultValue defaultValue = new DefaultValue(picker.getValues().get(index)
-                                .getTitle(), picker.getValues().get(index).getValue(), false);
+                        DefaultValue defaultValue = new DefaultValue(pickersList.get(i).getValues
+                                ().get
+                                (index)
+                                .getTitle(), pickersList.get(i).getValues().get(index).getValue()
+                                , false);
                         defaultPickerMap.put(group.getPickerName(), defaultValue);
                     }
                 }
             }
 
-            // Adding Picker to UI
-            if (picker.getUi()) {
-                if (picker.getPicker().equals(PICKER_DATA_INPUT_TYPE)) {
-                    adapter_input.add(new CodeEditItem(picker));
-                } else {
-                    adapter.add(new CodeItem(picker, defaultPickerMap, group.getSchemaIndex()));
+            // Updating the default values from the poll schema url like this :
+            // authoriti://purpose/purpose-name?picker1=value&picker2=value
+            if (defParamFromUrl != null && !defParamFromUrl.isEmpty()) {
+                if (defParamFromUrl.containsKey(pickersList.get(i).getPicker())) {
+                    ArrayList<String> title = new ArrayList<>();
+                    ArrayList<String> value = new ArrayList<>();
+                    for (int k = 0; k < pickersList.get(i).getValues().size(); k++) {
+                        if ((defParamFromUrl.get
+                                (pickersList.get(i).getPicker())).contains(pickersList.get(i)
+                                .getValues().get(k).getValue())) {
+                            title.add(pickersList.get(i).getValues
+                                    ().get
+                                    (k)
+                                    .getTitle());
+                            value.add(pickersList.get(i).getValues
+                                    ().get
+                                    (k)
+                                    .getValue());
+                        }
+                    }
+                    if (title.size() > 0) {
+                        DefaultValue defaultValue = new DefaultValue(title.toString().replace
+                                ("[", "").replace("]", "")
+                                , value.toString().replace
+                                ("[", "").replace("]", ""), false);
+                        defaultPickerMap.put(pickersList.get(i).getPicker(), defaultValue);
+                    }
                 }
+            }
+        }
+    }
+
+    ArrayList<Integer> uiFlaseListIndex = new ArrayList<>();
+
+    private void showSchema() {
+        adapter.clear();
+        adapter_input.clear();
+        uiFlaseListIndex.clear();
+        for (int i = 0; i < pickersList.size(); i++) {
+            // Adding Picker to UI
+            if (pickersList.get(i).getUi()) {
+                if (pickersList.get(i).getPicker().equals(PICKER_DATA_INPUT_TYPE)) {
+                    adapter_input.add(new CodeEditItem(pickersList.get(i)));
+                } else {
+                    adapter.add(new CodeItem(pickersList.get(i), defaultPickerMap, group
+                            .getSchemaIndex()));
+                }
+            } else {
+                uiFlaseListIndex.add(i);
             }
         }
 //        if (order != null && order.getPickers() != null && order.getPickers().size() > 0) {
@@ -203,6 +273,10 @@ public class CodePermissionActivity extends BaseActivity {
 
     public int getIndexOfValue(List<Value> values, String picker_def_value) {
         int index = -1;
+
+        if (values == null) return index;
+        if (picker_def_value == null) return index;
+
         for (int k = 0; k < values.size(); k++) {
             if (values.get(k).getValue().equals(picker_def_value)) {
                 index = k;
@@ -235,7 +309,8 @@ public class CodePermissionActivity extends BaseActivity {
             View childAt = rvEditFields.getChildAt(i);
             AppCompatEditText etCode = ((AppCompatEditText) childAt.findViewById(R.id.etCode));
             if (etCode.getText().toString().trim().length() == 0) {
-                errorMessage = "Pleae enter " + adapter_input.getAdapterItem(i).picker.getLabel();
+                errorMessage = "Pleae enter " + adapter_input.getAdapterItem(i).picker
+                        .getLabel();
                 break;
             } else {
                 DefaultValue defaultValue = new DefaultValue(adapter_input.getAdapterItem(i)
@@ -283,23 +358,38 @@ public class CodePermissionActivity extends BaseActivity {
 
                 // For account name
                 if (adapterPicker.getPicker().equals(PICKER_ACCOUNT)) {
-                    hashMap.put("value", defaultPickerMap.get(adapterPicker.getPicker()).getTitle
-                            ());
+                    hashMap.put("value", defaultPickerMap.get(adapterPicker.getPicker())
+                            .getTitle
+                                    ());
                 } else {
-                    hashMap.put("value", defaultPickerMap.get(adapterPicker.getPicker()).getValue
-                            ());
+                    hashMap.put("value", defaultPickerMap.get(adapterPicker.getPicker())
+                            .getValue
+                                    ());
                 }
                 finalPickersList.add(hashMap);
             }
             for (int i = 0; i < rvEditFields.getChildCount(); i++) {
                 View childAt = rvEditFields.getChildAt(i);
-                AppCompatEditText etCode = ((AppCompatEditText) childAt.findViewById(R.id.etCode));
+                AppCompatEditText etCode = ((AppCompatEditText) childAt.findViewById(R.id
+                        .etCode));
                 Picker adapterPicker = adapter_input.getAdapterItem(i).picker;
                 HashMap<String, String> hashMap = new HashMap<>();
                 hashMap.put("picker", adapterPicker.getPicker());
                 hashMap.put("key", adapter_input.getAdapterItem(i).picker.getInput());
                 hashMap.put("value", etCode.getText().toString());
                 finalPickersList.add(hashMap);
+            }
+
+
+            for (int i = 0; i < uiFlaseListIndex.size(); i++) {
+                HashMap<String, String> hashMap = new HashMap<>();
+                hashMap.put("picker", pickersList.get(uiFlaseListIndex.get(i)).getPicker());
+                hashMap.put("key", defaultPickerMap.get(pickersList.get(uiFlaseListIndex.get(i))
+                        .getPicker()).getTitle());
+                hashMap.put("value", defaultPickerMap.get(pickersList.get(uiFlaseListIndex.get(i)
+                ).getPicker())
+                        .getValue());
+                finalPickersList.add(uiFlaseListIndex.get(i), hashMap);
             }
 
             CodeGenerateActivity_.intent(mContext).schemaIndex("" + group.getSchemaIndex())

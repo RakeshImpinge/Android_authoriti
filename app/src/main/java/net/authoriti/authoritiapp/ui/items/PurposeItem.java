@@ -115,7 +115,7 @@ public class PurposeItem extends AbstractItem<PurposeItem, PurposeItem.ViewHolde
         holder.swipeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (dataManager.getScheme() != null &&  dataManager.getDefaultValues() != null) {
+                if (dataManager.getScheme() != null && dataManager.getDefaultValues() != null) {
                     CodePermissionActivity_.intent(context).purposeIndex(index).start();
                 }
             }

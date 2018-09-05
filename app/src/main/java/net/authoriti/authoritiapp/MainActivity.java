@@ -30,6 +30,7 @@ import net.authoriti.authoritiapp.api.model.SchemaGroup;
 import net.authoriti.authoritiapp.api.model.Value;
 import net.authoriti.authoritiapp.core.BaseActivity;
 import net.authoriti.authoritiapp.ui.auth.LoginActivity_;
+import net.authoriti.authoritiapp.ui.code.CodePermissionActivity_;
 import net.authoriti.authoritiapp.ui.help.HelpActivity_;
 import net.authoriti.authoritiapp.ui.menu.AccountChaseFragment_;
 import net.authoriti.authoritiapp.ui.menu.AccountFragment_;
@@ -286,6 +287,9 @@ public class MainActivity extends BaseActivity {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(SC.decryptString
                     (Constants.HELP_BASE) + topic));
             startActivity(browserIntent);
+//            PermissionCodeRequest
+//                    ("authoriti://purpose/manage-an-account?accountId=some_account_id" +
+//                            "&data_type=00,02,03&time=1 Hour");
         }
     }
 
@@ -308,15 +312,8 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
         loadPurposes();
         loadScheme();
-
-
-        PermissionCodeRequest("authoriti://purpose/manage-an-account?accountId=some_account_id" +
-                "&data_type=00,02,03&time=15");
-
-
     }
 
     private void loadPurposes() {
@@ -354,7 +351,6 @@ public class MainActivity extends BaseActivity {
                     } else {
                         dataManager.setScheme(response.body().getSchema());
                     }
-
                 }
             }
 
@@ -406,36 +402,48 @@ public class MainActivity extends BaseActivity {
     }
 
     private void PermissionCodeRequest(String url) {
-//        String[] splitUrl = url.split("\\?");
-//        if (splitUrl.length > 0) {
-//            String label = splitUrl[0].replace("authoriti://purpose/", "");
-//            label = label.replace("-", " ");
-//            List<Purpose> purposes = dataManager.getPurposes();
-//            String schemaIndex = "";
-//            for (int i = 0; i < purposes.size(); i++) {
-//                List<Group> groupList = purposes.get(i).getGroups();
-//                for (int k = 0; k < groupList.size(); k++) {
-//                    if (groupList.get(k).getLabel().equalsIgnoreCase(label)) {
-//                        schemaIndex = "" + groupList.get(k).getSchemaIndex();
-//                    } else {
-//
-//                    }
-//                }
-//            }
-//
-//            List<Picker> pickers = dataManager.getScheme().get("" + schemaIndex);
-//            System.out.println("=====pickers====" + pickers.toString());
-//            HashMap<String, DefaultValue> defaultValueHashMap = dataManager.getDefaultValues()
-//                    .get("" + schemaIndex);
-//            for (int i = 0; i < pickers.size(); i++) {
-//
-//            }
-//
-//        } else {
-//            Log.e("Message", "Invalid Url");
-//        }
-    }
+        String[] splitUrl = url.split("\\?");
+        if (splitUrl.length > 0) {
+            String label = splitUrl[0].replace("authoriti://purpose/", "");
+            label = label.replace("-", " ");
+            List<Purpose> purposes = dataManager.getPurposes();
+            String schemaIndex = "";
 
+            int indexGroup = -1;
+            int indexItem = -1;
+            for (int i = 0; i < purposes.size(); i++) {
+                List<Group> groupList = purposes.get(i).getGroups();
+                for (int k = 0; k < groupList.size(); k++) {
+                    if (groupList.get(k).getLabel().equalsIgnoreCase(label)) {
+                        schemaIndex = "" + groupList.get(k).getSchemaIndex();
+                        indexGroup = i;
+                        indexItem = k;
+                    } else {
+
+                    }
+                }
+            }
+//            accountId=some_account_id" +
+//            "&data_type=00,02,03&time=15"
+
+            String defString = splitUrl[1];
+            String defStringSplit[] = defString.split("&");
+            HashMap<String, String> hashMap = new HashMap<>();
+            if (defStringSplit.length > 0) {
+                for (String value : defStringSplit) {
+                    hashMap.put(value.split("=")[0].replace("-", ""), value.split("=")[1].replace
+                            ("-", ""));
+                }
+                if (!hashMap.isEmpty()) {
+                    CodePermissionActivity_.intent(mContext).purposeIndex(indexGroup)
+                            .purposeIndexItem(indexItem).defParamFromUrl(hashMap)
+                            .start();
+                }
+            }
+        } else {
+            Log.e("Message", "Invalid Url");
+        }
+    }
 
     private void firstUpdateSchema() {
 //        if (dataManager.getScheme() != null && dataManager.getScheme().getPickers() != null) {

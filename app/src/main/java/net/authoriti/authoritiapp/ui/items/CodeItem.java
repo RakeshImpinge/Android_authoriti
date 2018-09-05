@@ -232,7 +232,22 @@ public class CodeItem extends AbstractItem<CodeItem, CodeItem.ViewHolder> {
                 holder.swipeLayout.close(true);
                 defaultValue.setDefault(true);
                 if (defaultPickerMap != null) {
-                    dataManager.updateDefaultValues(schemaIndex, picker.getPicker(), defaultValue);
+                    if (defaultPickerMap.containsKey(PICKER_REQUEST) && picker.getPicker().equals
+                            (PICKER_REQUEST)) {
+                        dataManager.updateDefaultValues(schemaIndex, picker.getPicker(),
+                                defaultValue);
+                        dataManager.updateDefaultValues(schemaIndex, PICKER_DATA_TYPE,
+                                defaultPickerMap.get(PICKER_DATA_TYPE));
+                    } else if (defaultPickerMap.containsKey(PICKER_REQUEST) && picker.getPicker()
+                            .equals(PICKER_DATA_TYPE)) {
+                        dataManager.updateDefaultValues(schemaIndex, picker.getPicker(),
+                                defaultValue);
+                        dataManager.updateDefaultValues(schemaIndex, PICKER_REQUEST,
+                                defaultPickerMap.get(PICKER_REQUEST));
+                    } else {
+                        dataManager.updateDefaultValues(schemaIndex, picker.getPicker(),
+                                defaultValue);
+                    }
                 }
             }
         });

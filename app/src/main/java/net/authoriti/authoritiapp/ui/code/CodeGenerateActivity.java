@@ -101,6 +101,10 @@ public class CodeGenerateActivity extends BaseActivity {
         crypto = new Crypto();
         Crypto.PayloadGenerator payloadGenerator = null;
         for (HashMap<String, String> hashMap : finalPickersList) {
+
+            // Skip if key is blank
+            if (hashMap.get("key").equals("")) continue;
+
             String key_root = hashMap.get("picker");
             if (key_root.equals(PICKER_ACCOUNT)) {
                 payloadGenerator = crypto.init(hashMap.get("value"), schemaIndex);
@@ -125,6 +129,7 @@ public class CodeGenerateActivity extends BaseActivity {
             } else {
                 payloadGenerator.add(key_root, hashMap.get("value"));
             }
+
         }
 
         final String payload = payloadGenerator.generate();

@@ -207,7 +207,7 @@ public class AccountManagerActivity extends SecurityActivity implements Security
                 for (int i = 0; i < user.getAccountIDs().size(); i++) {
                     AccountID accountID = user.getAccountIDs().get(i);
                     accountID.setIdentifier(CryptoUtil.hash(accountID.getIdentifier()));
-                    user.getAccountIDs().set(i, accountID);
+                    user.getAccountIDs().set(i,accountID);
                 }
 
                 if (dataManager.defaultAccountSelected) {

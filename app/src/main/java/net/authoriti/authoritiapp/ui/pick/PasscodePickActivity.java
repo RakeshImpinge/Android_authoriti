@@ -93,7 +93,6 @@ public class PasscodePickActivity extends BaseActivity {
 
         addValuesToPicker();
 
-
         optionAdapter = new FastItemAdapter<OptionItem>();
         optionAdapter.withSelectable(true);
         rvOptions.setLayoutManager(new LinearLayoutManager(mContext));
@@ -183,11 +182,9 @@ public class PasscodePickActivity extends BaseActivity {
                             List<Value> values = dataManager.getValuesFromDataType(Integer
                                     .valueOf(picker
                                             .getValues().get(position).getValue()));
-
                             DefaultValue defaultValueDataType = new DefaultValue(values.get(0)
                                     .getTitle(), values.get(0).getValue(), false);
                             defaultPickerMap.put(PICKER_DATA_TYPE, defaultValueDataType);
-
                         } else {
                             defaultValue.setTitle(picker.getValues().get(position).getTitle());
                             defaultValue.setDefault(false);
@@ -200,7 +197,6 @@ public class PasscodePickActivity extends BaseActivity {
                         setResult(RESULT_OK, intent);
                         finish();
                     }
-
                 }
                 return true;
             }
@@ -210,27 +206,27 @@ public class PasscodePickActivity extends BaseActivity {
     }
 
     private void addValuesToPicker() {
-        // Adding default values of Picker is of Time
-        if (pickerType.equals(PICKER_TIME)) {
-            picker = utils.getDefaultTimePicker(picker);
-        } else if (pickerType.equals(PICKER_ACCOUNT)) {
-            List<Value> values = new ArrayList<>();
-            for (AccountID accountID : dataManager.getUser().getAccountIDs()) {
-                Value value = new Value(accountID.getIdentifier(), accountID
-                        .getType());
-                values.add(value);
-            }
-            picker.setValues(values);
-        } else if (pickerType.equals(PICKER_DATA_TYPE)) {
-            List<Value> values;
-            if (defaultPickerMap.containsKey(PICKER_REQUEST)) {
-                values = dataManager.getValuesFromDataType(Integer.valueOf(defaultPickerMap.get
-                        (PICKER_REQUEST).getValue().toString()));
-            } else {
-                values = dataManager.getValuesFromDataType(schemaIndex);
-            }
-            picker.setValues(values);
-        }
+//        // Adding default values of Picker is of Time
+//        if (pickerType.equals(PICKER_TIME)) {
+//            picker = utils.getDefaultTimePicker(picker);
+//        } else if (pickerType.equals(PICKER_ACCOUNT)) {
+//            List<Value> values = new ArrayList<>();
+//            for (AccountID accountID : dataManager.getUser().getAccountIDs()) {
+//                Value value = new Value(accountID.getIdentifier(), accountID
+//                        .getType());
+//                values.add(value);
+//            }
+//            picker.setValues(values);
+//        } else if (pickerType.equals(PICKER_DATA_TYPE)) {
+//            List<Value> values;
+//            if (defaultPickerMap.containsKey(PICKER_REQUEST)) {
+//                values = dataManager.getValuesFromDataType(Integer.valueOf(defaultPickerMap.get
+//                        (PICKER_REQUEST).getValue().toString()));
+//            } else {
+//                values = dataManager.getValuesFromDataType(schemaIndex);
+//            }
+//            picker.setValues(values);
+//        }
     }
 
     private void showDatePicker(final OptionItem item, final int position) {
