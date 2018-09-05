@@ -57,11 +57,9 @@ public class CodeGenerateActivity extends BaseActivity {
     @Extra
     String schemaIndex = "";
 
-    @Extra
-    int data_type_length = 0;
 
     @Extra
-    HashMap<String, DefaultValue> defaultPickerMap = new HashMap<>();
+    ArrayList<HashMap<String, String>> finalPickersList = new ArrayList<>();
 
     @Bean
     AuthoritiData dataManager;
@@ -78,7 +76,6 @@ public class CodeGenerateActivity extends BaseActivity {
     @AfterViews
     void callAfterViewInjection() {
         String code = generateCode();
-
         ivQRCode.setImageBitmap(QRCode.from(code).bitmap());
         tvCode.setText(utils.fromHtml(generateHTMLString(code)));
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
@@ -102,15 +99,13 @@ public class CodeGenerateActivity extends BaseActivity {
 
     private String generateCode() {
         crypto = new Crypto();
-        Crypto.PayloadGenerator payloadGenerator = crypto.init(defaultPickerMap.get
-                (PICKER_ACCOUNT).getTitle(), schemaIndex);
-        List<String> keyList = new ArrayList<String>(defaultPickerMap.keySet());
-        for (String key_root : keyList) {
-            DefaultValue defaultValue = defaultPickerMap.get(key_root);
-            if (key_root.equals(PICKER_ACCOUNT) || defaultValue.getValue().equals("")) {
-                continue;
+        Crypto.PayloadGenerator payloadGenerator = null;
+        for (HashMap<String, String> hashMap : finalPickersList) {
+            String key_root = hashMap.get("picker");
+            if (key_root.equals(PICKER_ACCOUNT)) {
+                payloadGenerator = crypto.init(hashMap.get("value"), schemaIndex);
             } else if (key_root.equals(PICKER_TIME)) {
-                Calendar newCalendar = timeFormat(defaultValue.getValue());
+                Calendar newCalendar = timeFormat(hashMap.get("value"));
                 try {
                     payloadGenerator.addTime(newCalendar.get(Calendar.YEAR),
                             newCalendar.get(Calendar.MONTH),
@@ -121,14 +116,14 @@ public class CodeGenerateActivity extends BaseActivity {
                     e.printStackTrace();
                 }
             } else if (key_root.equals(PICKER_DATA_TYPE)) {
-                String data[] = defaultValue.getValue().split("\\s*,\\s*");
-                payloadGenerator.addDataType(data_type_length, data);
+                String data[] = hashMap.get("value").split("\\s*,\\s*");
+                payloadGenerator.addDataType(Integer.valueOf(hashMap.get("key")), data);
             } else if (key_root.contains(PICKER_DATA_INPUT_TYPE + "_")) {
-                payloadGenerator.addInput(defaultValue.getTitle(), defaultValue.getValue());
+                payloadGenerator.addInput(hashMap.get("key"), hashMap.get("value"));
             } else if (key_root.equals(PICKER_REQUEST)) {
 
             } else {
-                payloadGenerator.add(key_root, defaultValue.getValue());
+                payloadGenerator.add(key_root, hashMap.get("value"));
             }
         }
 
@@ -164,17 +159,6 @@ public class CodeGenerateActivity extends BaseActivity {
 
         return code;
 
-//        for (Field field : defaultValue.getClass().getDeclaredFields()) {
-//            field.setAccessible(true);
-//            String name = field.getName();
-//            Object value = null;
-//            try {
-//                value = field.get(defaultValue);
-//            } catch (IllegalAccessException e) {
-//                e.printStackTrace();
-//            }
-//            Log.e(name, value.toString());
-//        }
     }
 
     private Calendar timeFormat(String value) {
@@ -248,6 +232,11 @@ public class CodeGenerateActivity extends BaseActivity {
         }
         newCalendar.setTimeZone(TimeZone.getTimeZone("UTC"));
         return newCalendar;
+    }
+
+    @Click({R.id.ivClose, R.id.cvGotIt})
+    void closeButtonClicked() {
+        finish();
     }
 
 //
@@ -494,9 +483,5 @@ public class CodeGenerateActivity extends BaseActivity {
 //        return picker.getValues().get(selectedIndex);
 //    }
 
-    @Click({R.id.ivClose, R.id.cvGotIt})
-    void closeButtonClicked() {
-        finish();
-    }
 
 }

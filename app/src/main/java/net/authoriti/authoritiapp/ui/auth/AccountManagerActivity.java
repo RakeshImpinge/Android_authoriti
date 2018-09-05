@@ -25,6 +25,7 @@ import net.authoriti.authoritiapp.ui.items.AccountAddItem;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
 import net.authoriti.authoritiapp.utils.AuthoritiUtils;
 import net.authoriti.authoritiapp.utils.crypto.CryptoKeyPair;
+import net.authoriti.authoritiapp.utils.crypto.CryptoUtil;
 
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 import com.tozny.crypto.android.AesCbcWithIntegrity;
@@ -200,6 +201,15 @@ public class AccountManagerActivity extends SecurityActivity implements Security
                 user.setEncryptPassword(AesCbcWithIntegrity.encrypt(dataManager.password, keys)
                         .toString());
 
+                Log.e("getDefaultAccountID", dataManager.getDefaultAccountID().getTitle());
+                Log.e("getDefaultAccountID", dataManager.getDefaultAccountID().getValue());
+
+                for (int i = 0; i < user.getAccountIDs().size(); i++) {
+                    AccountID accountID = user.getAccountIDs().get(i);
+                    accountID.setIdentifier(CryptoUtil.hash(accountID.getIdentifier()));
+                    user.getAccountIDs().set(i, accountID);
+                }
+
                 if (dataManager.defaultAccountSelected) {
                     dataManager.setDefaultAccountID(new Value(user.getAccountIDs().get
                             (dataManager.defaultAccountIndex)
@@ -207,9 +217,6 @@ public class AccountManagerActivity extends SecurityActivity implements Security
                             (dataManager.defaultAccountIndex).getType()
                     ));
                 }
-                Log.e("getDefaultAccountID", dataManager.getDefaultAccountID().getTitle());
-                Log.e("getDefaultAccountID", dataManager.getDefaultAccountID().getValue());
-
                 dataManager.setUser(user);
 
             } catch (UnsupportedEncodingException e) {

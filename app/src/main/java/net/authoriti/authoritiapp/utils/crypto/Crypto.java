@@ -29,7 +29,7 @@ public class Crypto {
         PayloadGenerator(String accountId, String schemaVersion) {
             this.accountId = accountId;
             this.schemaVersion = schemaVersion;
-            }
+        }
 
         public void add(String picker, String value) {
             System.out.println(picker + ": " + value);
@@ -41,7 +41,8 @@ public class Crypto {
                     payload = payload + value;
                     break;
                 default:
-                    System.out.println("TODO: handle picker " + picker + ". received value: " + value);
+                    System.out.println("TODO: handle picker " + picker + ". received value: " +
+                            value);
 
             }
         }
@@ -60,7 +61,7 @@ public class Crypto {
         public void addDataType(int requestorLength, String[] values) {
             //TODO: Placeholder code for now
             System.out.println("RequestorLength: " + requestorLength);
-            for (String value: values) {
+            for (String value : values) {
                 System.out.println("values: " + value);
             }
         }
@@ -88,12 +89,14 @@ public class Crypto {
 
 
         PKCS5S2ParametersGenerator generator = new PKCS5S2ParametersGenerator(new SHA256Digest());
-        generator.init(PBEParametersGenerator.PKCS5PasswordToUTF8Bytes(password.toCharArray()), saltBytes, 4096);
-        KeyParameter key = (KeyParameter)generator.generateDerivedMacParameters(256);
+        generator.init(PBEParametersGenerator.PKCS5PasswordToUTF8Bytes(password.toCharArray()),
+                saltBytes, 4096);
+        KeyParameter key = (KeyParameter) generator.generateDerivedMacParameters(256);
 
         byte[] seedBytes = key.getKey();
 
-        BigInteger numPrivateKey = CryptoUtil.intFromBytes(seedBytes).mod(new BigInteger("62").pow(6));
+        BigInteger numPrivateKey = CryptoUtil.intFromBytes(seedBytes).mod(new BigInteger("62")
+                .pow(6));
 
         String privateKey = CryptoUtil.intToBase62(numPrivateKey, -1);
         String publicKey = new EcDSA().getPublicKey(numPrivateKey);

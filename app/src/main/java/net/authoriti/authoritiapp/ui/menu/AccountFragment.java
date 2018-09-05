@@ -23,6 +23,7 @@ import net.authoriti.authoritiapp.ui.alert.AccountAddDialog;
 import net.authoriti.authoritiapp.ui.items.AccountAddItem;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
 import net.authoriti.authoritiapp.utils.AuthoritiUtils;
+import net.authoriti.authoritiapp.utils.crypto.CryptoUtil;
 
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 
@@ -149,11 +150,12 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
     private void addAccount(String name, String id, boolean setDefault) {
         User user = dataManager.getUser();
         List<AccountID> accountIDs = user.getAccountIDs();
-        accountIDs.add(new AccountID(name, id));
+        accountIDs.add(new AccountID(name, CryptoUtil.hash(id)));
         dataManager.setUser(user);
         if (setDefault) {
-            dataManager.setDefaultAccountID(new Value(id, name));
-            utils.updateDefaultvalues(getActivity(), PICKER_ACCOUNT, new Value(id, name), true);
+            dataManager.setDefaultAccountID(new Value(CryptoUtil.hash(id), name));
+            utils.updateDefaultvalues(getActivity(), PICKER_ACCOUNT, new Value(CryptoUtil.hash
+                    (id), name), true);
         }
         showAccounts();
     }

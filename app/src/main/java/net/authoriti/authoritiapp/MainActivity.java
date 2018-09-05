@@ -22,6 +22,7 @@ import net.authoriti.authoritiapp.api.AuthoritiAPI;
 import net.authoriti.authoritiapp.api.model.AccountID;
 import net.authoriti.authoritiapp.api.model.AuthLogIn;
 import net.authoriti.authoritiapp.api.model.DefaultValue;
+import net.authoriti.authoritiapp.api.model.Group;
 import net.authoriti.authoritiapp.api.model.Order;
 import net.authoriti.authoritiapp.api.model.Picker;
 import net.authoriti.authoritiapp.api.model.Purpose;
@@ -54,9 +55,12 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -308,6 +312,11 @@ public class MainActivity extends BaseActivity {
         loadPurposes();
         loadScheme();
 
+
+        PermissionCodeRequest("authoriti://purpose/manage-an-account?accountId=some_account_id" +
+                "&data_type=00,02,03&time=15");
+
+
     }
 
     private void loadPurposes() {
@@ -396,9 +405,39 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    private void PermissionCodeRequest(String url) {
+//        String[] splitUrl = url.split("\\?");
+//        if (splitUrl.length > 0) {
+//            String label = splitUrl[0].replace("authoriti://purpose/", "");
+//            label = label.replace("-", " ");
+//            List<Purpose> purposes = dataManager.getPurposes();
+//            String schemaIndex = "";
+//            for (int i = 0; i < purposes.size(); i++) {
+//                List<Group> groupList = purposes.get(i).getGroups();
+//                for (int k = 0; k < groupList.size(); k++) {
+//                    if (groupList.get(k).getLabel().equalsIgnoreCase(label)) {
+//                        schemaIndex = "" + groupList.get(k).getSchemaIndex();
+//                    } else {
+//
+//                    }
+//                }
+//            }
+//
+//            List<Picker> pickers = dataManager.getScheme().get("" + schemaIndex);
+//            System.out.println("=====pickers====" + pickers.toString());
+//            HashMap<String, DefaultValue> defaultValueHashMap = dataManager.getDefaultValues()
+//                    .get("" + schemaIndex);
+//            for (int i = 0; i < pickers.size(); i++) {
+//
+//            }
+//
+//        } else {
+//            Log.e("Message", "Invalid Url");
+//        }
+    }
+
 
     private void firstUpdateSchema() {
-
 //        if (dataManager.getScheme() != null && dataManager.getScheme().getPickers() != null) {
 //
 //            Order order = new Order();
@@ -510,11 +549,9 @@ public class MainActivity extends BaseActivity {
 //            order.setPickers(pickers);
 //            dataManager.setPickerOrder2(order);
 //        }
-
     }
 
     private void updateSchema() {
-
 //        if (dataManager.getScheme() != null && dataManager.getScheme().getPickers() != null) {
 //
 //            Order order = new Order();

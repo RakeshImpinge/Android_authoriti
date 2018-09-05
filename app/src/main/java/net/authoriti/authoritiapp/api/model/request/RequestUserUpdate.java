@@ -1,7 +1,9 @@
 package net.authoriti.authoritiapp.api.model.request;
 
 import com.google.gson.annotations.SerializedName;
+
 import net.authoriti.authoritiapp.api.model.AccountID;
+
 import java.util.List;
 
 /**
@@ -9,7 +11,6 @@ import java.util.List;
  */
 
 public class RequestUserUpdate {
-
     @SerializedName("accounts")
     private List<AccountID> accountIDs;
 

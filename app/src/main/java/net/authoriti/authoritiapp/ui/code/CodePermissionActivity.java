@@ -229,9 +229,9 @@ public class CodePermissionActivity extends BaseActivity {
     void generateButtonClicked() {
         hideKeyboard();
 
-        int count = rvEditFields.getChildCount();
         String errorMessage = "";
-        for (int i = 0; i < count; i++) {
+
+        for (int i = 0; i < rvEditFields.getChildCount(); i++) {
             View childAt = rvEditFields.getChildAt(i);
             AppCompatEditText etCode = ((AppCompatEditText) childAt.findViewById(R.id.etCode));
             if (etCode.getText().toString().trim().length() == 0) {
@@ -251,23 +251,59 @@ public class CodePermissionActivity extends BaseActivity {
             }
         }
 
-        // data_type List length
-        int data_type_length = 0;
-        if (defaultPickerMap.containsKey(PICKER_REQUEST) && defaultPickerMap.containsKey
-                (PICKER_REQUEST)) {
-            data_type_length = dataManager.getValuesFromDataType(Integer.valueOf(defaultPickerMap
-                    .get(PICKER_REQUEST).getValue().toString())).size();
-        } else {
-            data_type_length = dataManager.getValuesFromDataType(Integer.valueOf(group
-                    .getSchemaIndex())).size();
-        }
 
         if (errorMessage.length() != 0) {
             showAlert("", errorMessage);
         } else {
+            // data_type List length
+            int data_type_length = 0;
+            if (defaultPickerMap.containsKey(PICKER_REQUEST) && defaultPickerMap.containsKey
+                    (PICKER_REQUEST)) {
+                data_type_length = dataManager.getValuesFromDataType(Integer.valueOf
+                        (defaultPickerMap
+                                .get(PICKER_REQUEST).getValue().toString())).size();
+            } else {
+                data_type_length = dataManager.getValuesFromDataType(Integer.valueOf(group
+                        .getSchemaIndex())).size();
+            }
+
+            ArrayList<HashMap<String, String>> finalPickersList = new ArrayList<HashMap<String,
+                    String>>();
+            for (int i = 0; i < rvPermission.getChildCount(); i++) {
+                Picker adapterPicker = adapter.getAdapterItem(i).picker;
+                HashMap<String, String> hashMap = new HashMap<>();
+                hashMap.put("picker", adapterPicker.getPicker());
+
+                // Send length of data type list
+                if (adapterPicker.getPicker().equals(PICKER_DATA_TYPE)) {
+                    hashMap.put("key", "" + data_type_length);
+                } else {
+                    hashMap.put("key", "" + adapterPicker.getPicker());
+                }
+
+                // For account name
+                if (adapterPicker.getPicker().equals(PICKER_ACCOUNT)) {
+                    hashMap.put("value", defaultPickerMap.get(adapterPicker.getPicker()).getTitle
+                            ());
+                } else {
+                    hashMap.put("value", defaultPickerMap.get(adapterPicker.getPicker()).getValue
+                            ());
+                }
+                finalPickersList.add(hashMap);
+            }
+            for (int i = 0; i < rvEditFields.getChildCount(); i++) {
+                View childAt = rvEditFields.getChildAt(i);
+                AppCompatEditText etCode = ((AppCompatEditText) childAt.findViewById(R.id.etCode));
+                Picker adapterPicker = adapter_input.getAdapterItem(i).picker;
+                HashMap<String, String> hashMap = new HashMap<>();
+                hashMap.put("picker", adapterPicker.getPicker());
+                hashMap.put("key", adapter_input.getAdapterItem(i).picker.getInput());
+                hashMap.put("value", etCode.getText().toString());
+                finalPickersList.add(hashMap);
+            }
+
             CodeGenerateActivity_.intent(mContext).schemaIndex("" + group.getSchemaIndex())
-                    .data_type_length(data_type_length)
-                    .defaultPickerMap(defaultPickerMap).start();
+                    .finalPickersList(finalPickersList).start();
         }
     }
 
