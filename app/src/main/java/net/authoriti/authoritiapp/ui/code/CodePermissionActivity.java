@@ -79,7 +79,6 @@ public class CodePermissionActivity extends BaseActivity {
 
     public static int INTENT_REQUEST_PICK_VALUE = 1;
 
-
     int schemaIndex = -1;
 
     @AfterViews
@@ -96,10 +95,8 @@ public class CodePermissionActivity extends BaseActivity {
 
         showSchema();
 
-
         createPickerList();
         showSchema();
-
     }
 
     List<Picker> pickersList = new ArrayList<>();
@@ -155,33 +152,43 @@ public class CodePermissionActivity extends BaseActivity {
             // Updating the default values from the poll schema url like this :
             // authoriti://purpose/purpose-name?picker1=value&picker2=value
             if (defParamFromUrl != null && !defParamFromUrl.isEmpty()) {
-                if (defParamFromUrl.containsKey(pickersList.get(i).getPicker())) {
-                    ArrayList<String> title = new ArrayList<>();
-                    ArrayList<String> value = new ArrayList<>();
-                    for (int k = 0; k < pickersList.get(i).getValues().size(); k++) {
-                        if ((defParamFromUrl.get
-                                (pickersList.get(i).getPicker())).contains(pickersList.get(i)
-                                .getValues().get(k).getValue())) {
-                            title.add(pickersList.get(i).getValues
-                                    ().get
-                                    (k)
-                                    .getTitle());
-                            value.add(pickersList.get(i).getValues
-                                    ().get
-                                    (k)
-                                    .getValue());
+                String key = pickersList.get(i).getPicker();
+                if (key.equals(PICKER_DATA_INPUT_TYPE)) {
+                    key = pickersList.get(i).getInput();
+                    DefaultValue defaultValue = new DefaultValue(key
+                            , defParamFromUrl.get(key), false);
+                    defaultPickerMap.put(key, defaultValue);
+                } else {
+                    if (defParamFromUrl.containsKey(key)) {
+                        ArrayList<String> title = new ArrayList<>();
+                        ArrayList<String> value = new ArrayList<>();
+                        for (int k = 0; k < pickersList.get(i).getValues().size(); k++) {
+                            if ((defParamFromUrl.get
+                                    (pickersList.get(i).getPicker())).contains(pickersList.get(i)
+                                    .getValues().get(k).getValue())) {
+                                title.add(pickersList.get(i).getValues
+                                        ().get
+                                        (k)
+                                        .getTitle());
+                                value.add(pickersList.get(i).getValues
+                                        ().get
+                                        (k)
+                                        .getValue());
+                            }
                         }
-                    }
-                    if (title.size() > 0) {
-                        DefaultValue defaultValue = new DefaultValue(title.toString().replace
-                                ("[", "").replace("]", "")
-                                , value.toString().replace
-                                ("[", "").replace("]", ""), false);
-                        defaultPickerMap.put(pickersList.get(i).getPicker(), defaultValue);
+                        if (title.size() > 0) {
+                            DefaultValue defaultValue = new DefaultValue(title.toString().replace
+                                    ("[", "").replace("]", "")
+                                    , value.toString().replace
+                                    ("[", "").replace("]", ""), false);
+                            defaultPickerMap.put(pickersList.get(i).getPicker(), defaultValue);
+                        }
                     }
                 }
             }
         }
+
+        Log.e("List", pickersList.toString());
     }
 
     ArrayList<Integer> uiFlaseListIndex = new ArrayList<>();
@@ -194,7 +201,12 @@ public class CodePermissionActivity extends BaseActivity {
             // Adding Picker to UI
             if (pickersList.get(i).getUi()) {
                 if (pickersList.get(i).getPicker().equals(PICKER_DATA_INPUT_TYPE)) {
-                    adapter_input.add(new CodeEditItem(pickersList.get(i)));
+                    if (defaultPickerMap.containsKey(pickersList.get(i).getInput())) {
+                        adapter_input.add(new CodeEditItem(pickersList.get(i), defaultPickerMap
+                                .get(pickersList.get(i).getInput()).getValue()));
+                    } else {
+                        adapter_input.add(new CodeEditItem(pickersList.get(i), ""));
+                    }
                 } else {
                     adapter.add(new CodeItem(pickersList.get(i), defaultPickerMap, group
                             .getSchemaIndex()));
@@ -359,8 +371,8 @@ public class CodePermissionActivity extends BaseActivity {
                 // For account name
                 if (adapterPicker.getPicker().equals(PICKER_ACCOUNT)) {
                     hashMap.put("value", defaultPickerMap.get(adapterPicker.getPicker())
-                            .getTitle
-                                    ());
+                            .getValue());
+
                 } else {
                     hashMap.put("value", defaultPickerMap.get(adapterPicker.getPicker())
                             .getValue
@@ -393,7 +405,8 @@ public class CodePermissionActivity extends BaseActivity {
             }
 
             CodeGenerateActivity_.intent(mContext).schemaIndex("" + group.getSchemaIndex())
-                    .finalPickersList(finalPickersList).start();
+                    .finalPickersList(finalPickersList).isPollingRequest(defParamFromUrl != null)
+                    .start();
         }
     }
 

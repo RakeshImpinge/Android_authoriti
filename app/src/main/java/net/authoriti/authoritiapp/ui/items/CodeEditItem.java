@@ -21,9 +21,11 @@ import java.util.List;
 public class CodeEditItem extends AbstractItem<CodeEditItem, CodeEditItem.ViewHolder> {
 
     public Picker picker;
+    String defValue;
 
-    public CodeEditItem(Picker picker) {
+    public CodeEditItem(Picker picker, String defValue) {
         this.picker = picker;
+        this.defValue = defValue;
     }
 
     @Override
@@ -45,6 +47,7 @@ public class CodeEditItem extends AbstractItem<CodeEditItem, CodeEditItem.ViewHo
     public void bindView(final ViewHolder holder, List<Object> payloads) {
         super.bindView(holder, payloads);
         holder.tiCode.setHint(picker.getLabel());
+        holder.etCode.setText(defValue);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

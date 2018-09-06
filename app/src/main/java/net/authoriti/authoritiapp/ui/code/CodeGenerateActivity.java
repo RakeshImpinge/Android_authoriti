@@ -2,18 +2,15 @@ package net.authoriti.authoritiapp.ui.code;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import net.authoriti.authoritiapp.R;
-import net.authoriti.authoritiapp.api.model.DefaultValue;
-import net.authoriti.authoritiapp.api.model.Order;
-import net.authoriti.authoritiapp.api.model.Picker;
-import net.authoriti.authoritiapp.api.model.Purpose;
-import net.authoriti.authoritiapp.api.model.Value;
+import net.authoriti.authoritiapp.api.AuthoritiAPI;
+import net.authoriti.authoritiapp.api.model.request.RequestComplete;
+import net.authoriti.authoritiapp.api.model.response.ResponseComplete;
 import net.authoriti.authoritiapp.core.BaseActivity;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
 import net.authoriti.authoritiapp.utils.AuthoritiUtils;
@@ -21,8 +18,6 @@ import net.authoriti.authoritiapp.utils.crypto.Crypto;
 
 import com.tozny.crypto.android.AesCbcWithIntegrity;
 
-import net.authoriti.authoritiapp.R;
-import net.authoriti.authoritiapp.core.BaseActivity;
 import net.glxn.qrgen.android.QRCode;
 
 import org.androidannotations.annotations.AfterViews;
@@ -33,17 +28,16 @@ import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by mac on 12/2/17.
@@ -57,6 +51,8 @@ public class CodeGenerateActivity extends BaseActivity {
     @Extra
     String schemaIndex = "";
 
+    @Extra
+    boolean isPollingRequest = false;
 
     @Extra
     ArrayList<HashMap<String, String>> finalPickersList = new ArrayList<>();
@@ -73,6 +69,8 @@ public class CodeGenerateActivity extends BaseActivity {
     @ViewById(R.id.tvCode)
     TextView tvCode;
 
+    String userIndentifier = "";
+
     @AfterViews
     void callAfterViewInjection() {
         String code = generateCode();
@@ -81,8 +79,35 @@ public class CodeGenerateActivity extends BaseActivity {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("permission code", code);
         clipboard.setPrimaryClip(clip);
+
         Toast.makeText(this, "Code copied to clipboard", Toast.LENGTH_SHORT).show();
+
+        if (isPollingRequest) {
+            completePollingRequest(userIndentifier, code);
+        }
     }
+
+    private void completePollingRequest(String accountID, String permissionCode) {
+        RequestComplete requestComplete = new RequestComplete(accountID, permissionCode);
+        AuthoritiAPI.APIService().completePollingRequest(requestComplete).enqueue
+                (new Callback<ResponseComplete>() {
+                    @Override
+                    public void onResponse(Call<ResponseComplete> call,
+                                           Response<ResponseComplete>
+                                                   response) {
+                        if (response.isSuccessful()) {
+                            dismissProgressDialog();
+                        } else {
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseComplete> call, Throwable t) {
+                        dismissProgressDialog();
+                    }
+                });
+    }
+
 
     private String generateHTMLString(String code) {
         StringBuilder html = new StringBuilder();
@@ -101,13 +126,12 @@ public class CodeGenerateActivity extends BaseActivity {
         crypto = new Crypto();
         Crypto.PayloadGenerator payloadGenerator = null;
         for (HashMap<String, String> hashMap : finalPickersList) {
-
             // Skip if key is blank
             if (hashMap.get("key").equals("")) continue;
-
             String key_root = hashMap.get("picker");
             if (key_root.equals(PICKER_ACCOUNT)) {
                 payloadGenerator = crypto.init(hashMap.get("value"), schemaIndex);
+                userIndentifier = hashMap.get("value");
             } else if (key_root.equals(PICKER_TIME)) {
                 Calendar newCalendar = timeFormat(hashMap.get("value"));
                 try {

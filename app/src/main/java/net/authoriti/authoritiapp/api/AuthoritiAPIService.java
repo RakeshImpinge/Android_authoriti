@@ -2,11 +2,12 @@ package net.authoriti.authoritiapp.api;
 
 import net.authoriti.authoritiapp.api.model.Purpose;
 import net.authoriti.authoritiapp.api.model.SchemaGroup;
-import net.authoriti.authoritiapp.api.model.request.RequestDLSave;
+import net.authoriti.authoritiapp.api.model.request.RequestComplete;
 import net.authoriti.authoritiapp.api.model.request.RequestSignUp;
 import net.authoriti.authoritiapp.api.model.request.RequestUserUpdate;
 import net.authoriti.authoritiapp.api.model.response.ResponseInviteCode;
 import net.authoriti.authoritiapp.api.model.response.ResponsePolling;
+import net.authoriti.authoritiapp.api.model.response.ResponseComplete;
 import net.authoriti.authoritiapp.api.model.response.ResponseSignUp;
 import net.authoriti.authoritiapp.api.model.response.ResponseSignUpChase;
 
@@ -71,4 +72,8 @@ public interface AuthoritiAPIService {
 
     @GET("")
     Call<ResponsePolling> getPollingUrl(@Url String url);
+
+    @POST("api/v1/pc-request/complete")
+    Call<ResponseComplete> completePollingRequest(@Body RequestComplete requestComplete);
+
 }

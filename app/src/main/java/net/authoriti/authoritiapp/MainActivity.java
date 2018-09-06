@@ -485,14 +485,15 @@ public class MainActivity extends BaseActivity {
             }
 //            accountId=some_account_id" +
 //            "&data_type=00,02,03&time=15"
-
             String defString = splitUrl[1];
             String defStringSplit[] = defString.split("&");
             HashMap<String, String> hashMap = new HashMap<>();
             if (defStringSplit.length > 0) {
                 for (String value : defStringSplit) {
-                    hashMap.put(value.split("=")[0].replace("-", ""), value.split("=")[1].replace
-                            ("-", ""));
+                    String splitValue[] = value.split("=");
+                    if (splitValue.length > 1) {
+                        hashMap.put(splitValue[0].replace("-", ""), splitValue[1].replace("-", ""));
+                    }
                 }
                 if (!hashMap.isEmpty()) {
                     CodePermissionActivity_.intent(mContext).purposeIndex(indexGroup)
