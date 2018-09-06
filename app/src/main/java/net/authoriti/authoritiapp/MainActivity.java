@@ -8,6 +8,7 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.nfc.Tag;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,6 +18,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import net.authoriti.authoritiapp.api.AuthoritiAPI;
 import net.authoriti.authoritiapp.api.model.AccountID;
@@ -28,8 +30,11 @@ import net.authoriti.authoritiapp.api.model.Picker;
 import net.authoriti.authoritiapp.api.model.Purpose;
 import net.authoriti.authoritiapp.api.model.SchemaGroup;
 import net.authoriti.authoritiapp.api.model.Value;
+import net.authoriti.authoritiapp.api.model.response.ResponseInviteCode;
+import net.authoriti.authoritiapp.api.model.response.ResponsePolling;
 import net.authoriti.authoritiapp.core.BaseActivity;
 import net.authoriti.authoritiapp.ui.auth.LoginActivity_;
+import net.authoriti.authoritiapp.ui.auth.StartupActivity_;
 import net.authoriti.authoritiapp.ui.code.CodePermissionActivity_;
 import net.authoriti.authoritiapp.ui.help.HelpActivity_;
 import net.authoriti.authoritiapp.ui.menu.AccountChaseFragment_;
@@ -98,6 +103,10 @@ public class MainActivity extends BaseActivity {
 
     long SELECTED_MENU_ID;
 
+    ArrayList<AccountID> userAccountIds = new ArrayList<>();
+
+    long PollingStopMilliseconds = 0;
+
 
     Foreground.Listener listener = new Foreground.Listener() {
         @Override
@@ -140,14 +149,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         Foreground.get(getApplication()).addListener(listener);
-
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
 
     }
 
@@ -174,6 +176,8 @@ public class MainActivity extends BaseActivity {
                                 (MENU_ACCOUNT).withSelectable(true).withTypeface(typeface),
                         new PrimaryDrawerItem().withName(R.string.menu_wipe).withIdentifier
                                 (MENU_WIPE).withSelectable(true).withTypeface(typeface),
+                        new PrimaryDrawerItem().withName(R.string.menu_polling).withIdentifier
+                                (MENU_POLLING).withSelectable(true).withTypeface(typeface),
                         new PrimaryDrawerItem().withName(R.string.menu_logOut).withIdentifier
                                 (MENU_LOGOUT).withSelectable(true).withTypeface(typeface)
                 )
@@ -207,6 +211,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void menuSelected(long menu_id) {
+
         SELECTED_MENU_ID = menu_id;
         Fragment fragment = null;
         if (menu_id == MENU_CODE) {
@@ -226,6 +231,12 @@ public class MainActivity extends BaseActivity {
                 wipeFragment = WipeFragment_.builder().build();
             }
             fragment = wipeFragment;
+        } else if (menu_id == MENU_POLLING) {
+            userAccountIds.clear();
+            PollingStopMilliseconds = System.currentTimeMillis() + (30 * 1000);
+            userAccountIds.addAll(dataManager.getUser().getAccountIDs());
+            startPolling();
+            displayProgressDialog("Please Wait...");
         }
 
         if (menu_id == MENU_ACCOUNT) {
@@ -401,6 +412,55 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    int currentId = -1;
+
+    private void startPolling() {
+        if (currentId == userAccountIds.size() - 1) currentId = 0;
+        else currentId = currentId + 1;
+        pollingApi(userAccountIds.get(currentId).getIdentifier());
+    }
+
+    Handler handler = new Handler();
+    private Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            startPolling();
+        }
+    };
+
+    private void pollingApi(String Id) {
+        Log.e("pollingApi", "Started");
+        String pollingUrl = Constants.API_BASE_URL_POLLING + Id + ".json";
+        AuthoritiAPI.APIService().getPollingUrl(pollingUrl).enqueue
+                (new Callback<ResponsePolling>() {
+                    @Override
+                    public void onResponse(Call<ResponsePolling> call,
+                                           Response<ResponsePolling>
+                                                   response) {
+                        if (response.isSuccessful() && response.body().getUrl() != null &&
+                                !response.body().getUrl().equals("")) {
+                            dismissProgressDialog();
+                            PermissionCodeRequest(response.body().getUrl());
+                        } else {
+                            if (System.currentTimeMillis() < PollingStopMilliseconds) {
+                                handler.removeCallbacks(runnable);
+                                handler.postDelayed(runnable, 5000);
+                            } else {
+                                dismissProgressDialog();
+                                showAlert("", "No polling request found, Please try again thanks.");
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponsePolling> call, Throwable t) {
+                        dismissProgressDialog();
+                    }
+                });
+
+    }
+
+    // Parse polling url and redirect to next screen
     private void PermissionCodeRequest(String url) {
         String[] splitUrl = url.split("\\?");
         if (splitUrl.length > 0) {
@@ -444,6 +504,7 @@ public class MainActivity extends BaseActivity {
             Log.e("Message", "Invalid Url");
         }
     }
+
 
     private void firstUpdateSchema() {
 //        if (dataManager.getScheme() != null && dataManager.getScheme().getPickers() != null) {

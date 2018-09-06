@@ -6,6 +6,7 @@ import net.authoriti.authoritiapp.api.model.request.RequestDLSave;
 import net.authoriti.authoritiapp.api.model.request.RequestSignUp;
 import net.authoriti.authoritiapp.api.model.request.RequestUserUpdate;
 import net.authoriti.authoritiapp.api.model.response.ResponseInviteCode;
+import net.authoriti.authoritiapp.api.model.response.ResponsePolling;
 import net.authoriti.authoritiapp.api.model.response.ResponseSignUp;
 import net.authoriti.authoritiapp.api.model.response.ResponseSignUpChase;
 
@@ -26,6 +27,7 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
+import retrofit2.http.Url;
 
 /**
  * Created by mac on 11/30/17.
@@ -66,4 +68,7 @@ public interface AuthoritiAPIService {
     Call<JsonObject> saveDLInfo(@Part("log") RequestBody log,
                                 @Part MultipartBody.Part font,
                                 @Part MultipartBody.Part back);
+
+    @GET("")
+    Call<ResponsePolling> getPollingUrl(@Url String url);
 }

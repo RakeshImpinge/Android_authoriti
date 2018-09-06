@@ -6,9 +6,11 @@ package net.authoriti.authoritiapp.utils;
 
 public interface Constants {
 
-    // Server Url
     String API_BASE_URL =
             "4F57F17D187A04B32327D56F7E3755E34333DAA916F4317E4F075635094BEACF088459A0B58FE5442FBDD0D07FD2A2E9";
+    String API_BASE_URL_POLLING =
+            "https://s3.amazonaws.com/authoriti-requests-dev/requests/";
+
 //    String API_BASE_URL = "https://authoriti-test.crts.io";
 //    String API_BASE_URL = "https://authoriti-qa.crts.io";
 
@@ -21,6 +23,7 @@ public interface Constants {
     long MENU_ACCOUNT = 1002;
     long MENU_WIPE = 1003;
     long MENU_LOGOUT = 1004;
+    long MENU_POLLING = 1005;
 
     String MENU_ID = "menu_id";
 
