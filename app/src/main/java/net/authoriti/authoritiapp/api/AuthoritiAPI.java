@@ -67,7 +67,8 @@ public class AuthoritiAPI {
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(SC.decryptString(Constants.API_BASE_URL))
+//                .baseUrl(SC.decryptString(Constants.API_BASE_URL))
+                .baseUrl(Constants.API_BASE_URL)
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();

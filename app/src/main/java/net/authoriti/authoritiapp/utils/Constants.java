@@ -6,8 +6,8 @@ package net.authoriti.authoritiapp.utils;
 
 public interface Constants {
 
-    String API_BASE_URL =
-            "4F57F17D187A04B32327D56F7E3755E34333DAA916F4317E4F075635094BEACF088459A0B58FE5442FBDD0D07FD2A2E9";
+    String API_BASE_URL = "https://validate.authroriti.crts.io";
+//            "4F57F17D187A04B32327D56F7E3755E34333DAA916F4317E4F075635094BEACF088459A0B58FE5442FBDD0D07FD2A2E9";
     String API_BASE_URL_POLLING =
             "https://s3.amazonaws.com/authoriti-requests-dev/requests/";
 

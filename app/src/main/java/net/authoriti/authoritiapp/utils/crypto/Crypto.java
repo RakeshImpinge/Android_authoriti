@@ -8,12 +8,11 @@ import org.spongycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.spongycastle.crypto.params.KeyParameter;
 
 import java.math.BigInteger;
-import java.nio.charset.Charset;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
+
+import android.util.Log;
 
 /**
  * Created by mac on 12/20/17.
@@ -21,6 +20,25 @@ import java.util.TimeZone;
 
 public class Crypto {
     public class PayloadGenerator {
+        public static final String TAG = "PAYLOAD_GENERATOR";
+
+        private BigInteger BASE = new BigInteger("62");
+
+        private String ALPHANUM = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        private char[] DECANUM = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+
+        private String BASE22 = "0123456789abcdefghijkl";
+        private String BASE14 = "0123456789abcd";
+
+        private String[] SCHEMA1 = { BASE22, BASE22, BASE22, BASE22, BASE22, new String(DECANUM), new String(DECANUM), new String(DECANUM), new String(DECANUM) };
+        private String[] SCHEMA2 = { ALPHANUM, ALPHANUM, BASE22, BASE22, BASE22, BASE22, BASE22 };
+        private String[] SCHEMA3 = { ALPHANUM, ALPHANUM, BASE22, BASE22, BASE22, BASE22, BASE22 };
+        private String[] SCHEMA4 = { ALPHANUM, ALPHANUM, BASE22, BASE22, BASE22, BASE22, BASE22 };
+        private String[] SCHEMA5 = { new String(DECANUM), new String(DECANUM), new String(DECANUM), new String(DECANUM), new String(DECANUM), BASE14, BASE14, BASE14, BASE14, BASE14 };
+        private String[] SCHEMA6 =  { BASE22, BASE22, BASE22, BASE22, BASE22, ALPHANUM, ALPHANUM };
+
+        private String[][] SCHEMA_RANGES = { SCHEMA1, SCHEMA2, SCHEMA3, SCHEMA4, SCHEMA5, SCHEMA6 };
+
         private String accountId;
         private String schemaVersion;
 
@@ -32,7 +50,7 @@ public class Crypto {
         }
 
         public void add(String picker, String value) {
-            System.out.println(picker + ": " + value);
+            Log.v(TAG, "picker: " + picker + "; value: " + value);
             switch (picker) {
                 case Constants.PICKER_INDUSTRY:
                 case Constants.PICKER_LOCATION_COUNTRY:
@@ -48,19 +66,52 @@ public class Crypto {
         }
 
         public void addTime(int year, int month, int day, int hour, int minute) throws Exception {
-            //TODO: Placeholder code for now
-//            System.out.println(year + "-" + month + "-" + day + "-" + hour + "-" + minute);
-            System.out.println("time");
+            Calendar calendar = Calendar.getInstance();
+
+            calendar.set(Calendar.YEAR, year);
+            calendar.set(Calendar.MONTH, month);
+            calendar.set(Calendar.DAY_OF_MONTH, day);
+            calendar.set(Calendar.HOUR, hour);
+            calendar.set(Calendar.MINUTE, minute);
+
+            Date expirationTime = calendar.getTime();
+
+            calendar.set(Calendar.YEAR, 2018);
+            calendar.set(Calendar.MONTH, Calendar.JULY);
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
+            calendar.set(Calendar.HOUR, 0);
+            calendar.set(Calendar.MINUTE, 0);
+
+
+            Date baseTime = calendar.getTime();
+
+            long difference = expirationTime.getTime() - baseTime.getTime();
+            long minutes = difference / 60000 - 360;
+
+            String encodedTime = "";
+            if (schemaVersion.equalsIgnoreCase("5")) {
+                encodedTime = intToBase14(new BigInteger(minutes + ""), 5);
+                if (encodedTime.length() > 5) {
+                    encodedTime = "ddddd";
+                }
+            } else {
+                encodedTime = intToBase22(new BigInteger(minutes + ""), 5);
+                if (encodedTime.length() > 5) {
+                    encodedTime = "lllll";
+                }
+            }
+
+            payload = encodedTime + payload;
         }
 
         public void addInput(String inputType, String value) {
             //TODO: Placeholder code for now
-            System.out.println("InputType: " + inputType + ". Value: " + value);
+            Log.v(TAG, "picker (input): " + inputType + "; value: " + value);
         }
 
         public void addDataType(int requestorLength, String[] values) {
             //TODO: Placeholder code for now
-            System.out.println("RequestorLength: " + requestorLength);
+            Log.v(TAG, "data_type: " + requestorLength);
             for (String value : values) {
                 System.out.println("values: " + value);
             }
@@ -68,8 +119,50 @@ public class Crypto {
 
         public String generate() {
             //TODO: Placeholder code for now
-            System.out.println("generated-payload: " + payload);
+            Log.v(TAG, "Generated Payload: " + payload);
             return "0000000000";
+        }
+
+        private String intToBase22(BigInteger number, int length) {
+            StringBuilder str = new StringBuilder();
+            final BigInteger zero = new BigInteger("0");
+            if (number.compareTo(zero) == 0) {
+                return "0";
+            }
+
+            final BigInteger base = new BigInteger("22");
+            while (number.compareTo(zero) != 0) {
+                final int index = number.mod(base).intValue();
+                str.append(BASE22.charAt(index));
+                number = number.divide(base);
+            }
+
+            while (str.length() < length) {
+                str.append(BASE22.charAt(0));
+            }
+
+            return str.reverse().toString();
+        }
+
+        private String intToBase14(BigInteger number, int length) {
+            StringBuilder str = new StringBuilder();
+            final BigInteger zero = new BigInteger("0");
+            if (number.compareTo(zero) == 0) {
+                return "0";
+            }
+
+            final BigInteger base = new BigInteger("14");
+            while (number.compareTo(zero) != 0) {
+                final int index = number.mod(base).intValue();
+                str.append(BASE14.charAt(index));
+                number = number.divide(base);
+            }
+
+            while (str.length() < length) {
+                str.append(BASE14.charAt(0));
+            }
+
+            return str.reverse().toString();
         }
     }
 
