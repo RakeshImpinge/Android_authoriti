@@ -170,9 +170,9 @@ public class CodeGenerateActivity extends BaseActivity {
             }
         }
 
-        final String payload = payloadGenerator.generate();
-        String code = null;
-        code = crypto.sign(payload, privateKey);
+        final String code = payloadGenerator.generate();
+
+//        code = crypto.sign(payload, privateKey);
 
         return code;
     }

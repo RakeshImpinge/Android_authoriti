@@ -19,12 +19,12 @@ import android.util.Log;
  */
 
 public class Crypto {
-    public class PayloadGenerator {
-        public static final String TAG = "PAYLOAD_GENERATOR";
+    public static final String TAG = "PAYLOAD_GENERATOR";
 
+    public class PayloadGenerator {
         private BigInteger BASE = new BigInteger("62");
 
-        private String ALPHANUM = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        public String ALPHANUM = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
         private char[] DECANUM = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
         private String BASE22 = "0123456789abcdefghijkl";
@@ -189,16 +189,12 @@ public class Crypto {
                     extra = extra + extraInput;
                     break;
                 case "6":
-                    Log.v(TAG, "payload: " + payload);
                     encodedPayload = encodePayload(payload, 6);
-                    Log.v(TAG, "encoded payload: " + encodedPayload);
                     break;
             }
 
-            Log.v(TAG, "Encoded Payload: " + encodedPayload);
-            Log.v(TAG, "Extra: " + extra);
-
-            return "0000000000";
+            final String signedCode = sign(encodedPayload, privateKey);
+            return addDataToCode(extra, signedCode);
         }
 
         private String encodePayload(String payload, int schema) {
@@ -271,6 +267,19 @@ public class Crypto {
             }
 
             return str.reverse().toString();
+        }
+
+        private String addDataToCode(String data, String code) {
+            Log.v(TAG, "Adding " + data);
+            final String _data = CryptoUtil.cleanup(CryptoUtil.hash(data), 8);
+            Log.v(TAG, "Adding " + _data);
+
+            BigInteger a = CryptoUtil.base62ToInt(_data);
+            BigInteger b = CryptoUtil.base62ToInt(code);
+
+            BigInteger sum = a.add(b);
+
+            return CryptoUtil.intToBase62(sum, 10);
         }
     }
 
@@ -352,22 +361,7 @@ public class Crypto {
         return CryptoUtil.intToBase62(BigInteger.valueOf(minutes), 4);
     }
 
-    public String encodeGeo(String geo, String payload) {
-        BigInteger p = new BigInteger(geo);
-        return payload + CryptoUtil.intToBase62(p, 1);
-    }
-
-    public String encodeDataTypes(String selectedTypes, String payload) {
-        int dt = Integer.parseInt(selectedTypes, 2);
-        return payload + CryptoUtil.intToBase62(new BigInteger(dt + ""), 2);
-    }
-
-    public String sign(String payload, String privateKey) {
-        System.out.println("Payload: " + payload);
-        System.out.println("Private-Key: " + privateKey);
-
-        return payload;
-//        String signature = CryptoUtil.sign(payload, privateKey);
-//        return signature;
+    private String sign(String payload, String privateKey) {
+        return new EcDSA().sign(payload, privateKey);
     }
 }

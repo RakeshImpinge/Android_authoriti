@@ -1,5 +1,7 @@
 package net.authoriti.authoritiapp.utils.crypto;
 
+import android.util.Log;
+
 import org.spongycastle.crypto.PBEParametersGenerator;
 import org.spongycastle.crypto.digests.SHA256Digest;
 import org.spongycastle.crypto.generators.PKCS5S2ParametersGenerator;
@@ -16,41 +18,11 @@ import java.util.Random;
  */
 
 public class CryptoUtil {
+    private static final String TAG = "PAYLOAD_GENERATOR";
     private static final String CHARACTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final BigInteger BASE = new BigInteger("62");
 
-    public static BigInteger[] keys(int width) {
-        BigInteger p = BigInteger.probablePrime(width, new Random());
-        BigInteger q = BigInteger.probablePrime(width, new Random());
-
-        BigInteger n = p.multiply(q);
-
-        BigInteger one = new BigInteger("1");
-
-
-        BigInteger e = new BigInteger("65537");
-
-        BigInteger phi = (p.subtract(one)).multiply((q.subtract(one)));
-
-        BigInteger d = e.modInverse(phi);
-
-        BigInteger[] keys = {n, e, d};
-
-        return keys;
-    }
-
-    public static String sign(String payload, String privateKey) {
-        BigInteger p = base62ToInt(payload);
-        String[] parts = privateKey.split("-");
-
-        BigInteger modulus = base62ToInt(parts[0]);
-        BigInteger key = base62ToInt(parts[1]);
-
-        System.out.println("Modulus: " + modulus);
-        System.out.println("Key: " + key);
-
-        return intToBase62(p.modPow(key, modulus), 10);
-    }
+    static String ALPHANUM = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     public static String intToBase62(BigInteger num, int length) {
         StringBuilder str = new StringBuilder("");
@@ -70,6 +42,33 @@ public class CryptoUtil {
         return str.reverse().toString();
     }
 
+    public static String xor62_cipher(String msg, String seed) {
+        final int n = msg.length();
+        final BigInteger baseRaisedToN = new BigInteger("62").pow(n);
+
+        BigInteger key = intFromBytes(hash(seed)).mod(baseRaisedToN);
+        String x = intToBase62(key, n);
+
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < n; i++) {
+            char a = x.charAt(i);
+            char b = msg.charAt(i);
+
+            char m = xor62_minus(a, b);
+            result = result.append(m);
+        }
+
+        return result.toString();
+    }
+
+    public static char xor62_minus(char a, char b) {
+        int x = ALPHANUM.indexOf(a);
+        int y = ALPHANUM.indexOf(b);
+
+        String result = intToBase62(new BigInteger((x-y) + "").mod(BASE), 1);
+        return result.charAt(0);
+    }
+
     public static String cleanup(String str, int length) {
         StringBuilder result = new StringBuilder("");
         final int sz = str.length();
@@ -86,6 +85,22 @@ public class CryptoUtil {
             }
         }
         return result.toString();
+    }
+
+    private static byte[] hexStringToByteArray(String s) {
+        int len = s.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                    + Character.digit(s.charAt(i+1), 16));
+        }
+        return data;
+    }
+
+    public static BigInteger digestMessage(String message, BigInteger n) {
+        byte [] bytes = hexStringToByteArray(message);
+        BigInteger num = intFromBytes(bytes);
+        return num.mod(n);
     }
 
     public static String hash(String str) {
@@ -139,7 +154,6 @@ public class CryptoUtil {
             mult = mult.multiply(BASE);
 
         }
-
         return num;
     }
 
@@ -150,6 +164,10 @@ public class CryptoUtil {
         random.nextBytes(bytes);
 
         return bytes;
+    }
+
+    public static BigInteger intFromBytes(String message) {
+        return intFromBytes(hexStringToByteArray(message));
     }
 
     public static BigInteger intFromBytes(byte[] bytes) {
