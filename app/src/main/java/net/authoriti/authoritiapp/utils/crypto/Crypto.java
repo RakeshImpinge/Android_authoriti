@@ -62,6 +62,7 @@ public class Crypto {
                 case Constants.PICKER_GEO:
                     String geo = CryptoUtil.intToBase62(new BigInteger(value), 1);
                     payload = payload + geo;
+                    break;
                 default:
                     System.out.println("TODO: handle picker " + picker + ". received value: " +
                             value);
@@ -110,7 +111,17 @@ public class Crypto {
 
         public void addInput(String inputType, String value) {
             Log.v(TAG, "picker (input): " + inputType + "; value: " + value);
-            extraInput = extraInput + CryptoUtil.cleanup(value, value.length());
+            if (schemaVersion.equalsIgnoreCase("5") && inputType.equalsIgnoreCase("amount")) {
+                while (value.length() < 5) {
+                    value = "0" + value;
+                }
+                extraInput = payload.substring(5) + extraInput;
+                Log.v(TAG, "extraInput: " + extraInput);
+                payload = value + payload.substring(0, 5);
+            } else {
+                extraInput = extraInput + CryptoUtil.cleanup(value, value.length());
+            }
+
         }
 
         public void addDataType(int requestorLength, String[] values) {
@@ -135,7 +146,7 @@ public class Crypto {
 
         public String generate() {
             String strPayload = "";
-            String encodedPayload;
+            String encodedPayload = "";
             String extra = accountId;
 
             switch (schemaVersion) {
@@ -143,11 +154,11 @@ public class Crypto {
                     final char countryValue = payload.charAt(7);
                     payload = payload.substring(0, 7) + payload.substring(8);
                     encodedPayload = encodePayload(payload, 1);
-                    extra = extra + countryValue;
+                    extra = extraInput + extra + countryValue;
                     break;
                 case "7":
                     encodedPayload = encodePayload(payload, 1);
-                    extra = extra + "1"; // 1 = United States; Make this dynamic
+                    extra = extraInput + extra + "1"; // 1 = United States; Make this dynamic
                     break;
                 case "2":
                     Log.v(TAG, "payload: " + payload);
@@ -155,7 +166,8 @@ public class Crypto {
                 case "3": break;
                 case "4": break;
                 case "5":
-
+                    Log.v(TAG, "payload: " + payload);
+                    extra = extra + extraInput;
                     break;
                 case "6":
                     Log.v(TAG, "payload: " + payload);
@@ -163,7 +175,9 @@ public class Crypto {
                     Log.v(TAG, "encoded payload: " + encodedPayload);
                     break;
             }
-//            Log.v(TAG, "Generated Payload: " + strPayload);
+
+            Log.v(TAG, "Encoded Payload: " + encodedPayload);
+            Log.v(TAG, "Extra: " + extra);
 
             return "0000000000";
         }
