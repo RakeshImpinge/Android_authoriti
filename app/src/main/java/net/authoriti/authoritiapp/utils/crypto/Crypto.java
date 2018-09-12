@@ -43,6 +43,7 @@ public class Crypto {
         private String schemaVersion;
 
         private String payload = "";
+        private String extraInput = "";
 
         PayloadGenerator(String accountId, String schemaVersion) {
             this.accountId = accountId;
@@ -55,9 +56,12 @@ public class Crypto {
                 case Constants.PICKER_INDUSTRY:
                 case Constants.PICKER_LOCATION_COUNTRY:
                 case Constants.PICKER_LOCATION_STATE:
-//                case Constants.PICKER_ANY_STATE:
+                case Constants.PICKER_REQUEST:
                     payload = payload + value;
                     break;
+                case Constants.PICKER_GEO:
+                    String geo = CryptoUtil.intToBase62(new BigInteger(value), 1);
+                    payload = payload + geo;
                 default:
                     System.out.println("TODO: handle picker " + picker + ". received value: " +
                             value);
@@ -105,22 +109,93 @@ public class Crypto {
         }
 
         public void addInput(String inputType, String value) {
-            //TODO: Placeholder code for now
             Log.v(TAG, "picker (input): " + inputType + "; value: " + value);
+            extraInput = extraInput + CryptoUtil.cleanup(value, value.length());
         }
 
         public void addDataType(int requestorLength, String[] values) {
-            //TODO: Placeholder code for now
-            Log.v(TAG, "data_type: " + requestorLength);
-            for (String value : values) {
-                System.out.println("values: " + value);
+            Log.v(TAG, "addDataType");
+            StringBuilder bitmask = new StringBuilder();
+
+            for (int i = 0; i < requestorLength; i++) {
+                boolean found = false;
+                for (String v: values) {
+                    if (Integer.parseInt(v) == i) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) bitmask.append("1");
+                else bitmask.append("0");
             }
+
+            int decimal = Integer.parseInt(bitmask.toString(), 2);
+            payload = payload + CryptoUtil.intToBase62(new BigInteger(decimal + ""), 2);
         }
 
         public String generate() {
-            //TODO: Placeholder code for now
-            Log.v(TAG, "Generated Payload: " + payload);
+            String strPayload = "";
+            String encodedPayload;
+            String extra = accountId;
+
+            switch (schemaVersion) {
+                case "1":
+                    final char countryValue = payload.charAt(7);
+                    payload = payload.substring(0, 7) + payload.substring(8);
+                    encodedPayload = encodePayload(payload, 1);
+                    extra = extra + countryValue;
+                    break;
+                case "7":
+                    encodedPayload = encodePayload(payload, 1);
+                    extra = extra + "1"; // 1 = United States; Make this dynamic
+                    break;
+                case "2":
+                    Log.v(TAG, "payload: " + payload);
+                    break;
+                case "3": break;
+                case "4": break;
+                case "5":
+
+                    break;
+                case "6":
+                    Log.v(TAG, "payload: " + payload);
+                    encodedPayload = encodePayload(payload, 6);
+                    Log.v(TAG, "encoded payload: " + encodedPayload);
+                    break;
+            }
+//            Log.v(TAG, "Generated Payload: " + strPayload);
+
             return "0000000000";
+        }
+
+        private String encodePayload(String payload, int schema) {
+            String[] payloadRanges = SCHEMA_RANGES[schema - 1];
+            return encodePayload(payload, payloadRanges);
+        }
+
+        private String encodePayload(String payload, String[] ranges) {
+            BigInteger total = new BigInteger("0");
+            BigInteger mult = new BigInteger("1");
+
+            int len = payload.length();
+            for (int i = len - 1; i >= 0; i--) {
+                char d = payload.charAt(i);
+                String r = ranges[i];
+
+                int index = r.indexOf(d);
+                if (index != -1) {
+                    total = total.add(new BigInteger(index + "").multiply(mult));
+                    mult = mult.multiply(new BigInteger(r.length() + ""));
+                }
+            }
+
+
+            StringBuilder encoded = new StringBuilder(CryptoUtil.intToBase62(total, 6));
+            while (encoded.length() < 6) {
+                encoded.insert(0, "0");
+            }
+
+            return encoded.toString();
         }
 
         private String intToBase22(BigInteger number, int length) {
