@@ -128,7 +128,20 @@ public class Crypto {
                 if (inputType.equalsIgnoreCase("secret")) {
                     trimmed = CryptoUtil.hash(trimmed);
                 } else if (inputType.equalsIgnoreCase("amount")) {
-                    trimmed = CryptoUtil.cleanup(value.replace('.', 'x'), value.length());
+                    String amount = value;
+                    int indexOfPeriod = amount.indexOf('.');
+                    if (indexOfPeriod != -1) {
+                        int distance = amount.length() - indexOfPeriod;
+                        if (distance == 1) {
+                            amount = amount + "00";
+                        } else if (distance == 2) {
+                            amount = amount + "0";
+                        } else {
+                            amount = amount.substring(0, indexOfPeriod + 3);
+                        }
+                    } else amount = amount + "x00";
+                    Log.v(TAG, "Amount: " + amount);
+                    trimmed = CryptoUtil.cleanup(amount.replace('.', 'x'), amount.length());
                 }
 
                 extraInput = extraInput + trimmed;
@@ -150,7 +163,7 @@ public class Crypto {
                 if (found) bitmask.append("1");
                 else bitmask.append("0");
             }
-
+            Log.v(TAG, "BITMASK: " + bitmask);
             int decimal = Integer.parseInt(bitmask.toString(), 2);
             payload = payload + CryptoUtil.intToBase62(new BigInteger(decimal + ""), 2);
         }
@@ -183,7 +196,7 @@ public class Crypto {
                 case "3":
                 case "4":
                     String tmpHash = CryptoUtil.hash(extraInput);
-                    encodedPayload = encodePayload(tmpHash.substring(0, 2) + payload, 5);
+                    encodedPayload = encodePayload(tmpHash.substring(0, 2) + payload, 3);
                     extra = extra + extraInput;
                     break;
                 case "5":
@@ -203,6 +216,7 @@ public class Crypto {
         }
 
         private String encodePayload(String payload, int schema) {
+            Log.v(TAG, "ENCODING: " + payload);
             String[] payloadRanges = SCHEMA_RANGES[schema - 1];
             return encodePayload(payload, payloadRanges);
         }
