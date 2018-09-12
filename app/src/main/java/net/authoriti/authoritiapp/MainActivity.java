@@ -455,7 +455,7 @@ public class MainActivity extends BaseActivity {
                                 handler.postDelayed(runnable, 5000);
                             } else {
                                 dismissProgressDialog();
-                                showAlert("", "No polling request found, Please try again thanks.");
+                                showAlert("", "No Pending Updates");
                             }
                         }
                     }
