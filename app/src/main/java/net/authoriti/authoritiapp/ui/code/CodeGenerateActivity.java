@@ -146,7 +146,7 @@ public class CodeGenerateActivity extends BaseActivity {
             } else if (key_root.equals(PICKER_DATA_TYPE)) {
                 String data[] = hashMap.get("value").split("\\s*,\\s*");
                 payloadGenerator.addDataType(Integer.valueOf(hashMap.get("key")), data);
-            } else if (key_root.contains(PICKER_DATA_INPUT_TYPE + "_")) {
+            } else if (key_root.equals(PICKER_DATA_INPUT_TYPE)) {
                 payloadGenerator.addInput(hashMap.get("key"), hashMap.get("value"));
             } else if (key_root.equals(PICKER_REQUEST)) {
 
