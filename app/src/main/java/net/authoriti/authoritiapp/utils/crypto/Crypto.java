@@ -110,7 +110,7 @@ public class Crypto {
                     encodedTime = "lllll";
                 }
             }
-
+            Log.i(TAG, "Time: " + encodedTime);
             payload = encodedTime + payload;
         }
 
@@ -156,19 +156,21 @@ public class Crypto {
         }
 
         public String generate() {
-            String strPayload = "";
             String encodedPayload = "";
             String extra = accountId;
-
+            Log.i(TAG, "schemaVersion: " + schemaVersion);
             switch (schemaVersion) {
                 case "1":
                     final char countryValue = payload.charAt(7);
+                    Log.i(TAG, "Payload before: " + payload);
                     payload = payload.substring(0, 7) + payload.substring(8);
+                    Log.i(TAG, "Payload: " + payload);
                     encodedPayload = encodePayload(payload, 1);
                     extra = extraInput + extra + countryValue;
                     break;
                 case "7":
-                    encodedPayload = encodePayload(payload, 1);
+                    Log.i(TAG, "Payload before: " + payload);
+                    encodedPayload = encodePayload(payload + "99", 1);
                     extra = extraInput + extra + "1"; // 1 = United States; Make this dynamic
                     break;
                 case "2":
@@ -194,6 +196,9 @@ public class Crypto {
             }
 
             final String signedCode = sign(encodedPayload, privateKey);
+            Log.i(TAG, "Encoded Payload: " + encodedPayload);
+            Log.i(TAG, "Signed Code: " + signedCode);
+            Log.i(TAG, "Extra: " + extra);
             return addDataToCode(extra, signedCode);
         }
 
@@ -220,9 +225,7 @@ public class Crypto {
 
 
             StringBuilder encoded = new StringBuilder(CryptoUtil.intToBase62(total, 6));
-            while (encoded.length() < 6) {
-                encoded.insert(0, "0");
-            }
+            Log.v(TAG, "Encoded: " + encoded);
 
             return encoded.toString();
         }
