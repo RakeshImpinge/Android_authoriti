@@ -8,8 +8,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.stringcare.library.SC;
-
 import net.authoriti.authoritiapp.R;
 import net.authoriti.authoritiapp.core.BaseActivity;
 import net.authoriti.authoritiapp.utils.Constants;
@@ -19,7 +17,6 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
-import static net.authoriti.authoritiapp.utils.Constants.API_BASE_URL;
 
 /**
  * Created by mac on 1/24/18.
@@ -36,7 +33,7 @@ public class HelpActivity extends BaseActivity {
     @AfterViews
     void callAfterViewInjection() {
 
-        url = SC.decryptString(Constants.API_BASE_URL) + "/hlep";
+        url = API_BASE_URL + "/hlep";
 
         webView.setWebViewClient(new WebViewClient() {
             @Override

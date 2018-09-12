@@ -10,7 +10,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import com.stringcare.library.SC;
 
 import net.authoriti.authoritiapp.R;
 import net.authoriti.authoritiapp.api.AuthoritiAPI;
@@ -129,8 +128,8 @@ public class InviteCodeActivity extends BaseActivity {
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(SC.decryptString
-                (Constants.HELP_BASE) + TOPIC_INVITE));
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.HELP_BASE +
+                TOPIC_INVITE));
         startActivity(browserIntent);
     }
 

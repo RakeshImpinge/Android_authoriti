@@ -7,7 +7,6 @@ package net.authoriti.authoritiapp.utils;
 public interface Constants {
 
     String API_BASE_URL = "https://validate.authroriti.crts.io";
-//            "4F57F17D187A04B32327D56F7E3755E34333DAA916F4317E4F075635094BEACF088459A0B58FE5442FBDD0D07FD2A2E9";
     String API_BASE_URL_POLLING =
             "https://s3.amazonaws.com/authoriti-requests-dev/requests/";
 
@@ -48,7 +47,7 @@ public interface Constants {
 
     String ACUANT_LICENSE_KEY = "FAD9B2F0E7F1";
 
-    String HELP_BASE = "6C314AD4584F32063A0917CB08FAD817DC8BF22FE9F8ED29EAF658A34A1E0F7E";
+    String HELP_BASE = "https://help.authoriti.net/";
     String TOPIC_INVITE = "help-invite-code";
     String TOPIC_DLV = "help-dlv";
     String TOPIC_PASSWORD = "TOPIC_PASSWORD";

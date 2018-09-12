@@ -25,7 +25,6 @@ import net.authoriti.authoritiapp.utils.Constants;
 import net.authoriti.authoritiapp.utils.crypto.Crypto;
 
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
-import com.stringcare.library.SC;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -299,8 +298,8 @@ public class CodePermissionActivity extends BaseActivity {
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(SC.decryptString
-                (Constants.HELP_BASE) + TOPIC_PURPOSE_DETAIL));
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.HELP_BASE +
+                TOPIC_PURPOSE_DETAIL));
         startActivity(browserIntent);
     }
 

@@ -18,8 +18,6 @@ import net.authoriti.authoritiapp.utils.AuthoritiData;
 import net.authoriti.authoritiapp.utils.AuthoritiUtils;
 import net.authoriti.authoritiapp.utils.Constants;
 import net.authoriti.authoritiapp.utils.ViewUtils;
-
-import com.stringcare.library.SC;
 import com.tozny.crypto.android.AesCbcWithIntegrity;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
@@ -229,7 +227,7 @@ public class ResetPasswordActivity extends BaseActivity {
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(SC.decryptString
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(
                 (Constants.HELP_BASE) + TOPIC_RESET_PASSWORD));
         startActivity(browserIntent);
     }
