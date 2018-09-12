@@ -118,14 +118,21 @@ public class Crypto {
                 extraInput = payload.substring(5) + extraInput;
                 Log.v(TAG, "extraInput: " + extraInput);
                 payload = value + payload.substring(0, 5);
-            } else {
-                extraInput = extraInput + CryptoUtil.cleanup(value, value.length());
+            }
+            else {
+                String trimmed = CryptoUtil.cleanup(value, value.length());
+                if (inputType.equalsIgnoreCase("secret")) {
+                    trimmed = CryptoUtil.hash(trimmed);
+                } else if (inputType.equalsIgnoreCase("amount")) {
+                    trimmed = CryptoUtil.cleanup(value.replace('.', 'x'), value.length());
+                }
+
+                extraInput = extraInput + trimmed;
             }
 
         }
 
         public void addDataType(int requestorLength, String[] values) {
-            Log.v(TAG, "addDataType");
             StringBuilder bitmask = new StringBuilder();
 
             for (int i = 0; i < requestorLength; i++) {
@@ -161,12 +168,20 @@ public class Crypto {
                     extra = extraInput + extra + "1"; // 1 = United States; Make this dynamic
                     break;
                 case "2":
-                    Log.v(TAG, "payload: " + payload);
+                    String tmpTime = payload.substring(0, 5);
+                    payload = payload.replace(tmpTime, "") + tmpTime;
+                    extra = extra + extraInput + payload.substring(0, 3);
+                    payload = payload.substring(3);
+                    encodedPayload = encodePayload(payload, 2);
                     break;
-                case "3": break;
-                case "4": break;
+                case "3":
+                case "4":
+                    String tmpHash = CryptoUtil.hash(extraInput);
+                    encodedPayload = encodePayload(tmpHash.substring(0, 2) + payload, 5);
+                    extra = extra + extraInput;
+                    break;
                 case "5":
-                    Log.v(TAG, "payload: " + payload);
+                    encodedPayload = encodePayload(payload, 5);
                     extra = extra + extraInput;
                     break;
                 case "6":
