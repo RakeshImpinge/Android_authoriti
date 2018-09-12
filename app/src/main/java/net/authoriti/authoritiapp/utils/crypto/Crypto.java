@@ -25,29 +25,34 @@ public class Crypto {
         private BigInteger BASE = new BigInteger("62");
 
         private String ALPHANUM = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        private char[] DECANUM = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+        private char[] DECANUM = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
         private String BASE22 = "0123456789abcdefghijkl";
         private String BASE14 = "0123456789abcd";
 
-        private String[] SCHEMA1 = { BASE22, BASE22, BASE22, BASE22, BASE22, new String(DECANUM), new String(DECANUM), new String(DECANUM), new String(DECANUM) };
-        private String[] SCHEMA2 = { ALPHANUM, ALPHANUM, BASE22, BASE22, BASE22, BASE22, BASE22 };
-        private String[] SCHEMA3 = { ALPHANUM, ALPHANUM, BASE22, BASE22, BASE22, BASE22, BASE22 };
-        private String[] SCHEMA4 = { ALPHANUM, ALPHANUM, BASE22, BASE22, BASE22, BASE22, BASE22 };
-        private String[] SCHEMA5 = { new String(DECANUM), new String(DECANUM), new String(DECANUM), new String(DECANUM), new String(DECANUM), BASE14, BASE14, BASE14, BASE14, BASE14 };
-        private String[] SCHEMA6 =  { BASE22, BASE22, BASE22, BASE22, BASE22, ALPHANUM, ALPHANUM };
+        private String[] SCHEMA1 = {BASE22, BASE22, BASE22, BASE22, BASE22, new String(DECANUM),
+                new String(DECANUM), new String(DECANUM), new String(DECANUM)};
+        private String[] SCHEMA2 = {ALPHANUM, ALPHANUM, BASE22, BASE22, BASE22, BASE22, BASE22};
+        private String[] SCHEMA3 = {ALPHANUM, ALPHANUM, BASE22, BASE22, BASE22, BASE22, BASE22};
+        private String[] SCHEMA4 = {ALPHANUM, ALPHANUM, BASE22, BASE22, BASE22, BASE22, BASE22};
+        private String[] SCHEMA5 = {new String(DECANUM), new String(DECANUM), new String(DECANUM)
+                , new String(DECANUM), new String(DECANUM), BASE14, BASE14, BASE14, BASE14, BASE14};
+        private String[] SCHEMA6 = {BASE22, BASE22, BASE22, BASE22, BASE22, ALPHANUM, ALPHANUM};
 
-        private String[][] SCHEMA_RANGES = { SCHEMA1, SCHEMA2, SCHEMA3, SCHEMA4, SCHEMA5, SCHEMA6 };
+        private String[][] SCHEMA_RANGES = {SCHEMA1, SCHEMA2, SCHEMA3, SCHEMA4, SCHEMA5, SCHEMA6};
 
         private String accountId;
         private String schemaVersion;
 
         private String payload = "";
         private String extraInput = "";
+        private String privateKey = "";
 
-        PayloadGenerator(String accountId, String schemaVersion) {
+
+        PayloadGenerator(String accountId, String schemaVersion, String privateKey) {
             this.accountId = accountId;
             this.schemaVersion = schemaVersion;
+            this.privateKey = privateKey;
         }
 
         public void add(String picker, String value) {
@@ -118,8 +123,7 @@ public class Crypto {
                 extraInput = payload.substring(5) + extraInput;
                 Log.v(TAG, "extraInput: " + extraInput);
                 payload = value + payload.substring(0, 5);
-            }
-            else {
+            } else {
                 String trimmed = CryptoUtil.cleanup(value, value.length());
                 if (inputType.equalsIgnoreCase("secret")) {
                     trimmed = CryptoUtil.hash(trimmed);
@@ -137,7 +141,7 @@ public class Crypto {
 
             for (int i = 0; i < requestorLength; i++) {
                 boolean found = false;
-                for (String v: values) {
+                for (String v : values) {
                     if (Integer.parseInt(v) == i) {
                         found = true;
                         break;
@@ -270,8 +274,8 @@ public class Crypto {
         }
     }
 
-    public PayloadGenerator init(String accountId, String schemaVersion) {
-        return new PayloadGenerator(accountId, schemaVersion);
+    public PayloadGenerator init(String accountId, String schemaVersion, String privateKey) {
+        return new PayloadGenerator(accountId, schemaVersion, privateKey);
     }
 
     public CryptoKeyPair generateKeyPair(String password, String salt) {

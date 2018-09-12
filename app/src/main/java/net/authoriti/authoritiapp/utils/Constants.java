@@ -6,9 +6,12 @@ package net.authoriti.authoritiapp.utils;
 
 public interface Constants {
 
-    String API_BASE_URL = "https://validate.authroriti.crts.io";
+    String API_BASE_URL = "nX3U8Oa8toVLs5s1u/PnFg==:1/xjwmKL3L+cpAIR7XfAgYLmufA1vBYlbmjJjaLh9bs" +
+            "=:hy3b8GdRW27PwqPSzZ8xY/RM99ALscLq/3/Qxxkmc/KV2+Vmq4L1izQ7F1aJ7Rfx";
     String API_BASE_URL_POLLING =
             "https://s3.amazonaws.com/authoriti-requests-dev/requests/";
+    String HELP_BASE = "https://help.authoriti.net";
+
 
 //    String API_BASE_URL = "https://authoriti-test.crts.io";
 //    String API_BASE_URL = "https://authoriti-qa.crts.io";
@@ -47,13 +50,30 @@ public interface Constants {
 
     String ACUANT_LICENSE_KEY = "FAD9B2F0E7F1";
 
-    String HELP_BASE = "https://help.authoriti.net/";
+    String TOPIC_PURPOSE_MANAGE_MY_AC = "help-phone-inquiry";
+    String TOPIC_PURPOSE_SEND_MONEY = "help-send-cash";
+    String TOPIC_PURPOSE_MOVE_MONEY = "help-move-money";
+    String TOPIC_PURPOSE_OPEN_NEW_AC = "help-open-new-account";
+    String TOPIC_PURPOSE_EQUIDITY_TRADE = "help-equity-trade";
+    String TOPIC_PURPOSE_SHARE_PERSONAL_DATA = "help-share-my-data";
+    String TOPIC_PURPOSE_INSURENCE_CLAIM = "help-insurance-claim";
+    String TOPIC_PURPOSE_TEX_RETURN = "help-file-taxes";
+    String TOPIC_PURPOSE_ESCROW = "help-escrow-disbursement";
+
+    String TOPIC_PICKER_ACCOUNT_ID = "help-picker-account-id";
+    String TOPIC_PICKER_TIME = "help-picker-time";
+    String TOPIC_PICKER_INDUSTRY = "help-picker-industry";
+    String TOPIC_PICKER_LOCATION = "help-picker-location";
+    String TOPIC_PICKER_GEO = "help-picker-geo";
+    String TOPIC_PICKER_DATA_TYPE = "help-picker-data-type";
+    String TOPIC_PICKER_REQUESTOR = "help-picker-requestor";
+
     String TOPIC_INVITE = "help-invite-code";
     String TOPIC_DLV = "help-dlv";
+    String TOPIC_GENERAL = "help-general";
+    String TOPIC_ACCOUNT_2018 = "help-account-id";
     String TOPIC_PASSWORD = "TOPIC_PASSWORD";
     String TOPIC_RESET_PASSWORD = "TOPIC_RESET_PASSWORD";
-    String TOPIC_PURPOSE = "TOPIC_PURPOSE";
-    String TOPIC_ACCOUNT_2018 = "help-account-id";
     String TOPIC_CHASE = "help-account-id";
     String TOPIC_ABOUT = "TOPIC_ABOUT";
     String TOPIC_PURPOSE_DETAIL = "TOPIC_PURPOSE_DETAIL";

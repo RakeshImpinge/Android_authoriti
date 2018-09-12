@@ -8,7 +8,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import net.authoriti.authoritiapp.R;
 import net.authoriti.authoritiapp.api.model.AccountID;
@@ -21,8 +20,7 @@ import net.authoriti.authoritiapp.ui.items.CodeEditItem;
 import net.authoriti.authoritiapp.ui.items.CodeItem;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
 import net.authoriti.authoritiapp.utils.AuthoritiUtils;
-import net.authoriti.authoritiapp.utils.Constants;
-import net.authoriti.authoritiapp.utils.crypto.Crypto;
+import net.authoriti.authoritiapp.utils.ConstantUtils;
 
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 
@@ -33,11 +31,9 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by movdev on 3/1/18.
@@ -298,8 +294,30 @@ public class CodePermissionActivity extends BaseActivity {
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.HELP_BASE +
-                TOPIC_PURPOSE_DETAIL));
+        String endPoint = "";
+        if (group.getLabel().equalsIgnoreCase("Manage an account")) {
+            endPoint = TOPIC_PURPOSE_MANAGE_MY_AC;
+        } else if (group.getLabel().equalsIgnoreCase("Transfer funds")) {
+            endPoint = TOPIC_PURPOSE_SEND_MONEY;
+        } else if (group.getLabel().equalsIgnoreCase("Open new account")) {
+            endPoint = TOPIC_PURPOSE_OPEN_NEW_AC;
+        } else if (group.getLabel().equalsIgnoreCase("Remotely withdraw cash")) {
+            endPoint = TOPIC_PURPOSE_MOVE_MONEY;
+        } else if (group.getLabel().equalsIgnoreCase("Trade stocks")) {
+            endPoint = TOPIC_PURPOSE_EQUIDITY_TRADE;
+        } else if (group.getLabel().equalsIgnoreCase("Share personal information")) {
+            endPoint = TOPIC_PURPOSE_SHARE_PERSONAL_DATA;
+        } else if (group.getLabel().equalsIgnoreCase("File insurance claim")) {
+            endPoint = TOPIC_PURPOSE_INSURENCE_CLAIM;
+        } else if (group.getLabel().equalsIgnoreCase("File tax return")) {
+            endPoint = TOPIC_PURPOSE_TEX_RETURN;
+        } else if (group.getLabel().equalsIgnoreCase("Manage escrow account")) {
+            endPoint = TOPIC_PURPOSE_ESCROW;
+        }
+        if (endPoint.equals("")) return;
+
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ConstantUtils.getHelpUrl
+                (endPoint)));
         startActivity(browserIntent);
     }
 

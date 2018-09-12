@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import net.authoriti.authoritiapp.MainActivity;
 import net.authoriti.authoritiapp.R;
 import net.authoriti.authoritiapp.api.AuthoritiAPI;
 import net.authoriti.authoritiapp.api.model.AccountID;
@@ -25,6 +26,7 @@ import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 
 import net.authoriti.authoritiapp.R;
+import net.authoriti.authoritiapp.utils.Constants;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -86,6 +88,12 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
             }
         });
         showAccounts();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((MainActivity) getActivity()).updateMenuToolbar(Constants.MENU_ACCOUNT);
     }
 
     private void showAccounts() {

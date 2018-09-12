@@ -42,6 +42,7 @@ import net.authoriti.authoritiapp.api.model.request.RequestDLSave;
 import net.authoriti.authoritiapp.core.BaseActivity;
 import net.authoriti.authoritiapp.ui.help.HelpActivity_;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
+import net.authoriti.authoritiapp.utils.ConstantUtils;
 import net.authoriti.authoritiapp.utils.Constants;
 
 import com.google.gson.JsonObject;
@@ -691,8 +692,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(
-                (Constants.HELP_BASE) + (Constants.TOPIC_DLV)));
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ConstantUtils.getHelpUrl(TOPIC_DLV)));
         startActivity(browserIntent);
     }
 

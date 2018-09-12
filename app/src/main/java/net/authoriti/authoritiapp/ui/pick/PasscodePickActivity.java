@@ -23,6 +23,7 @@ import net.authoriti.authoritiapp.ui.code.CodePermissionActivity_;
 import net.authoriti.authoritiapp.ui.items.OptionItem;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
 import net.authoriti.authoritiapp.utils.AuthoritiUtils;
+import net.authoriti.authoritiapp.utils.ConstantUtils;
 import net.authoriti.authoritiapp.utils.Constants;
 
 import com.mikepenz.fastadapter.FastAdapter;
@@ -144,7 +145,9 @@ public class PasscodePickActivity extends BaseActivity {
 //                        }
 //                    } else {
 //                        utils.setSelectedPickerIndex(mContext, pickerType, position);
-//                        utils.setIndexSelected(mContext, pickerType, true);
+//                                 utils.setIndexSelected(mContext, pickerType, true);
+
+
 //                        finish();
 //                    }
                     if (pickerType.equals(PICKER_DATA_TYPE)) {
@@ -418,8 +421,27 @@ public class PasscodePickActivity extends BaseActivity {
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(
-                (Constants.HELP_BASE) + TOPIC_PURPOSE_DETAIL_PICKER));
+
+        String endPoint = "";
+        if (pickerType.equalsIgnoreCase(PICKER_ACCOUNT)) {
+            endPoint = TOPIC_PICKER_ACCOUNT_ID;
+        } else if (pickerType.equalsIgnoreCase(PICKER_TIME)) {
+            endPoint = TOPIC_PICKER_TIME;
+        } else if (pickerType.equalsIgnoreCase(PICKER_INDUSTRY)) {
+            endPoint = TOPIC_PICKER_INDUSTRY;
+        } else if (pickerType.equalsIgnoreCase(PICKER_LOCATION_COUNTRY)) {
+            endPoint = TOPIC_PICKER_LOCATION;
+        } else if (pickerType.equalsIgnoreCase(PICKER_GEO)) {
+            endPoint = TOPIC_PICKER_GEO;
+        } else if (pickerType.equalsIgnoreCase(PICKER_REQUEST)) {
+            endPoint = TOPIC_PICKER_REQUESTOR;
+        } else if (pickerType.equalsIgnoreCase(PICKER_DATA_TYPE)) {
+            endPoint = TOPIC_PICKER_DATA_TYPE;
+        }
+        if (endPoint.equals("")) return;
+
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ConstantUtils.getHelpUrl
+                (endPoint)));
         startActivity(browserIntent);
     }
 

@@ -123,6 +123,21 @@ public class CodeGenerateActivity extends BaseActivity {
     }
 
     private String generateCode() {
+
+        AesCbcWithIntegrity.SecretKeys keys;
+        String keyStr = dataManager.getUser().getEncryptKey();
+        String privateKey = "";
+        try {
+            keys = AesCbcWithIntegrity.keys(keyStr);
+            AesCbcWithIntegrity.CipherTextIvMac civ = new AesCbcWithIntegrity.CipherTextIvMac
+                    (dataManager.getUser().getEncryptPrivateKey());
+            privateKey = AesCbcWithIntegrity.decryptString(civ, keys);
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
         crypto = new Crypto();
         Crypto.PayloadGenerator payloadGenerator = null;
         for (HashMap<String, String> hashMap : finalPickersList) {
@@ -130,7 +145,7 @@ public class CodeGenerateActivity extends BaseActivity {
             if (hashMap.get("key").equals("")) continue;
             String key_root = hashMap.get("picker");
             if (key_root.equals(PICKER_ACCOUNT)) {
-                payloadGenerator = crypto.init(hashMap.get("value"), schemaIndex);
+                payloadGenerator = crypto.init(hashMap.get("value"), schemaIndex, privateKey);
                 userIndentifier = hashMap.get("value");
             } else if (key_root.equals(PICKER_TIME)) {
                 Calendar newCalendar = timeFormat(hashMap.get("value"));
@@ -157,35 +172,9 @@ public class CodeGenerateActivity extends BaseActivity {
 
         final String payload = payloadGenerator.generate();
         String code = null;
-        AesCbcWithIntegrity.SecretKeys keys;
-        String keyStr = dataManager.getUser().getEncryptKey();
-
-        try {
-
-            keys = AesCbcWithIntegrity.keys(keyStr);
-            AesCbcWithIntegrity.CipherTextIvMac civ = new AesCbcWithIntegrity.CipherTextIvMac
-                    (dataManager.getUser().getEncryptPrivateKey());
-
-            try {
-
-                String privateKey = AesCbcWithIntegrity.decryptString(civ, keys);
-                code = crypto.sign(payload, privateKey);
-
-                Log.e("Code", code);
-
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            } catch (GeneralSecurityException e) {
-                e.printStackTrace();
-            }
-
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        }
-
+        code = crypto.sign(payload, privateKey);
 
         return code;
-
     }
 
     private Calendar timeFormat(String value) {

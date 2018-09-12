@@ -5,6 +5,7 @@ import android.graphics.Paint;
 import android.widget.TextView;
 
 import net.authoriti.authoritiapp.BuildConfig;
+import net.authoriti.authoritiapp.MainActivity;
 import net.authoriti.authoritiapp.R;
 import net.authoriti.authoritiapp.api.AuthoritiAPI;
 import net.authoriti.authoritiapp.api.model.AuthLogIn;
@@ -12,6 +13,8 @@ import net.authoriti.authoritiapp.core.BaseFragment;
 import net.authoriti.authoritiapp.ui.auth.InviteCodeActivity_;
 import net.authoriti.authoritiapp.ui.auth.LoginActivity_;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
+import net.authoriti.authoritiapp.utils.Constants;
+
 import com.google.gson.JsonObject;
 
 import org.androidannotations.annotations.AfterViews;
@@ -44,30 +47,37 @@ public class WipeFragment extends BaseFragment {
     TextView tvWipe;
 
     @AfterViews
-    void callAfterViewInjection(){
+    void callAfterViewInjection() {
 
         tvVersion.setText("Version " + BuildConfig.VERSION_NAME + "." + BuildConfig.VERSION_CODE);
 
-        tvWipe.setPaintFlags(tvWipe.getPaintFlags() |Paint.UNDERLINE_TEXT_FLAG);
+        tvWipe.setPaintFlags(tvWipe.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
     }
 
-    private void deleteAccount(){
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((MainActivity) getActivity()).updateMenuToolbar(Constants.MENU_WIPE);
+    }
+
+    private void deleteAccount() {
 
         dataManager.wipeSetting(mContext);
 
     }
 
-    private void logOut(){
+    private void logOut() {
 
         AuthLogIn logIn = dataManager.loginStatus();
         logIn.setLogin(false);
         logIn.setWipe(true);
         dataManager.setAuthLogin(logIn);
 
-        LoginActivity_.intent(mContext).flags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK).start();
+        LoginActivity_.intent(mContext).flags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK)
+                .start();
     }
 
-    private void wipeLogOut(){
+    private void wipeLogOut() {
 
         deleteAccount();
 
@@ -76,12 +86,13 @@ public class WipeFragment extends BaseFragment {
         logIn.setWipe(true);
         dataManager.setAuthLogin(logIn);
 
-        InviteCodeActivity_.intent(mContext).flags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK).showBack(false).start();
+        InviteCodeActivity_.intent(mContext).flags(FLAG_ACTIVITY_CLEAR_TASK |
+                FLAG_ACTIVITY_NEW_TASK).showBack(false).start();
 
     }
 
     @Click(R.id.tvWipe)
-    void wipe(){
+    void wipe() {
 
         wipeLogOut();
 
