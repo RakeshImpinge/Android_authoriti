@@ -23,12 +23,12 @@ import net.authoriti.authoritiapp.ui.code.CodePermissionActivity_;
 import net.authoriti.authoritiapp.ui.items.OptionItem;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
 import net.authoriti.authoritiapp.utils.AuthoritiUtils;
+import net.authoriti.authoritiapp.utils.ConstantUtils;
 import net.authoriti.authoritiapp.utils.Constants;
 
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
-import com.stringcare.library.SC;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -145,7 +145,9 @@ public class PasscodePickActivity extends BaseActivity {
 //                        }
 //                    } else {
 //                        utils.setSelectedPickerIndex(mContext, pickerType, position);
-//                        utils.setIndexSelected(mContext, pickerType, true);
+//                                 utils.setIndexSelected(mContext, pickerType, true);
+
+
 //                        finish();
 //                    }
                     if (pickerType.equals(PICKER_DATA_TYPE)) {
@@ -171,9 +173,11 @@ public class PasscodePickActivity extends BaseActivity {
                         optionAdapter.notifyAdapterDataSetChanged();
 
                     } else {
+
+                        boolean isPickerRequestType = false;
+
                         if (pickerType.equals(PICKER_REQUEST) && defaultPickerMap.containsKey
                                 (PICKER_DATA_TYPE)) {
-
                             defaultValue.setTitle(picker.getValues().get(position).getTitle());
                             defaultValue.setDefault(false);
                             defaultValue.setValue(picker.getValues().get(position).getValue());
@@ -185,6 +189,7 @@ public class PasscodePickActivity extends BaseActivity {
                             DefaultValue defaultValueDataType = new DefaultValue(values.get(0)
                                     .getTitle(), values.get(0).getValue(), false);
                             defaultPickerMap.put(PICKER_DATA_TYPE, defaultValueDataType);
+                            isPickerRequestType = true;
                         } else {
                             defaultValue.setTitle(picker.getValues().get(position).getTitle());
                             defaultValue.setDefault(false);
@@ -194,6 +199,7 @@ public class PasscodePickActivity extends BaseActivity {
 
                         Intent intent = new Intent();
                         intent.putExtra("selected_values", defaultPickerMap);
+                        intent.putExtra("isPickerRequestType", isPickerRequestType);
                         setResult(RESULT_OK, intent);
                         finish();
                     }
@@ -319,6 +325,7 @@ public class PasscodePickActivity extends BaseActivity {
                             defaultPickerMap.put(pickerType, defaultValue);
                             Intent intent = new Intent();
                             intent.putExtra("selected_values", defaultPickerMap);
+                            intent.putExtra("isPickerRequestType", false);
                             setResult(RESULT_OK, intent);
                             finish();
                         }
@@ -358,6 +365,7 @@ public class PasscodePickActivity extends BaseActivity {
                             defaultPickerMap.put(pickerType, defaultValue);
                             Intent intent = new Intent();
                             intent.putExtra("selected_values", defaultPickerMap);
+                            intent.putExtra("isPickerRequestType", false);
                             setResult(RESULT_OK, intent);
                             finish();
                         }
@@ -406,14 +414,34 @@ public class PasscodePickActivity extends BaseActivity {
     void backButtonClicked() {
         Intent intent = new Intent();
         intent.putExtra("selected_values", defaultPickerMap);
+        intent.putExtra("isPickerRequestType", false);
         setResult(RESULT_OK, intent);
         finish();
     }
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(SC.decryptString
-                (Constants.HELP_BASE) + TOPIC_PURPOSE_DETAIL_PICKER));
+
+        String endPoint = "";
+        if (pickerType.equalsIgnoreCase(PICKER_ACCOUNT)) {
+            endPoint = TOPIC_PICKER_ACCOUNT_ID;
+        } else if (pickerType.equalsIgnoreCase(PICKER_TIME)) {
+            endPoint = TOPIC_PICKER_TIME;
+        } else if (pickerType.equalsIgnoreCase(PICKER_INDUSTRY)) {
+            endPoint = TOPIC_PICKER_INDUSTRY;
+        } else if (pickerType.equalsIgnoreCase(PICKER_LOCATION_COUNTRY)) {
+            endPoint = TOPIC_PICKER_LOCATION;
+        } else if (pickerType.equalsIgnoreCase(PICKER_GEO)) {
+            endPoint = TOPIC_PICKER_GEO;
+        } else if (pickerType.equalsIgnoreCase(PICKER_REQUEST)) {
+            endPoint = TOPIC_PICKER_REQUESTOR;
+        } else if (pickerType.equalsIgnoreCase(PICKER_DATA_TYPE)) {
+            endPoint = TOPIC_PICKER_DATA_TYPE;
+        }
+        if (endPoint.equals("")) return;
+
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ConstantUtils.getHelpUrl
+                (endPoint)));
         startActivity(browserIntent);
     }
 

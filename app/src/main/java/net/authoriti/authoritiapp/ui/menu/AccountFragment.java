@@ -9,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
+import net.authoriti.authoritiapp.MainActivity;
 import net.authoriti.authoritiapp.R;
 import net.authoriti.authoritiapp.api.AuthoritiAPI;
 import net.authoriti.authoritiapp.api.model.AccountID;
@@ -23,6 +24,7 @@ import net.authoriti.authoritiapp.ui.alert.AccountAddDialog;
 import net.authoriti.authoritiapp.ui.items.AccountAddItem;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
 import net.authoriti.authoritiapp.utils.AuthoritiUtils;
+import net.authoriti.authoritiapp.utils.Constants;
 import net.authoriti.authoritiapp.utils.crypto.CryptoUtil;
 
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
@@ -85,6 +87,12 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
         rvAccount.setAdapter(adapter);
 
         showAccounts();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((MainActivity) getActivity()).updateMenuToolbar(Constants.MENU_ACCOUNT);
     }
 
     @Override

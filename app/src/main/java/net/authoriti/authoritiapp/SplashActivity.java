@@ -3,12 +3,18 @@ package net.authoriti.authoritiapp;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.tozny.crypto.android.AesCbcWithIntegrity;
+
 import net.authoriti.authoritiapp.ui.auth.InviteCodeActivity_;
 import net.authoriti.authoritiapp.ui.auth.LoginActivity_;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
 import net.authoriti.authoritiapp.utils.AuthoritiData_;
+import net.authoriti.authoritiapp.utils.ConstantUtils;
+import net.authoriti.authoritiapp.utils.Constants;
 
 import org.androidannotations.annotations.EActivity;
+
+import java.security.GeneralSecurityException;
 
 
 /**

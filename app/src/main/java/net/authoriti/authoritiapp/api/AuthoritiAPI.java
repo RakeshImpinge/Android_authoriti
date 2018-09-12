@@ -2,16 +2,15 @@ package net.authoriti.authoritiapp.api;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.stringcare.library.SC;
 
 import net.authoriti.authoritiapp.BuildConfig;
+import net.authoriti.authoritiapp.utils.ConstantUtils;
 import net.authoriti.authoritiapp.utils.Constants;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.CipherSuite;
 import okhttp3.ConnectionSpec;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -67,8 +66,7 @@ public class AuthoritiAPI {
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder()
-//                .baseUrl(SC.decryptString(Constants.API_BASE_URL))
-                .baseUrl(Constants.API_BASE_URL)
+                .baseUrl(ConstantUtils.getBaseUrl())
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();

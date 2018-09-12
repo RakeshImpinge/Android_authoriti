@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -18,31 +17,26 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import net.authoriti.authoritiapp.api.AuthoritiAPI;
 import net.authoriti.authoritiapp.api.model.AccountID;
 import net.authoriti.authoritiapp.api.model.AuthLogIn;
 import net.authoriti.authoritiapp.api.model.DefaultValue;
 import net.authoriti.authoritiapp.api.model.Group;
-import net.authoriti.authoritiapp.api.model.Order;
 import net.authoriti.authoritiapp.api.model.Picker;
 import net.authoriti.authoritiapp.api.model.Purpose;
 import net.authoriti.authoritiapp.api.model.SchemaGroup;
 import net.authoriti.authoritiapp.api.model.Value;
-import net.authoriti.authoritiapp.api.model.response.ResponseInviteCode;
 import net.authoriti.authoritiapp.api.model.response.ResponsePolling;
 import net.authoriti.authoritiapp.core.BaseActivity;
 import net.authoriti.authoritiapp.ui.auth.LoginActivity_;
-import net.authoriti.authoritiapp.ui.auth.StartupActivity_;
 import net.authoriti.authoritiapp.ui.code.CodePermissionActivity_;
-import net.authoriti.authoritiapp.ui.help.HelpActivity_;
 import net.authoriti.authoritiapp.ui.menu.AccountChaseFragment_;
 import net.authoriti.authoritiapp.ui.menu.AccountFragment_;
 import net.authoriti.authoritiapp.ui.menu.PurposeFragment_;
 import net.authoriti.authoritiapp.ui.menu.WipeFragment_;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
-import net.authoriti.authoritiapp.utils.AuthoritiUtils_;
+import net.authoriti.authoritiapp.utils.ConstantUtils;
 import net.authoriti.authoritiapp.utils.Constants;
 
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -52,7 +46,6 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.sjl.foreground.Foreground;
-import com.stringcare.library.SC;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -61,12 +54,9 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -153,6 +143,7 @@ public class MainActivity extends BaseActivity {
 
     }
 
+
     @AfterViews
     void callAfterViewInjection() {
 
@@ -211,7 +202,9 @@ public class MainActivity extends BaseActivity {
     }
 
     private void menuSelected(long menu_id) {
-
+        if (SELECTED_MENU_ID == menu_id && menu_id != MENU_POLLING) {
+            return;
+        }
         SELECTED_MENU_ID = menu_id;
         Fragment fragment = null;
         if (menu_id == MENU_CODE) {
@@ -239,6 +232,13 @@ public class MainActivity extends BaseActivity {
             displayProgressDialog("Please Wait...");
         }
 
+        changeFragment(fragment);
+    }
+
+
+    public void updateMenuToolbar(long menu_id) {
+        drawer.setSelection(menu_id, false);
+        SELECTED_MENU_ID = menu_id;
         if (menu_id == MENU_ACCOUNT) {
             if (dataManager.getUser().getInviteCode().equals("Startup2018")) {
                 btnAdd.setVisibility(View.VISIBLE);
@@ -248,14 +248,22 @@ public class MainActivity extends BaseActivity {
         } else {
             btnAdd.setVisibility(View.INVISIBLE);
         }
-        changeFragment(fragment);
     }
+
+    boolean isFirstFragment = false;
 
     private void changeFragment(Fragment fragment) {
         if (fragment != null) {
             FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.frame_container, fragment)
-                    .commitAllowingStateLoss();
+            if (!isFirstFragment) {
+                isFirstFragment = true;
+                fragmentManager.beginTransaction().replace(R.id.frame_container, fragment)
+                        .commitAllowingStateLoss();
+            } else {
+                fragmentManager.beginTransaction().replace(R.id.frame_container, fragment)
+                        .addToBackStack(fragment.getClass().getName())
+                        .commitAllowingStateLoss();
+            }
         }
     }
 
@@ -284,7 +292,7 @@ public class MainActivity extends BaseActivity {
     void helpButtonClicked() {
         String topic = "";
         if (SELECTED_MENU_ID == MENU_CODE) {
-            topic = TOPIC_PURPOSE;
+            topic = TOPIC_GENERAL;
         } else if (SELECTED_MENU_ID == MENU_ACCOUNT) {
             if (dataManager.getUser().getInviteCode().equals("Startup2018")) {
                 topic = TOPIC_ACCOUNT_2018;
@@ -295,8 +303,8 @@ public class MainActivity extends BaseActivity {
             topic = TOPIC_ABOUT;
         }
         if (!topic.equals("")) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(SC.decryptString
-                    (Constants.HELP_BASE) + topic));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ConstantUtils
+                    .getHelpUrl(topic)));
             startActivity(browserIntent);
 //            PermissionCodeRequest
 //                    ("authoriti://purpose/manage-an-account?accountId=some_account_id" +

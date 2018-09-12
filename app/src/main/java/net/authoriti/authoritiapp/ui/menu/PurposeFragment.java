@@ -6,6 +6,7 @@ import android.text.SpannableStringBuilder;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import net.authoriti.authoritiapp.MainActivity;
 import net.authoriti.authoritiapp.R;
 import net.authoriti.authoritiapp.api.AuthoritiAPI;
 import net.authoriti.authoritiapp.api.model.GroupItem;
@@ -14,6 +15,7 @@ import net.authoriti.authoritiapp.core.BaseFragment;
 import net.authoriti.authoritiapp.ui.items.PurposeItem;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
 import net.authoriti.authoritiapp.utils.AuthoritiUtils;
+import net.authoriti.authoritiapp.utils.Constants;
 
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 
@@ -164,6 +166,7 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
     @Override
     public void onResume() {
         super.onResume();
+        ((MainActivity) getActivity()).updateMenuToolbar(Constants.MENU_CODE);
 
 //        if (dataManager.getScheme() != null) {
 //            utils.initSelectedIndex(mContext);
