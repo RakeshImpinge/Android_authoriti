@@ -171,9 +171,11 @@ public class PasscodePickActivity extends BaseActivity {
                         optionAdapter.notifyAdapterDataSetChanged();
 
                     } else {
+
+                        boolean isPickerRequestType = false;
+
                         if (pickerType.equals(PICKER_REQUEST) && defaultPickerMap.containsKey
                                 (PICKER_DATA_TYPE)) {
-
                             defaultValue.setTitle(picker.getValues().get(position).getTitle());
                             defaultValue.setDefault(false);
                             defaultValue.setValue(picker.getValues().get(position).getValue());
@@ -185,6 +187,7 @@ public class PasscodePickActivity extends BaseActivity {
                             DefaultValue defaultValueDataType = new DefaultValue(values.get(0)
                                     .getTitle(), values.get(0).getValue(), false);
                             defaultPickerMap.put(PICKER_DATA_TYPE, defaultValueDataType);
+                            isPickerRequestType = true;
                         } else {
                             defaultValue.setTitle(picker.getValues().get(position).getTitle());
                             defaultValue.setDefault(false);
@@ -194,6 +197,7 @@ public class PasscodePickActivity extends BaseActivity {
 
                         Intent intent = new Intent();
                         intent.putExtra("selected_values", defaultPickerMap);
+                        intent.putExtra("isPickerRequestType", isPickerRequestType);
                         setResult(RESULT_OK, intent);
                         finish();
                     }
@@ -319,6 +323,7 @@ public class PasscodePickActivity extends BaseActivity {
                             defaultPickerMap.put(pickerType, defaultValue);
                             Intent intent = new Intent();
                             intent.putExtra("selected_values", defaultPickerMap);
+                            intent.putExtra("isPickerRequestType", false);
                             setResult(RESULT_OK, intent);
                             finish();
                         }
@@ -358,6 +363,7 @@ public class PasscodePickActivity extends BaseActivity {
                             defaultPickerMap.put(pickerType, defaultValue);
                             Intent intent = new Intent();
                             intent.putExtra("selected_values", defaultPickerMap);
+                            intent.putExtra("isPickerRequestType", false);
                             setResult(RESULT_OK, intent);
                             finish();
                         }
@@ -406,6 +412,7 @@ public class PasscodePickActivity extends BaseActivity {
     void backButtonClicked() {
         Intent intent = new Intent();
         intent.putExtra("selected_values", defaultPickerMap);
+        intent.putExtra("isPickerRequestType", false);
         setResult(RESULT_OK, intent);
         finish();
     }
