@@ -6,10 +6,9 @@ package net.authoriti.authoritiapp.utils;
 
 public interface Constants {
 
-    String API_BASE_URL = "nX3U8Oa8toVLs5s1u/PnFg==:1/xjwmKL3L+cpAIR7XfAgYLmufA1vBYlbmjJjaLh9bs" +
-            "=:hy3b8GdRW27PwqPSzZ8xY/RM99ALscLq/3/Qxxkmc/KV2+Vmq4L1izQ7F1aJ7Rfx";
+    String API_BASE_URL = "ga1YBx5IFYSUOrnyed2XIw==:+WP0nDUps/9zc/sXhAAGjsjNdHGsePro3H6Ema2z+9s=:uKc+QJFeTOe03JonkBacwycP7rPVIIg+DzG3CwVEDP8=";
     String API_BASE_URL_POLLING =
-            "https://s3.amazonaws.com/authoriti-requests-dev/requests/";
+            "https://s3.amazonaws.com/authoriti-requests-prod/requests/";
     String HELP_BASE = "https://help.authoriti.net";
 
 
