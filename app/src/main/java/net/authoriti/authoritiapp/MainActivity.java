@@ -52,7 +52,6 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.sjl.foreground.Foreground;
-import com.stringcare.library.SC;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -295,7 +294,7 @@ public class MainActivity extends BaseActivity {
             topic = TOPIC_ABOUT;
         }
         if (!topic.equals("")) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(SC.decryptString
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(
                     (Constants.HELP_BASE) + topic));
             startActivity(browserIntent);
 //            PermissionCodeRequest

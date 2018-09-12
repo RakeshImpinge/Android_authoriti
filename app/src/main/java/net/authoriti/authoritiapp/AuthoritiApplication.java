@@ -5,7 +5,6 @@ import android.content.Context;
 
 import com.crashlytics.android.Crashlytics;
 import com.sjl.foreground.Foreground;
-import com.stringcare.library.SC;
 
 import org.androidannotations.annotations.EApplication;
 
@@ -30,6 +29,5 @@ public class AuthoritiApplication extends Application {
         Fabric.with(this, new Crashlytics());
         context = getApplicationContext();
         Foreground.init(this);
-        SC.init(getApplicationContext());
     }
 }

@@ -45,7 +45,6 @@ import net.authoriti.authoritiapp.utils.AuthoritiData;
 import net.authoriti.authoritiapp.utils.Constants;
 
 import com.google.gson.JsonObject;
-import com.stringcare.library.SC;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -692,7 +691,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(SC.decryptString
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(
                 (Constants.HELP_BASE) + (Constants.TOPIC_DLV)));
         startActivity(browserIntent);
     }

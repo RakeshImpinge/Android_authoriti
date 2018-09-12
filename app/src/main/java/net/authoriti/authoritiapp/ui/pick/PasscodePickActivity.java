@@ -28,7 +28,6 @@ import net.authoriti.authoritiapp.utils.Constants;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
-import com.stringcare.library.SC;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -419,7 +418,7 @@ public class PasscodePickActivity extends BaseActivity {
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(SC.decryptString
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(
                 (Constants.HELP_BASE) + TOPIC_PURPOSE_DETAIL_PICKER));
         startActivity(browserIntent);
     }

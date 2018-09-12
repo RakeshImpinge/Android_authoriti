@@ -8,8 +8,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.EditText;
 
-import com.stringcare.library.SC;
-
 import net.authoriti.authoritiapp.R;
 import net.authoriti.authoritiapp.core.BaseActivity;
 import net.authoriti.authoritiapp.ui.help.HelpActivity_;
@@ -125,8 +123,8 @@ public class StartupActivity extends BaseActivity {
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(SC.decryptString
-                (Constants.HELP_BASE) + TOPIC_PASSWORD));
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse((Constants.HELP_BASE) +
+                TOPIC_PASSWORD));
         startActivity(browserIntent);
     }
 
