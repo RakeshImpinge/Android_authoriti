@@ -92,9 +92,7 @@ public class CodePermissionActivity extends BaseActivity {
         group = dataManager.getPurposes().get(purposeIndex).getGroups().get(purposeIndexItem);
         defaultPickerMap = dataManager.getDefaultValues().get("" + group.getSchemaIndex());
         schemaIndex = group.getSchemaIndex();
-
         showSchema();
-
         createPickerList();
         showSchema();
     }
@@ -424,6 +422,24 @@ public class CodePermissionActivity extends BaseActivity {
         if (resultCode == RESULT_OK) {
             defaultPickerMap = (HashMap<String, DefaultValue>) data.getExtras().get
                     ("selected_values");
+
+            // This is the case to update the data type values on basis of selected picker request
+            if (data.getBooleanExtra("isPickerRequestType", false)) {
+                for (int i = 0; i < pickersList.size(); i++) {
+                    if (pickersList.get(i).getPicker().equals(PICKER_DATA_TYPE)) {
+                        List<Value> values;
+                        if (defaultPickerMap.containsKey(PICKER_REQUEST)) {
+                            values = dataManager.getValuesFromDataType(Integer.valueOf
+                                    (defaultPickerMap.get
+                                            (PICKER_REQUEST).getValue().toString()));
+                        } else {
+                            values = dataManager.getValuesFromDataType(schemaIndex);
+                        }
+                        pickersList.get(i).setValues(values);
+                        pickersList.set(i, pickersList.get(i));
+                    }
+                }
+            }
             showSchema();
         }
     }

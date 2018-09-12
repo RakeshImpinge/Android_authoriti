@@ -149,16 +149,14 @@ public class CodeGenerateActivity extends BaseActivity {
             } else if (key_root.equals(PICKER_DATA_INPUT_TYPE)) {
                 payloadGenerator.addInput(hashMap.get("key"), hashMap.get("value"));
             } else if (key_root.equals(PICKER_REQUEST)) {
-
+                payloadGenerator.add(key_root, hashMap.get("value"));
             } else {
                 payloadGenerator.add(key_root, hashMap.get("value"));
             }
-
         }
 
         final String payload = payloadGenerator.generate();
         String code = null;
-
         AesCbcWithIntegrity.SecretKeys keys;
         String keyStr = dataManager.getUser().getEncryptKey();
 
