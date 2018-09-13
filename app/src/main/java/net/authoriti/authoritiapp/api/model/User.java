@@ -31,12 +31,21 @@ public class User {
 
     private boolean fingerPrintAuthEnabled = false;
 
+    boolean isChaseType = false;
 
     private List<AccountID> unconfirmedAccountIDs;
 
 
-    public User(){
+    public User() {
 
+    }
+
+    public boolean getChaseType() {
+        return isChaseType;
+    }
+
+    public void setChaseType(boolean chaseType) {
+        isChaseType = chaseType;
     }
 
     public String getUserId() {

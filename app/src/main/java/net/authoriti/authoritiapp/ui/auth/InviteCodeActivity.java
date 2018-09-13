@@ -46,6 +46,9 @@ public class InviteCodeActivity extends BaseActivity {
     @Extra
     boolean showBack = true;
 
+    @Extra
+    boolean isSyncRequired = false;
+
     @Bean
     AuthoritiUtils utils;
 
@@ -63,6 +66,7 @@ public class InviteCodeActivity extends BaseActivity {
 
     @ViewById(R.id.scrollView)
     NestedScrollView scrollView;
+
 
     @AfterViews
     void callAfterViewInjection() {
@@ -106,9 +110,12 @@ public class InviteCodeActivity extends BaseActivity {
     @Click(R.id.cvNext)
     void nextButtonClicked() {
         if (TextUtils.isEmpty(etCode.getText())) {
-//            tiCode.setError(utils.getSpannableStringForEditTextError("This field is required",
-//                    this));
-            StartupActivity_.intent(mContext).start();
+            if (isSyncRequired) {
+                tiCode.setError(utils.getSpannableStringForEditTextError("This field is required",
+                        this));
+            } else {
+                StartupActivity_.intent(mContext).start();
+            }
         } else {
             hideKeyboard();
             checkInviteCode(true);
@@ -117,6 +124,7 @@ public class InviteCodeActivity extends BaseActivity {
 
     @Click(R.id.cvNeed)
     void needButtonClicked() {
+
         if (TextUtils.isEmpty(etCode.getText())) {
             StartupActivity_.intent(mContext).start();
         } else {
@@ -175,10 +183,21 @@ public class InviteCodeActivity extends BaseActivity {
         } else {
             dataManager.inviteCode = etCode.getText().toString();
             dataManager.showSkip = responseInviteCode.isSkipDLV();
-            if (responseInviteCode.getCustomer() != null) {
-                ChaseActivity_.intent(mContext).customer(responseInviteCode.getCustomer()).start();
+            if (isSyncRequired) {
+                if (responseInviteCode.getCustomer() != null) {
+                    ChaseActivity_.intent(mContext).customer(responseInviteCode.getCustomer())
+                            .isSyncRequired(isSyncRequired).start();
+                    finish();
+                } else {
+                    showAlert("", "Invalid Password.");
+                }
             } else {
-                StartupActivity_.intent(mContext).start();
+                if (responseInviteCode.getCustomer() != null) {
+                    ChaseActivity_.intent(mContext).customer(responseInviteCode.getCustomer())
+                            .start();
+                } else {
+                    StartupActivity_.intent(mContext).start();
+                }
             }
         }
     }

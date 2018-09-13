@@ -1,11 +1,15 @@
 package net.authoriti.authoritiapp.ui.menu;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Toast;
 
 import net.authoriti.authoritiapp.MainActivity;
 import net.authoriti.authoritiapp.R;
@@ -16,6 +20,7 @@ import net.authoriti.authoritiapp.api.model.User;
 import net.authoriti.authoritiapp.api.model.Value;
 import net.authoriti.authoritiapp.core.BaseFragment;
 import net.authoriti.authoritiapp.ui.alert.AccountConfirmDialog;
+import net.authoriti.authoritiapp.ui.auth.InviteCodeActivity_;
 import net.authoriti.authoritiapp.ui.items.AccountConfirmItem;
 import net.authoriti.authoritiapp.utils.AuthoritiData;
 import net.authoriti.authoritiapp.utils.AuthoritiUtils;
@@ -66,8 +71,20 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
     AccountID selectedAccountId;
     int selectedPosition;
 
+    BroadcastReceiver broadcastReceiver;
+
     @AfterViews
     void callAfterViewInjection() {
+
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                InviteCodeActivity_.intent(getActivity()).showBack(true).isSyncRequired(true)
+                        .start();
+            }
+        };
+        LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastReceiver, new
+                IntentFilter(BROADCAST_SYNC_BUTTON_CLICKED));
 
         adapter = new FastItemAdapter<AccountConfirmItem>();
         rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
@@ -87,13 +104,19 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
                 return false;
             }
         });
-        showAccounts();
     }
 
     @Override
     public void onResume() {
         super.onResume();
         ((MainActivity) getActivity()).updateMenuToolbar(Constants.MENU_ACCOUNT);
+        showAccounts();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(mContext).unregisterReceiver(broadcastReceiver);
     }
 
     private void showAccounts() {

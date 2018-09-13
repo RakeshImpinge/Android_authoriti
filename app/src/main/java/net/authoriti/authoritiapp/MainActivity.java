@@ -213,7 +213,7 @@ public class MainActivity extends BaseActivity {
             }
             fragment = purposeFragment;
         } else if (menu_id == MENU_ACCOUNT) {
-            if (dataManager.getUser().getInviteCode().equals("Startup2018")) {
+            if (!dataManager.getUser().getChaseType()) {
                 accountFragment = AccountFragment_.builder().build();
             } else {
                 accountFragment = AccountChaseFragment_.builder().build();
@@ -240,10 +240,11 @@ public class MainActivity extends BaseActivity {
         drawer.setSelection(menu_id, false);
         SELECTED_MENU_ID = menu_id;
         if (menu_id == MENU_ACCOUNT) {
-            if (dataManager.getUser().getInviteCode().equals("Startup2018")) {
-                btnAdd.setVisibility(View.VISIBLE);
+            btnAdd.setVisibility(View.VISIBLE);
+            if (!dataManager.getUser().getChaseType()) {
+                btnAdd.setText("Add");
             } else {
-                btnAdd.setVisibility(View.INVISIBLE);
+                btnAdd.setText("Sync");
             }
         } else {
             btnAdd.setVisibility(View.INVISIBLE);
@@ -294,7 +295,7 @@ public class MainActivity extends BaseActivity {
         if (SELECTED_MENU_ID == MENU_CODE) {
             topic = TOPIC_GENERAL;
         } else if (SELECTED_MENU_ID == MENU_ACCOUNT) {
-            if (dataManager.getUser().getInviteCode().equals("Startup2018")) {
+            if (!dataManager.getUser().getChaseType()) {
                 topic = TOPIC_ACCOUNT_2018;
             } else {
                 topic = TOPIC_CHASE;
@@ -314,8 +315,13 @@ public class MainActivity extends BaseActivity {
 
     @Click(R.id.btnAdd)
     void addButtonClicked() {
-        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent
-                (BROADCAST_ADD_BUTTON_CLICKED));
+        if (dataManager.getUser().getChaseType()) {
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent
+                    (BROADCAST_SYNC_BUTTON_CLICKED));
+        } else {
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent
+                    (BROADCAST_ADD_BUTTON_CLICKED));
+        }
     }
 
     @Override
