@@ -43,6 +43,7 @@ import org.androidannotations.annotations.ViewById;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import retrofit2.Call;
@@ -65,7 +66,6 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
 
     @Bean
     AuthoritiData dataManager;
-
 
     @Extra
     String customer;
@@ -91,6 +91,9 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
     private CryptoKeyPair keyPair;
 
     private boolean saveSuccess = false;
+
+    @Extra
+    boolean isSyncRequired = false;
 
     @AfterViews
     void callAfterViewInjection() {
@@ -148,82 +151,92 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
     }
 
     private void fetchSignUpInfo(ResponseSignUpChase responseSignUpChase) {
+        if (isSyncRequired) {
+            User user = dataManager.getUser();
+            List<AccountID> savedAccountIDs = user.getAccountIDs();
+            List<AccountID> newAccountIDs = responseSignUpChase.getAccounts();
+            List<AccountID> newIds = new ArrayList<>();
 
-        User user = new User();
-        user.setUserId(responseSignUpChase.getId());
-        user.setToken(responseSignUpChase.getToken());
-        user.setPassword(etPassword.getText().toString());
-        user.setInviteCode(dataManager.inviteCode);
-
-//        AccountID accountID = new AccountID(responseSignUpChase.getAccountName(), etIdentifier
-//                .getText().toString());
-//        List<AccountID> accountIDs = new ArrayList<>();
-//        accountIDs.add(accountID);
-        user.setAccountIDs(responseSignUpChase.getAccounts());
-
-//        if (responseSignUpChase.getAccounts() != null && responseSignUpChase.getAccounts().size()
-//                > 0) {
-//            List<AccountID> accountIDs1 = new ArrayList<>();
-//            for (int i = 0; i < responseSignUpChase.getAccounts().size(); i++) {
-//                AccountID accountID1 = new AccountID();
-//                accountID1.setConfirmed(false);
-//                accountID1.setType(responseSignUpChase.getAccounts().get(i).getType());
-//                accountID1.setIdentifier(responseSignUpChase.getAccounts().get(i).getIdentifier
-// ());
-//                accountIDs1.add(accountID1);
-//            }
-//            user.setUnconfirmedAccountIDs(accountIDs1);
-//        }
-
-        try {
-
-            AesCbcWithIntegrity.SecretKeys keys;
-
-            String salt = AesCbcWithIntegrity.saltString(AesCbcWithIntegrity.generateSalt());
-            keys = AesCbcWithIntegrity.generateKeyFromPassword(etPassword.getText().toString(),
-                    salt);
-
-            String keyStr = AesCbcWithIntegrity.keyString(keys);
-
-            user.setEncryptKey(keyStr);
+            for (int i = 0; i < newAccountIDs.size(); i++) {
+                boolean isContained = false;
+                for (int k = 0; k < savedAccountIDs.size(); k++) {
+                    if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
+                            .getIdentifier())
+                            && savedAccountIDs.get(k).getType().equals(newAccountIDs.get(i)
+                            .getType())) {
+                        isContained = true;
+                        break;
+                    } else {
+                    }
+                }
+                if (!isContained) {
+                    newIds.add(newAccountIDs.get(i));
+                }
+            }
+            savedAccountIDs.addAll(newIds);
+            user.setAccountIDs(savedAccountIDs);
+            dataManager.setUser(user);
+            finish();
+        } else {
+            User user = new User();
+            user.setUserId(responseSignUpChase.getId());
+            user.setToken(responseSignUpChase.getToken());
+            user.setPassword(etPassword.getText().toString());
+            user.setInviteCode(dataManager.inviteCode);
+            user.setChaseType(true);
+            user.setAccountIDs(responseSignUpChase.getAccounts());
 
             try {
 
-                user.setEncryptPrivateKey(AesCbcWithIntegrity.encrypt(keyPair.getPrivateKey(),
-                        keys).toString());
-                user.setEncryptSalt(AesCbcWithIntegrity.encrypt(keyPair.getSalt(), keys).toString
-                        ());
-                user.setEncryptPassword(AesCbcWithIntegrity.encrypt(etPassword.getText().toString
-                        (), keys).toString());
+                AesCbcWithIntegrity.SecretKeys keys;
+
+                String salt = AesCbcWithIntegrity.saltString(AesCbcWithIntegrity.generateSalt());
+                keys = AesCbcWithIntegrity.generateKeyFromPassword(etPassword.getText().toString(),
+                        salt);
+
+                String keyStr = AesCbcWithIntegrity.keyString(keys);
+
+                user.setEncryptKey(keyStr);
+
+                try {
+
+                    user.setEncryptPrivateKey(AesCbcWithIntegrity.encrypt(keyPair.getPrivateKey(),
+                            keys).toString());
+                    user.setEncryptSalt(AesCbcWithIntegrity.encrypt(keyPair.getSalt(), keys)
+                            .toString
+                                    ());
+                    user.setEncryptPassword(AesCbcWithIntegrity.encrypt(etPassword.getText()
+                            .toString
+                                    (), keys).toString());
 
 
-                dataManager.setUser(user);
+                    dataManager.setUser(user);
 
-                if (responseSignUpChase.getAccounts() != null && responseSignUpChase.getAccounts
-                        ().size() > 0) {
+                    if (responseSignUpChase.getAccounts() != null && responseSignUpChase.getAccounts
+                            ().size() > 0) {
 
-                    AccountConfirmActivity_.intent(this).start();
+                        AccountConfirmActivity_.intent(this).start();
 
-                } else {
+                    } else {
 
-                    saveSuccess = true;
-                    mFingerPrintAuthHelper.startAuth();
+                        saveSuccess = true;
+                        mFingerPrintAuthHelper.startAuth();
 
-                    hideKeyboard();
-                    checkFingerPrintAuth();
+                        hideKeyboard();
+                        checkFingerPrintAuth();
 
+                    }
+
+
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
                 }
 
 
-            } catch (UnsupportedEncodingException e) {
+            } catch (GeneralSecurityException e) {
                 e.printStackTrace();
             }
-
-
-        } catch (GeneralSecurityException e) {
-            e.printStackTrace();
         }
-
     }
 
     private void checkFingerPrintAuth() {
@@ -297,7 +310,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
 
     @Click(R.id.ivBack)
     void backButtonClicked() {
-        finish();
+        onBackPressed();
     }
 
     @Click(R.id.ivHelp)
@@ -372,5 +385,16 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
         updateLoginState();
         goHome();
 
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        if (isSyncRequired) {
+            InviteCodeActivity_.intent(getApplicationContext()).showBack(true).isSyncRequired
+                    (true).start();
+        } else {
+            super.onBackPressed();
+        }
     }
 }
