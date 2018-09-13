@@ -394,14 +394,21 @@ public class PasscodePickActivity extends BaseActivity {
             optionAdapter.clear();
         }
         for (int i = 0; i < picker.getValues().size(); i++) {
-            if (!pickerType.equals(PICKER_DATA_TYPE)) {
-                if (defaultValue.getValue().equals(picker.getValues().get(i).getValue())) {
+            if (pickerType.equals(PICKER_ACCOUNT)) {
+                if (defaultValue.getValue().equals(picker.getValues().get(i).getValue()) &&
+                        defaultValue.getTitle().equals(picker.getValues().get(i).getTitle())) {
+                    optionAdapter.add(new OptionItem(picker.getValues().get(i), true));
+                } else {
+                    optionAdapter.add(new OptionItem(picker.getValues().get(i), false));
+                }
+            } else if (pickerType.equals(PICKER_DATA_TYPE)) {
+                if (value.contains(picker.getValues().get(i).getValue())) {
                     optionAdapter.add(new OptionItem(picker.getValues().get(i), true));
                 } else {
                     optionAdapter.add(new OptionItem(picker.getValues().get(i), false));
                 }
             } else {
-                if (value.contains(picker.getValues().get(i).getValue())) {
+                if (defaultValue.getValue().equals(picker.getValues().get(i).getValue())) {
                     optionAdapter.add(new OptionItem(picker.getValues().get(i), true));
                 } else {
                     optionAdapter.add(new OptionItem(picker.getValues().get(i), false));

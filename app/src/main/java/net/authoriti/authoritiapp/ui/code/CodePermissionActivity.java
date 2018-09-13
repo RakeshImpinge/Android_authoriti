@@ -196,9 +196,9 @@ public class CodePermissionActivity extends BaseActivity {
                 if (pickersList.get(i).getPicker().equals(PICKER_DATA_INPUT_TYPE)) {
                     if (defaultPickerMap.containsKey(pickersList.get(i).getInput())) {
                         adapter_input.add(new CodeEditItem(pickersList.get(i), defaultPickerMap
-                                .get(pickersList.get(i).getInput()).getValue()));
+                                .get(pickersList.get(i).getInput()).getValue(),schemaIndex));
                     } else {
-                        adapter_input.add(new CodeEditItem(pickersList.get(i), ""));
+                        adapter_input.add(new CodeEditItem(pickersList.get(i), "",schemaIndex));
                     }
                 } else {
                     adapter.add(new CodeItem(pickersList.get(i), defaultPickerMap, group

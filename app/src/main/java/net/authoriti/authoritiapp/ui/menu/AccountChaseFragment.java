@@ -71,21 +71,16 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
     AccountID selectedAccountId;
     int selectedPosition;
 
-    BroadcastReceiver broadcastReceiver;
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            InviteCodeActivity_.intent(getActivity()).showBack(true).isSyncRequired(true)
+                    .start();
+        }
+    };
 
     @AfterViews
     void callAfterViewInjection() {
-
-        broadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                InviteCodeActivity_.intent(getActivity()).showBack(true).isSyncRequired(true)
-                        .start();
-            }
-        };
-        LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastReceiver, new
-                IntentFilter(BROADCAST_SYNC_BUTTON_CLICKED));
-
         adapter = new FastItemAdapter<AccountConfirmItem>();
         rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
         rvAccount.setAdapter(adapter);
@@ -104,6 +99,13 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
                 return false;
             }
         });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastReceiver, new
+                IntentFilter(BROADCAST_SYNC_BUTTON_CLICKED));
     }
 
     @Override
