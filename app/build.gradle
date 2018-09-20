@@ -8,7 +8,7 @@ android {
     compileSdkVersion 26
     buildToolsVersion '27.0.3'
     defaultConfig {
-        applicationId "net.authoriti.authoritiapp"
+        applicationId 'net.authoriti.authoriti'
         minSdkVersion 17
         targetSdkVersion 26
         versionCode 73
@@ -22,7 +22,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
     packagingOptions {
         exclude 'META-INF/DEPENDENCIES'
         exclude 'META-INF/NOTICE'
@@ -32,45 +31,38 @@ android {
         exclude 'META-INF/NOTICE.txt'
         pickFirst 'AndroidManifest.xml'
     }
-
     dexOptions {
         maxProcessCount 4
         preDexLibraries false
         javaMaxHeapSize "8g"
     }
-
+    productFlavors {
+    }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-
     annotationProcessor "org.androidannotations:androidannotations:$AAVersion"
     implementation "org.androidannotations:androidannotations-api:$AAVersion"
-
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support:percent:26.1.0'
     implementation 'com.android.support:design:26.1.0'
     implementation 'com.android.support:cardview-v7:26.1.0'
     implementation 'com.android.support:recyclerview-v7:26.1.0'
-
     implementation 'uk.co.chrisjenx:calligraphy:2.3.0'
-
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.8.0'
     implementation 'com.google.code.gson:gson:2.8.1'
-
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     testImplementation 'junit:junit:4.12'
     implementation('com.crashlytics.sdk.android:crashlytics:2.8.0@aar') {
         transitive = true;
     }
-
     implementation 'uk.co.chrisjenx:calligraphy:2.3.0'
-
     implementation('com.mikepenz:fastadapter:2.5.0@aar') {
         transitive = true
     }
@@ -80,29 +72,22 @@ dependencies {
     implementation('com.mikepenz:materialdrawer:5.9.0@aar') {
         transitive = true
     }
-
     implementation 'com.github.simbiose:Encryption:2.0.1'
-
-//    compile 'com.acuant.mobilesdk:acuantMobileSDK:5.0'
+    //    compile 'com.acuant.mobilesdk:acuantMobileSDK:5.0'
     implementation project(':acuantMobileSDK')
-    implementation('com.microblink:pdf417.mobi:6.4.0@aar')
-    implementation('com.google.code.gson:gson:2.8')
-    implementation('com.squareup.okhttp3:okhttp:3.8.0')
-    implementation('org.jmrtd:jmrtd:0.5.6')
-    implementation('org.ejbca.cvc:cert-cvc:1.4.3')
-    implementation('com.madgag.spongycastle:prov:1.54.0.0')
-    implementation('net.sf.scuba:scuba-sc-android:0.0.9')
-
-    implementation "com.daimajia.swipelayout:library:1.2.0@aar"
+    implementation 'com.microblink:pdf417.mobi:6.4.0@aar'
+    implementation 'com.google.code.gson:gson:2.8'
+    implementation 'com.squareup.okhttp3:okhttp:3.8.0'
+    implementation 'org.jmrtd:jmrtd:0.5.6'
+    implementation 'org.ejbca.cvc:cert-cvc:1.4.3'
+    implementation 'com.madgag.spongycastle:prov:1.54.0.0'
+    implementation 'net.sf.scuba:scuba-sc-android:0.0.9'
+    implementation 'com.daimajia.swipelayout:library:1.2.0@aar'
     implementation 'com.github.thunder413:DateTimeUtils:1.0'
     implementation 'com.github.kenglxn.QRGen:android:2.3.0'
     implementation 'com.github.dmytrodanylyk.shadow-layout:library:1.0.3'
     implementation 'com.github.tozny:java-aes-crypto:1.1.0'
-
     implementation 'com.multidots:fingerprint-auth:1.0.1'
     implementation 'com.sjl:Foredroid:1.0.2'
-
     implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.1.0'
-
-
 }
