@@ -8,7 +8,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-
+import android.util.Log;
 
 import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.api.AuthoritiAPI;
@@ -41,6 +41,7 @@ import retrofit2.Response;
 
 @EActivity(R.layout.activity_invite_code)
 public class InviteCodeActivity extends BaseActivity {
+    private static final String TAG = "InviteCodeActivity";
 
     @Extra
     boolean showBack = true;
@@ -113,6 +114,7 @@ public class InviteCodeActivity extends BaseActivity {
                 tiCode.setError(utils.getSpannableStringForEditTextError("This field is required",
                         this));
             } else {
+                dataManager.showSkip = true;
                 StartupActivity_.intent(mContext).start();
             }
         } else {
