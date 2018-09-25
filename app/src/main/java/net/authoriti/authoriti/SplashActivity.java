@@ -25,8 +25,6 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        System.out.println(ConstantUtils.encrypt("https://authoriti-qa.crts.io"));
-
         dataManager = AuthoritiData_.getInstance_(this);
 
         if (dataManager.loginStatus() != null && dataManager.loginStatus().isLogin()) {
