@@ -114,7 +114,7 @@ public class InviteCodeActivity extends BaseActivity {
                 tiCode.setError(utils.getSpannableStringForEditTextError("This field is required",
                         this));
             } else {
-//                dataManager.showSkip = true;
+                dataManager.showSkip = true;
                 StartupActivity_.intent(mContext).start();
             }
         } else {
