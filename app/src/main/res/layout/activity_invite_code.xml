@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    android:id="@+id/parent"
-    android:focusableInTouchMode="true">
+    android:focusableInTouchMode="true"
+    android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -18,13 +18,14 @@
             android:id="@+id/ivBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="16dp"
             android:layout_centerVertical="true"
-            android:tint="@android:color/white"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="16dp"
             android:src="@drawable/ic_back"
-            android:background="?attr/selectableItemBackgroundBorderless"/>
+            android:tint="@android:color/white" />
 
         <android.support.v7.widget.AppCompatTextView
+            fontPath="@string/font_oswaldo_regular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
@@ -32,10 +33,20 @@
             android:gravity="center"
             android:maxLines="1"
             android:text="@string/app_name"
-            android:textColor="@android:color/white"
             android:textAllCaps="true"
-            fontPath="@string/font_oswaldo_regular"
-            android:textSize="18sp"/>
+            android:textColor="@android:color/white"
+            android:textSize="18sp" />
+
+        <ImageButton
+            android:id="@+id/ivHelp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="16dp"
+            android:src="@drawable/ic_help_outline_white_24dp"
+            android:visibility="visible" />
 
     </RelativeLayout>
 
@@ -44,23 +55,25 @@
         android:layout_height="match_parent">
 
         <android.support.v4.widget.NestedScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
             android:overScrollMode="never">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:orientation="vertical"
-                android:gravity="center">
+                android:paddingBottom="10dp">
 
                 <ImageView
                     android:layout_width="121dp"
                     android:layout_height="63dp"
-                    android:layout_marginTop="70dp"
                     android:layout_marginBottom="24dp"
-                    android:src="@drawable/logo_blue"/>
+                    android:layout_marginTop="30dp"
+                    android:src="@drawable/logo_blue" />
 
                 <android.support.v7.widget.CardView
                     android:layout_width="match_parent"
@@ -73,79 +86,98 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="16dp"
-                        android:orientation="vertical"
-                        android:gravity="center">
+                        android:gravity="center"
+                        android:orientation="vertical">
 
                         <android.support.v7.widget.AppCompatTextView
                             android:id="@+id/tvTitle"
+                            fontPath="@string/font_oswaldo_regular"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
                             android:gravity="center"
-                            android:maxLines="1"
-                            android:text="Enter Invitation Code."
+                            android:maxLines="2"
+                            android:text="Please Enter Your Password - if you don't have a password, just click next"
                             android:textColor="@color/colorPrimary"
-                            fontPath="@string/font_oswaldo_regular"
-                            android:textSize="17sp"/>
+                            android:textSize="17sp" />
 
                         <android.support.design.widget.TextInputLayout
                             android:id="@+id/tiCode"
+                            fontPath="@string/font_oswaldo_regular"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="32dp"
-                            android:layout_marginBottom="16dp"
                             app:errorEnabled="true"
-                            fontPath="@string/font_oswaldo_regular"
                             app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
 
                             <android.support.v7.widget.AppCompatEditText
                                 android:id="@+id/etCode"
+                                fontPath="@string/font_oswaldo_regular"
                                 android:layout_width="match_parent"
                                 android:layout_height="40dp"
-                                android:inputType="text"
-                                android:imeOptions="actionDone"
                                 android:backgroundTint="@color/colorPrimary"
+                                android:hint="PASSWORD"
+                                android:imeOptions="actionDone"
+                                android:inputType="textPassword"
                                 android:textCursorDrawable="@color/colorPrimary"
-                                android:hint="INVITE CODE"
-                                android:textSize="15sp"
-                                fontPath="@string/font_oswaldo_regular"/>
-
+                                android:textSize="15sp" />
                         </android.support.design.widget.TextInputLayout>
 
+                        <android.support.v7.widget.CardView
+                            android:id="@+id/cvNext"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="right"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?attr/selectableItemBackground"
+                            app:cardBackgroundColor="@color/colorPrimary">
+
+                            <android.support.v7.widget.AppCompatTextView
+                                fontPath="@string/font_oswaldo_regular"
+                                android:layout_width="match_parent"
+                                android:layout_height="50dp"
+                                android:gravity="center"
+                                android:paddingLeft="40dp"
+                                android:paddingRight="40dp"
+                                android:text="NEXT"
+                                android:textColor="@android:color/white"
+                                android:textSize="17sp" />
+
+                        </android.support.v7.widget.CardView>
                     </LinearLayout>
 
 
                 </android.support.v7.widget.CardView>
 
-                <android.support.v4.widget.Space
-                    android:layout_width="match_parent"
-                    android:layout_height="70dp" />
 
+                <android.support.v7.widget.CardView
+                    android:id="@+id/cvNeed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="25dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="@color/colorNeedPasswordButton">
+
+                    <android.support.v7.widget.AppCompatTextView
+                        fontPath="@string/font_oswaldo_regular"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:gravity="center"
+                        android:paddingLeft="40dp"
+                        android:paddingRight="40dp"
+                        android:text="Need a Password?"
+                        android:textColor="@android:color/white"
+                        android:textSize="17sp" />
+                </android.support.v7.widget.CardView>
             </LinearLayout>
 
         </android.support.v4.widget.NestedScrollView>
 
-
-        <android.support.v7.widget.CardView
-            android:id="@+id/cvNext"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:foreground="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:layout_gravity="bottom"
-            app:cardBackgroundColor="@color/colorPrimary">
-
-            <android.support.v7.widget.AppCompatTextView
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center"
-                android:text="NEXT"
-                android:textColor="@android:color/white"
-                fontPath="@string/font_oswaldo_regular"
-                android:textSize="17sp"/>
-
-        </android.support.v7.widget.CardView>
 
     </FrameLayout>
 
