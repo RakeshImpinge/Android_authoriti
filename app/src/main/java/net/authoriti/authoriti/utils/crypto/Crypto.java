@@ -12,6 +12,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+import android.util.Base64;
 import android.util.Log;
 
 /**
@@ -306,13 +307,15 @@ public class Crypto {
 
     public CryptoKeyPair generateKeyPair(String password, String salt) {
         byte[] saltBytes;
-
+        Log.i(TAG, "Generate password from: " + password + " and " + salt);
         if (salt == null) {
             saltBytes = CryptoUtil.generateRandomBytes(64);
             salt = new String(saltBytes);
         } else {
             saltBytes = salt.getBytes();
         }
+
+        Log.i(TAG, "Salt: " + salt);
 
 
         PKCS5S2ParametersGenerator generator = new PKCS5S2ParametersGenerator(new SHA256Digest());
@@ -322,11 +325,15 @@ public class Crypto {
 
         byte[] seedBytes = key.getKey();
 
+        Log.i(TAG, "Seed bytes: " + seedBytes);
+
         BigInteger numPrivateKey = CryptoUtil.intFromBytes(seedBytes).mod(new BigInteger("62")
                 .pow(6));
 
         String privateKey = CryptoUtil.intToBase62(numPrivateKey, -1);
         String publicKey = new EcDSA().getPublicKey(numPrivateKey);
+
+        Log.i(TAG, "public-key: " + publicKey);
 
         return new CryptoKeyPair(privateKey, publicKey, salt);
     }
