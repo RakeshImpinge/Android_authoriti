@@ -92,9 +92,6 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
 
     @AfterViews
     void callAfterViewInjection() {
-
-        keyPair = dataManager.getCryptoKeyPair(dataManager.password, "");
-
         tvTitle.setText(customer + " is a partner of Authority. Please enter your " + customer +
                 " password so we can authorize you.");
 
@@ -117,6 +114,8 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
         AccountID accountID = new AccountID("", etIdentifier.getText().toString());
         List<AccountID> accountIDs = new ArrayList<>();
         accountIDs.add(accountID);
+
+        keyPair = dataManager.getCryptoKeyPair(etIdentifier.getText().toString(), "");
 
         RequestSignUp requestSignUp = new RequestSignUp(etPassword.getText().toString(), keyPair
                 .getPublicKey(), keyPair.getSalt(), dataManager.inviteCode, accountIDs);
