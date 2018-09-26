@@ -8,9 +8,12 @@ import org.spongycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.spongycastle.crypto.params.KeyParameter;
 
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import android.util.Base64;
 import android.util.Log;
@@ -57,7 +60,6 @@ public class Crypto {
         }
 
         public void add(String picker, String value) {
-            Log.v(TAG, "picker: " + picker + "; value: " + value);
             switch (picker) {
                 case Constants.PICKER_INDUSTRY:
                 case Constants.PICKER_LOCATION_COUNTRY:
@@ -76,28 +78,17 @@ public class Crypto {
             }
         }
 
-        public void addTime(int year, int month, int day, int hour, int minute) throws Exception {
-            Calendar calendar = Calendar.getInstance();
 
-            calendar.set(Calendar.YEAR, year);
-            calendar.set(Calendar.MONTH, month);
-            calendar.set(Calendar.DAY_OF_MONTH, day);
-            calendar.set(Calendar.HOUR, hour);
-            calendar.set(Calendar.MINUTE, minute);
+        public void addTime(long expiresAt) throws Exception {
+            Log.i(TAG, "Expires At: " + expiresAt);
 
-            Date expirationTime = calendar.getTime();
+            long difference = expiresAt - 1530403200000l;
+            long minutes = TimeUnit.MINUTES.convert(difference, TimeUnit.MILLISECONDS);
 
-            calendar.set(Calendar.YEAR, 2018);
-            calendar.set(Calendar.MONTH, Calendar.JULY);
-            calendar.set(Calendar.DAY_OF_MONTH, 1);
-            calendar.set(Calendar.HOUR, 0);
-            calendar.set(Calendar.MINUTE, 0);
+            // 1537974156094
+            // 1530403200000l
 
-
-            Date baseTime = calendar.getTime();
-
-            long difference = expirationTime.getTime() - baseTime.getTime();
-            long minutes = difference / 60000 - 360;
+            Log.i(TAG, "Minutes (new): " + minutes);
 
             String encodedTime = "";
             if (schemaVersion.equalsIgnoreCase("5")) {
@@ -116,13 +107,11 @@ public class Crypto {
         }
 
         public void addInput(String inputType, String value) {
-            Log.v(TAG, "picker (input): " + inputType + "; value: " + value);
             if (schemaVersion.equalsIgnoreCase("5") && inputType.equalsIgnoreCase("amount")) {
                 while (value.length() < 5) {
                     value = "0" + value;
                 }
                 extraInput = payload.substring(5) + extraInput;
-                Log.v(TAG, "extraInput: " + extraInput);
                 payload = value + payload.substring(0, 5);
             } else {
                 String trimmed = CryptoUtil.cleanup(value, value.length());
@@ -141,7 +130,6 @@ public class Crypto {
                             amount = amount.substring(0, indexOfPeriod + 3);
                         }
                     } else amount = amount + "x00";
-                    Log.v(TAG, "Amount: " + amount);
                     trimmed = CryptoUtil.cleanup(amount.replace('.', 'x'), amount.length());
                 }
 
@@ -164,7 +152,6 @@ public class Crypto {
                 if (found) bitmask.append("1");
                 else bitmask.append("0");
             }
-            Log.v(TAG, "BITMASK: " + bitmask);
             int decimal = Integer.parseInt(bitmask.toString(), 2);
             payload = payload + CryptoUtil.intToBase62(new BigInteger(decimal + ""), 2);
         }
@@ -172,18 +159,14 @@ public class Crypto {
         public String generate() {
             String encodedPayload = "";
             String extra = accountId;
-            Log.i(TAG, "schemaVersion: " + schemaVersion);
             switch (schemaVersion) {
                 case "1":
                     final char countryValue = payload.charAt(7);
-                    Log.i(TAG, "Payload before: " + payload);
                     payload = payload.substring(0, 7) + payload.substring(8);
-                    Log.i(TAG, "Payload: " + payload);
                     encodedPayload = encodePayload(payload, 1);
                     extra = extraInput + extra + countryValue;
                     break;
                 case "7":
-                    Log.i(TAG, "Payload before: " + payload);
                     encodedPayload = encodePayload(payload + "99", 1);
                     extra = extraInput + extra + "1"; // 1 = United States; Make this dynamic
                     break;
@@ -210,14 +193,12 @@ public class Crypto {
             }
 
             final String signedCode = sign(encodedPayload, privateKey);
-            Log.i(TAG, "Encoded Payload: " + encodedPayload);
-            Log.i(TAG, "Signed Code: " + signedCode);
-            Log.i(TAG, "Extra: " + extra);
-            return addDataToCode(extra, signedCode);
+            final String passcode = addDataToCode(extra, signedCode);
+            Log.i(TAG, "PC: " + passcode);
+            return passcode;
         }
 
         private String encodePayload(String payload, int schema) {
-            Log.v(TAG, "ENCODING: " + payload);
             String[] payloadRanges = SCHEMA_RANGES[schema - 1];
             return encodePayload(payload, payloadRanges);
         }
@@ -240,8 +221,6 @@ public class Crypto {
 
 
             StringBuilder encoded = new StringBuilder(CryptoUtil.intToBase62(total, 6));
-            Log.v(TAG, "Encoded: " + encoded);
-
             return encoded.toString();
         }
 
@@ -288,9 +267,7 @@ public class Crypto {
         }
 
         private String addDataToCode(String data, String code) {
-            Log.v(TAG, "Adding " + data);
             final String _data = CryptoUtil.cleanup(CryptoUtil.hash(data), 8);
-            Log.v(TAG, "Adding " + _data);
 
             BigInteger a = CryptoUtil.base62ToInt(_data);
             BigInteger b = CryptoUtil.base62ToInt(code);
@@ -307,15 +284,12 @@ public class Crypto {
 
     public CryptoKeyPair generateKeyPair(String password, String salt) {
         byte[] saltBytes;
-        Log.i(TAG, "Generate password from: " + password + " and " + salt);
         if (salt == null) {
             saltBytes = CryptoUtil.generateRandomBytes(64);
             salt = new String(saltBytes);
         } else {
             saltBytes = salt.getBytes();
         }
-
-        Log.i(TAG, "Salt: " + salt);
 
 
         PKCS5S2ParametersGenerator generator = new PKCS5S2ParametersGenerator(new SHA256Digest());
@@ -325,15 +299,12 @@ public class Crypto {
 
         byte[] seedBytes = key.getKey();
 
-        Log.i(TAG, "Seed bytes: " + seedBytes);
-
         BigInteger numPrivateKey = CryptoUtil.intFromBytes(seedBytes).mod(new BigInteger("62")
                 .pow(6));
 
         String privateKey = CryptoUtil.intToBase62(numPrivateKey, -1);
         String publicKey = new EcDSA().getPublicKey(numPrivateKey);
 
-        Log.i(TAG, "public-key: " + publicKey);
 
         return new CryptoKeyPair(privateKey, publicKey, salt);
     }
