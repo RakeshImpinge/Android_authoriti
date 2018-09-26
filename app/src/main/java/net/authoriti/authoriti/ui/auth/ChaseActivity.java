@@ -92,7 +92,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
 
     @AfterViews
     void callAfterViewInjection() {
-        etIdentifier.setHint(customer + " USERNAME");
+        etIdentifier.setHint(customer.toUpperCase() + " USERNAME");
         tvTitle.setText(customer + " is a partner of Authority. Please enter your " + customer +
                 " password so we can authorize you.");
 
