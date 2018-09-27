@@ -5,7 +5,7 @@ import android.provider.Settings;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import net.authoriti.authoriti.utils.Log;
 import android.view.View;
 import android.widget.TextView;
 

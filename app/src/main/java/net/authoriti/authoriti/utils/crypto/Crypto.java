@@ -12,7 +12,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import android.util.Log;
+import net.authoriti.authoriti.utils.Log;
 
 /**
  * Created by mac on 12/20/17.

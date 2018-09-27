@@ -8,6 +8,7 @@ import net.authoriti.authoriti.ui.auth.LoginActivity_;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiData_;
 import net.authoriti.authoriti.utils.ConstantUtils;
+import net.authoriti.authoriti.utils.Log;
 
 import org.androidannotations.annotations.EActivity;
 
@@ -24,6 +25,8 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.e("Test", "Log");
 
         dataManager = AuthoritiData_.getInstance_(this);
 

@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
+import net.authoriti.authoriti.utils.Log;
 
 import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.ui.alert.TouchIDAlert;
