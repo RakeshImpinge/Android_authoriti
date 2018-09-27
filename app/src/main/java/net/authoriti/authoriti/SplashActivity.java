@@ -7,6 +7,7 @@ import net.authoriti.authoriti.ui.auth.InviteCodeActivity_;
 import net.authoriti.authoriti.ui.auth.LoginActivity_;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiData_;
+import net.authoriti.authoriti.utils.ConstantUtils;
 
 import org.androidannotations.annotations.EActivity;
 
