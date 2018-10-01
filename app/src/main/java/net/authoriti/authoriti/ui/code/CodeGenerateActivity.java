@@ -5,6 +5,7 @@ import android.content.ClipboardManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.util.Log;
 
 import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.api.AuthoritiAPI;
@@ -148,11 +149,7 @@ public class CodeGenerateActivity extends BaseActivity {
             } else if (key_root.equals(PICKER_TIME)) {
                 Calendar newCalendar = timeFormat(hashMap.get("value"));
                 try {
-                    payloadGenerator.addTime(newCalendar.get(Calendar.YEAR),
-                            newCalendar.get(Calendar.MONTH),
-                            newCalendar.get(Calendar.DAY_OF_MONTH),
-                            newCalendar.get(Calendar.HOUR_OF_DAY),
-                            newCalendar.get(Calendar.MINUTE));
+                    payloadGenerator.addTime(newCalendar.getTime().getTime());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -177,6 +174,7 @@ public class CodeGenerateActivity extends BaseActivity {
 
     private Calendar timeFormat(String value) {
         Calendar newCalendar = Calendar.getInstance();
+        newCalendar.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         int day = 0;
         int hour = 0;
@@ -244,7 +242,8 @@ public class CodeGenerateActivity extends BaseActivity {
                 break;
 
         }
-        newCalendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+//        newCalendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Log.i("PAYLOAD_GENERATOR: ", "Expires At: " + newCalendar.getTime().getTime());
         return newCalendar;
     }
 

@@ -111,7 +111,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="40dp"
                                 android:backgroundTint="@color/colorPrimary"
-                                android:hint="CHASE IDENTIFIER"
+                                android:hint="IDENTIFIER"
                                 android:imeOptions="actionNext"
                                 android:inputType="text"
                                 android:textCursorDrawable="@color/colorPrimary"
