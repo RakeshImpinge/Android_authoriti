@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -57,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -322,8 +324,10 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
             Log.e("Social Security ", licenseCard.getSocialSecurity());
             Log.e("TID ", licenseCard.getTransactionId());
 
+            String failureSummary = TextUtils.join(", ", licenseCard.getAuthenticationResultSummaryList());
 
             String builder = "Authentication Result - " + licenseCard.getAuthenticationResult() +
+                    ", Authentication Result Summary - " + failureSummary +
                     ", First Name - " + licenseCard.getNameFirst() +
                     ", Middle Name - " + licenseCard.getNameMiddle() +
                     ", Last Name - " + licenseCard.getNameLast() +
