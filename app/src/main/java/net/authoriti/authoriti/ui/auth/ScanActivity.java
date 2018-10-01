@@ -54,6 +54,7 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
 import java.io.ByteArrayOutputStream;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -124,8 +125,6 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
     }
 
     private void initializeSDK() {
-
-
         cardRegion = Region.REGION_UNITED_STATES;
         isConnect = isConnectWS();
 
@@ -245,9 +244,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
     }
 
     private void showFacialCamera() {
-
         acuantAndroidMobileSdkControllerInstance.showManualFacialCameraInterface(this);
-
     }
 
     private void updateSkipButton() {
@@ -260,11 +257,8 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
     }
 
     private void showCardDetails(Card card) {
-
         if (card == null || card.isEmpty()) {
-
             showAlert("", "No data found for this license card.");
-
         } else {
 
             licenseCard = (DriversLicenseCard) card;
@@ -391,42 +385,37 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
             saveDLInfo(builder, "DL authentication");
 
             if (isNext) {
-
-                if (licenseCard.getAuthenticationResult().toLowerCase().equals("passed")) {
-
-                    Log.e("Verification - ", "Passed");
+                final String authResult = licenseCard.getAuthenticationResult().toLowerCase();
+                if (dataManager.ignoreAcuant || authResult.equals("passed") || authResult.equalsIgnoreCase("attention") || authResult.equalsIgnoreCase("unknown")) {
                     showFacialCamera();
-
                 } else {
-
                     showAlert("", "Could not verify your Driver's License, Please try again.");
-//                    showFacialCamera();
                 }
-
             }
 
             if (isSkip) {
-
                 AccountManagerActivity_.intent(mContext).start();
-
             }
         }
 
     }
 
     private void saveDLInfo(String metaData, String type) {
-
         Event event = new Event();
         event.setEvent(type);
         Date now = new Date();
-        event.setTime(now.toString());
+
+        String nowStr = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG).format(now);
+
+
+        event.setTime(nowStr + "-" + type);
         event.setMetaData(metaData);
 
         MultipartBody.Part front = null;
         if (frontBitmap != null) {
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            frontBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            frontBitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream);
             final byte[] bitmapData = stream.toByteArray();
             RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), bitmapData);
             front = MultipartBody.Part.createFormData("front", "front.jpg", reqFile);
@@ -437,7 +426,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
         if (backBitmap != null) {
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            backBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            backBitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream);
             final byte[] bitmapData = stream.toByteArray();
             RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), bitmapData);
             back = MultipartBody.Part.createFormData("back", "back.jpg", reqFile);
@@ -499,7 +488,6 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
     }
 
     private void saveFacialInfo(String metaData) {
-
         Event event = new Event();
         event.setEvent("Selfie authentication");
         Date now = new Date();
@@ -517,7 +505,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
         if (frontBitmap != null) {
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            frontBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            frontBitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream);
             final byte[] bitmapData = stream.toByteArray();
             RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), bitmapData);
             front = MultipartBody.Part.createFormData("front", "front.jpg", reqFile);
@@ -528,7 +516,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
         if (backBitmap != null) {
 
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            backBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            backBitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream);
             final byte[] bitmapData = stream.toByteArray();
             RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), bitmapData);
             back = MultipartBody.Part.createFormData("back", "back.jpg", reqFile);
@@ -639,7 +627,6 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
     }
 
     private void processFaceValidation(final Bitmap face) {
-
         isFacial = true;
 
         final ProcessImageRequestOptions options = ProcessImageRequestOptions.getInstance();
@@ -939,20 +926,15 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
 
     @Override
     public void didFailWithError(int code, String message) {
-
         dismissProgressDialog();
         Log.e("Did Failed with Error -", message + " - " + code);
 
         if (isNext) {
-
             showAlert("", message + " - " + code);
-
         }
 
         if (isSkip) {
-
             AccountManagerActivity_.intent(mContext).start();
-
         }
 
     }
@@ -1031,19 +1013,12 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
 
     @Override
     public void onFacialRecognitionCompleted(final Bitmap faceBitmap) {
-
         Log.e("Facial Recognition ", "Completed");
-
         if (isSkip) {
-
             AccountManagerActivity_.intent(mContext).start();
-
         } else {
-
             if (faceBitmap != null) {
-
                 processFaceValidation(faceBitmap);
-
             }
 
 //            AccountManagerActivity_.intent(mContext).start();
