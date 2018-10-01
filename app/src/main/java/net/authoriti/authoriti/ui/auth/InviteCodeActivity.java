@@ -184,6 +184,8 @@ public class InviteCodeActivity extends BaseActivity {
         } else {
             dataManager.inviteCode = etCode.getText().toString();
             dataManager.showSkip = responseInviteCode.isSkipDLV();
+            dataManager.ignoreAcuant = responseInviteCode.ignoreAcuant();
+            Log.i(TAG, "Skip Acuant: " + dataManager.ignoreAcuant);
             if (isSyncRequired) {
                 if (responseInviteCode.getCustomer() != null) {
                     ChaseActivity_.intent(mContext).customer(responseInviteCode.getCustomer())

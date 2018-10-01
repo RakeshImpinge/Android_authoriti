@@ -32,6 +32,6 @@ public class AuthoritiApplication extends Application {
         context = getApplicationContext();
         Foreground.init(this);
 
-//        System.out.println("BASE_URL: " + ConstantUtils.encrypt("https://authoriti-qa.crts.io"));
+        System.out.println("BASE_URL: " + ConstantUtils.encrypt("https://validate.authroriti.crts.io"));
     }
 }
