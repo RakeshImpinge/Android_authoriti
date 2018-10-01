@@ -5,10 +5,11 @@ package net.authoriti.authoriti.utils;
  */
 
 public interface Constants {
-
-    String API_BASE_URL = "cr+VY8pCMSyDKL1sbVqMOw==:Lh4dj9inxqWRxnLWvF1yUMJxCT15HuDrD36BQifsHtY=:uh+8FxiJVQsF9uuYVw3mGSNslFG48IJFPySub6vQHL8=";
+    String QA = "16/AtQ1ZYsw2x48wBUNVrA==:EO1rTvhdVo8jfjClM1zcc9Cqrl2c4CugEaJCaoMK+78=:Cao10YznfpfHZxvJLzkzFyU5dhlfaIzubXBh6b6wBsg=";
+    String PROD = "ylTU0o9L9ldUKosJwH7a4Q==:Lr1DDV3P4FgAYkAl4osdKT+w1F8pW/y5bWAuoY4Qedk=:OnJLNvBmGZyX9XyfZ8OIjoP5R2Br9SnyI3d6TAK5lo8=";
+    String API_BASE_URL = QA;
     String API_BASE_URL_POLLING =
-            "https://s3.amazonaws.com/authoriti-requests-prod/requests/";
+            "https://s3.amazonaws.com/authoriti-requests-dev/requests/";
     String HELP_BASE = "https://help.authoriti.net";
 
 

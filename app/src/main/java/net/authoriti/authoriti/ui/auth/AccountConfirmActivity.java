@@ -83,7 +83,6 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
                 selectedPosition = position;
                 if (selectedAccountId.isConfirmed()) {
 //                    showAlert("", "This account has already confirmed.");
-
                 } else {
 
                     showAccountConfirmDialog();

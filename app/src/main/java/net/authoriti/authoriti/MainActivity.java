@@ -13,7 +13,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import net.authoriti.authoriti.utils.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;

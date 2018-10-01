@@ -15,8 +15,8 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-import android.util.Base64;
-import android.util.Log;
+import net.authoriti.authoriti.utils.Log;
+
 
 /**
  * Created by mac on 12/20/17.
