@@ -15,7 +15,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.util.DisplayMetrics;
-import android.util.Log;
+import net.authoriti.authoriti.utils.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;

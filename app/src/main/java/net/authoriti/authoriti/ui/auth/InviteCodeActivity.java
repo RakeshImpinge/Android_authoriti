@@ -8,7 +8,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.util.Log;
+import net.authoriti.authoriti.utils.Log;
 
 import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.api.AuthoritiAPI;

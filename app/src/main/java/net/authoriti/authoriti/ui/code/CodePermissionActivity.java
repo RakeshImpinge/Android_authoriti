@@ -5,7 +5,7 @@ import android.net.Uri;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import net.authoriti.authoriti.utils.Log;
 import android.view.View;
 import android.widget.EditText;
 
