@@ -17,6 +17,9 @@ public class ResponseInviteCode {
     @SerializedName("skipDLV")
     private boolean skipDLV;
 
+    @SerializedName("ignoreAcuant")
+    private boolean ignoreAcuant;
+
     public boolean isValid() {
         return valid;
     }
@@ -35,6 +38,10 @@ public class ResponseInviteCode {
 
     public boolean isSkipDLV() {
         return skipDLV;
+    }
+
+    public boolean ignoreAcuant() {
+        return ignoreAcuant;
     }
 
     public void setSkipDLV(boolean skipDLV) {

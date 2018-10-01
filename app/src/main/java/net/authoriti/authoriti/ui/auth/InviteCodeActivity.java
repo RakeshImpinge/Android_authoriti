@@ -8,7 +8,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.util.Log;
+import net.authoriti.authoriti.utils.Log;
 
 import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.api.AuthoritiAPI;
@@ -184,6 +184,8 @@ public class InviteCodeActivity extends BaseActivity {
         } else {
             dataManager.inviteCode = etCode.getText().toString();
             dataManager.showSkip = responseInviteCode.isSkipDLV();
+            dataManager.ignoreAcuant = responseInviteCode.ignoreAcuant();
+            Log.i(TAG, "Skip Acuant: " + dataManager.ignoreAcuant);
             if (isSyncRequired) {
                 if (responseInviteCode.getCustomer() != null) {
                     ChaseActivity_.intent(mContext).customer(responseInviteCode.getCustomer())

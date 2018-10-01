@@ -39,8 +39,6 @@ public class AuthoritiAPI {
                 .setDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSS'Z'")
                 .create();
 
-        HttpLoggingInterceptor logInterceptor = new HttpLoggingInterceptor();
-        logInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(120, TimeUnit.SECONDS)
@@ -61,7 +59,7 @@ public class AuthoritiAPI {
                         return chain.proceed(request);
                     }
                 })
-                .addInterceptor(logInterceptor)
+                .addInterceptor(getInterceptorLevel())
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -71,6 +69,15 @@ public class AuthoritiAPI {
                 .build();
 
         apiService = retrofit.create(AuthoritiAPIService.class);
+    }
+
+    private HttpLoggingInterceptor getInterceptorLevel() {
+        HttpLoggingInterceptor logInterceptor = new HttpLoggingInterceptor();
+        if (BuildConfig.DEBUG) {
+            return logInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        } else {
+            return logInterceptor.setLevel(HttpLoggingInterceptor.Level.NONE);
+        }
     }
 
     public static AuthoritiAPIService APIService() {
