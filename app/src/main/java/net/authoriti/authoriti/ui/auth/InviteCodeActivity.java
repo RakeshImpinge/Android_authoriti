@@ -1,13 +1,21 @@
 package net.authoriti.authoriti.ui.auth;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.provider.Settings;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+
+import net.authoriti.authoriti.BuildConfig;
+import net.authoriti.authoriti.ui.share.ImportActivity;
 import net.authoriti.authoriti.utils.Log;
 
 import net.authoriti.authoriti.R;
@@ -67,6 +75,7 @@ public class InviteCodeActivity extends BaseActivity {
     @ViewById(R.id.scrollView)
     NestedScrollView scrollView;
 
+    public static final int PERMISSIONS_REQUEST_CAMERA = 0;
 
     @AfterViews
     void callAfterViewInjection() {
@@ -141,6 +150,23 @@ public class InviteCodeActivity extends BaseActivity {
                 TOPIC_INVITE));
         startActivity(browserIntent);
     }
+
+    @Click(R.id.cvImport)
+    void importButtonClicked() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
+            startActivity(new Intent(this, ImportActivity.class));
+        } else if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    PERMISSIONS_REQUEST_CAMERA);
+        } else {
+            startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse
+                    ("package:" + BuildConfig.APPLICATION_ID)));
+        }
+    }
+
 
     private void checkInviteCode(final boolean isNextClick) {
         if (isNextClick) {

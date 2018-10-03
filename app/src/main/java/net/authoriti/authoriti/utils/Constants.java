@@ -28,6 +28,8 @@ public interface Constants {
     long MENU_WIPE = 1003;
     long MENU_LOGOUT = 1004;
     long MENU_POLLING = 1005;
+    long MENU_EXPORT = 1006;
+
 
     String MENU_ID = "menu_id";
 
