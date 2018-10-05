@@ -26,8 +26,6 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.e("Test", "Log");
-
         dataManager = AuthoritiData_.getInstance_(this);
 
         if (dataManager.loginStatus() != null && dataManager.loginStatus().isLogin()) {

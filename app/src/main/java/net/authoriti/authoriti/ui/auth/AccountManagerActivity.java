@@ -5,7 +5,9 @@ import android.provider.Settings;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+
 import net.authoriti.authoriti.utils.Log;
+
 import android.view.View;
 import android.widget.TextView;
 
@@ -146,8 +148,10 @@ public class AccountManagerActivity extends SecurityActivity implements Security
         Log.e("Private Key", keyPair.getPrivateKey());
         Log.e("Public Key", keyPair.getPublicKey());
         Log.e("Salt", keyPair.getSalt());
-        RequestSignUp requestSignUp = new RequestSignUp(dataManager.password, keyPair
-                .getPublicKey(), keyPair.getSalt(), dataManager.inviteCode, dataManager.accountIDs);
+
+        RequestSignUp requestSignUp = new RequestSignUp(keyPair
+                .getPublicKey(), dataManager.inviteCode, dataManager.accountIDs);
+
         displayProgressDialog("Sign Up...");
         AuthoritiAPI.APIService().signUp(requestSignUp).enqueue(new Callback<ResponseSignUp>() {
             @Override
@@ -178,7 +182,6 @@ public class AccountManagerActivity extends SecurityActivity implements Security
         User user = responseSignUp.getUser();
         user.setUserId(responseSignUp.getUserId());
         user.setToken(responseSignUp.getToken());
-        user.setPassword(dataManager.password);
         user.setInviteCode(dataManager.inviteCode);
         try {
 
@@ -206,7 +209,7 @@ public class AccountManagerActivity extends SecurityActivity implements Security
                 for (int i = 0; i < user.getAccountIDs().size(); i++) {
                     AccountID accountID = user.getAccountIDs().get(i);
                     accountID.setIdentifier(CryptoUtil.hash(accountID.getIdentifier()));
-                    user.getAccountIDs().set(i,accountID);
+                    user.getAccountIDs().set(i, accountID);
                 }
 
                 if (dataManager.defaultAccountSelected) {
