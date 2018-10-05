@@ -21,6 +21,7 @@ import com.google.gson.reflect.TypeToken;
 
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.sharedpreferences.Pref;
+import org.json.JSONObject;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -99,6 +100,10 @@ public class AuthoritiData {
         } else {
             pref.edit().userJson().remove().apply();
         }
+    }
+
+    public void setUserJson(JSONObject user) {
+        pref.edit().userJson().put(user.toString()).apply();
     }
 
     public User getUser() {

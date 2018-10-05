@@ -43,7 +43,7 @@ public class AuthoritiUtils implements Constants {
                 defaultValue.setDefault(isDefault);
             }
             dataManager.setDefaultValues(defaultSelectedList);
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -71,7 +71,6 @@ public class AuthoritiUtils implements Constants {
             e.printStackTrace();
         }
     }
-
 
     public Spanned fromHtml(String source) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

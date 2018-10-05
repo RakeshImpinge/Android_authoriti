@@ -13,7 +13,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.Toolbar;
+
+import net.authoriti.authoriti.ui.share.ExportActivity_;
 import net.authoriti.authoriti.utils.Log;
+
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -169,6 +172,8 @@ public class MainActivity extends BaseActivity {
                                 (MENU_WIPE).withSelectable(true).withTypeface(typeface),
                         new PrimaryDrawerItem().withName(R.string.menu_polling).withIdentifier
                                 (MENU_POLLING).withSelectable(true).withTypeface(typeface),
+                        new PrimaryDrawerItem().withName(R.string.menu_export).withIdentifier
+                                (MENU_EXPORT).withSelectable(true).withTypeface(typeface),
                         new PrimaryDrawerItem().withName(R.string.menu_logOut).withIdentifier
                                 (MENU_LOGOUT).withSelectable(true).withTypeface(typeface)
                 )
@@ -205,6 +210,11 @@ public class MainActivity extends BaseActivity {
         if (SELECTED_MENU_ID == menu_id && menu_id != MENU_POLLING) {
             return;
         }
+        if (menu_id == MENU_EXPORT) {
+            ExportActivity_.intent(getApplicationContext()).flags(Intent.FLAG_ACTIVITY_NEW_TASK).start();
+            return;
+        }
+
         SELECTED_MENU_ID = menu_id;
         Fragment fragment = null;
         if (menu_id == MENU_CODE) {
