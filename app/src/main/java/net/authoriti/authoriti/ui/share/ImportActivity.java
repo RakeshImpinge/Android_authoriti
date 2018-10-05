@@ -14,6 +14,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.zxing.Result;
@@ -34,11 +35,13 @@ import java.net.URLEncoder;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 
-public class ImportActivity extends BaseActivity implements ZXingScannerView.ResultHandler, WebAppInterface.DataInterface {
+public class ImportActivity extends BaseActivity implements ZXingScannerView.ResultHandler, WebAppInterface.DataInterface, View.OnClickListener {
 
     AuthoritiData authoritiData;
     private ZXingScannerView mScannerView;
     WebView webView;
+
+    ImageView ivClose;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,6 +50,8 @@ public class ImportActivity extends BaseActivity implements ZXingScannerView.Res
         mScannerView = (ZXingScannerView) findViewById(R.id.ZXingScannerView);
         authoritiData = AuthoritiData_.getInstance_(getApplicationContext());
         webView = (WebView) findViewById(R.id.webview);
+        ivClose = (ImageView) findViewById(R.id.ivClose);
+        ivClose.setOnClickListener(this);
 
     }
 
@@ -159,6 +164,15 @@ public class ImportActivity extends BaseActivity implements ZXingScannerView.Res
             LoginActivity_.intent(getApplicationContext()).flags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK).start();
         } else {
             Toast.makeText(mContext, "Unable to scan please try again", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.ivClose:
+                onBackPressed();
+                break;
         }
     }
 }
