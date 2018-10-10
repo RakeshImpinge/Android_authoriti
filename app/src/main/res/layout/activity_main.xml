@@ -11,10 +11,10 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/primary"
-        android:contentInsetEnd="0dp"
-        android:contentInsetLeft="0dp"
-        android:contentInsetRight="0dp"
         android:contentInsetStart="0dp"
+        android:contentInsetLeft="0dp"
+        android:contentInsetEnd="0dp"
+        android:contentInsetRight="0dp"
         android:elevation="4dp"
         app:contentInsetEnd="0dp"
         app:contentInsetLeft="0dp"
@@ -56,14 +56,29 @@
                 android:id="@+id/btnAdd"
                 style="@android:style/Widget.Holo.Button.Borderless"
                 fontPath="@string/font_oswaldo_regular"
-                android:layout_width="50dp"
+                android:layout_width="35dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="4dp"
+                android:layout_toLeftOf="@+id/btnSync"
+                android:text="Add"
+                android:textAllCaps="false"
+                android:textSize="15dp"
+                android:visibility="visible" />
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btnSync"
+                style="@android:style/Widget.Holo.Button.Borderless"
+                fontPath="@string/font_oswaldo_regular"
+                android:layout_width="41dp"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="4dp"
                 android:layout_toLeftOf="@+id/ivHelp"
-                android:text="Add"
+                android:text="Sync"
                 android:textAllCaps="false"
-                android:visibility="invisible" />
+                android:textSize="15dp"
+                android:visibility="visible" />
 
             <ImageButton
                 android:id="@+id/ivHelp"

@@ -91,6 +91,9 @@ public class MainActivity extends BaseActivity {
     @ViewById(R.id.btnAdd)
     Button btnAdd;
 
+    @ViewById(R.id.btnSync)
+    Button btnSync;
+
     @ViewById(R.id.ivHelp)
     ImageButton ivHelp;
 
@@ -252,12 +255,13 @@ public class MainActivity extends BaseActivity {
         if (menu_id == MENU_ACCOUNT) {
             btnAdd.setVisibility(View.VISIBLE);
             if (!dataManager.getUser().getChaseType()) {
-                btnAdd.setText("Add");
+                btnSync.setVisibility(View.INVISIBLE);
             } else {
-                btnAdd.setText("Sync");
+                btnSync.setVisibility(View.VISIBLE);
             }
         } else {
             btnAdd.setVisibility(View.INVISIBLE);
+            btnSync.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -325,13 +329,14 @@ public class MainActivity extends BaseActivity {
 
     @Click(R.id.btnAdd)
     void addButtonClicked() {
-        if (dataManager.getUser().getChaseType()) {
-            LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent
-                    (BROADCAST_SYNC_BUTTON_CLICKED));
-        } else {
-            LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent
-                    (BROADCAST_ADD_BUTTON_CLICKED));
-        }
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent
+                (BROADCAST_ADD_BUTTON_CLICKED));
+    }
+
+    @Click(R.id.btnSync)
+    void syncButtonClicked() {
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent
+                (BROADCAST_SYNC_BUTTON_CLICKED));
     }
 
     @Override
@@ -431,7 +436,7 @@ public class MainActivity extends BaseActivity {
             }
             Log.e("defaultSelectedList", defaultSelectedList.toString());
             dataManager.setDefaultValues(defaultSelectedList);
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
