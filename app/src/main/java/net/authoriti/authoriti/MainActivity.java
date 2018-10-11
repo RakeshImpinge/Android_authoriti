@@ -255,13 +255,13 @@ public class MainActivity extends BaseActivity {
         if (menu_id == MENU_ACCOUNT) {
             btnAdd.setVisibility(View.VISIBLE);
             if (!dataManager.getUser().getChaseType()) {
-                btnSync.setVisibility(View.INVISIBLE);
+                btnSync.setVisibility(View.GONE);
             } else {
                 btnSync.setVisibility(View.VISIBLE);
             }
         } else {
             btnAdd.setVisibility(View.INVISIBLE);
-            btnSync.setVisibility(View.INVISIBLE);
+            btnSync.setVisibility(View.GONE);
         }
     }
 
