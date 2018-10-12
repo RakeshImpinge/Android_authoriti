@@ -16,7 +16,10 @@ import net.authoriti.authoriti.api.AuthoritiAPI;
 import net.authoriti.authoriti.api.model.AccountID;
 import net.authoriti.authoriti.api.model.User;
 import net.authoriti.authoriti.api.model.Value;
+import net.authoriti.authoriti.api.model.request.RequestUserUpdate;
+import net.authoriti.authoriti.api.model.response.ResponseSignUp;
 import net.authoriti.authoriti.core.BaseFragment;
+import net.authoriti.authoriti.ui.alert.AccountAddDialog;
 import net.authoriti.authoriti.ui.alert.AccountConfirmDialog;
 import net.authoriti.authoriti.ui.auth.InviteCodeActivity_;
 import net.authoriti.authoriti.ui.items.AccountConfirmItem;
@@ -29,12 +32,16 @@ import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 
 import net.authoriti.authoriti.utils.Constants;
+import net.authoriti.authoriti.utils.crypto.CryptoUtil;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -46,7 +53,7 @@ import retrofit2.Response;
 
 @EFragment(R.layout.fragment_account_chase)
 public class AccountChaseFragment extends BaseFragment implements AccountConfirmDialog
-        .AccountConfirmDialogListener {
+        .AccountConfirmDialogListener, AccountAddDialog.AccountAddDialogListener {
 
     @Bean
     AuthoritiUtils utils;
@@ -66,11 +73,20 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
     AccountID selectedAccountId;
     int selectedPosition;
 
-    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    private AccountAddDialog accountAddDialog;
+
+
+    BroadcastReceiver broadcastSyncReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             InviteCodeActivity_.intent(getActivity()).showBack(true).isSyncRequired(true)
                     .start();
+        }
+    };
+    BroadcastReceiver broadcastAddReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            showAccountAddDialog();
         }
     };
 
@@ -79,6 +95,9 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
         adapter = new FastItemAdapter<AccountConfirmItem>();
         rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
         rvAccount.setAdapter(adapter);
+
+        accountAddDialog = new AccountAddDialog(getActivity());
+        accountAddDialog.setListener(this);
 
         adapter.withOnClickListener(new FastAdapter.OnClickListener<AccountConfirmItem>() {
             @Override
@@ -99,8 +118,10 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
     @Override
     public void onStart() {
         super.onStart();
-        LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastReceiver, new
+        LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastSyncReceiver, new
                 IntentFilter(BROADCAST_SYNC_BUTTON_CLICKED));
+        LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastAddReceiver, new
+                IntentFilter(BROADCAST_ADD_BUTTON_CLICKED));
     }
 
     @Override
@@ -113,7 +134,8 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
     @Override
     public void onPause() {
         super.onPause();
-        LocalBroadcastManager.getInstance(mContext).unregisterReceiver(broadcastReceiver);
+        LocalBroadcastManager.getInstance(mContext).unregisterReceiver(broadcastSyncReceiver);
+        LocalBroadcastManager.getInstance(mContext).unregisterReceiver(broadcastAddReceiver);
     }
 
     private void showAccounts() {
@@ -199,7 +221,7 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
 //        Picker accountPicker = dataManager.getAccountPicker();
 //        List<Value> values = accountPicker.getValues();
 //        Value value = new Value(id, selectedAccountId.getType());
-//        values.add(value);
+//        values.ic_add(value);
 //        if (setDefault) {
 //
 //            accountPicker.setEnableDefault(true);
@@ -254,15 +276,108 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
 
     @Override
     public void accountConfirmDialogOKButtonClicked(String id, boolean setDefault) {
-
         hideAccountConfirmDialog();
         saveAccountName(id, setDefault);
     }
 
     @Override
     public void accountConfirmDialogCancelButtonClicked() {
-
         hideAccountConfirmDialog();
+    }
+
+
+    private void showAccountAddDialog() {
+        if (accountAddDialog == null) {
+            accountAddDialog = new AccountAddDialog(getActivity());
+            accountAddDialog.setListener(this);
+        } else {
+            accountAddDialog.init();
+        }
+        if (!getActivity().isFinishing() && !accountAddDialog.isShowing()) {
+            accountAddDialog.show();
+        }
+    }
+
+    @Override
+    public void accountAddDialogOKButtonClicked(String name, String id, boolean setDefault) {
+        hideAccountAddDialog();
+        saveAccount(name, id, setDefault);
+    }
+
+    private void saveAccount(final String name, final String id, final boolean setDefault) {
+        RequestUserUpdate request = new RequestUserUpdate();
+        AccountID accountID = new AccountID(name, id);
+        List<AccountID> accountIDs = new ArrayList<>();
+        accountIDs.add(accountID);
+        request.setAccountIDs(accountIDs);
+
+        String token = "Bearer " + dataManager.getUser().getToken();
+        displayProgressDialog("");
+        AuthoritiAPI.APIService().updateUser(token, request).enqueue(new Callback<ResponseSignUp>
+                () {
+            @Override
+            public void onResponse(Call<ResponseSignUp> call, Response<ResponseSignUp> response) {
+                dismissProgressDialog();
+                if (response.code() == 200 && response.body() != null) {
+                    addAccount(name, id, setDefault);
+                } else {
+                    showAlert("", "Account Save Failed.");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSignUp> call, Throwable t) {
+                dismissProgressDialog();
+                showAlert("", "Account Save Failed.");
+            }
+        });
 
     }
+
+    private void addAccount(String name, String id, boolean setDefault) {
+        User user = dataManager.getUser();
+        dataManager.accountIDs = user.getAccountIDs();
+        if (dataManager.accountIDs == null) {
+            dataManager.accountIDs = new ArrayList<>();
+        }
+        if (setDefault) {
+            dataManager.defaultAccountSelected = true;
+            dataManager.defaultAccountIndex = dataManager.accountIDs.size();
+            dataManager.setDefaultAccountID(new Value(CryptoUtil.hash(id), name));
+            utils.updateDefaultvalues(getActivity(), PICKER_ACCOUNT, new Value(CryptoUtil.hash
+                    (id), name), true);
+        }
+        AccountID accountID = new AccountID(name, id);
+        accountID.setIdentifier(CryptoUtil.hash(accountID.getIdentifier()));
+        dataManager.accountIDs.add(accountID);
+        user.setAccountIDs(dataManager.accountIDs);
+        dataManager.setUser(user);
+
+        adapter.clear();
+        for (int i = 0; i < user.getAccountIDs().size(); i++) {
+            boolean isDefault = false;
+            if (dataManager.getDefaultAccountID().getTitle().equals(user.getAccountIDs().get
+                    (i).getType()) &&
+                    dataManager.getDefaultAccountID().getValue().equals(user.getAccountIDs()
+                            .get(i)
+                            .getIdentifier())) {
+                isDefault = true;
+            }
+            adapter.add(new AccountConfirmItem(user.getAccountIDs().get(i), isDefault));
+        }
+    }
+
+
+    @Override
+    public void accountAddDialogCancelButtonClicked() {
+        hideAccountAddDialog();
+    }
+
+    private void hideAccountAddDialog() {
+        if (accountAddDialog != null) {
+            accountAddDialog.dismiss();
+            accountAddDialog = null;
+        }
+    }
+
 }

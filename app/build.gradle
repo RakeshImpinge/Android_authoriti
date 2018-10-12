@@ -21,6 +21,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
     }
     packagingOptions {
         exclude 'META-INF/DEPENDENCIES'
@@ -90,4 +94,6 @@ dependencies {
     implementation 'com.multidots:fingerprint-auth:1.0.1'
     implementation 'com.sjl:Foredroid:1.0.2'
     implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.1.0'
+    implementation 'me.dm7.barcodescanner:zxing:1.9.8'
+
 }

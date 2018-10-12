@@ -27,7 +27,7 @@ import java.util.Map;
 public class AuthoritiUtils implements Constants {
 
 
-    // update default values for new value add
+    // update default values for new value ic_add
     public void updateDefaultvalues(Context context, String picker, Value value,
                                     Boolean
                                             isDefault) {
@@ -43,7 +43,7 @@ public class AuthoritiUtils implements Constants {
                 defaultValue.setDefault(isDefault);
             }
             dataManager.setDefaultValues(defaultSelectedList);
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -71,7 +71,6 @@ public class AuthoritiUtils implements Constants {
             e.printStackTrace();
         }
     }
-
 
     public Spanned fromHtml(String source) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

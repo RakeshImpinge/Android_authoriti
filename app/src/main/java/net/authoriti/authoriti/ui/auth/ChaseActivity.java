@@ -14,7 +14,8 @@ import net.authoriti.authoriti.api.AuthoritiAPI;
 import net.authoriti.authoriti.api.model.AccountID;
 import net.authoriti.authoriti.api.model.AuthLogIn;
 import net.authoriti.authoriti.api.model.User;
-import net.authoriti.authoriti.api.model.request.RequestSignUp;
+
+import net.authoriti.authoriti.api.model.request.RequestSignUpChase;
 import net.authoriti.authoriti.api.model.response.ResponseSignUpChase;
 import net.authoriti.authoriti.core.SecurityActivity;
 import net.authoriti.authoriti.ui.help.HelpActivity_;
@@ -118,7 +119,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
 
         keyPair = dataManager.getCryptoKeyPair(etIdentifier.getText().toString(), "");
 
-        RequestSignUp requestSignUp = new RequestSignUp(etPassword.getText().toString(), keyPair
+        RequestSignUpChase requestSignUp = new RequestSignUpChase(etPassword.getText().toString(), keyPair
                 .getPublicKey(), keyPair.getSalt(), dataManager.inviteCode, accountIDs);
 
         displayProgressDialog("Sign Up...");
@@ -176,7 +177,6 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
             User user = new User();
             user.setUserId(responseSignUpChase.getId());
             user.setToken(responseSignUpChase.getToken());
-            user.setPassword(etPassword.getText().toString());
             user.setInviteCode(dataManager.inviteCode);
             user.setChaseType(true);
             user.setAccountIDs(responseSignUpChase.getAccounts());
@@ -388,6 +388,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
         if (isSyncRequired) {
             InviteCodeActivity_.intent(getApplicationContext()).showBack(true).isSyncRequired
                     (true).start();
+            finish();
         } else {
             super.onBackPressed();
         }

@@ -13,9 +13,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.Toolbar;
+
+import net.authoriti.authoriti.ui.share.ExportActivity_;
 import net.authoriti.authoriti.utils.Log;
+
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 
 import net.authoriti.authoriti.api.AuthoritiAPI;
@@ -85,8 +87,11 @@ public class MainActivity extends BaseActivity {
     @ViewById(R.id.toolbar)
     Toolbar toolbar;
 
-    @ViewById(R.id.btnAdd)
-    Button btnAdd;
+    @ViewById(R.id.ivAdd)
+    ImageButton ivAdd;
+
+    @ViewById(R.id.ivSync)
+    ImageButton ivSync;
 
     @ViewById(R.id.ivHelp)
     ImageButton ivHelp;
@@ -169,6 +174,8 @@ public class MainActivity extends BaseActivity {
                                 (MENU_WIPE).withSelectable(true).withTypeface(typeface),
                         new PrimaryDrawerItem().withName(R.string.menu_polling).withIdentifier
                                 (MENU_POLLING).withSelectable(true).withTypeface(typeface),
+                        new PrimaryDrawerItem().withName(R.string.menu_export).withIdentifier
+                                (MENU_EXPORT).withSelectable(true).withTypeface(typeface),
                         new PrimaryDrawerItem().withName(R.string.menu_logOut).withIdentifier
                                 (MENU_LOGOUT).withSelectable(true).withTypeface(typeface)
                 )
@@ -205,6 +212,11 @@ public class MainActivity extends BaseActivity {
         if (SELECTED_MENU_ID == menu_id && menu_id != MENU_POLLING) {
             return;
         }
+        if (menu_id == MENU_EXPORT) {
+            ExportActivity_.intent(getApplicationContext()).flags(Intent.FLAG_ACTIVITY_NEW_TASK).start();
+            return;
+        }
+
         SELECTED_MENU_ID = menu_id;
         Fragment fragment = null;
         if (menu_id == MENU_CODE) {
@@ -240,14 +252,15 @@ public class MainActivity extends BaseActivity {
         drawer.setSelection(menu_id, false);
         SELECTED_MENU_ID = menu_id;
         if (menu_id == MENU_ACCOUNT) {
-            btnAdd.setVisibility(View.VISIBLE);
+            ivAdd.setVisibility(View.VISIBLE);
             if (!dataManager.getUser().getChaseType()) {
-                btnAdd.setText("Add");
+                ivSync.setVisibility(View.GONE);
             } else {
-                btnAdd.setText("Sync");
+                ivSync.setVisibility(View.VISIBLE);
             }
         } else {
-            btnAdd.setVisibility(View.INVISIBLE);
+            ivAdd.setVisibility(View.INVISIBLE);
+            ivSync.setVisibility(View.GONE);
         }
     }
 
@@ -313,15 +326,16 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    @Click(R.id.btnAdd)
+    @Click(R.id.ivAdd)
     void addButtonClicked() {
-        if (dataManager.getUser().getChaseType()) {
-            LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent
-                    (BROADCAST_SYNC_BUTTON_CLICKED));
-        } else {
-            LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent
-                    (BROADCAST_ADD_BUTTON_CLICKED));
-        }
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent
+                (BROADCAST_ADD_BUTTON_CLICKED));
+    }
+
+    @Click(R.id.ivSync)
+    void syncButtonClicked() {
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent
+                (BROADCAST_SYNC_BUTTON_CLICKED));
     }
 
     @Override
@@ -421,7 +435,7 @@ public class MainActivity extends BaseActivity {
             }
             Log.e("defaultSelectedList", defaultSelectedList.toString());
             dataManager.setDefaultValues(defaultSelectedList);
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -529,7 +543,7 @@ public class MainActivity extends BaseActivity {
 //
 //            for (Picker picker : dataManager.getScheme().getPickers()) {
 //
-//                pickers.add(picker.getPicker());
+//                pickers.ic_add(picker.getPicker());
 //
 //                switch (picker.getPicker()) {
 //
@@ -546,7 +560,7 @@ public class MainActivity extends BaseActivity {
 //
 //                                Value value = new Value(accountID.getIdentifier(), accountID
 //                                        .getType());
-//                                values.add(value);
+//                                values.ic_add(value);
 //
 //                            }
 //                            picker1.setValues(values);
@@ -603,7 +617,7 @@ public class MainActivity extends BaseActivity {
 //
 //            for (Picker picker : dataManager.getScheme().getPickers2()) {
 //
-//                pickers.add(picker.getPicker());
+//                pickers.ic_add(picker.getPicker());
 //
 //                switch (picker.getPicker()) {
 //
@@ -643,7 +657,7 @@ public class MainActivity extends BaseActivity {
 //
 //            for (Picker picker : dataManager.getScheme().getPickers()) {
 //
-//                pickers.add(picker.getPicker());
+//                pickers.ic_add(picker.getPicker());
 //
 //                switch (picker.getPicker()) {
 //
@@ -757,7 +771,7 @@ public class MainActivity extends BaseActivity {
 //
 //            for (Picker picker : dataManager.getScheme().getPickers2()) {
 //
-//                pickers.add(picker.getPicker());
+//                pickers.ic_add(picker.getPicker());
 //
 //                switch (picker.getPicker()) {
 //

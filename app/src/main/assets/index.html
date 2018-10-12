@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Compacted JSON to QR code</title>
+    <script type="text/javascript" src="js/qrcode.js"></script>
+    <script type="text/javascript" src="js/json_compactor.js"></script>
+
+    <style>
+        pre {
+          white-space: pre-wrap;       /* css-3 */
+          white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+          white-space: -pre-wrap;      /* Opera 4-6 */
+          white-space: -o-pre-wrap;    /* Opera 7 */
+          word-wrap: break-word;       /* Internet Explorer 5.5+ */
+        }
+    </style>
+  </head>
+  <body>
+    <h1>Compacted JSON to QR code</h1>
+
+    <h2>Input JSON</h2>
+    <pre id = "input"></pre>
+    Size: <span id="json-size"></span> bytes
+
+    <h2>Compacted JSON (Base85)</h2>
+    <pre id = "compacted-b85"></pre>
+    Size: <span id="compacted-b85-size"></span> bytes
+
+    <h2>Compacted JSON (raw binary)</h2>
+    Size: <span id="compacted-raw-size"></span> bytes
+
+    <h2>QR Code (Raw binary)</h2>
+    <div id="qrcode-raw"></div>
+
+    <h2>QR Code (Base85)</h2>
+    <div id="qrcode-b85"></div>
+
+    <h2>Decompacted JSON</h2>
+    <pre id="decompacted"></pre>
+
+    <script type="text/javascript" src="js/main.js"></script>
+  </body>
+</html>
