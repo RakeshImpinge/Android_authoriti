@@ -133,7 +133,7 @@ public class PasscodePickActivity extends BaseActivity {
 //                                }
 //                            }
 //                        } else {
-//                            values.add(item.getValue());
+//                            values.ic_add(item.getValue());
 //                            item.setChecked(!item.isChecked());
 //                            optionAdapter.notifyAdapterItemChanged(position);
 //                            dataManager.setSelectedValuesForDataType(utils.getPickerSelectedIndex
@@ -217,7 +217,7 @@ public class PasscodePickActivity extends BaseActivity {
 //            for (AccountID accountID : dataManager.getUser().getAccountIDs()) {
 //                Value value = new Value(accountID.getIdentifier(), accountID
 //                        .getType());
-//                values.add(value);
+//                values.ic_add(value);
 //            }
 //            picker.setValues(values);
 //        } else if (pickerType.equals(PICKER_DATA_TYPE)) {

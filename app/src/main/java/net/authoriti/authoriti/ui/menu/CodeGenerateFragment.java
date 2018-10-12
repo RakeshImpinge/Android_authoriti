@@ -86,7 +86,7 @@ public class CodeGenerateFragment extends BaseFragment {
 //
 //            for (Picker picker : dataManager.getScheme().getPickers()) {
 //
-//                pickers.add(picker.getPicker());
+//                pickers.ic_add(picker.getPicker());
 //
 //                switch (picker.getPicker()) {
 //
@@ -103,7 +103,7 @@ public class CodeGenerateFragment extends BaseFragment {
 //
 //                                Value value = new Value(accountID.getIdentifier(), accountID
 //                                        .getType());
-//                                values.add(value);
+//                                values.ic_add(value);
 //
 //                            }
 //                            picker1.setValues(values);

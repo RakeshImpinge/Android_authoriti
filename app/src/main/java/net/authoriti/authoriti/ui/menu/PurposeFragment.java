@@ -108,7 +108,7 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
 //
 //            for (int i = 0; i < dataManager.getPurposes().size(); i++) {
 //                boolean isDefault = defaultIndex == i;
-//                adapter.add(new GroupItem(dataManager.getPurposes().get(i), i, isDefault,
+//                adapter.ic_add(new GroupItem(dataManager.getPurposes().get(i), i, isDefault,
 // this));
 //            }
             groupItems.clear();

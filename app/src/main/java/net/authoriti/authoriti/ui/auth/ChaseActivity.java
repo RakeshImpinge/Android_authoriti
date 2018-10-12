@@ -388,6 +388,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
         if (isSyncRequired) {
             InviteCodeActivity_.intent(getApplicationContext()).showBack(true).isSyncRequired
                     (true).start();
+            finish();
         } else {
             super.onBackPressed();
         }

@@ -27,7 +27,7 @@ import java.util.Map;
 public class AuthoritiUtils implements Constants {
 
 
-    // update default values for new value add
+    // update default values for new value ic_add
     public void updateDefaultvalues(Context context, String picker, Value value,
                                     Boolean
                                             isDefault) {

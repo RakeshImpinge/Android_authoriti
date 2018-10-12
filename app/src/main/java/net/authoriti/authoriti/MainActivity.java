@@ -18,7 +18,6 @@ import net.authoriti.authoriti.ui.share.ExportActivity_;
 import net.authoriti.authoriti.utils.Log;
 
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 
 import net.authoriti.authoriti.api.AuthoritiAPI;
@@ -88,11 +87,11 @@ public class MainActivity extends BaseActivity {
     @ViewById(R.id.toolbar)
     Toolbar toolbar;
 
-    @ViewById(R.id.btnAdd)
-    Button btnAdd;
+    @ViewById(R.id.ivAdd)
+    ImageButton ivAdd;
 
-    @ViewById(R.id.btnSync)
-    Button btnSync;
+    @ViewById(R.id.ivSync)
+    ImageButton ivSync;
 
     @ViewById(R.id.ivHelp)
     ImageButton ivHelp;
@@ -253,15 +252,15 @@ public class MainActivity extends BaseActivity {
         drawer.setSelection(menu_id, false);
         SELECTED_MENU_ID = menu_id;
         if (menu_id == MENU_ACCOUNT) {
-            btnAdd.setVisibility(View.VISIBLE);
+            ivAdd.setVisibility(View.VISIBLE);
             if (!dataManager.getUser().getChaseType()) {
-                btnSync.setVisibility(View.GONE);
+                ivSync.setVisibility(View.GONE);
             } else {
-                btnSync.setVisibility(View.VISIBLE);
+                ivSync.setVisibility(View.VISIBLE);
             }
         } else {
-            btnAdd.setVisibility(View.INVISIBLE);
-            btnSync.setVisibility(View.GONE);
+            ivAdd.setVisibility(View.INVISIBLE);
+            ivSync.setVisibility(View.GONE);
         }
     }
 
@@ -327,13 +326,13 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    @Click(R.id.btnAdd)
+    @Click(R.id.ivAdd)
     void addButtonClicked() {
         LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent
                 (BROADCAST_ADD_BUTTON_CLICKED));
     }
 
-    @Click(R.id.btnSync)
+    @Click(R.id.ivSync)
     void syncButtonClicked() {
         LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent
                 (BROADCAST_SYNC_BUTTON_CLICKED));
@@ -544,7 +543,7 @@ public class MainActivity extends BaseActivity {
 //
 //            for (Picker picker : dataManager.getScheme().getPickers()) {
 //
-//                pickers.add(picker.getPicker());
+//                pickers.ic_add(picker.getPicker());
 //
 //                switch (picker.getPicker()) {
 //
@@ -561,7 +560,7 @@ public class MainActivity extends BaseActivity {
 //
 //                                Value value = new Value(accountID.getIdentifier(), accountID
 //                                        .getType());
-//                                values.add(value);
+//                                values.ic_add(value);
 //
 //                            }
 //                            picker1.setValues(values);
@@ -618,7 +617,7 @@ public class MainActivity extends BaseActivity {
 //
 //            for (Picker picker : dataManager.getScheme().getPickers2()) {
 //
-//                pickers.add(picker.getPicker());
+//                pickers.ic_add(picker.getPicker());
 //
 //                switch (picker.getPicker()) {
 //
@@ -658,7 +657,7 @@ public class MainActivity extends BaseActivity {
 //
 //            for (Picker picker : dataManager.getScheme().getPickers()) {
 //
-//                pickers.add(picker.getPicker());
+//                pickers.ic_add(picker.getPicker());
 //
 //                switch (picker.getPicker()) {
 //
@@ -772,7 +771,7 @@ public class MainActivity extends BaseActivity {
 //
 //            for (Picker picker : dataManager.getScheme().getPickers2()) {
 //
-//                pickers.add(picker.getPicker());
+//                pickers.ic_add(picker.getPicker());
 //
 //                switch (picker.getPicker()) {
 //

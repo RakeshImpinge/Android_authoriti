@@ -221,7 +221,7 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
 //        Picker accountPicker = dataManager.getAccountPicker();
 //        List<Value> values = accountPicker.getValues();
 //        Value value = new Value(id, selectedAccountId.getType());
-//        values.add(value);
+//        values.ic_add(value);
 //        if (setDefault) {
 //
 //            accountPicker.setEnableDefault(true);

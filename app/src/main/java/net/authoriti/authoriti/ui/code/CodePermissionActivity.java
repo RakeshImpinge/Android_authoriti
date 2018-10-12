@@ -218,7 +218,7 @@ public class CodePermissionActivity extends BaseActivity {
 //                        if (dataManager.getAccountPicker() != null) {
 //                            if (group.getPickerName() == null || !group.getPickerName()
 //                                    .equals(PICKER_ACCOUNT)) {
-//                                adapter.add(new CodeItem(dataManager.getAccountPicker()));
+//                                adapter.ic_add(new CodeItem(dataManager.getAccountPicker()));
 //                            }
 //                        }
 //                        break;
@@ -227,7 +227,7 @@ public class CodePermissionActivity extends BaseActivity {
 //                        if (dataManager.getIndustryPicker() != null) {
 //                            if (group.getPickerName() == null || !group.getPickerName()
 //                                    .equals(PICKER_INDUSTRY)) {
-//                                adapter.add(new CodeItem(dataManager.getIndustryPicker()));
+//                                adapter.ic_add(new CodeItem(dataManager.getIndustryPicker()));
 //                            }
 //                        }
 //                        break;
@@ -235,7 +235,7 @@ public class CodePermissionActivity extends BaseActivity {
 //                        if (dataManager.getLocationPicker() != null) {
 //                            if (group.getPickerName() == null || !group.getPickerName()
 //                                    .equals(PICKER_LOCATION_STATE)) {
-//                                adapter.add(new CodeItem(dataManager.getLocationPicker()));
+//                                adapter.ic_add(new CodeItem(dataManager.getLocationPicker()));
 //                            }
 //                        }
 //                        break;
@@ -243,7 +243,7 @@ public class CodePermissionActivity extends BaseActivity {
 //                        if (dataManager.getTimePicker() != null) {
 //                            if (group.getPickerName() == null || !group.getPickerName()
 //                                    .equals(PICKER_TIME)) {
-//                                adapter.add(new CodeItem(dataManager.getTimePicker()));
+//                                adapter.ic_add(new CodeItem(dataManager.getTimePicker()));
 //                            }
 //                        }
 //                        break;
@@ -251,7 +251,7 @@ public class CodePermissionActivity extends BaseActivity {
 //                        if (dataManager.getGeoPicker() != null) {
 //                            if (group.getPickerName() == null || !group.getPickerName()
 //                                    .equals(PICKER_GEO)) {
-//                                adapter.add(new CodeItem(dataManager.getGeoPicker()));
+//                                adapter.ic_add(new CodeItem(dataManager.getGeoPicker()));
 //                            }
 //                        }
 //                        break;
@@ -259,7 +259,7 @@ public class CodePermissionActivity extends BaseActivity {
 //                        if (dataManager.getRequestPicker() != null) {
 //                            if (group.getPickerName() == null || !group.getPickerName()
 //                                    .equals(PICKER_REQUEST)) {
-//                                adapter.add(new CodeItem(dataManager.getRequestPicker()));
+//                                adapter.ic_add(new CodeItem(dataManager.getRequestPicker()));
 //                            }
 //                        }
 //                        break;
@@ -267,7 +267,7 @@ public class CodePermissionActivity extends BaseActivity {
 //                        if (dataManager.getDataTypePicker() != null) {
 //                            if (group.getPickerName() == null || !group.getPickerName()
 //                                    .equals(PICKER_DATA_TYPE)) {
-//                                adapter.add(new CodeItem(dataManager.getDataTypePicker()));
+//                                adapter.ic_add(new CodeItem(dataManager.getDataTypePicker()));
 //                            }
 //                        }
 //                        break;

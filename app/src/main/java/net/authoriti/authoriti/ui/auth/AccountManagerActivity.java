@@ -237,7 +237,7 @@ public class AccountManagerActivity extends SecurityActivity implements Security
         finish();
     }
 
-    @Click(R.id.btnAdd)
+    @Click(R.id.ivAdd)
     void addButtonClicked() {
 
         showAccountAddDialog();

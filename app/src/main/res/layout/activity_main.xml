@@ -52,33 +52,31 @@
                 android:textColor="@android:color/white"
                 android:textSize="18sp" />
 
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/btnAdd"
-                style="@android:style/Widget.Holo.Button.Borderless"
-                fontPath="@string/font_oswaldo_regular"
-                android:layout_width="35dp"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="4dp"
-                android:layout_toLeftOf="@+id/btnSync"
-                android:text="Add"
-                android:textAllCaps="false"
-                android:textSize="15dp"
-                android:visibility="visible" />
 
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/btnSync"
-                style="@android:style/Widget.Holo.Button.Borderless"
-                fontPath="@string/font_oswaldo_regular"
-                android:layout_width="41dp"
+            <ImageButton
+                android:id="@+id/ivAdd"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginEnd="4dp"
+                android:layout_marginLeft="2dp"
                 android:layout_toLeftOf="@+id/ivHelp"
-                android:text="Sync"
-                android:textAllCaps="false"
-                android:textSize="15dp"
-                android:visibility="visible" />
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="8dp"
+                android:src="@mipmap/ic_add"
+                android:tint="@android:color/white" />
+
+
+            <ImageButton
+                android:id="@+id/ivSync"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="2dp"
+                android:layout_toLeftOf="@+id/ivAdd"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="8dp"
+                android:src="@mipmap/ic_sync"
+                android:tint="@android:color/white" />
 
             <ImageButton
                 android:id="@+id/ivHelp"
