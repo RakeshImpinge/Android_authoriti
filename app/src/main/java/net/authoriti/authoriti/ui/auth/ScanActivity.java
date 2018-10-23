@@ -328,7 +328,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
                     ", Authentication Result Summary - " + failureSummary +
                     ", First Name - " + CryptoUtil.hash(licenseCard.getNameFirst()) +
                     ", Middle Name - " + CryptoUtil.hash(licenseCard.getNameMiddle()) +
-                    ", Last Name - " + licenseCard.getNameLast() +
+                    ", Last Name - " + CryptoUtil.hash(licenseCard.getNameLast()) +
                     ", Name Suffix - " + CryptoUtil.hash(licenseCard.getNameSuffix()) +
                     ", ID - " + CryptoUtil.hash(licenseCard.getLicenceID()) +
                     ", License - " + CryptoUtil.hash(licenseCard.getLicense()) +
