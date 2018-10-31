@@ -51,7 +51,7 @@ import retrofit2.Response;
  * Created by mac on 12/17/17.
  */
 
-@EFragment(R.layout.fragment_account_chase)
+@EFragment(R.layout.fragment_account)
 public class AccountChaseFragment extends BaseFragment implements AccountConfirmDialog
         .AccountConfirmDialogListener, AccountAddDialog.AccountAddDialogListener {
 

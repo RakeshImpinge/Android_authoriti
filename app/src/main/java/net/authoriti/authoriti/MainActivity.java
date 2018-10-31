@@ -230,7 +230,7 @@ public class MainActivity extends BaseActivity {
             if (!dataManager.getUser().getChaseType()) {
                 accountFragment = AccountFragment_.builder().build();
             } else {
-                accountFragment = AccountChaseFragment_.builder().build();
+                accountFragment = AccountFragment_.builder().build();
             }
             fragment = accountFragment;
         } else if (menu_id == MENU_WIPE) {

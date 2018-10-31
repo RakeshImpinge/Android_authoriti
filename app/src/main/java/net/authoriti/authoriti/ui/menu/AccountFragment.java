@@ -229,7 +229,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
     public void itemDelete(int position) {
 
         if (dataManager.getUser().getAccountIDs().size() == 1) {
-            showAlert("", "You have to at least 1 account ID.");
+            showAlert("", "You must have at least one Account/ID!");
         } else {
             deleteAccount(position);
         }
