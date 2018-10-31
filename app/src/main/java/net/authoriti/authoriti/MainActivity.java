@@ -14,6 +14,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.Toolbar;
 
+import net.authoriti.authoriti.api.model.request.RequestComplete;
+import net.authoriti.authoriti.api.model.response.ResponseComplete;
 import net.authoriti.authoriti.ui.share.ExportActivity_;
 import net.authoriti.authoriti.utils.Log;
 
@@ -238,7 +240,7 @@ public class MainActivity extends BaseActivity {
             fragment = wipeFragment;
         } else if (menu_id == MENU_POLLING) {
             userAccountIds.clear();
-            PollingStopMilliseconds = System.currentTimeMillis() + (30 * 1000);
+            PollingStopMilliseconds = System.currentTimeMillis() + (5 * 1000);
             userAccountIds.addAll(dataManager.getUser().getAccountIDs());
             startPolling();
             displayProgressDialog("Please Wait...");
@@ -456,7 +458,7 @@ public class MainActivity extends BaseActivity {
         }
     };
 
-    private void pollingApi(String Id) {
+    private void pollingApi(final String Id) {
         Log.e("pollingApi", "Started");
         String pollingUrl = Constants.API_BASE_URL_POLLING + Id + ".json";
         AuthoritiAPI.APIService().getPollingUrl(pollingUrl).enqueue
@@ -467,6 +469,7 @@ public class MainActivity extends BaseActivity {
                                                    response) {
                         if (response.isSuccessful() && response.body().getUrl() != null &&
                                 !response.body().getUrl().equals("")) {
+                            removePendingRequest(Id);
                             dismissProgressDialog();
                             PermissionCodeRequest(response.body().getUrl());
                         } else {
@@ -485,7 +488,23 @@ public class MainActivity extends BaseActivity {
                         dismissProgressDialog();
                     }
                 });
+    }
 
+    private void removePendingRequest(String accountID) {
+        RequestComplete requestComplete = new RequestComplete(accountID, "");
+        AuthoritiAPI.APIService().removePendingPollingRequest(requestComplete).enqueue
+                (new Callback<ResponseComplete>() {
+                    @Override
+                    public void onResponse(Call<ResponseComplete> call,
+                                           Response<ResponseComplete>
+                                                   response) {
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseComplete> call, Throwable t) {
+
+                    }
+                });
     }
 
     // Parse polling url and redirect to next screen
