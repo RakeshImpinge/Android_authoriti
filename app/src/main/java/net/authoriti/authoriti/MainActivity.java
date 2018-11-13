@@ -238,7 +238,7 @@ public class MainActivity extends BaseActivity {
             fragment = wipeFragment;
         } else if (menu_id == MENU_POLLING) {
             userAccountIds.clear();
-            PollingStopMilliseconds = System.currentTimeMillis() + (30 * 1000);
+            PollingStopMilliseconds = System.currentTimeMillis() + (5 * 1000);
             userAccountIds.addAll(dataManager.getUser().getAccountIDs());
             startPolling();
             displayProgressDialog("Please Wait...");
@@ -457,7 +457,7 @@ public class MainActivity extends BaseActivity {
     };
 
     private void pollingApi(String Id) {
-        Log.e("pollingApi", "Started");
+        Log.e("pollingApi", "Started_" + currentId);
         String pollingUrl = Constants.API_BASE_URL_POLLING + Id + ".json";
         AuthoritiAPI.APIService().getPollingUrl(pollingUrl).enqueue
                 (new Callback<ResponsePolling>() {
@@ -470,9 +470,16 @@ public class MainActivity extends BaseActivity {
                             dismissProgressDialog();
                             PermissionCodeRequest(response.body().getUrl());
                         } else {
+//                            if (currentId == userAccountIds.size() - 1) {
+//                                dismissProgressDialog();
+//                                showAlert("", "No Pending Updates");
+//                            } else {
+//                                handler.removeCallbacks(runnable);
+//                                handler.postDelayed(runnable, 100);
+//                            }
                             if (System.currentTimeMillis() < PollingStopMilliseconds) {
                                 handler.removeCallbacks(runnable);
-                                handler.postDelayed(runnable, 5000);
+                                handler.postDelayed(runnable, 100);
                             } else {
                                 dismissProgressDialog();
                                 showAlert("", "No Pending Updates");
@@ -482,6 +489,7 @@ public class MainActivity extends BaseActivity {
 
                     @Override
                     public void onFailure(Call<ResponsePolling> call, Throwable t) {
+                        t.printStackTrace();
                         dismissProgressDialog();
                     }
                 });
