@@ -754,7 +754,6 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
         Log.e("CARD Cropping - ", "Finished");
 
         if (!isBack) {
-
             frontBitmap = card_bitmap;
 
             if (card_bitmap == null) {
@@ -763,7 +762,9 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
 
                 ivFront.setImageBitmap(null);
                 capturedFront = false;
-
+            } else if (imageMetrics != null && Boolean.parseBoolean(imageMetrics.get("HAS_GLARE").toString()) && Float.parseFloat(imageMetrics.get("GLARE_GRADE").toString()) < 0.60f) {
+                showAlert("", "We detected too much glare in the image, please try again with different lighting.");
+                capturedFront = false;
             } else {
 
                 ivFront.setImageBitmap(card_bitmap);
@@ -780,7 +781,9 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
 
                 ivBackward.setImageBitmap(null);
                 capturedBack = false;
-
+            } else if (imageMetrics != null && Boolean.parseBoolean(imageMetrics.get("HAS_GLARE").toString()) && Float.parseFloat(imageMetrics.get("GLARE_GRADE").toString()) < 0.60f) {
+                showAlert("", "We detected too much glare in the image, please try again with different lighting.");
+                capturedBack = false;
             } else {
 
                 ivBackward.setImageBitmap(card_bitmap);

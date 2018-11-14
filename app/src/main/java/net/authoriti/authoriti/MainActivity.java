@@ -14,6 +14,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.Toolbar;
 
+import net.authoriti.authoriti.api.model.request.RequestComplete;
+import net.authoriti.authoriti.api.model.response.ResponseComplete;
 import net.authoriti.authoriti.ui.share.ExportActivity_;
 import net.authoriti.authoriti.utils.Log;
 
@@ -228,7 +230,7 @@ public class MainActivity extends BaseActivity {
             if (!dataManager.getUser().getChaseType()) {
                 accountFragment = AccountFragment_.builder().build();
             } else {
-                accountFragment = AccountChaseFragment_.builder().build();
+                accountFragment = AccountFragment_.builder().build();
             }
             fragment = accountFragment;
         } else if (menu_id == MENU_WIPE) {
@@ -467,6 +469,7 @@ public class MainActivity extends BaseActivity {
                                                    response) {
                         if (response.isSuccessful() && response.body().getUrl() != null &&
                                 !response.body().getUrl().equals("")) {
+                            removePendingRequest(Id);
                             dismissProgressDialog();
                             PermissionCodeRequest(response.body().getUrl());
                         } else {
@@ -493,7 +496,23 @@ public class MainActivity extends BaseActivity {
                         dismissProgressDialog();
                     }
                 });
+    }
 
+    private void removePendingRequest(String accountID) {
+        RequestComplete requestComplete = new RequestComplete(accountID, "");
+        AuthoritiAPI.APIService().removePendingPollingRequest(requestComplete).enqueue
+                (new Callback<ResponseComplete>() {
+                    @Override
+                    public void onResponse(Call<ResponseComplete> call,
+                                           Response<ResponseComplete>
+                                                   response) {
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseComplete> call, Throwable t) {
+
+                    }
+                });
     }
 
     // Parse polling url and redirect to next screen

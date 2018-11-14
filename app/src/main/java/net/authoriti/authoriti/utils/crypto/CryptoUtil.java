@@ -60,6 +60,7 @@ public class CryptoUtil {
     }
 
     public static String cleanup(String str, int length) {
+        str = str.replaceFirst("^0+(?!$)", "");
         StringBuilder result = new StringBuilder("");
         final int sz = str.length();
         int k = 0;

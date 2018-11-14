@@ -94,7 +94,8 @@ public class AccountAddDialog extends AppCompatDialog {
 
                     if (listener != null){
                         assert checkBox != null;
-                        listener.accountAddDialogOKButtonClicked(etName.getText().toString(), etNumber.getText().toString(), checkBox.isChecked());
+                        String accountNumber = etNumber.getText().toString().replaceFirst("^0+(?!$)", "");
+                        listener.accountAddDialogOKButtonClicked(etName.getText().toString(), accountNumber, checkBox.isChecked());
                     }
                 }
 
