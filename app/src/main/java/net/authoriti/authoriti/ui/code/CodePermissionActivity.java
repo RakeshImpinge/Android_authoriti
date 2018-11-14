@@ -92,7 +92,6 @@ public class CodePermissionActivity extends BaseActivity {
         group = dataManager.getPurposes().get(purposeIndex).getGroups().get(purposeIndexItem);
         defaultPickerMap = dataManager.getDefaultValues().get("" + group.getSchemaIndex());
         schemaIndex = group.getSchemaIndex();
-        showSchema();
         createPickerList();
         showSchema();
     }
@@ -288,6 +287,23 @@ public class CodePermissionActivity extends BaseActivity {
 //        }
     }
 
+    private void updateSchema() {
+        adapter.clear();
+        uiFlaseListIndex.clear();
+        for (int i = 0; i < pickersList.size(); i++) {
+            if (pickersList.get(i).getUi()) {
+                if (pickersList.get(i).getPicker().equals(PICKER_DATA_INPUT_TYPE)) {
+
+                } else {
+                    adapter.add(new CodeItem(pickersList.get(i), defaultPickerMap, group
+                            .getSchemaIndex()));
+                }
+            } else {
+                uiFlaseListIndex.add(i);
+            }
+        }
+    }
+
     public int getIndexOfValue(List<Value> values, String picker_def_value) {
         int index = -1;
 
@@ -469,7 +485,9 @@ public class CodePermissionActivity extends BaseActivity {
                     }
                 }
             }
-            showSchema();
+
+
+            updateSchema();
         }
     }
 }
