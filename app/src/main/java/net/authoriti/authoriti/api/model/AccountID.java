@@ -15,16 +15,34 @@ public class AccountID {
 
     private boolean confirmed = true;
 
-    public AccountID(){
+    public String getCustomer() {
+
+        return Customer;
+    }
+
+    public void setCustomer(String customer) {
+        Customer = customer;
+    }
+
+    private String Customer = "";
+
+    public AccountID() {
         this.type = "";
         this.identifier = "";
         confirmed = true;
     }
 
-    public AccountID(String type, String identifier){
+    public AccountID(String type, String identifier) {
         this.type = type;
         this.identifier = identifier;
         confirmed = true;
+    }
+
+    public AccountID(String type, String identifier, String Customer) {
+        this.type = type;
+        this.identifier = identifier;
+        confirmed = true;
+        this.Customer = Customer;
     }
 
     public String getType() {
