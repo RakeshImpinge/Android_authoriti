@@ -77,4 +77,7 @@ public interface AuthoritiAPIService {
     @POST("api/v1/pc-request/complete")
     Call<ResponseComplete> completePollingRequest(@Body RequestComplete requestComplete);
 
+    @POST("api/v1/pc-request/remove")
+    Call<ResponseComplete> removePendingPollingRequest(@Body RequestComplete requestComplete);
+
 }
