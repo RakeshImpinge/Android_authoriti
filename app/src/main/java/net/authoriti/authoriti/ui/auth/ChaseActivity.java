@@ -155,6 +155,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
 
             for (int i = 0; i < newAccountIDs.size(); i++) {
                 boolean isContained = false;
+                newAccountIDs.get(i).setCustomer(customer);
                 for (int k = 0; k < savedAccountIDs.size(); k++) {
                     if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
                             .getIdentifier())
@@ -179,7 +180,12 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
             user.setToken(responseSignUpChase.getToken());
             user.setInviteCode(dataManager.inviteCode);
             user.setChaseType(true);
-            user.setAccountIDs(responseSignUpChase.getAccounts());
+
+            List<AccountID> UserAccountsList = responseSignUpChase.getAccounts();
+            for (AccountID accountID : UserAccountsList) {
+                accountID.setCustomer(customer);
+            }
+            user.setAccountIDs(UserAccountsList);
 
             try {
 

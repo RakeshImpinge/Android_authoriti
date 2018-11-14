@@ -6,6 +6,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import net.authoriti.authoriti.ui.menu.AccountAdaper;
 import net.authoriti.authoriti.utils.Log;
 
 import android.view.View;
@@ -41,6 +42,9 @@ import org.androidannotations.annotations.ViewById;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -73,7 +77,8 @@ public class AccountManagerActivity extends SecurityActivity implements Security
     @ViewById(R.id.tvEmpty)
     TextView tvEmpty;
 
-    FastItemAdapter<AccountAddItem> adapter;
+    AccountAdaper adapter;
+    List<AccountID> accountList = new ArrayList<>();
 
 
     private AccountAddDialog accountAddDialog;
@@ -94,9 +99,11 @@ public class AccountManagerActivity extends SecurityActivity implements Security
         accountAddDialog = new AccountAddDialog(this);
         accountAddDialog.setListener(this);
 
-        adapter = new FastItemAdapter<AccountAddItem>();
+        adapter = new AccountAdaper(accountList);
         rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
         rvAccount.setAdapter(adapter);
+
+        showAccount();
 
     }
 
@@ -129,19 +136,27 @@ public class AccountManagerActivity extends SecurityActivity implements Security
     }
 
     private void showAccount() {
-
         tvEmpty.setVisibility(View.GONE);
-
-        if (adapter != null) {
-            adapter.clear();
-        } else {
-            adapter = new FastItemAdapter<>();
-        }
-
+        accountList.clear();
         for (int i = 0; i < dataManager.accountIDs.size(); i++) {
-            adapter.add(new AccountAddItem(dataManager.accountIDs.get(i), dataManager
-                    .defaultAccountSelected && i == dataManager.defaultAccountIndex, this));
+            accountList.add(dataManager.accountIDs.get(i));
         }
+
+        Collections.sort(accountList, new Comparator<AccountID>() {
+            @Override
+            public int compare(AccountID accountID, AccountID t1) {
+                return accountID.getCustomer().compareTo(t1.getCustomer());
+            }
+        });
+
+        for (int i = 0; i < accountList.size(); i++) {
+            if (dataManager.getDefaultAccountID().getTitle().equals(accountList.get(i).getType()) &&
+                    dataManager.getDefaultAccountID().getValue().equals(accountList.get(i).getIdentifier())) {
+                adapter.mDefaultPostion = i;
+            }
+        }
+
+        adapter.notifyDataSetChanged();
     }
 
     private void signUp() {

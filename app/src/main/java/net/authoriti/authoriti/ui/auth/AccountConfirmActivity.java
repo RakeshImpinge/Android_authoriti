@@ -19,6 +19,7 @@ import net.authoriti.authoriti.ui.alert.AccountAddDialog;
 import net.authoriti.authoriti.ui.alert.AccountConfirmDialog;
 import net.authoriti.authoriti.ui.help.HelpActivity_;
 import net.authoriti.authoriti.ui.items.AccountConfirmItem;
+import net.authoriti.authoriti.ui.menu.AccountAdaper;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiUtils;
 import net.authoriti.authoriti.utils.crypto.CryptoUtil;
@@ -35,6 +36,9 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -63,7 +67,9 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
     @ViewById(R.id.rvAccount)
     RecyclerView rvAccount;
 
-    FastItemAdapter<AccountConfirmItem> adapter;
+    AccountAdaper adapter;
+    List<AccountID> accountList = new ArrayList<>();
+
     AccountConfirmDialog accountConfirmDialog;
 
     AccountID selectedAccountId;
@@ -80,51 +86,64 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
         accountAddDialog = new AccountAddDialog(this);
         accountAddDialog.setListener(this);
 
-        adapter = new FastItemAdapter<AccountConfirmItem>();
+        adapter = new AccountAdaper(accountList);
         rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
         rvAccount.setAdapter(adapter);
 
-        adapter.withOnClickListener(new FastAdapter.OnClickListener<AccountConfirmItem>() {
-            @Override
-            public boolean onClick(View v, IAdapter<AccountConfirmItem> adapter,
-                                   AccountConfirmItem item, int position) {
-
-                selectedAccountId = item.getAccountID();
-                selectedPosition = position;
-                if (selectedAccountId.isConfirmed()) {
-//                    showAlert("", "This account has already confirmed.");
-                } else {
-
-                    showAccountConfirmDialog();
-                }
-
-                return false;
-            }
-        });
+//        adapter.withOnClickListener(new FastAdapter.OnClickListener<AccountConfirmItem>() {
+//            @Override
+//            public boolean onClick(View v, IAdapter<AccountConfirmItem> adapter,
+//                                   AccountConfirmItem item, int position) {
+//
+//                selectedAccountId = item.getAccountID();
+//                selectedPosition = position;
+//                if (selectedAccountId.isConfirmed()) {
+////                    showAlert("", "This account has already confirmed.");
+//                } else {
+//
+//                    showAccountConfirmDialog();
+//                }
+//
+//                return false;
+//            }
+//        });
         showAccounts();
     }
 
     private void showAccounts() {
 
-        if (adapter != null) {
-            adapter.clear();
-        } else {
-            adapter = new FastItemAdapter<>();
-        }
+//        if (adapter != null) {
+//            adapter.clear();
+//        } else {
+//            adapter = new FastItemAdapter<>();
+//        }
 
+        accountList.clear();
         User user = dataManager.getUser();
         if (user.getAccountIDs() != null && user.getAccountIDs().size() > 0) {
             for (int i = 0; i < user.getAccountIDs().size(); i++) {
-                adapter.add(new AccountConfirmItem(user.getAccountIDs().get(i), dataManager
-                        .defaultAccountSelected && i == dataManager.defaultAccountIndex));
+                accountList.add(user.getAccountIDs().get(i));
             }
         }
+        Collections.sort(accountList, new Comparator<AccountID>() {
+            @Override
+            public int compare(AccountID accountID, AccountID t1) {
+                return accountID.getCustomer().compareTo(t1.getCustomer());
+            }
+        });
+        for (int i = 0; i < accountList.size(); i++) {
+            if (dataManager.getDefaultAccountID().getTitle().equals(accountList.get(i).getType()) &&
+                    dataManager.getDefaultAccountID().getValue().equals(accountList.get(i).getIdentifier())) {
+                adapter.mDefaultPostion = i;
+            }
+        }
+        adapter.notifyDataSetChanged();
 
-        if (user.getUnconfirmedAccountIDs() != null && user.getUnconfirmedAccountIDs().size() > 0) {
-            for (int i = 0; i < user.getUnconfirmedAccountIDs().size(); i++) {
-                adapter.add(new AccountConfirmItem(user.getUnconfirmedAccountIDs().get(i), false));
-            }
-        }
+//        if (user.getUnconfirmedAccountIDs() != null && user.getUnconfirmedAccountIDs().size() > 0) {
+//            for (int i = 0; i < user.getUnconfirmedAccountIDs().size(); i++) {
+//                adapter.add(new AccountConfirmItem(user.getUnconfirmedAccountIDs().get(i), false));
+//            }
+//        }
     }
 
     private void showAccountConfirmDialog() {
@@ -366,9 +385,11 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
         AccountID accountID = new AccountID(name, id);
         accountID.setIdentifier(CryptoUtil.hash(accountID.getIdentifier()));
         dataManager.accountIDs.add(accountID);
-        adapter.add(new AccountConfirmItem(accountID, setDefault));
+//        adapter.add(new AccountConfirmItem(accountID, setDefault));
         user.setAccountIDs(dataManager.accountIDs);
         dataManager.setUser(user);
+
+        showAccounts();
     }
 
     @Override

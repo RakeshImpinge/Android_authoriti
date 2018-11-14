@@ -5,7 +5,9 @@ import android.net.Uri;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+
 import net.authoriti.authoriti.utils.Log;
+
 import android.view.View;
 import android.widget.EditText;
 
@@ -31,6 +33,9 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,7 +92,6 @@ public class CodePermissionActivity extends BaseActivity {
         group = dataManager.getPurposes().get(purposeIndex).getGroups().get(purposeIndexItem);
         defaultPickerMap = dataManager.getDefaultValues().get("" + group.getSchemaIndex());
         schemaIndex = group.getSchemaIndex();
-        showSchema();
         createPickerList();
         showSchema();
     }
@@ -148,8 +152,15 @@ public class CodePermissionActivity extends BaseActivity {
                 String key = pickersList.get(i).getPicker();
                 if (key.equals(PICKER_DATA_INPUT_TYPE)) {
                     key = pickersList.get(i).getInput();
+                    String value_decoded = "";
+                    try {
+                        value_decoded = URLDecoder.decode(defParamFromUrl.get(key), "UTF-8");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        value_decoded = "";
+                    }
                     DefaultValue defaultValue = new DefaultValue(key
-                            , defParamFromUrl.get(key), false);
+                            , value_decoded, false);
                     defaultPickerMap.put(key, defaultValue);
                 } else {
                     if (defParamFromUrl.containsKey(key)) {
@@ -196,9 +207,9 @@ public class CodePermissionActivity extends BaseActivity {
                 if (pickersList.get(i).getPicker().equals(PICKER_DATA_INPUT_TYPE)) {
                     if (defaultPickerMap.containsKey(pickersList.get(i).getInput())) {
                         adapter_input.add(new CodeEditItem(pickersList.get(i), defaultPickerMap
-                                .get(pickersList.get(i).getInput()).getValue(),schemaIndex));
+                                .get(pickersList.get(i).getInput()).getValue(), schemaIndex));
                     } else {
-                        adapter_input.add(new CodeEditItem(pickersList.get(i), "",schemaIndex));
+                        adapter_input.add(new CodeEditItem(pickersList.get(i), "", schemaIndex));
                     }
                 } else {
                     adapter.add(new CodeItem(pickersList.get(i), defaultPickerMap, group
@@ -274,6 +285,23 @@ public class CodePermissionActivity extends BaseActivity {
 //                }
 //            }
 //        }
+    }
+
+    private void updateSchema() {
+        adapter.clear();
+        uiFlaseListIndex.clear();
+        for (int i = 0; i < pickersList.size(); i++) {
+            if (pickersList.get(i).getUi()) {
+                if (pickersList.get(i).getPicker().equals(PICKER_DATA_INPUT_TYPE)) {
+
+                } else {
+                    adapter.add(new CodeItem(pickersList.get(i), defaultPickerMap, group
+                            .getSchemaIndex()));
+                }
+            } else {
+                uiFlaseListIndex.add(i);
+            }
+        }
     }
 
     public int getIndexOfValue(List<Value> values, String picker_def_value) {
@@ -457,7 +485,9 @@ public class CodePermissionActivity extends BaseActivity {
                     }
                 }
             }
-            showSchema();
+
+
+            updateSchema();
         }
     }
 }

@@ -117,7 +117,7 @@ public class MainActivity extends BaseActivity {
                 long inactiveTime = Long.parseLong(dataManager.getInactiveTime());
                 Log.e("Inactive TimeStamp", String.valueOf(inactiveTime));
 
-                if (currentTime - inactiveTime > 300) {
+                if (currentTime - inactiveTime > 120) {
 
                     logOut();
 
@@ -458,8 +458,8 @@ public class MainActivity extends BaseActivity {
         }
     };
 
-    private void pollingApi(final String Id) {
-        Log.e("pollingApi", "Started");
+    private void pollingApi(String Id) {
+        Log.e("pollingApi", "Started_" + currentId);
         String pollingUrl = Constants.API_BASE_URL_POLLING + Id + ".json";
         AuthoritiAPI.APIService().getPollingUrl(pollingUrl).enqueue
                 (new Callback<ResponsePolling>() {
@@ -473,9 +473,16 @@ public class MainActivity extends BaseActivity {
                             dismissProgressDialog();
                             PermissionCodeRequest(response.body().getUrl());
                         } else {
+//                            if (currentId == userAccountIds.size() - 1) {
+//                                dismissProgressDialog();
+//                                showAlert("", "No Pending Updates");
+//                            } else {
+//                                handler.removeCallbacks(runnable);
+//                                handler.postDelayed(runnable, 100);
+//                            }
                             if (System.currentTimeMillis() < PollingStopMilliseconds) {
                                 handler.removeCallbacks(runnable);
-                                handler.postDelayed(runnable, 5000);
+                                handler.postDelayed(runnable, 100);
                             } else {
                                 dismissProgressDialog();
                                 showAlert("", "No Pending Updates");
@@ -485,6 +492,7 @@ public class MainActivity extends BaseActivity {
 
                     @Override
                     public void onFailure(Call<ResponsePolling> call, Throwable t) {
+                        t.printStackTrace();
                         dismissProgressDialog();
                     }
                 });

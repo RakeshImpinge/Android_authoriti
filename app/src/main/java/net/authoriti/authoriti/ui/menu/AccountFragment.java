@@ -33,6 +33,8 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -58,7 +60,9 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
     @ViewById(R.id.rvAccount)
     RecyclerView rvAccount;
 
-    FastItemAdapter<AccountAddItem> adapter;
+    AccountAdaper adapter;
+    List<AccountID> accountList = new ArrayList<>();
+
     private AccountAddDialog accountAddDialog;
     BroadcastReceiver broadcastReceiver;
 
@@ -77,7 +81,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
         LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastReceiver, new
                 IntentFilter(BROADCAST_ADD_BUTTON_CLICKED));
 
-        adapter = new FastItemAdapter<AccountAddItem>();
+        adapter = new AccountAdaper(accountList);
         rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
         rvAccount.setAdapter(adapter);
 
@@ -98,26 +102,32 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
     }
 
     private void showAccounts() {
+        accountList.clear();
         if (dataManager.getUser().getAccountIDs() != null) {
-            if (adapter != null) {
-                adapter.clear();
-            } else {
-                adapter = new FastItemAdapter<>();
-            }
-
             for (int i = 0; i < dataManager.getUser().getAccountIDs().size(); i++) {
                 AccountID accountID = dataManager.getUser().getAccountIDs().get(i);
-
-                boolean isDefault = false;
                 if (dataManager.getDefaultAccountID().getTitle().equals(accountID.getType()) &&
                         dataManager.getDefaultAccountID().getValue().equals(accountID
                                 .getIdentifier())) {
-                    isDefault = true;
                 }
-                adapter.add(new AccountAddItem(accountID, isDefault, this));
+                accountList.add(dataManager.getUser().getAccountIDs().get(i));
+            }
+        }
+        Collections.sort(accountList, new Comparator<AccountID>() {
+            @Override
+            public int compare(AccountID accountID, AccountID t1) {
+                return accountID.getCustomer().compareTo(t1.getCustomer());
+            }
+        });
+
+        for (int i = 0; i < accountList.size(); i++) {
+            if (dataManager.getDefaultAccountID().getTitle().equals(accountList.get(i).getType()) &&
+                    dataManager.getDefaultAccountID().getValue().equals(accountList.get(i).getIdentifier())) {
+                adapter.mDefaultPostion = i;
             }
         }
 
+        adapter.notifyDataSetChanged();
     }
 
     private void saveAccount(final String name, final String id, final boolean setDefault) {
