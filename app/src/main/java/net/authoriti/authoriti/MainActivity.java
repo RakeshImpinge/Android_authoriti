@@ -458,7 +458,7 @@ public class MainActivity extends BaseActivity {
         }
     };
 
-    private void pollingApi(String Id) {
+    private void pollingApi(final String Id) {
         Log.e("pollingApi", "Started_" + currentId);
         String pollingUrl = Constants.API_BASE_URL_POLLING + Id + ".json";
         AuthoritiAPI.APIService().getPollingUrl(pollingUrl).enqueue
