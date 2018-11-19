@@ -579,6 +579,11 @@ public class MainActivity extends BaseActivity {
         if (splitUrl.length > 0) {
             String label = splitUrl[0].replace("authoriti://purpose/", "");
             label = label.replace("-", " ");
+
+            if (label.equals("insurance claim")) {
+                label = "file insurance claim";
+            }
+
             List<Purpose> purposes = dataManager.getPurposes();
             String schemaIndex = "";
 
@@ -608,7 +613,7 @@ public class MainActivity extends BaseActivity {
                         hashMap.put(splitValue[0].replace("-", ""), splitValue[1].replace("-", ""));
                     }
                 }
-                if (!hashMap.isEmpty()) {
+                if (!hashMap.isEmpty() && indexGroup != -1 && indexItem != -1) {
                     CodePermissionActivity_.intent(mContext).purposeIndex(indexGroup)
                             .purposeIndexItem(indexItem).defParamFromUrl(hashMap)
                             .start();
