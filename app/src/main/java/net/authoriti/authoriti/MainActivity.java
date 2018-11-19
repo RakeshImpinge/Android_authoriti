@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 
 import net.authoriti.authoriti.api.model.request.RequestComplete;
 import net.authoriti.authoriti.api.model.response.ResponseComplete;
+import net.authoriti.authoriti.ui.menu.AccountChaseFragment;
 import net.authoriti.authoriti.ui.share.ExportActivity_;
 import net.authoriti.authoriti.utils.Log;
 
@@ -230,7 +231,7 @@ public class MainActivity extends BaseActivity {
             if (!dataManager.getUser().getChaseType()) {
                 accountFragment = AccountFragment_.builder().build();
             } else {
-                accountFragment = AccountFragment_.builder().build();
+                accountFragment = AccountChaseFragment_.builder().build();
             }
             fragment = accountFragment;
         } else if (menu_id == MENU_WIPE) {
@@ -330,14 +331,12 @@ public class MainActivity extends BaseActivity {
 
     @Click(R.id.ivAdd)
     void addButtonClicked() {
-        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent
-                (BROADCAST_ADD_BUTTON_CLICKED));
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(BROADCAST_ADD_BUTTON_CLICKED));
     }
 
     @Click(R.id.ivSync)
     void syncButtonClicked() {
-        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent
-                (BROADCAST_SYNC_BUTTON_CLICKED));
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(BROADCAST_SYNC_BUTTON_CLICKED));
     }
 
     @Override
@@ -391,6 +390,7 @@ public class MainActivity extends BaseActivity {
                         addDefaultvalues();
                     } else {
                         dataManager.setScheme(response.body().getSchema());
+                        updateDefaultvalues();
                     }
                 }
             }
@@ -421,9 +421,67 @@ public class MainActivity extends BaseActivity {
                                 .getType(), dataManager.getUser().getAccountIDs().get(0)
                                 .getIdentifier(), false);
                     } else if (picker.getPicker().equals(PICKER_DATA_TYPE)) {
-                        List<Value> list = dataManager.getValuesFromDataType(Integer.valueOf(key));
-                        defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
-                                false);
+                        if (defaultValuesHashMap.containsKey(PICKER_REQUEST)) {
+                            List<Value> list = dataManager.getValuesFromDataType(defaultValuesHashMap.get(PICKER_REQUEST).getValue());
+                            defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
+                                    false);
+                        } else {
+                            List<Value> list = dataManager.getValuesFromDataType(key);
+                            defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
+                                    false);
+                        }
+                    } else if (picker.getValues() != null && picker.getValues().size() > 0) {
+                        defValue = new DefaultValue(picker.getValues().get(0).getTitle(), picker
+                                .getValues()
+                                .get(0).getValue(), false);
+                    } else {
+                        defValue = new DefaultValue("", "", false);
+                    }
+                    defaultValuesHashMap.put(picker.getPicker(), defValue);
+                }
+                defaultSelectedList.put("" + key.trim(), defaultValuesHashMap);
+            }
+            Log.e("defaultSelectedList", defaultSelectedList.toString());
+            dataManager.setDefaultValues(defaultSelectedList);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void updateDefaultvalues() {
+        try {
+            Map<String, List<Picker>> schemaHashList = dataManager.getScheme();
+            List<String> keyList = new ArrayList<String>(schemaHashList.keySet());
+            Map<String, HashMap<String, DefaultValue>> defaultSelectedList = dataManager.getDefaultValues();
+            if (defaultSelectedList == null) {
+                defaultSelectedList = new HashMap<>();
+            }
+            for (String key : keyList) {
+                if (defaultSelectedList.containsKey(key)) {
+                    continue;
+                }
+                List<Picker> pickers = schemaHashList.get(key);
+                HashMap<String, DefaultValue> defaultValuesHashMap = new HashMap();
+                for (Picker picker : pickers) {
+                    DefaultValue defValue;
+                    // Adding default values of Picker is of Time
+                    if (picker.getPicker().equals(PICKER_TIME)) {
+                        defValue = new DefaultValue(TIME_15_MINS, TIME_15_MINS, false);
+                    } else if (picker.getPicker().equals(PICKER_ACCOUNT)) {
+                        defValue = new DefaultValue(dataManager.getUser().getAccountIDs().get(0)
+                                .getType(), dataManager.getUser().getAccountIDs().get(0)
+                                .getIdentifier(), false);
+                    } else if (picker.getPicker().equals(PICKER_DATA_TYPE)) {
+                        if (defaultValuesHashMap.containsKey(PICKER_REQUEST)) {
+                            List<Value> list = dataManager.getValuesFromDataType(defaultValuesHashMap.get(PICKER_REQUEST).getValue());
+                            defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
+                                    false);
+                        } else {
+                            List<Value> list = dataManager.getValuesFromDataType(key);
+                            defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
+                                    false);
+                        }
                     } else if (picker.getValues() != null && picker.getValues().size() > 0) {
                         defValue = new DefaultValue(picker.getValues().get(0).getTitle(), picker
                                 .getValues()
@@ -521,6 +579,11 @@ public class MainActivity extends BaseActivity {
         if (splitUrl.length > 0) {
             String label = splitUrl[0].replace("authoriti://purpose/", "");
             label = label.replace("-", " ");
+
+            if (label.equals("insurance claim")) {
+                label = "file insurance claim";
+            }
+
             List<Purpose> purposes = dataManager.getPurposes();
             String schemaIndex = "";
 
@@ -550,7 +613,7 @@ public class MainActivity extends BaseActivity {
                         hashMap.put(splitValue[0].replace("-", ""), splitValue[1].replace("-", ""));
                     }
                 }
-                if (!hashMap.isEmpty()) {
+                if (!hashMap.isEmpty() && indexGroup != -1 && indexItem != -1) {
                     CodePermissionActivity_.intent(mContext).purposeIndex(indexGroup)
                             .purposeIndexItem(indexItem).defParamFromUrl(hashMap)
                             .start();

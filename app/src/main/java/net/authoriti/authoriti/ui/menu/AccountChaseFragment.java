@@ -9,6 +9,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Toast;
 
 import net.authoriti.authoriti.MainActivity;
 import net.authoriti.authoriti.R;
@@ -119,6 +120,7 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
     @Override
     public void onResume() {
         super.onResume();
+
         ((MainActivity) getActivity()).updateMenuToolbar(Constants.MENU_ACCOUNT);
         showAccounts();
     }

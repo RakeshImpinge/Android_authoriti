@@ -122,8 +122,8 @@ public class CodePermissionActivity extends BaseActivity {
             else if (pickersList.get(i).getPicker().equals(PICKER_DATA_TYPE)) {
                 List<Value> values;
                 if (defaultPickerMap.containsKey(PICKER_REQUEST)) {
-                    values = dataManager.getValuesFromDataType(Integer.valueOf(defaultPickerMap.get
-                            (PICKER_REQUEST).getValue().toString()));
+                    values = dataManager.getValuesFromDataType(defaultPickerMap.get
+                            (PICKER_REQUEST).getValue());
                 } else {
                     values = dataManager.getValuesFromDataType(schemaIndex);
                 }
@@ -389,9 +389,8 @@ public class CodePermissionActivity extends BaseActivity {
             int data_type_length = 0;
             if (defaultPickerMap.containsKey(PICKER_REQUEST) && defaultPickerMap.containsKey
                     (PICKER_REQUEST)) {
-                data_type_length = dataManager.getValuesFromDataType(Integer.valueOf
-                        (defaultPickerMap
-                                .get(PICKER_REQUEST).getValue().toString())).size();
+                data_type_length = dataManager.getValuesFromDataType(defaultPickerMap
+                        .get(PICKER_REQUEST).getValue()).size();
             } else {
                 data_type_length = dataManager.getValuesFromDataType(Integer.valueOf(group
                         .getSchemaIndex())).size();
@@ -447,6 +446,20 @@ public class CodePermissionActivity extends BaseActivity {
                 finalPickersList.add(uiFlaseListIndex.get(i), hashMap);
             }
 
+
+            // Default value for any state for schema index 8 i.e clain insurance
+            if (schemaIndex == 8) {
+                for (int i = 0; i < finalPickersList.size(); i++) {
+                    if (finalPickersList.get(i).get("picker").equals("any_state")) {
+                        HashMap<String, String> anystate = finalPickersList.get(i);
+                        anystate.put("value", "99");
+                        anystate.put("key", "any_state");
+                        finalPickersList.set(i, anystate);
+                    }
+                }
+            }
+
+
             CodeGenerateActivity_.intent(mContext).schemaIndex("" + group.getSchemaIndex())
                     .finalPickersList(finalPickersList).isPollingRequest(defParamFromUrl != null)
                     .start();
@@ -474,9 +487,8 @@ public class CodePermissionActivity extends BaseActivity {
                     if (pickersList.get(i).getPicker().equals(PICKER_DATA_TYPE)) {
                         List<Value> values;
                         if (defaultPickerMap.containsKey(PICKER_REQUEST)) {
-                            values = dataManager.getValuesFromDataType(Integer.valueOf
-                                    (defaultPickerMap.get
-                                            (PICKER_REQUEST).getValue().toString()));
+                            values = dataManager.getValuesFromDataType(defaultPickerMap.get
+                                    (PICKER_REQUEST).getValue());
                         } else {
                             values = dataManager.getValuesFromDataType(schemaIndex);
                         }

@@ -60,6 +60,7 @@ public class Crypto {
         }
 
         public void add(String picker, String value) {
+            System.out.println("picker: " + picker + ". value: " + value);
             switch (picker) {
                 case Constants.PICKER_INDUSTRY:
                 case Constants.PICKER_LOCATION_COUNTRY:
@@ -171,6 +172,7 @@ public class Crypto {
                     extra = extraInput + extra + "1"; // 1 = United States; Make this dynamic
                     break;
                 case "2":
+                case "8":
                     String tmpTime = payload.substring(0, 5);
                     payload = payload.replace(tmpTime, "") + tmpTime;
                     extra = extra + extraInput + payload.substring(0, 3);
@@ -193,6 +195,7 @@ public class Crypto {
             }
 
             final String signedCode = sign(encodedPayload, privateKey);
+            System.out.println("Adding: "+ extra);
             final String passcode = addDataToCode(extra, signedCode);
             Log.i(TAG, "PC: " + passcode);
             return passcode;
