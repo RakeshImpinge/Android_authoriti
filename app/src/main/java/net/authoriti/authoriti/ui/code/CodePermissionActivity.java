@@ -446,6 +446,20 @@ public class CodePermissionActivity extends BaseActivity {
                 finalPickersList.add(uiFlaseListIndex.get(i), hashMap);
             }
 
+
+            // Default value for any state for schema index 8 i.e clain insurance
+            if (schemaIndex == 8) {
+                for (int i = 0; i < finalPickersList.size(); i++) {
+                    if (finalPickersList.get(i).get("picker").equals("any_state")) {
+                        HashMap<String, String> anystate = finalPickersList.get(i);
+                        anystate.put("value", "99");
+                        anystate.put("key", "any_state");
+                        finalPickersList.set(i, anystate);
+                    }
+                }
+            }
+
+
             CodeGenerateActivity_.intent(mContext).schemaIndex("" + group.getSchemaIndex())
                     .finalPickersList(finalPickersList).isPollingRequest(defParamFromUrl != null)
                     .start();

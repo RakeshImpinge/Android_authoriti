@@ -330,14 +330,12 @@ public class MainActivity extends BaseActivity {
 
     @Click(R.id.ivAdd)
     void addButtonClicked() {
-        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent
-                (BROADCAST_ADD_BUTTON_CLICKED));
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(BROADCAST_ADD_BUTTON_CLICKED));
     }
 
     @Click(R.id.ivSync)
     void syncButtonClicked() {
-        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent
-                (BROADCAST_SYNC_BUTTON_CLICKED));
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(BROADCAST_SYNC_BUTTON_CLICKED));
     }
 
     @Override

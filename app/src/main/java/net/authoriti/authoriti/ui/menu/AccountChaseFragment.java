@@ -110,15 +110,16 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
     @Override
     public void onStart() {
         super.onStart();
-        LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastSyncReceiver, new
-                IntentFilter(BROADCAST_SYNC_BUTTON_CLICKED));
-        LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastAddReceiver, new
-                IntentFilter(BROADCAST_ADD_BUTTON_CLICKED));
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastSyncReceiver, new
+                IntentFilter(BROADCAST_SYNC_BUTTON_CLICKED));
+        LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastAddReceiver, new
+                IntentFilter(BROADCAST_ADD_BUTTON_CLICKED));
         ((MainActivity) getActivity()).updateMenuToolbar(Constants.MENU_ACCOUNT);
         showAccounts();
     }
