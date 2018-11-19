@@ -422,9 +422,15 @@ public class MainActivity extends BaseActivity {
                                 .getType(), dataManager.getUser().getAccountIDs().get(0)
                                 .getIdentifier(), false);
                     } else if (picker.getPicker().equals(PICKER_DATA_TYPE)) {
-                        List<Value> list = dataManager.getValuesFromDataType(defaultValuesHashMap.get(PICKER_REQUEST).getValue());
-                        defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
-                                false);
+                        if (defaultValuesHashMap.containsKey(PICKER_REQUEST)) {
+                            List<Value> list = dataManager.getValuesFromDataType(defaultValuesHashMap.get(PICKER_REQUEST).getValue());
+                            defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
+                                    false);
+                        } else {
+                            List<Value> list = dataManager.getValuesFromDataType(key);
+                            defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
+                                    false);
+                        }
                     } else if (picker.getValues() != null && picker.getValues().size() > 0) {
                         defValue = new DefaultValue(picker.getValues().get(0).getTitle(), picker
                                 .getValues()
