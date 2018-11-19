@@ -422,8 +422,6 @@ public class MainActivity extends BaseActivity {
                                 .getType(), dataManager.getUser().getAccountIDs().get(0)
                                 .getIdentifier(), false);
                     } else if (picker.getPicker().equals(PICKER_DATA_TYPE)) {
-                        System.out.println("=====" + defaultValuesHashMap.get(PICKER_REQUEST).getValue());
-                        System.out.println("=====" + dataManager.getValuesFromDataType(defaultValuesHashMap.get(PICKER_REQUEST).getValue()));
                         List<Value> list = dataManager.getValuesFromDataType(defaultValuesHashMap.get(PICKER_REQUEST).getValue());
                         defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
                                 false);
@@ -447,7 +445,6 @@ public class MainActivity extends BaseActivity {
 
 
     private void updateDefaultvalues() {
-        System.out.println("=====First====="+dataManager.getDefaultValues());
         try {
             Map<String, List<Picker>> schemaHashList = dataManager.getScheme();
             List<String> keyList = new ArrayList<String>(schemaHashList.keySet());
@@ -496,9 +493,6 @@ public class MainActivity extends BaseActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        System.out.println("=====First=Update===="+dataManager.getDefaultValues());
-
     }
 
     int currentId = -1;
