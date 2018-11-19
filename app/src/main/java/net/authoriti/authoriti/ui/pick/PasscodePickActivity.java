@@ -180,9 +180,8 @@ public class PasscodePickActivity extends BaseActivity {
                             defaultValue.setValue(picker.getValues().get(position).getValue());
                             defaultPickerMap.put(pickerType, defaultValue);
 
-                            List<Value> values = dataManager.getValuesFromDataType(Integer
-                                    .valueOf(picker
-                                            .getValues().get(position).getValue()));
+                            List<Value> values = dataManager.getValuesFromDataType(picker
+                                    .getValues().get(position).getValue());
                             DefaultValue defaultValueDataType = new DefaultValue(values.get(0)
                                     .getTitle(), values.get(0).getValue(), false);
                             defaultPickerMap.put(PICKER_DATA_TYPE, defaultValueDataType);
@@ -394,6 +393,12 @@ public class PasscodePickActivity extends BaseActivity {
             if (pickerType.equals(PICKER_ACCOUNT)) {
                 if (defaultValue.getValue().equals(picker.getValues().get(i).getValue()) &&
                         defaultValue.getTitle().equals(picker.getValues().get(i).getTitle())) {
+                    optionAdapter.add(new OptionItem(picker.getValues().get(i), true));
+                } else {
+                    optionAdapter.add(new OptionItem(picker.getValues().get(i), false));
+                }
+            } else if (pickerType.equals(PICKER_REQUEST)) {
+                if (value.contains(picker.getValues().get(i).getValue()) && title.contains(picker.getValues().get(i).getTitle())) {
                     optionAdapter.add(new OptionItem(picker.getValues().get(i), true));
                 } else {
                     optionAdapter.add(new OptionItem(picker.getValues().get(i), false));

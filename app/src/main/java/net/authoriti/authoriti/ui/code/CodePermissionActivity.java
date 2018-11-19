@@ -122,8 +122,8 @@ public class CodePermissionActivity extends BaseActivity {
             else if (pickersList.get(i).getPicker().equals(PICKER_DATA_TYPE)) {
                 List<Value> values;
                 if (defaultPickerMap.containsKey(PICKER_REQUEST)) {
-                    values = dataManager.getValuesFromDataType(Integer.valueOf(defaultPickerMap.get
-                            (PICKER_REQUEST).getValue().toString()));
+                    values = dataManager.getValuesFromDataType(defaultPickerMap.get
+                            (PICKER_REQUEST).getValue());
                 } else {
                     values = dataManager.getValuesFromDataType(schemaIndex);
                 }
@@ -389,9 +389,8 @@ public class CodePermissionActivity extends BaseActivity {
             int data_type_length = 0;
             if (defaultPickerMap.containsKey(PICKER_REQUEST) && defaultPickerMap.containsKey
                     (PICKER_REQUEST)) {
-                data_type_length = dataManager.getValuesFromDataType(Integer.valueOf
-                        (defaultPickerMap
-                                .get(PICKER_REQUEST).getValue().toString())).size();
+                data_type_length = dataManager.getValuesFromDataType(defaultPickerMap
+                        .get(PICKER_REQUEST).getValue()).size();
             } else {
                 data_type_length = dataManager.getValuesFromDataType(Integer.valueOf(group
                         .getSchemaIndex())).size();
@@ -474,9 +473,8 @@ public class CodePermissionActivity extends BaseActivity {
                     if (pickersList.get(i).getPicker().equals(PICKER_DATA_TYPE)) {
                         List<Value> values;
                         if (defaultPickerMap.containsKey(PICKER_REQUEST)) {
-                            values = dataManager.getValuesFromDataType(Integer.valueOf
-                                    (defaultPickerMap.get
-                                            (PICKER_REQUEST).getValue().toString()));
+                            values = dataManager.getValuesFromDataType(defaultPickerMap.get
+                                    (PICKER_REQUEST).getValue());
                         } else {
                             values = dataManager.getValuesFromDataType(schemaIndex);
                         }

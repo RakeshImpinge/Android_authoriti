@@ -210,6 +210,42 @@ public class AuthoritiData {
         return values;
     }
 
+    boolean parseInteger(String s) {
+        try {
+            Integer.parseInt(s);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public List<Value> getValuesFromDataType(String key) {
+        if (key.equals("6")) {
+            key = "x";
+        } else if (parseInteger(key)) {
+            if (Integer.parseInt(key) < 10) {
+                key = "0" + Integer.parseInt(key);
+            } else {
+                key = "" + key;
+            }
+        } else {
+            key = key;
+        }
+
+        List<Value> values = new ArrayList<>();
+        JsonObject jsonObject = getDataType();
+        if (jsonObject != null) {
+            if (jsonObject.get(key) != null) {
+                JsonArray jsonArray = jsonObject.get(key).getAsJsonArray();
+                Gson gson = new Gson();
+                Type type = new TypeToken<List<Value>>() {
+                }.getType();
+                values = gson.fromJson(jsonArray, type);
+            }
+        }
+        return values;
+    }
+
     public void setSelectedValuesForDataType(int index, List<Value> values) {
 
         List<String> keys = getDataTypeKeys();

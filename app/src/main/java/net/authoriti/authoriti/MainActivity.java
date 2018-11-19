@@ -391,6 +391,7 @@ public class MainActivity extends BaseActivity {
                         addDefaultvalues();
                     } else {
                         dataManager.setScheme(response.body().getSchema());
+                        updateDefaultvalues();
                     }
                 }
             }
@@ -421,7 +422,9 @@ public class MainActivity extends BaseActivity {
                                 .getType(), dataManager.getUser().getAccountIDs().get(0)
                                 .getIdentifier(), false);
                     } else if (picker.getPicker().equals(PICKER_DATA_TYPE)) {
-                        List<Value> list = dataManager.getValuesFromDataType(Integer.valueOf(key));
+                        System.out.println("=====" + defaultValuesHashMap.get(PICKER_REQUEST).getValue());
+                        System.out.println("=====" + dataManager.getValuesFromDataType(defaultValuesHashMap.get(PICKER_REQUEST).getValue()));
+                        List<Value> list = dataManager.getValuesFromDataType(defaultValuesHashMap.get(PICKER_REQUEST).getValue());
                         defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
                                 false);
                     } else if (picker.getValues() != null && picker.getValues().size() > 0) {
@@ -440,6 +443,62 @@ public class MainActivity extends BaseActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+
+    private void updateDefaultvalues() {
+        System.out.println("=====First====="+dataManager.getDefaultValues());
+        try {
+            Map<String, List<Picker>> schemaHashList = dataManager.getScheme();
+            List<String> keyList = new ArrayList<String>(schemaHashList.keySet());
+            Map<String, HashMap<String, DefaultValue>> defaultSelectedList = dataManager.getDefaultValues();
+            if (defaultSelectedList == null) {
+                defaultSelectedList = new HashMap<>();
+            }
+            for (String key : keyList) {
+                if (defaultSelectedList.containsKey(key)) {
+                    continue;
+                }
+                List<Picker> pickers = schemaHashList.get(key);
+                HashMap<String, DefaultValue> defaultValuesHashMap = new HashMap();
+                for (Picker picker : pickers) {
+                    DefaultValue defValue;
+                    // Adding default values of Picker is of Time
+                    if (picker.getPicker().equals(PICKER_TIME)) {
+                        defValue = new DefaultValue(TIME_15_MINS, TIME_15_MINS, false);
+                    } else if (picker.getPicker().equals(PICKER_ACCOUNT)) {
+                        defValue = new DefaultValue(dataManager.getUser().getAccountIDs().get(0)
+                                .getType(), dataManager.getUser().getAccountIDs().get(0)
+                                .getIdentifier(), false);
+                    } else if (picker.getPicker().equals(PICKER_DATA_TYPE)) {
+                        if (defaultValuesHashMap.containsKey(PICKER_REQUEST)) {
+                            List<Value> list = dataManager.getValuesFromDataType(defaultValuesHashMap.get(PICKER_REQUEST).getValue());
+                            defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
+                                    false);
+                        } else {
+                            List<Value> list = dataManager.getValuesFromDataType(key);
+                            defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
+                                    false);
+                        }
+                    } else if (picker.getValues() != null && picker.getValues().size() > 0) {
+                        defValue = new DefaultValue(picker.getValues().get(0).getTitle(), picker
+                                .getValues()
+                                .get(0).getValue(), false);
+                    } else {
+                        defValue = new DefaultValue("", "", false);
+                    }
+                    defaultValuesHashMap.put(picker.getPicker(), defValue);
+                }
+                defaultSelectedList.put("" + key.trim(), defaultValuesHashMap);
+            }
+            Log.e("defaultSelectedList", defaultSelectedList.toString());
+            dataManager.setDefaultValues(defaultSelectedList);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("=====First=Update===="+dataManager.getDefaultValues());
+
     }
 
     int currentId = -1;
