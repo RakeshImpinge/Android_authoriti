@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 
 import net.authoriti.authoriti.api.model.request.RequestComplete;
 import net.authoriti.authoriti.api.model.response.ResponseComplete;
+import net.authoriti.authoriti.ui.menu.AccountChaseFragment;
 import net.authoriti.authoriti.ui.share.ExportActivity_;
 import net.authoriti.authoriti.utils.Log;
 
@@ -230,7 +231,7 @@ public class MainActivity extends BaseActivity {
             if (!dataManager.getUser().getChaseType()) {
                 accountFragment = AccountFragment_.builder().build();
             } else {
-                accountFragment = AccountFragment_.builder().build();
+                accountFragment = AccountChaseFragment_.builder().build();
             }
             fragment = accountFragment;
         } else if (menu_id == MENU_WIPE) {
