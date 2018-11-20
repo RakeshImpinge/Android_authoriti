@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 
 def AAVersion = '4.5.2'
-
+def bitriseCode = System.getenv('BITRISE_BUILD_NUMBRER') ?: "1"
 android {
     compileSdkVersion 26
     buildToolsVersion '28.0.3'
@@ -11,7 +11,7 @@ android {
         applicationId 'net.authoriti.authoriti'
         minSdkVersion 17
         targetSdkVersion 26
-        versionCode 104
+        versionCode Integer.parseInt("$bitriseCode")
         versionName "1.1.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
