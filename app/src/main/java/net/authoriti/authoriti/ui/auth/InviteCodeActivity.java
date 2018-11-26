@@ -132,17 +132,6 @@ public class InviteCodeActivity extends BaseActivity {
         }
     }
 
-    @Click(R.id.cvNeed)
-    void needButtonClicked() {
-
-        if (TextUtils.isEmpty(etCode.getText())) {
-            StartupActivity_.intent(mContext).start();
-        } else {
-            hideKeyboard();
-            checkInviteCode(false);
-        }
-    }
-
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
