@@ -155,14 +155,14 @@
                     <android.support.v7.widget.AppCompatTextView
                         fontPath="@string/font_oswaldo_regular"
                         android:layout_marginLeft="15dp"
-                        android:drawableLeft="@drawable/ic_qrcode_scan_black_48dp"
+                        android:drawableLeft="@drawable/ic_qrcode_scan_grey600_18dp"
                         android:layout_marginStart="15dp"
                         android:layout_alignParentBottom="true"
                         android:id="@+id/cvImport"
                         android:layout_width="wrap_content"
                         android:textColor="@color/colorPrimary"
-                        android:textSize="17sp"
                         android:layout_height="wrap_content"
+                        android:drawablePadding="5dp"
                         android:gravity="center"
                         android:text="Import Wallet"/>
 
