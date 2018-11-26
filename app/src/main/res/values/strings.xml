@@ -2,10 +2,11 @@
     <string name="app_name">Authoriti</string>
 
     <string name="menu_code_generate">Generate Permission Code</string>
-    <string name="menu_account">MY IDs</string>
-    <string name="menu_wipe">About Us</string>
     <string name="menu_polling">Check Permission Code Requests</string>
-    <string name="menu_export">Export</string>
+    <string name="menu_account">MY IDs</string>
+    <string name="menu_export">Transfer Wallet to New Device</string>
+    <string name="menu_change_pwd">Change Password</string>
+    <string name="menu_wipe">About Us</string>
     <string name="menu_logOut">Logout</string>
 
     <!-- Fonts -->

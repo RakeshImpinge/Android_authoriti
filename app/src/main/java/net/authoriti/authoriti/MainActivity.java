@@ -171,14 +171,16 @@ public class MainActivity extends BaseActivity {
                         new PrimaryDrawerItem().withName(R.string.menu_code_generate)
                                 .withIdentifier(MENU_CODE).withSelectable(true).withTypeface
                                 (typeface),
-                        new PrimaryDrawerItem().withName(R.string.menu_account).withIdentifier
-                                (MENU_ACCOUNT).withSelectable(true).withTypeface(typeface),
-                        new PrimaryDrawerItem().withName(R.string.menu_wipe).withIdentifier
-                                (MENU_WIPE).withSelectable(true).withTypeface(typeface),
                         new PrimaryDrawerItem().withName(R.string.menu_polling).withIdentifier
                                 (MENU_POLLING).withSelectable(true).withTypeface(typeface),
+                        new PrimaryDrawerItem().withName(R.string.menu_account).withIdentifier
+                                (MENU_ACCOUNT).withSelectable(true).withTypeface(typeface),
                         new PrimaryDrawerItem().withName(R.string.menu_export).withIdentifier
                                 (MENU_EXPORT).withSelectable(true).withTypeface(typeface),
+                        new PrimaryDrawerItem().withName(R.string.menu_change_pwd).withIdentifier
+                                (MENU_EXPORT).withSelectable(true).withTypeface(typeface),
+                        new PrimaryDrawerItem().withName(R.string.menu_wipe).withIdentifier
+                                (MENU_WIPE).withSelectable(true).withTypeface(typeface),
                         new PrimaryDrawerItem().withName(R.string.menu_logOut).withIdentifier
                                 (MENU_LOGOUT).withSelectable(true).withTypeface(typeface)
                 )

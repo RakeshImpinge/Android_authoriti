@@ -167,7 +167,6 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
     }
 
     private void setSpinner() {
-
         setPopupHeight();
         popupWidth = ViewUtils.getScreenWidth(this) - (int) ViewUtils.convertDpToPixel(64, this);
 
@@ -177,28 +176,28 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
             list = dataManager.getUser().getAccountIDs();
         }
 
-        SpinnerItem item = new SpinnerItem(this, list);
-
-        lv = new ListView(this);
-        lv.setAdapter(item);
-        lv.setDividerHeight(0);
-        lv.setOnItemClickListener(this);
-        lv.setOnItemSelectedListener(this);
-        lv.setSelector(android.R.color.transparent);
-        lv.setBackgroundResource(R.drawable.bg_spinner_pop);
-        lv.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
-        lv.setOverScrollMode(View.OVER_SCROLL_NEVER);
+//        SpinnerItem item = new SpinnerItem(this, list);
+//
+//        lv = new ListView(this);
+//        lv.setAdapter(item);
+//        lv.setDividerHeight(0);
+//        lv.setOnItemClickListener(this);
+//        lv.setOnItemSelectedListener(this);
+//        lv.setSelector(android.R.color.transparent);
+//        lv.setBackgroundResource(R.drawable.bg_spinner_pop);
+//        lv.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+//                ViewGroup.LayoutParams.MATCH_PARENT));
+//        lv.setOverScrollMode(View.OVER_SCROLL_NEVER);
     }
 
     private void setAccount() {
         if (list != null && list.size() > 0 && selectedPosition < list.size()) {
             etAccount.setText(list.get(selectedPosition).getType());
-            if (defaultPosition == selectedPosition) {
-                checkBox.setChecked(true);
-            } else {
-                checkBox.setChecked(false);
-            }
+//            if (defaultPosition == selectedPosition) {
+//                checkBox.setChecked(true);
+//            } else {
+//                checkBox.setChecked(false);
+//            }
         }
     }
 
