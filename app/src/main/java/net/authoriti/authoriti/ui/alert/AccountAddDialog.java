@@ -19,6 +19,7 @@ import android.widget.EditText;
 import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.utils.AuthoritiUtils;
 import net.authoriti.authoriti.utils.AuthoritiUtils_;
+import net.authoriti.authoriti.utils.crypto.CryptoUtil;
 
 /**
  * Created by mac on 1/24/18.
@@ -94,7 +95,7 @@ public class AccountAddDialog extends AppCompatDialog {
 
                     if (listener != null){
                         assert checkBox != null;
-                        String accountNumber = etNumber.getText().toString().replaceFirst("^0+(?!$)", "");
+                        String accountNumber = CryptoUtil.hash(etNumber.getText().toString().replaceFirst("^0+(?!$)", ""));
                         listener.accountAddDialogOKButtonClicked(etName.getText().toString(), accountNumber, checkBox.isChecked());
                     }
                 }

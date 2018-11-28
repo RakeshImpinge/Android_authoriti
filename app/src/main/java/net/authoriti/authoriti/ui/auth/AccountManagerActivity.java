@@ -126,8 +126,8 @@ public class AccountManagerActivity extends SecurityActivity implements Security
         if (dataManager.accountIDs == null) {
             dataManager.accountIDs = new ArrayList<>();
         }
-
-        AccountID accountID = new AccountID(name, id);
+        Log.e("SaveAccount", "Name: " + id);
+        AccountID accountID = new AccountID(name, id, true);
         dataManager.accountIDs.add(accountID);
 
         showAccount();
@@ -166,7 +166,7 @@ public class AccountManagerActivity extends SecurityActivity implements Security
 
         RequestSignUp requestSignUp = new RequestSignUp(keyPair
                 .getPublicKey(), dataManager.inviteCode, dataManager.accountIDs);
-
+        Log.e("Step1", "Completed");
         displayProgressDialog("Sign Up...");
         AuthoritiAPI.APIService().signUp(requestSignUp).enqueue(new Callback<ResponseSignUp>() {
             @Override
@@ -195,6 +195,7 @@ public class AccountManagerActivity extends SecurityActivity implements Security
 
     private void fetchSignUpInfo(ResponseSignUp responseSignUp) {
         User user = responseSignUp.getUser();
+
         user.setUserId(responseSignUp.getUserId());
         user.setToken(responseSignUp.getToken());
         user.setInviteCode(dataManager.inviteCode);
@@ -218,12 +219,15 @@ public class AccountManagerActivity extends SecurityActivity implements Security
                 user.setEncryptPassword(AesCbcWithIntegrity.encrypt(dataManager.password, keys)
                         .toString());
 
-                Log.e("getDefaultAccountID", dataManager.getDefaultAccountID().getTitle());
-                Log.e("getDefaultAccountID", dataManager.getDefaultAccountID().getValue());
-
                 for (int i = 0; i < user.getAccountIDs().size(); i++) {
                     AccountID accountID = user.getAccountIDs().get(i);
-                    accountID.setIdentifier(CryptoUtil.hash(accountID.getIdentifier()));
+                    if (!accountID.getHashed()) {
+                        Log.e("HashCheck", "Not Hashed");
+                        accountID.setIdentifier(CryptoUtil.hash(accountID.getIdentifier()));
+                    } else {
+                        accountID.setIdentifier(accountID.getIdentifier());
+                        Log.e("HashCheck", "Saved: " + accountID.getIdentifier());
+                    }
                     user.getAccountIDs().set(i, accountID);
                 }
 

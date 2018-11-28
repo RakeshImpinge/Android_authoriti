@@ -6,6 +6,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 
 import net.authoriti.authoriti.MainActivity_;
@@ -221,8 +222,8 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
     }
 
     private void updateAccount(String id, boolean setDefault) {
-
-        AccountID accountID = new AccountID(selectedAccountId.getType(), id);
+        Log.e("updateAccount", id);
+        AccountID accountID = new AccountID(selectedAccountId.getType(), id, true);
         User user = dataManager.getUser();
         user.getAccountIDs().add(accountID);
 
@@ -382,7 +383,7 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
             dataManager.defaultAccountSelected = true;
             dataManager.defaultAccountIndex = dataManager.accountIDs.size();
         }
-        AccountID accountID = new AccountID(name, id);
+        AccountID accountID = new AccountID(name, id, true);
         accountID.setIdentifier(CryptoUtil.hash(accountID.getIdentifier()));
         dataManager.accountIDs.add(accountID);
 //        adapter.add(new AccountConfirmItem(accountID, setDefault));

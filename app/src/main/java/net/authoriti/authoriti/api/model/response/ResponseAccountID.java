@@ -1,24 +1,20 @@
-package net.authoriti.authoriti.api.model;
+package net.authoriti.authoriti.api.model.response;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * Created by mac on 12/13/17.
- */
-
-public class AccountID {
+public class ResponseAccountID {
+    @SerializedName("userId")
+    private String userId;
 
     @SerializedName("type")
     private String type;
-    @SerializedName("value")
+
+    @SerializedName("number")
     private String identifier;
-    @SerializedName("hashed")
-    private Boolean hashed;
 
     private boolean confirmed = true;
 
     public String getCustomer() {
-
         return Customer;
     }
 
@@ -28,24 +24,21 @@ public class AccountID {
 
     private String Customer = "";
 
-    public AccountID() {
+    public ResponseAccountID() {
         this.type = "";
         this.identifier = "";
-        this.hashed = false;
         confirmed = true;
     }
 
-    public AccountID(String type, String identifier, Boolean hashed) {
+    public ResponseAccountID(String type, String identifier) {
         this.type = type;
         this.identifier = identifier;
-        this.hashed = hashed;
         confirmed = true;
     }
 
-    public AccountID(String type, String identifier, Boolean hashed, String Customer) {
+    public ResponseAccountID(String type, String identifier, String Customer) {
         this.type = type;
         this.identifier = identifier;
-        this.hashed = hashed;
         confirmed = true;
         this.Customer = Customer;
     }
@@ -60,10 +53,6 @@ public class AccountID {
 
     public String getIdentifier() {
         return identifier;
-    }
-
-    public Boolean getHashed() {
-        return this.hashed;
     }
 
     public void setIdentifier(String identifier) {

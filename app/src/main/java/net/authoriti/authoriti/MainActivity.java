@@ -171,14 +171,16 @@ public class MainActivity extends BaseActivity {
                         new PrimaryDrawerItem().withName(R.string.menu_code_generate)
                                 .withIdentifier(MENU_CODE).withSelectable(true).withTypeface
                                 (typeface),
-                        new PrimaryDrawerItem().withName(R.string.menu_account).withIdentifier
-                                (MENU_ACCOUNT).withSelectable(true).withTypeface(typeface),
-                        new PrimaryDrawerItem().withName(R.string.menu_wipe).withIdentifier
-                                (MENU_WIPE).withSelectable(true).withTypeface(typeface),
                         new PrimaryDrawerItem().withName(R.string.menu_polling).withIdentifier
                                 (MENU_POLLING).withSelectable(true).withTypeface(typeface),
+                        new PrimaryDrawerItem().withName(R.string.menu_account).withIdentifier
+                                (MENU_ACCOUNT).withSelectable(true).withTypeface(typeface),
                         new PrimaryDrawerItem().withName(R.string.menu_export).withIdentifier
                                 (MENU_EXPORT).withSelectable(true).withTypeface(typeface),
+                        new PrimaryDrawerItem().withName(R.string.menu_change_pwd).withIdentifier
+                                (MENU_EXPORT).withSelectable(true).withTypeface(typeface),
+                        new PrimaryDrawerItem().withName(R.string.menu_wipe).withIdentifier
+                                (MENU_WIPE).withSelectable(true).withTypeface(typeface),
                         new PrimaryDrawerItem().withName(R.string.menu_logOut).withIdentifier
                                 (MENU_LOGOUT).withSelectable(true).withTypeface(typeface)
                 )
@@ -517,7 +519,7 @@ public class MainActivity extends BaseActivity {
     };
 
     private void pollingApi(final String Id) {
-        Log.e("pollingApi", "Started_" + currentId);
+        Log.e("pollingApi", "Started_" + currentId + "_: " + Id);
         String pollingUrl = Constants.API_BASE_URL_POLLING + Id + ".json";
         AuthoritiAPI.APIService().getPollingUrl(pollingUrl).enqueue
                 (new Callback<ResponsePolling>() {

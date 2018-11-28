@@ -113,7 +113,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
 
     private void signUp() {
 
-        AccountID accountID = new AccountID("", etIdentifier.getText().toString());
+        AccountID accountID = new AccountID("", etIdentifier.getText().toString(), false);
         List<AccountID> accountIDs = new ArrayList<>();
         accountIDs.add(accountID);
 

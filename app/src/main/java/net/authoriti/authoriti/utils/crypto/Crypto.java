@@ -73,7 +73,13 @@ public class Crypto {
                     payload = payload + geo;
                     break;
                 default:
-                    System.out.println("TODO: handle picker " + picker + ". received value: " +
+                    if (schemaVersion.equalsIgnoreCase("8")) {
+                        Log.e("SCHEMA_VERSION", schemaVersion);
+                        Log.e("ANY_STATE", payload);
+                        payload = payload + value;
+                        Log.e("AFTER", payload);
+                    }
+                    else System.out.println("TODO: handle picker " + picker + ". received value: " +
                             value);
 
             }
