@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -212,8 +213,8 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
     }
 
     private void updateAccount(String id, boolean setDefault) {
-
-        AccountID accountID = new AccountID(selectedAccountId.getType(), id);
+        Log.e("AccountChaseFragmentUp", id);
+        AccountID accountID = new AccountID(selectedAccountId.getType(), id, true);
         User user = dataManager.getUser();
         user.getAccountIDs().add(accountID);
 
@@ -315,7 +316,7 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
 
     private void saveAccount(final String name, final String id, final boolean setDefault) {
         RequestUserUpdate request = new RequestUserUpdate();
-        AccountID accountID = new AccountID(name, id);
+        AccountID accountID = new AccountID(name, id, true);
         List<AccountID> accountIDs = new ArrayList<>();
         accountIDs.add(accountID);
         request.setAccountIDs(accountIDs);
@@ -356,7 +357,8 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
             utils.updateDefaultvalues(getActivity(), PICKER_ACCOUNT, new Value(CryptoUtil.hash
                     (id), name), true);
         }
-        AccountID accountID = new AccountID(name, id);
+        Log.e("AddAccount", id);
+        AccountID accountID = new AccountID(name, id, true);
         accountID.setIdentifier(CryptoUtil.hash(accountID.getIdentifier()));
         dataManager.accountIDs.add(accountID);
         user.setAccountIDs(dataManager.accountIDs);

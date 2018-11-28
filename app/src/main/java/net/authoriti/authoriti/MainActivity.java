@@ -519,7 +519,7 @@ public class MainActivity extends BaseActivity {
     };
 
     private void pollingApi(final String Id) {
-        Log.e("pollingApi", "Started_" + currentId);
+        Log.e("pollingApi", "Started_" + currentId + "_: " + Id);
         String pollingUrl = Constants.API_BASE_URL_POLLING + Id + ".json";
         AuthoritiAPI.APIService().getPollingUrl(pollingUrl).enqueue
                 (new Callback<ResponsePolling>() {

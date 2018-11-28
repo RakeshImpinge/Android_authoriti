@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.widget.Toast;
 
 import net.authoriti.authoriti.MainActivity;
@@ -134,7 +135,8 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
 
     private void saveAccount(final String name, final String id, final boolean setDefault) {
         RequestUserUpdate request = new RequestUserUpdate();
-        AccountID accountID = new AccountID(name, id);
+        Log.e("AccountFragment", id);
+        AccountID accountID = new AccountID(name, id, true);
         List<AccountID> accountIDs = new ArrayList<>();
         accountIDs.add(accountID);
         request.setAccountIDs(accountIDs);
@@ -165,7 +167,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
     private void addAccount(String name, String id, boolean setDefault) {
         User user = dataManager.getUser();
         List<AccountID> accountIDs = user.getAccountIDs();
-        accountIDs.add(new AccountID(name, CryptoUtil.hash(id)));
+        accountIDs.add(new AccountID(name, id, true));
         dataManager.setUser(user);
         if (setDefault) {
             dataManager.setDefaultAccountID(new Value(CryptoUtil.hash(id), name));
