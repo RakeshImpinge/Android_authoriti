@@ -14,14 +14,17 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.Toolbar;
 
+import net.authoriti.authoriti.api.model.User;
 import net.authoriti.authoriti.api.model.request.RequestComplete;
 import net.authoriti.authoriti.api.model.response.ResponseComplete;
+import net.authoriti.authoriti.api.model.response.ResponseSync;
 import net.authoriti.authoriti.ui.menu.AccountChaseFragment;
 import net.authoriti.authoriti.ui.share.ExportActivity_;
 import net.authoriti.authoriti.utils.Log;
 
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import net.authoriti.authoriti.api.AuthoritiAPI;
 import net.authoriti.authoriti.api.model.AccountID;
@@ -338,7 +341,53 @@ public class MainActivity extends BaseActivity {
 
     @Click(R.id.ivSync)
     void syncButtonClicked() {
-        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(BROADCAST_SYNC_BUTTON_CLICKED));
+        Log.e("Sync", "Sync button clicked");
+        displayProgressDialog("Downloading wallet items...");
+        Log.e("Sync", "Token: " + dataManager.getUser().getToken());
+        AuthoritiAPI.APIService().sync("Bearer " + dataManager.getUser().getToken()).enqueue(new Callback<ResponseSync>() {
+            @Override
+            public void onResponse(Call<ResponseSync> call, Response<ResponseSync> response) {
+                String customerName = response.body().getCustomerName();
+
+                User user = dataManager.getUser();
+                List<AccountID> savedAccountIDs = user.getAccountIDs();
+                List<AccountID> newAccountIDs = response.body().getAccounts();
+                List<AccountID> newIds = new ArrayList<>();
+
+                final int newAccounts = newAccountIDs.size();
+                Log.e("Sync", "Total number of accounts: " + newAccounts);
+                for (int i = 0; i < newAccounts; i++) {
+                    Log.e("Loop", "" + i);
+                    boolean isContained = false;
+                    newAccountIDs.get(i).setCustomer(customerName);
+                    for (int k = 0; k < savedAccountIDs.size(); k++) {
+                        if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
+                                .getIdentifier())
+                                && savedAccountIDs.get(k).getType().equals(newAccountIDs.get(i)
+                                .getType())) {
+                            isContained = true;
+                            break;
+                        }
+                    }
+                    if (!isContained) {
+                        newIds.add(newAccountIDs.get(i));
+                    }
+                }
+                savedAccountIDs.addAll(newIds);
+                user.setAccountIDs(savedAccountIDs);
+                dataManager.setUser(user);
+
+                dismissProgressDialog();
+                Toast.makeText(MainActivity.this, "Wallets downloaded successfully", Toast.LENGTH_LONG).show();
+                ((AccountChaseFragment)accountFragment).showAccounts();
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSync> call, Throwable t) {
+                dismissProgressDialog();
+                Toast.makeText(MainActivity.this, "Wallets downloaded failed. Please try again later!", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     @Override

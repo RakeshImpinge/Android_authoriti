@@ -45,6 +45,7 @@ import retrofit2.Response;
 @EActivity(R.layout.activity_code_generate)
 public class CodeGenerateActivity extends BaseActivity {
 
+    public static final int CODE = 234;
     private Crypto crypto;
 
     @Extra
@@ -250,6 +251,7 @@ public class CodeGenerateActivity extends BaseActivity {
     @Click({R.id.ivClose, R.id.cvGotIt})
     void closeButtonClicked() {
         finish();
+        Log.e("GoBack", "from here");
     }
 
 //
