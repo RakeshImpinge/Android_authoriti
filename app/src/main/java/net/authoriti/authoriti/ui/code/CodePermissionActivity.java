@@ -462,7 +462,7 @@ public class CodePermissionActivity extends BaseActivity {
 
             CodeGenerateActivity_.intent(mContext).schemaIndex("" + group.getSchemaIndex())
                     .finalPickersList(finalPickersList).isPollingRequest(defParamFromUrl != null)
-                    .start();
+                    .startForResult(CodeGenerateActivity.CODE);
         }
     }
 
@@ -477,7 +477,10 @@ public class CodePermissionActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
+        if (requestCode == CodeGenerateActivity.CODE) {
+            finish();
+        }
+        else if (resultCode == RESULT_OK) {
             defaultPickerMap = (HashMap<String, DefaultValue>) data.getExtras().get
                     ("selected_values");
 

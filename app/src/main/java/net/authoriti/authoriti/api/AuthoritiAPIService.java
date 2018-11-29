@@ -11,6 +11,7 @@ import net.authoriti.authoriti.api.model.response.ResponsePolling;
 import net.authoriti.authoriti.api.model.response.ResponseComplete;
 import net.authoriti.authoriti.api.model.response.ResponseSignUp;
 import net.authoriti.authoriti.api.model.response.ResponseSignUpChase;
+import net.authoriti.authoriti.api.model.response.ResponseSync;
 
 import com.google.gson.JsonObject;
 
@@ -52,6 +53,9 @@ public interface AuthoritiAPIService {
 
     @POST("api/v1/users")
     Call<ResponseSignUpChase> signUpChase(@Body RequestSignUpChase requestSignUpChase);
+
+    @POST("api/v1/users/sync")
+    Call<ResponseSync> sync(@Header("Authorization") String token);
 
     @FormUrlEncoded
     @POST("api/v1/users/confirm")

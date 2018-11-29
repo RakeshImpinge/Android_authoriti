@@ -133,7 +133,7 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
         LocalBroadcastManager.getInstance(mContext).unregisterReceiver(broadcastAddReceiver);
     }
 
-    private void showAccounts() {
+    public void showAccounts() {
 //        if (adapter != null) {
 //            adapter.clear();
 //        } else {
