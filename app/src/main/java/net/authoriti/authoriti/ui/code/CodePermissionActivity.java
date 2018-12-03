@@ -101,7 +101,7 @@ public class CodePermissionActivity extends BaseActivity {
     private void createPickerList() {
         pickersList = dataManager.getScheme().get("" + group.getSchemaIndex());
         for (int i = 0; i < pickersList.size(); i++) {
-
+            Log.e("Picker Type", pickersList.get(i).getPicker());
             // Adding default values of Picker is of Time
             if (pickersList.get(i).getPicker().equals(PICKER_TIME)) {
                 pickersList.set(i, utils.getDefaultTimePicker(pickersList.get(i)));
@@ -130,6 +130,7 @@ public class CodePermissionActivity extends BaseActivity {
                 pickersList.get(i).setValues(values);
                 pickersList.set(i, pickersList.get(i));
             }
+
 
             // updateDefaultValuesFromGroup
             if (group.getPickerName() != null && !group.getPickerName().equals("")) {
@@ -162,7 +163,16 @@ public class CodePermissionActivity extends BaseActivity {
                     DefaultValue defaultValue = new DefaultValue(key
                             , value_decoded, false);
                     defaultPickerMap.put(key, defaultValue);
-                } else {
+                } else if(key.equals(PICKER_REQUEST)) {
+                    try {
+                        String customer = URLDecoder.decode(defParamFromUrl.get("customer"), "UTF-8");
+                        String code = defParamFromUrl.get("customer_code");
+                        DefaultValue defaultValue = new DefaultValue(customer, code, false);
+                        defaultPickerMap.put(key, defaultValue);
+                    } catch (Exception ignore) {
+
+                    }
+                }else {
                     if (defParamFromUrl.containsKey(key)) {
                         ArrayList<String> title = new ArrayList<>();
                         ArrayList<String> value = new ArrayList<>();
@@ -191,8 +201,6 @@ public class CodePermissionActivity extends BaseActivity {
                 }
             }
         }
-
-        Log.e("List", pickersList.toString());
     }
 
     ArrayList<Integer> uiFlaseListIndex = new ArrayList<>();
@@ -364,7 +372,7 @@ public class CodePermissionActivity extends BaseActivity {
             View childAt = rvEditFields.getChildAt(i);
             AppCompatEditText etCode = ((AppCompatEditText) childAt.findViewById(R.id.etCode));
             if (etCode.getText().toString().trim().length() == 0) {
-                errorMessage = "Pleae enter " + adapter_input.getAdapterItem(i).picker
+                errorMessage = "Please enter " + adapter_input.getAdapterItem(i).picker
                         .getLabel();
                 break;
             } else {

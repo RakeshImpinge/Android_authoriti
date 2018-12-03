@@ -329,8 +329,7 @@ public class MainActivity extends BaseActivity {
                     .getHelpUrl(topic)));
             startActivity(browserIntent);
 //            PermissionCodeRequest
-//                    ("authoriti://purpose/manage-an-account?accountId=some_account_id" +
-//                            "&data_type=00,02,03&time=1 Hour");
+//                    ("authoriti://purpose/file-insurance-claim?accountId=74169e0ede463dc4b6e541b80d1dfd2d119b57aa5387de61319a15194ae5d7d8&schemaVersion=8&customer=Aetna%20Health&customer_code=13&requestor_value=y&data_type=01%2C03%2C05&secret=abc");
         }
     }
 
