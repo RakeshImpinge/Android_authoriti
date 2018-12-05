@@ -75,7 +75,7 @@ public class CryptoUtil {
                 }
             }
         }
-        return result.toString();
+        return result.toString().toLowerCase();
     }
 
     private static byte[] hexStringToByteArray(String s) {
