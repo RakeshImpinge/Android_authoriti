@@ -6,6 +6,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import net.authoriti.authoriti.core.AccountManagerUpdateInterfce;
 import net.authoriti.authoriti.ui.menu.AccountAdaper;
 import net.authoriti.authoriti.utils.Log;
 
@@ -60,7 +61,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 @EActivity(R.layout.activity_account_manager)
 public class AccountManagerActivity extends SecurityActivity implements SecurityActivity
         .TouchIDEnableAlertListener, AccountAddDialog.AccountAddDialogListener, AccountAddItem
-        .AccountAddItemListener {
+        .AccountAddItemListener, AccountManagerUpdateInterfce {
 
     @Bean
     AuthoritiUtils utils;
@@ -99,7 +100,7 @@ public class AccountManagerActivity extends SecurityActivity implements Security
         accountAddDialog = new AccountAddDialog(this);
         accountAddDialog.setListener(this);
 
-        adapter = new AccountAdaper(accountList);
+        adapter = new AccountAdaper(accountList, this);
         rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
         rvAccount.setAdapter(adapter);
 
@@ -402,5 +403,10 @@ public class AccountManagerActivity extends SecurityActivity implements Security
         }
         showAccount();
         updateFinishButton();
+    }
+
+    @Override
+    public void deleted(String accountId) {
+        System.out.println("Deleted: " + accountId);
     }
 }

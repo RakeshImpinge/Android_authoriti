@@ -18,6 +18,7 @@ import net.authoriti.authoriti.api.model.User;
 import net.authoriti.authoriti.api.model.Value;
 import net.authoriti.authoriti.api.model.request.RequestUserUpdate;
 import net.authoriti.authoriti.api.model.response.ResponseSignUp;
+import net.authoriti.authoriti.core.AccountManagerUpdateInterfce;
 import net.authoriti.authoriti.core.BaseFragment;
 import net.authoriti.authoriti.ui.alert.AccountAddDialog;
 import net.authoriti.authoriti.ui.items.AccountAddItem;
@@ -50,7 +51,7 @@ import retrofit2.Response;
 
 @EFragment(R.layout.fragment_account)
 public class AccountFragment extends BaseFragment implements AccountAddItem
-        .AccountAddItemListener, AccountAddDialog.AccountAddDialogListener {
+        .AccountAddItemListener, AccountAddDialog.AccountAddDialogListener, AccountManagerUpdateInterfce {
 
 
     @Bean
@@ -83,7 +84,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
         LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastReceiver, new
                 IntentFilter(BROADCAST_ADD_BUTTON_CLICKED));
 
-        adapter = new AccountAdaper(accountList);
+        adapter = new AccountAdaper(accountList, this);
         rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
         rvAccount.setAdapter(adapter);
 
@@ -262,5 +263,17 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
 
         hideAccountAddDialog();
 
+    }
+
+    @Override
+    public void deleted(String accountId) {
+        List<AccountID> accountIDS = dataManager.getUser().getAccountIDs();
+        int nAccounts = accountIDS.size();
+        for (int i = 0; i < nAccounts; i++) {
+            if (accountIDS.get(i).getIdentifier().equalsIgnoreCase(accountId)) {
+                deleteAccount(i);
+                break;
+            }
+        }
     }
 }

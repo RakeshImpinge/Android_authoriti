@@ -20,6 +20,7 @@ import net.authoriti.authoriti.api.model.User;
 import net.authoriti.authoriti.api.model.Value;
 import net.authoriti.authoriti.api.model.request.RequestUserUpdate;
 import net.authoriti.authoriti.api.model.response.ResponseSignUp;
+import net.authoriti.authoriti.core.AccountManagerUpdateInterfce;
 import net.authoriti.authoriti.core.BaseFragment;
 import net.authoriti.authoriti.ui.alert.AccountAddDialog;
 import net.authoriti.authoriti.ui.alert.AccountConfirmDialog;
@@ -59,7 +60,7 @@ import retrofit2.Response;
 
 @EFragment(R.layout.fragment_account)
 public class AccountChaseFragment extends BaseFragment implements AccountConfirmDialog
-        .AccountConfirmDialogListener, AccountAddDialog.AccountAddDialogListener {
+        .AccountConfirmDialogListener, AccountAddDialog.AccountAddDialogListener, AccountManagerUpdateInterfce {
 
     @Bean
     AuthoritiUtils utils;
@@ -101,7 +102,7 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
 
     @AfterViews
     void callAfterViewInjection() {
-        adapter = new AccountAdaper(accountList);
+        adapter = new AccountAdaper(accountList, this);
         rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
         rvAccount.setAdapter(adapter);
 
@@ -387,6 +388,28 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
 //        }
     }
 
+    private void deleteAccount(int position) {
+        User user = dataManager.getUser();
+        List<AccountID> accountIDs = user.getAccountIDs();
+        if (dataManager.getDefaultAccountID().getTitle().equals(accountIDs.get(position).getType
+                ()) && dataManager.getDefaultAccountID().getValue().equals(accountIDs.get(position)
+                .getIdentifier())) {
+
+            // Updating saved default values with the first index if the saved value contain
+            // deleted record.
+            utils.deleteDefaultvalues(getActivity(), PICKER_ACCOUNT,
+                    new Value(accountIDs.get(position)
+                            .getIdentifier(), accountIDs.get(position).getType()),
+                    new Value(accountIDs.get(0).getIdentifier(), accountIDs.get(0).getType()));
+
+            // Saving default saved account to blank
+            dataManager.setDefaultAccountID(new Value("", ""));
+        }
+        accountIDs.remove(position);
+        dataManager.setUser(user);
+        showAccounts();
+    }
+
 
     @Override
     public void accountAddDialogCancelButtonClicked() {
@@ -400,4 +423,15 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
         }
     }
 
+    @Override
+    public void deleted(String accountId) {
+        List<AccountID> accountIDS = dataManager.getUser().getAccountIDs();
+        int nAccounts = accountIDS.size();
+        for (int i = 0; i < nAccounts; i++) {
+            if (accountIDS.get(i).getIdentifier().equalsIgnoreCase(accountId)) {
+                deleteAccount(i);
+                break;
+            }
+        }
+    }
 }

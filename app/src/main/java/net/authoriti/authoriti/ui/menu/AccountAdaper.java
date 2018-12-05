@@ -8,9 +8,12 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.daimajia.swipe.SwipeLayout;
+
 import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.api.model.AccountID;
 import net.authoriti.authoriti.api.model.GroupItem;
+import net.authoriti.authoriti.core.AccountManagerUpdateInterfce;
 import net.authoriti.authoriti.ui.code.CodePermissionActivity_;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiData_;
@@ -24,6 +27,8 @@ import java.util.List;
 public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHolder> {
 
     private List<AccountID> countryList;
+    private AccountManagerUpdateInterfce updateInterfce;
+
     public int mDefaultPostion = -1;
 
 
@@ -33,23 +38,28 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
         public LinearLayout lin_header;
         public View markDefault;
 
-        public MyViewHolder(View view) {
+        TextView txt_delete;
+        SwipeLayout swipeLayout;
+
+        MyViewHolder(View view) {
             super(view);
             tvTitle = (TextView) view.findViewById(R.id.tvTitle);
             txt_header = (TextView) view.findViewById(R.id.txt_header);
+            txt_delete = (TextView) view.findViewById(R.id.tvDelete);
             lin_header = (LinearLayout) view.findViewById(R.id.lin_header);
             markDefault = (View) view.findViewById(R.id.markDefault);
+            swipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipe);
         }
     }
 
-    public AccountAdaper(List<AccountID> countryList) {
+    public AccountAdaper(List<AccountID> countryList, AccountManagerUpdateInterfce accountManagerUpdateInterfce) {
         this.countryList = countryList;
+        this.updateInterfce = accountManagerUpdateInterfce;
     }
 
-
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
-        AccountID accountID = countryList.get(position);
+    public void onBindViewHolder(final MyViewHolder holder, final int position) {
+        final AccountID accountID = countryList.get(position);
         holder.tvTitle.setText(accountID.getType());
         if (position == 0) {
             holder.lin_header.setVisibility(View.VISIBLE);
@@ -58,6 +68,15 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
         } else {
             holder.lin_header.setVisibility(View.GONE);
         }
+
+        holder.txt_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                System.out.println("AccountId: " + accountID.getIdentifier());
+                holder.swipeLayout.close(true);
+                updateInterfce.deleted(accountID.getIdentifier());
+            }
+        });
 
         String customer = countryList.get(position).getCustomer();
         if (customer.equals("")) {
