@@ -15,6 +15,7 @@ import net.authoriti.authoriti.api.AuthoritiAPI;
 import net.authoriti.authoriti.api.model.AccountID;
 import net.authoriti.authoriti.api.model.AuthLogIn;
 import net.authoriti.authoriti.api.model.User;
+import net.authoriti.authoriti.core.AccountManagerUpdateInterfce;
 import net.authoriti.authoriti.core.SecurityActivity;
 import net.authoriti.authoriti.ui.alert.AccountAddDialog;
 import net.authoriti.authoriti.ui.alert.AccountConfirmDialog;
@@ -54,7 +55,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 @EActivity(R.layout.activity_account_confirm)
 public class AccountConfirmActivity extends SecurityActivity implements SecurityActivity
-        .TouchIDEnableAlertListener, AccountConfirmDialog.AccountConfirmDialogListener, AccountAddDialog.AccountAddDialogListener {
+        .TouchIDEnableAlertListener, AccountConfirmDialog.AccountConfirmDialogListener, AccountAddDialog.AccountAddDialogListener, AccountManagerUpdateInterfce {
 
     @Bean
     AuthoritiUtils utils;
@@ -87,7 +88,7 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
         accountAddDialog = new AccountAddDialog(this);
         accountAddDialog.setListener(this);
 
-        adapter = new AccountAdaper(accountList);
+        adapter = new AccountAdaper(accountList, this);
         rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
         rvAccount.setAdapter(adapter);
 
@@ -405,4 +406,8 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
         }
     }
 
+    @Override
+    public void deleted(String accountId) {
+        System.out.println("ConfirmActivity - Deleted: " + accountId);
+    }
 }

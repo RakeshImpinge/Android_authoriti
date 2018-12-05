@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/item_account_confirm_id"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -39,6 +40,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+        <com.daimajia.swipe.SwipeLayout
+            android:id="@+id/swipe"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:drag_edge="right"
+            app:clickToClose="true">
+
+        <TextView
+            android:id="@+id/tvDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="Delete"
+            android:textAlignment="center"
+            android:gravity="center"
+            android:background="@android:color/holo_red_dark"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            fontPath="@string/font_oswaldo_light"
+            tools:ignore="MissingPrefix" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -82,6 +104,7 @@
                 android:visibility="gone" />
 
         </LinearLayout>
+        </com.daimajia.swipe.SwipeLayout>
 
         <View
             android:id="@+id/divider"
