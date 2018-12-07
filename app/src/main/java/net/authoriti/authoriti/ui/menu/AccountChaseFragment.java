@@ -360,16 +360,10 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
         }
         Log.e("AddAccount", id);
         AccountID accountID = new AccountID(name, id, true);
-        accountID.setIdentifier(CryptoUtil.hash(accountID.getIdentifier()));
+        accountID.setIdentifier(accountID.getIdentifier());
         dataManager.accountIDs.add(accountID);
         user.setAccountIDs(dataManager.accountIDs);
         dataManager.setUser(user);
-
-//        accountList.add(accountID);
-//        if (setDefault) {
-//            adapter.mDefaultPostion = accountList.size() - 1;
-//        }
-//        adapter.notifyDataSetChanged();
 
         showAccounts();
 

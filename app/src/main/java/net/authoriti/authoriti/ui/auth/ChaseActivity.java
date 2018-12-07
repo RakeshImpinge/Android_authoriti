@@ -154,6 +154,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
             List<AccountID> newIds = new ArrayList<>();
 
             for (int i = 0; i < newAccountIDs.size(); i++) {
+                System.out.println("Checking: " + newAccountIDs.get(i));
                 boolean isContained = false;
                 newAccountIDs.get(i).setCustomer(customer);
                 for (int k = 0; k < savedAccountIDs.size(); k++) {
