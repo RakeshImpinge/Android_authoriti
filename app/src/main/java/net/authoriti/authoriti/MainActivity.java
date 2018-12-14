@@ -99,6 +99,9 @@ public class MainActivity extends BaseActivity {
     @ViewById(R.id.ivSync)
     ImageButton ivSync;
 
+    @ViewById(R.id.ivCloud)
+    ImageButton ivCloud;
+
     @ViewById(R.id.ivHelp)
     ImageButton ivHelp;
 
@@ -266,9 +269,12 @@ public class MainActivity extends BaseActivity {
             } else {
                 ivSync.setVisibility(View.VISIBLE);
             }
+            ivCloud.setVisibility(View.VISIBLE);
+            ivAdd.setVisibility(View.GONE);
         } else {
             ivAdd.setVisibility(View.INVISIBLE);
             ivSync.setVisibility(View.GONE);
+            ivCloud.setVisibility(View.GONE);
         }
     }
 
@@ -338,8 +344,14 @@ public class MainActivity extends BaseActivity {
         LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(BROADCAST_ADD_BUTTON_CLICKED));
     }
 
+    @Click(R.id.ivCloud)
+    void cloudButtonClicked() {
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(BROADCAST_CLOUD_BUTTON_CLICKED));
+    }
+
     @Click(R.id.ivSync)
     void syncButtonClicked() {
+//        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(BROADCAST_SYNC_BUTTON_CLICKED));
         Log.e("Sync", "Sync button clicked");
         displayProgressDialog("Downloading wallet items...");
         Log.e("Sync", "Token: " + dataManager.getUser().getToken());
@@ -378,7 +390,7 @@ public class MainActivity extends BaseActivity {
 
                 dismissProgressDialog();
                 Toast.makeText(MainActivity.this, "Wallets downloaded successfully", Toast.LENGTH_LONG).show();
-                ((AccountChaseFragment)accountFragment).showAccounts();
+                ((AccountChaseFragment) accountFragment).showAccounts();
             }
 
             @Override
@@ -388,6 +400,7 @@ public class MainActivity extends BaseActivity {
             }
         });
     }
+
 
     @Override
     public void onBackPressed() {

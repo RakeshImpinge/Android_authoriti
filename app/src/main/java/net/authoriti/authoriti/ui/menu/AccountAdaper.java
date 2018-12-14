@@ -1,22 +1,18 @@
 package net.authoriti.authoriti.ui.menu;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.daimajia.swipe.SwipeLayout;
 
 import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.api.model.AccountID;
-import net.authoriti.authoriti.api.model.GroupItem;
 import net.authoriti.authoriti.core.AccountManagerUpdateInterfce;
-import net.authoriti.authoriti.ui.code.CodePermissionActivity_;
-import net.authoriti.authoriti.utils.AuthoritiData;
-import net.authoriti.authoriti.utils.AuthoritiData_;
 
 import java.util.List;
 
@@ -35,9 +31,10 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView tvTitle;
         public TextView txt_header;
-        public LinearLayout lin_header;
+        public RelativeLayout rel_header;
         public View markDefault;
-
+        LinearLayout lin_add_self_id;
+        LinearLayout surface;
         TextView txt_delete;
         SwipeLayout swipeLayout;
 
@@ -46,9 +43,11 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
             tvTitle = (TextView) view.findViewById(R.id.tvTitle);
             txt_header = (TextView) view.findViewById(R.id.txt_header);
             txt_delete = (TextView) view.findViewById(R.id.tvDelete);
-            lin_header = (LinearLayout) view.findViewById(R.id.lin_header);
+            rel_header = (RelativeLayout) view.findViewById(R.id.rel_header);
             markDefault = (View) view.findViewById(R.id.markDefault);
             swipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipe);
+            lin_add_self_id = (LinearLayout) itemView.findViewById(R.id.lin_add_self_id);
+            surface = (LinearLayout) itemView.findViewById(R.id.surface);
         }
     }
 
@@ -60,13 +59,12 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
         final AccountID accountID = countryList.get(position);
-        holder.tvTitle.setText(accountID.getType());
         if (position == 0) {
-            holder.lin_header.setVisibility(View.VISIBLE);
+            holder.rel_header.setVisibility(View.VISIBLE);
         } else if (!countryList.get(position).getCustomer().equals(countryList.get(position - 1).getCustomer())) {
-            holder.lin_header.setVisibility(View.VISIBLE);
+            holder.rel_header.setVisibility(View.VISIBLE);
         } else {
-            holder.lin_header.setVisibility(View.GONE);
+            holder.rel_header.setVisibility(View.GONE);
         }
 
         holder.txt_delete.setOnClickListener(new View.OnClickListener() {
@@ -80,16 +78,32 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
 
         String customer = countryList.get(position).getCustomer();
         if (customer.equals("")) {
+            holder.lin_add_self_id.setVisibility(View.VISIBLE);
             customer = "Self Registered ID's";
         } else {
+            holder.lin_add_self_id.setVisibility(View.GONE);
             customer = customer + " ID's";
         }
-        holder.txt_header.setText(customer);
 
+        holder.lin_add_self_id.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateInterfce.addSelfSigned();
+            }
+        });
+
+        holder.txt_header.setText(customer);
+        holder.tvTitle.setText(accountID.getType());
         if (position == mDefaultPostion) {
             holder.markDefault.setVisibility(View.VISIBLE);
         } else {
             holder.markDefault.setVisibility(View.GONE);
+        }
+
+        if (accountID.getType().equals("")) {
+            holder.surface.setVisibility(View.GONE);
+        } else {
+            holder.surface.setVisibility(View.VISIBLE);
         }
     }
 

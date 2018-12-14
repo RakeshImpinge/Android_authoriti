@@ -31,7 +31,6 @@ import net.authoriti.authoriti.utils.AuthoritiUtils;
 import net.authoriti.authoriti.utils.crypto.CryptoKeyPair;
 import net.authoriti.authoriti.utils.crypto.CryptoUtil;
 
-import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 import com.tozny.crypto.android.AesCbcWithIntegrity;
 
 import org.androidannotations.annotations.AfterViews;
@@ -141,6 +140,11 @@ public class AccountManagerActivity extends SecurityActivity implements Security
         accountList.clear();
         for (int i = 0; i < dataManager.accountIDs.size(); i++) {
             accountList.add(dataManager.accountIDs.get(i));
+        }
+
+        // Its only to display add + button if no self Id is added
+        if (accountList.size() == 0) {
+            accountList.add(new AccountID());
         }
 
         Collections.sort(accountList, new Comparator<AccountID>() {
@@ -408,5 +412,10 @@ public class AccountManagerActivity extends SecurityActivity implements Security
     @Override
     public void deleted(String accountId) {
         System.out.println("Deleted: " + accountId);
+    }
+
+    @Override
+    public void addSelfSigned() {
+        showAccountAddDialog();
     }
 }

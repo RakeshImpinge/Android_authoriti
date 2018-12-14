@@ -16,11 +16,14 @@ import net.authoriti.authoriti.api.AuthoritiAPI;
 import net.authoriti.authoriti.api.model.AccountID;
 import net.authoriti.authoriti.api.model.User;
 import net.authoriti.authoriti.api.model.Value;
+import net.authoriti.authoriti.api.model.request.RequestSignUpChase;
 import net.authoriti.authoriti.api.model.request.RequestUserUpdate;
 import net.authoriti.authoriti.api.model.response.ResponseSignUp;
+import net.authoriti.authoriti.api.model.response.ResponseSignUpChase;
 import net.authoriti.authoriti.core.AccountManagerUpdateInterfce;
 import net.authoriti.authoriti.core.BaseFragment;
 import net.authoriti.authoriti.ui.alert.AccountAddDialog;
+import net.authoriti.authoriti.ui.alert.AccountDownloadDialog;
 import net.authoriti.authoriti.ui.items.AccountAddItem;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiUtils;
@@ -28,6 +31,7 @@ import net.authoriti.authoriti.utils.Constants;
 import net.authoriti.authoriti.utils.crypto.CryptoUtil;
 
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
+import com.tozny.crypto.android.AesCbcWithIntegrity;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -35,6 +39,8 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 
+import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -51,23 +57,21 @@ import retrofit2.Response;
 
 @EFragment(R.layout.fragment_account)
 public class AccountFragment extends BaseFragment implements AccountAddItem
-        .AccountAddItemListener, AccountAddDialog.AccountAddDialogListener, AccountManagerUpdateInterfce {
+        .AccountAddItemListener, AccountAddDialog.AccountAddDialogListener, AccountManagerUpdateInterfce, AccountDownloadDialog.AccountDownloadDialogListener {
 
 
     @Bean
     AuthoritiUtils utils;
-
     @Bean
     AuthoritiData dataManager;
-
     @ViewById(R.id.rvAccount)
     RecyclerView rvAccount;
-
     AccountAdaper adapter;
     List<AccountID> accountList = new ArrayList<>();
-
     private AccountAddDialog accountAddDialog;
-    BroadcastReceiver broadcastReceiver;
+    BroadcastReceiver broadcastReceiver, broadcastCloudReceiver;
+    AccountDownloadDialog accountDownloadDialog;
+
 
     @AfterViews
     void callAfterViewInjection() {
@@ -81,8 +85,19 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
             }
         };
 
+        broadcastCloudReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                showAccountDownloadDialog();
+            }
+        };
+
+
         LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastReceiver, new
                 IntentFilter(BROADCAST_ADD_BUTTON_CLICKED));
+        LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastCloudReceiver, new
+                IntentFilter(BROADCAST_CLOUD_BUTTON_CLICKED));
+
 
         adapter = new AccountAdaper(accountList, this);
         rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
@@ -103,6 +118,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
         super.onPause();
 
         LocalBroadcastManager.getInstance(mContext).unregisterReceiver(broadcastReceiver);
+        LocalBroadcastManager.getInstance(mContext).unregisterReceiver(broadcastCloudReceiver);
     }
 
     private void showAccounts() {
@@ -276,4 +292,88 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
             }
         }
     }
+
+    @Override
+    public void addSelfSigned() {
+        showAccountAddDialog();
+    }
+
+    private void showAccountDownloadDialog() {
+        if (accountDownloadDialog == null) {
+            accountDownloadDialog = new AccountDownloadDialog(mActivity);
+            accountDownloadDialog.setListener(this);
+        } else {
+            accountDownloadDialog.init();
+        }
+        if (!mActivity.isFinishing() && !accountDownloadDialog.isShowing()) {
+            accountDownloadDialog.show();
+        }
+    }
+
+    private void hideAccountDownloadDialog() {
+        if (accountDownloadDialog != null) {
+            accountDownloadDialog.dismiss();
+            accountDownloadDialog = null;
+        }
+    }
+
+    @Override
+    public void accountDownloadDialogOKButtonClicked(String inviteCode, String userName, String password) {
+        hideAccountDownloadDialog();
+        signUp(inviteCode, userName, password);
+    }
+
+    @Override
+    public void accountDownloadDialogCancelButtonClicked() {
+        hideAccountDownloadDialog();
+    }
+
+    private void signUp(String inviteCode, String userName, String password) {
+
+        AccountID accountID = new AccountID("", userName, false);
+        List<AccountID> accountIDs = new ArrayList<>();
+        accountIDs.add(accountID);
+
+        AesCbcWithIntegrity.SecretKeys keys;
+        String keyStr = dataManager.getUser().getEncryptKey();
+        String privateKey = "";
+        try {
+            keys = AesCbcWithIntegrity.keys(keyStr);
+            AesCbcWithIntegrity.CipherTextIvMac civ = new AesCbcWithIntegrity.CipherTextIvMac
+                    (dataManager.getUser().getEncryptPrivateKey());
+            privateKey = AesCbcWithIntegrity.decryptString(civ, keys);
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        String dummyPublicKey = privateKey;
+        RequestSignUpChase requestSignUp = new RequestSignUpChase(password,
+                dummyPublicKey,
+                "",
+                inviteCode, accountIDs);
+
+        displayProgressDialog("Please wait...");
+
+        AuthoritiAPI.APIService().signUpChase(requestSignUp).enqueue(new Callback<ResponseSignUpChase>() {
+            @Override
+            public void onResponse(Call<ResponseSignUpChase> call, Response<ResponseSignUpChase>
+                    response) {
+                dismissProgressDialog();
+                if (response.code() == 200 && response.body() != null) {
+
+                } else {
+                    showAlert("", "Failed. Try Again Later.");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSignUpChase> call, Throwable t) {
+                dismissProgressDialog();
+                showAlert("", "SFailed. Try Again Later.");
+            }
+        });
+
+    }
+
 }
