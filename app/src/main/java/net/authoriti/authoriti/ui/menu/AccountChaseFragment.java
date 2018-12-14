@@ -18,12 +18,15 @@ import net.authoriti.authoriti.api.AuthoritiAPI;
 import net.authoriti.authoriti.api.model.AccountID;
 import net.authoriti.authoriti.api.model.User;
 import net.authoriti.authoriti.api.model.Value;
+import net.authoriti.authoriti.api.model.request.RequestSignUpChase;
 import net.authoriti.authoriti.api.model.request.RequestUserUpdate;
 import net.authoriti.authoriti.api.model.response.ResponseSignUp;
+import net.authoriti.authoriti.api.model.response.ResponseSignUpChase;
 import net.authoriti.authoriti.core.AccountManagerUpdateInterfce;
 import net.authoriti.authoriti.core.BaseFragment;
 import net.authoriti.authoriti.ui.alert.AccountAddDialog;
 import net.authoriti.authoriti.ui.alert.AccountConfirmDialog;
+import net.authoriti.authoriti.ui.alert.AccountDownloadDialog;
 import net.authoriti.authoriti.ui.auth.InviteCodeActivity_;
 import net.authoriti.authoriti.ui.items.AccountConfirmItem;
 import net.authoriti.authoriti.ui.items.AccountItem;
@@ -34,8 +37,10 @@ import com.google.gson.JsonObject;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
+import com.tozny.crypto.android.AesCbcWithIntegrity;
 
 import net.authoriti.authoriti.utils.Constants;
+import net.authoriti.authoriti.utils.crypto.CryptoKeyPair;
 import net.authoriti.authoriti.utils.crypto.CryptoUtil;
 
 import org.androidannotations.annotations.AfterViews;
@@ -44,6 +49,8 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 
+import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -60,7 +67,7 @@ import retrofit2.Response;
 
 @EFragment(R.layout.fragment_account)
 public class AccountChaseFragment extends BaseFragment implements AccountConfirmDialog
-        .AccountConfirmDialogListener, AccountAddDialog.AccountAddDialogListener, AccountManagerUpdateInterfce {
+        .AccountConfirmDialogListener, AccountAddDialog.AccountAddDialogListener, AccountManagerUpdateInterfce, AccountDownloadDialog.AccountDownloadDialogListener {
 
     @Bean
     AuthoritiUtils utils;
@@ -76,6 +83,7 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
 
     AccountAdaper adapter;
     AccountConfirmDialog accountConfirmDialog;
+    AccountDownloadDialog accountDownloadDialog;
 
     AccountID selectedAccountId;
     int selectedPosition;
@@ -86,8 +94,9 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
     BroadcastReceiver broadcastSyncReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            InviteCodeActivity_.intent(getActivity()).showBack(true).isSyncRequired(true)
-                    .start();
+//            InviteCodeActivity_.intent(getActivity()).showBack(true).isSyncRequired(true)
+//                    .start();
+            showAccounts();
         }
     };
     BroadcastReceiver broadcastAddReceiver = new BroadcastReceiver() {
@@ -96,6 +105,14 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
             showAccountAddDialog();
         }
     };
+
+    BroadcastReceiver broadcastCloudReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            showAccountDownloadDialog();
+        }
+    };
+
 
     List<AccountID> accountList = new ArrayList<>();
 
@@ -117,6 +134,8 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
                 IntentFilter(BROADCAST_SYNC_BUTTON_CLICKED));
         LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastAddReceiver, new
                 IntentFilter(BROADCAST_ADD_BUTTON_CLICKED));
+        LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastCloudReceiver, new
+                IntentFilter(BROADCAST_CLOUD_BUTTON_CLICKED));
     }
 
     @Override
@@ -132,6 +151,7 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
         super.onPause();
         LocalBroadcastManager.getInstance(mContext).unregisterReceiver(broadcastSyncReceiver);
         LocalBroadcastManager.getInstance(mContext).unregisterReceiver(broadcastAddReceiver);
+        LocalBroadcastManager.getInstance(mContext).unregisterReceiver(broadcastCloudReceiver);
     }
 
     public void showAccounts() {
@@ -142,6 +162,9 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
 //        }
 //
         accountList.clear();
+
+        int selfAccountCount = 0;
+
         User user = dataManager.getUser();
         if (user.getAccountIDs() != null && user.getAccountIDs().size() > 0) {
             for (int i = 0; i < user.getAccountIDs().size(); i++) {
@@ -153,8 +176,18 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
                     adapter.mDefaultPostion = i;
                 }
                 accountList.add(user.getAccountIDs().get(i));
+                if (user.getAccountIDs().get(i).getCustomer().equals("")) {
+                    selfAccountCount = selfAccountCount + 1;
+                }
             }
         }
+
+
+        // Its only to display add + button if no self Id is added
+        if (selfAccountCount == 0) {
+            accountList.add(new AccountID());
+        }
+
 
         Collections.sort(accountList, new Comparator<AccountID>() {
             @Override
@@ -285,6 +318,25 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
         }
     }
 
+    private void showAccountDownloadDialog() {
+        if (accountDownloadDialog == null) {
+            accountDownloadDialog = new AccountDownloadDialog(mActivity);
+            accountDownloadDialog.setListener(this);
+        } else {
+            accountDownloadDialog.init();
+        }
+        if (!mActivity.isFinishing() && !accountDownloadDialog.isShowing()) {
+            accountDownloadDialog.show();
+        }
+    }
+
+    private void hideAccountDownloadDialog() {
+        if (accountDownloadDialog != null) {
+            accountDownloadDialog.dismiss();
+            accountDownloadDialog = null;
+        }
+    }
+
     @Override
     public void accountConfirmDialogOKButtonClicked(String id, boolean setDefault) {
         hideAccountConfirmDialog();
@@ -360,16 +412,10 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
         }
         Log.e("AddAccount", id);
         AccountID accountID = new AccountID(name, id, true);
-        accountID.setIdentifier(CryptoUtil.hash(accountID.getIdentifier()));
+        accountID.setIdentifier(accountID.getIdentifier());
         dataManager.accountIDs.add(accountID);
         user.setAccountIDs(dataManager.accountIDs);
         dataManager.setUser(user);
-
-//        accountList.add(accountID);
-//        if (setDefault) {
-//            adapter.mDefaultPostion = accountList.size() - 1;
-//        }
-//        adapter.notifyDataSetChanged();
 
         showAccounts();
 
@@ -433,5 +479,105 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
                 break;
             }
         }
+    }
+
+    @Override
+    public void addSelfSigned() {
+        showAccountAddDialog();
+    }
+
+    @Override
+    public void accountDownloadDialogOKButtonClicked(String inviteCode, String userName, String password) {
+        hideAccountDownloadDialog();
+        signUp(inviteCode, userName, password);
+    }
+
+    private void signUp(String inviteCode, final String userName, String password) {
+
+        AccountID accountID = new AccountID("", userName, false);
+        List<AccountID> accountIDs = new ArrayList<>();
+        accountIDs.add(accountID);
+
+        AesCbcWithIntegrity.SecretKeys keys;
+        String keyStr = dataManager.getUser().getEncryptKey();
+        String privateKey = "";
+        try {
+            keys = AesCbcWithIntegrity.keys(keyStr);
+            AesCbcWithIntegrity.CipherTextIvMac civ = new AesCbcWithIntegrity.CipherTextIvMac
+                    (dataManager.getUser().getEncryptPrivateKey());
+            privateKey = AesCbcWithIntegrity.decryptString(civ, keys);
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        String dummyPublicKey = privateKey;
+        RequestSignUpChase requestSignUp = new RequestSignUpChase(password,
+                dummyPublicKey,
+                "",
+                inviteCode, accountIDs);
+
+        displayProgressDialog("Please wait...");
+
+        AuthoritiAPI.APIService().signUpChase(requestSignUp).enqueue(new Callback<ResponseSignUpChase>() {
+            @Override
+            public void onResponse(Call<ResponseSignUpChase> call, Response<ResponseSignUpChase>
+                    response) {
+                dismissProgressDialog();
+                if (response.code() == 200 && response.body() != null) {
+                    userInfo(response.body());
+                } else {
+                    showAlert("", "Failed. Try Again Later.");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSignUpChase> call, Throwable t) {
+                dismissProgressDialog();
+                showAlert("", "SFailed. Try Again Later.");
+            }
+        });
+
+    }
+
+    private void userInfo(ResponseSignUpChase body) {
+        User user = dataManager.getUser();
+        user.setToken(body.getToken());
+        List<AccountID> savedAccountIDs = user.getAccountIDs();
+        List<AccountID> newAccountIDs = body.getAccounts();
+        List<AccountID> newIds = new ArrayList<>();
+        List<String> downloadIdList = user.getDownloadedWalletIDList();
+        if (!downloadIdList.contains(body.getId())) {
+            downloadIdList.add(body.getId());
+        }
+
+        for (int i = 0; i < newAccountIDs.size(); i++) {
+            System.out.println("Checking: " + newAccountIDs.get(i));
+            boolean isContained = false;
+            newAccountIDs.get(i).setCustomer(body.getCustomerName());
+            for (int k = 0; k < savedAccountIDs.size(); k++) {
+                if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
+                        .getIdentifier())
+                        && savedAccountIDs.get(k).getType().equals(newAccountIDs.get(i)
+                        .getType())) {
+                    isContained = true;
+                    break;
+                } else {
+                }
+            }
+            if (!isContained) {
+                newIds.add(newAccountIDs.get(i));
+            }
+        }
+        savedAccountIDs.addAll(newIds);
+        user.setAccountIDs(savedAccountIDs);
+        dataManager.setUser(user);
+        showAccounts();
+    }
+
+
+    @Override
+    public void accountDownloadDialogCancelButtonClicked() {
+        hideAccountDownloadDialog();
     }
 }

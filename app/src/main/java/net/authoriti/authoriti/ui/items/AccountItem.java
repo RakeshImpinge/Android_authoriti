@@ -3,11 +3,11 @@ package net.authoriti.authoriti.ui.items;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.api.model.AccountID;
-import net.authoriti.authoriti.api.model.Value;
 
 import com.mikepenz.fastadapter.items.AbstractItem;
 
@@ -77,18 +77,16 @@ public class AccountItem extends AbstractItem<AccountConfirmItem, AccountItem
         TextView tvSubTitle;
         TextView tvDelete;
         View markDefault;
-        LinearLayout lin_header;
+        RelativeLayout rel_header;
 
 
         public ViewHolder(View itemView) {
             super(itemView);
-
             tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
-            lin_header = (LinearLayout) itemView.findViewById(R.id.lin_header);
+            rel_header = (RelativeLayout) itemView.findViewById(R.id.rel_header);
             tvSubTitle = (TextView) itemView.findViewById(R.id.tvSubTitle);
             tvDelete = (TextView) itemView.findViewById(R.id.tvDelete);
             markDefault = itemView.findViewById(R.id.markDefault);
-
         }
     }
 }

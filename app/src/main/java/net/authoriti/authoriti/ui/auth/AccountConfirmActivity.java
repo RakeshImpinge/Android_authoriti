@@ -410,4 +410,9 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
     public void deleted(String accountId) {
         System.out.println("ConfirmActivity - Deleted: " + accountId);
     }
+
+    @Override
+    public void addSelfSigned() {
+
+    }
 }

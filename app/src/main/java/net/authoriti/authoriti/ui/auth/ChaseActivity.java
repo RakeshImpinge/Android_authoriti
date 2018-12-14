@@ -149,13 +149,15 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
     private void fetchSignUpInfo(ResponseSignUpChase responseSignUpChase) {
         if (isSyncRequired) {
             User user = dataManager.getUser();
+            user.setToken(responseSignUpChase.getToken());
             List<AccountID> savedAccountIDs = user.getAccountIDs();
             List<AccountID> newAccountIDs = responseSignUpChase.getAccounts();
             List<AccountID> newIds = new ArrayList<>();
 
             for (int i = 0; i < newAccountIDs.size(); i++) {
+                System.out.println("Checking: " + newAccountIDs.get(i));
                 boolean isContained = false;
-                newAccountIDs.get(i).setCustomer(customer);
+                newAccountIDs.get(i).setCustomer(responseSignUpChase.getCustomerName());
                 for (int k = 0; k < savedAccountIDs.size(); k++) {
                     if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
                             .getIdentifier())

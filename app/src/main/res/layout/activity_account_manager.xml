@@ -47,7 +47,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="8dp"
             android:src="@mipmap/ic_add"
-            android:tint="@android:color/white" />
+            android:tint="@android:color/white"
+            android:visibility="gone" />
 
 
         <ImageButton

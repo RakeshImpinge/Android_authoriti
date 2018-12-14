@@ -593,9 +593,7 @@ public class AuthoritiData {
     }
 
     public CryptoKeyPair getCryptoKeyPair(String password, String salt) {
-
         Crypto crypto = new Crypto();
-
         return crypto.generateKeyPair(password, salt);
 
     }
@@ -681,4 +679,5 @@ public class AuthoritiData {
     public void setSelectedDataTypeIndex(int selectedDataTypeIndex) {
         this.selectedDataTypeIndex = selectedDataTypeIndex;
     }
+
 }

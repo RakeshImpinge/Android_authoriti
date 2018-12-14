@@ -85,7 +85,6 @@ public class Crypto {
             }
         }
 
-
         public void addTime(long expiresAt) throws Exception {
             Log.i(TAG, "Expires At: " + expiresAt);
 
