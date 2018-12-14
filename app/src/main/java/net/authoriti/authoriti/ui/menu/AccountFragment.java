@@ -29,6 +29,7 @@ import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiUtils;
 import net.authoriti.authoriti.utils.Constants;
 import net.authoriti.authoriti.utils.crypto.CryptoUtil;
+import net.authoriti.authoriti.utils.crypto.EcDSA;
 
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 import com.tozny.crypto.android.AesCbcWithIntegrity;
@@ -356,9 +357,9 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        String dummyPublicKey = privateKey;
+        String publicKey = new EcDSA().getPublicKey(CryptoUtil.base62ToInt(privateKey));
         RequestSignUpChase requestSignUp = new RequestSignUpChase(password,
-                dummyPublicKey,
+                publicKey,
                 "",
                 inviteCode, accountIDs);
 
