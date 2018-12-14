@@ -69,7 +69,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
     AccountAdaper adapter;
     List<AccountID> accountList = new ArrayList<>();
     private AccountAddDialog accountAddDialog;
-    BroadcastReceiver broadcastReceiver, broadcastCloudReceiver;
+    BroadcastReceiver broadcastReceiver, broadcastCloudReceiver, broadcastSyncReceiver;
     AccountDownloadDialog accountDownloadDialog;
 
 
@@ -92,11 +92,19 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
             }
         };
 
+        broadcastSyncReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                showAccounts();
+            }
+        };
 
         LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastReceiver, new
                 IntentFilter(BROADCAST_ADD_BUTTON_CLICKED));
         LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastCloudReceiver, new
                 IntentFilter(BROADCAST_CLOUD_BUTTON_CLICKED));
+        LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastSyncReceiver, new
+                IntentFilter(BROADCAST_SYNC_BUTTON_CLICKED));
 
 
         adapter = new AccountAdaper(accountList, this);
@@ -119,6 +127,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
 
         LocalBroadcastManager.getInstance(mContext).unregisterReceiver(broadcastReceiver);
         LocalBroadcastManager.getInstance(mContext).unregisterReceiver(broadcastCloudReceiver);
+        LocalBroadcastManager.getInstance(mContext).unregisterReceiver(broadcastSyncReceiver);
     }
 
     private void showAccounts() {
@@ -328,7 +337,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
         hideAccountDownloadDialog();
     }
 
-    private void signUp(String inviteCode, String userName, String password) {
+    private void signUp(String inviteCode, final String userName, String password) {
 
         AccountID accountID = new AccountID("", userName, false);
         List<AccountID> accountIDs = new ArrayList<>();
@@ -361,7 +370,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                     response) {
                 dismissProgressDialog();
                 if (response.code() == 200 && response.body() != null) {
-
+                    userInfo(response.body());
                 } else {
                     showAlert("", "Failed. Try Again Later.");
                 }
@@ -374,6 +383,43 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
             }
         });
 
+    }
+
+    private void userInfo(ResponseSignUpChase body) {
+        User user = dataManager.getUser();
+        user.setToken(body.getToken());
+
+        List<AccountID> savedAccountIDs = user.getAccountIDs();
+        List<AccountID> newAccountIDs = body.getAccounts();
+        List<AccountID> newIds = new ArrayList<>();
+        List<String> downloadIdList = user.getDownloadedWalletIDList();
+        if (!downloadIdList.contains(body.getId())) {
+            downloadIdList.add(body.getId());
+        }
+
+        for (int i = 0; i < newAccountIDs.size(); i++) {
+            System.out.println("Checking: " + newAccountIDs.get(i));
+            boolean isContained = false;
+            newAccountIDs.get(i).setCustomer(body.getCustomerName());
+            for (int k = 0; k < savedAccountIDs.size(); k++) {
+                if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
+                        .getIdentifier())
+                        && savedAccountIDs.get(k).getType().equals(newAccountIDs.get(i)
+                        .getType())) {
+                    isContained = true;
+                    break;
+                } else {
+                }
+            }
+            if (!isContained) {
+                newIds.add(newAccountIDs.get(i));
+            }
+        }
+        savedAccountIDs.addAll(newIds);
+        user.setAccountIDs(savedAccountIDs);
+        dataManager.setUser(user);
+
+        showAccounts();
     }
 
 }

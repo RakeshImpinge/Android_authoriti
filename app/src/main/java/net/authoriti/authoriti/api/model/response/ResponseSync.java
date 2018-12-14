@@ -12,25 +12,40 @@ import java.util.List;
 
 public class ResponseSync {
 
-    @SerializedName("customerName")
-    private String customerName;
+    @SerializedName("updates")
+    private List<Sync> updates;
 
-    @SerializedName("accounts")
-    private List<AccountID> accounts;
-
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
+    public List<Sync> getUpdates() {
+        return updates;
     }
 
-    public String getCustomerName() {
-        return customerName;
+    public void setUpdates(List<Sync> updates) {
+        this.updates = updates;
     }
 
-    public List<AccountID> getAccounts() {
-        return accounts;
-    }
+    public class Sync {
 
-    public void setAccounts(List<AccountID> accounts) {
-        this.accounts = accounts;
+        @SerializedName("customerName")
+        private String customerName;
+
+        @SerializedName("accounts")
+        private List<AccountID> accounts;
+
+        public void setCustomerName(String customerName) {
+            this.customerName = customerName;
+        }
+
+        public String getCustomerName() {
+            return customerName;
+        }
+
+        public List<AccountID> getAccounts() {
+            return accounts;
+        }
+
+        public void setAccounts(List<AccountID> accounts) {
+            this.accounts = accounts;
+        }
+
     }
 }

@@ -94,8 +94,9 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
     BroadcastReceiver broadcastSyncReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            InviteCodeActivity_.intent(getActivity()).showBack(true).isSyncRequired(true)
-                    .start();
+//            InviteCodeActivity_.intent(getActivity()).showBack(true).isSyncRequired(true)
+//                    .start();
+            showAccounts();
         }
     };
     BroadcastReceiver broadcastAddReceiver = new BroadcastReceiver() {
@@ -491,7 +492,7 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
         signUp(inviteCode, userName, password);
     }
 
-    private void signUp(String inviteCode, String userName, String password) {
+    private void signUp(String inviteCode, final String userName, String password) {
 
         AccountID accountID = new AccountID("", userName, false);
         List<AccountID> accountIDs = new ArrayList<>();
@@ -524,7 +525,7 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
                     response) {
                 dismissProgressDialog();
                 if (response.code() == 200 && response.body() != null) {
-
+                    userInfo(response.body());
                 } else {
                     showAlert("", "Failed. Try Again Later.");
                 }
@@ -537,6 +538,41 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
             }
         });
 
+    }
+
+    private void userInfo(ResponseSignUpChase body) {
+        User user = dataManager.getUser();
+        user.setToken(body.getToken());
+        List<AccountID> savedAccountIDs = user.getAccountIDs();
+        List<AccountID> newAccountIDs = body.getAccounts();
+        List<AccountID> newIds = new ArrayList<>();
+        List<String> downloadIdList = user.getDownloadedWalletIDList();
+        if (!downloadIdList.contains(body.getId())) {
+            downloadIdList.add(body.getId());
+        }
+
+        for (int i = 0; i < newAccountIDs.size(); i++) {
+            System.out.println("Checking: " + newAccountIDs.get(i));
+            boolean isContained = false;
+            newAccountIDs.get(i).setCustomer(body.getCustomerName());
+            for (int k = 0; k < savedAccountIDs.size(); k++) {
+                if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
+                        .getIdentifier())
+                        && savedAccountIDs.get(k).getType().equals(newAccountIDs.get(i)
+                        .getType())) {
+                    isContained = true;
+                    break;
+                } else {
+                }
+            }
+            if (!isContained) {
+                newIds.add(newAccountIDs.get(i));
+            }
+        }
+        savedAccountIDs.addAll(newIds);
+        user.setAccountIDs(savedAccountIDs);
+        dataManager.setUser(user);
+        showAccounts();
     }
 
 

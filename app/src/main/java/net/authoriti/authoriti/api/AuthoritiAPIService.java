@@ -5,6 +5,7 @@ import net.authoriti.authoriti.api.model.SchemaGroup;
 import net.authoriti.authoriti.api.model.request.RequestComplete;
 import net.authoriti.authoriti.api.model.request.RequestSignUp;
 import net.authoriti.authoriti.api.model.request.RequestSignUpChase;
+import net.authoriti.authoriti.api.model.request.RequestSync;
 import net.authoriti.authoriti.api.model.request.RequestUserUpdate;
 import net.authoriti.authoriti.api.model.response.ResponseInviteCode;
 import net.authoriti.authoriti.api.model.response.ResponsePolling;
@@ -55,7 +56,7 @@ public interface AuthoritiAPIService {
     Call<ResponseSignUpChase> signUpChase(@Body RequestSignUpChase requestSignUpChase);
 
     @POST("api/v1/users/sync")
-    Call<ResponseSync> sync(@Header("Authorization") String token);
+    Call<ResponseSync> sync(@Header("Authorization") String token, @Body RequestSync requestSync);
 
     @FormUrlEncoded
     @POST("api/v1/users/confirm")

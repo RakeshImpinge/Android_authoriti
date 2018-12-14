@@ -679,4 +679,5 @@ public class AuthoritiData {
     public void setSelectedDataTypeIndex(int selectedDataTypeIndex) {
         this.selectedDataTypeIndex = selectedDataTypeIndex;
     }
+
 }
