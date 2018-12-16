@@ -121,7 +121,10 @@ public class CodePermissionActivity extends BaseActivity {
             // Adding default values of Picker is of Data Type
             else if (pickersList.get(i).getPicker().equals(PICKER_DATA_TYPE)) {
                 List<Value> values;
-                if (defaultPickerMap.containsKey(PICKER_REQUEST)) {
+                if (schemaIndex == 8) {
+                    values = dataManager.getValuesFromDataType("y");
+                }
+                else if (defaultPickerMap.containsKey(PICKER_REQUEST)) {
                     values = dataManager.getValuesFromDataType(defaultPickerMap.get
                             (PICKER_REQUEST).getValue());
                 } else {
@@ -129,8 +132,11 @@ public class CodePermissionActivity extends BaseActivity {
                 }
                 pickersList.get(i).setValues(values);
                 pickersList.set(i, pickersList.get(i));
-            }
 
+                for (int j = 0; j < values.size(); j++) {
+                    Log.i("DEFAULT VALUE", values.get(j).getTitle());
+                }
+            }
 
             // updateDefaultValuesFromGroup
             if (group.getPickerName() != null && !group.getPickerName().equals("")) {
@@ -227,72 +233,6 @@ public class CodePermissionActivity extends BaseActivity {
                 uiFlaseListIndex.add(i);
             }
         }
-//        if (order != null && order.getPickers() != null && order.getPickers().size() > 0) {
-//
-//            for (String picker : order.getPickers()) {
-//
-//                switch (picker) {
-//
-//                    case PICKER_ACCOUNT:
-//                        if (dataManager.getAccountPicker() != null) {
-//                            if (group.getPickerName() == null || !group.getPickerName()
-//                                    .equals(PICKER_ACCOUNT)) {
-//                                adapter.ic_add(new CodeItem(dataManager.getAccountPicker()));
-//                            }
-//                        }
-//                        break;
-//
-//                    case PICKER_INDUSTRY:
-//                        if (dataManager.getIndustryPicker() != null) {
-//                            if (group.getPickerName() == null || !group.getPickerName()
-//                                    .equals(PICKER_INDUSTRY)) {
-//                                adapter.ic_add(new CodeItem(dataManager.getIndustryPicker()));
-//                            }
-//                        }
-//                        break;
-//                    case PICKER_LOCATION_STATE:
-//                        if (dataManager.getLocationPicker() != null) {
-//                            if (group.getPickerName() == null || !group.getPickerName()
-//                                    .equals(PICKER_LOCATION_STATE)) {
-//                                adapter.ic_add(new CodeItem(dataManager.getLocationPicker()));
-//                            }
-//                        }
-//                        break;
-//                    case PICKER_TIME:
-//                        if (dataManager.getTimePicker() != null) {
-//                            if (group.getPickerName() == null || !group.getPickerName()
-//                                    .equals(PICKER_TIME)) {
-//                                adapter.ic_add(new CodeItem(dataManager.getTimePicker()));
-//                            }
-//                        }
-//                        break;
-//                    case PICKER_GEO:
-//                        if (dataManager.getGeoPicker() != null) {
-//                            if (group.getPickerName() == null || !group.getPickerName()
-//                                    .equals(PICKER_GEO)) {
-//                                adapter.ic_add(new CodeItem(dataManager.getGeoPicker()));
-//                            }
-//                        }
-//                        break;
-//                    case PICKER_REQUEST:
-//                        if (dataManager.getRequestPicker() != null) {
-//                            if (group.getPickerName() == null || !group.getPickerName()
-//                                    .equals(PICKER_REQUEST)) {
-//                                adapter.ic_add(new CodeItem(dataManager.getRequestPicker()));
-//                            }
-//                        }
-//                        break;
-//                    case PICKER_DATA_TYPE:
-//                        if (dataManager.getDataTypePicker() != null) {
-//                            if (group.getPickerName() == null || !group.getPickerName()
-//                                    .equals(PICKER_DATA_TYPE)) {
-//                                adapter.ic_add(new CodeItem(dataManager.getDataTypePicker()));
-//                            }
-//                        }
-//                        break;
-//                }
-//            }
-//        }
     }
 
     private void updateSchema() {
@@ -394,8 +334,12 @@ public class CodePermissionActivity extends BaseActivity {
             showAlert("", errorMessage);
         } else {
             // data_type List length
-            int data_type_length = 0;
-            if (defaultPickerMap.containsKey(PICKER_REQUEST) && defaultPickerMap.containsKey
+            int data_type_length;
+            System.out.println("Setting data_type_length");
+            if (schemaIndex == 8) {
+                data_type_length = dataManager.getValuesFromDataType("y").size();
+            }
+            else if (defaultPickerMap.containsKey(PICKER_REQUEST) && defaultPickerMap.containsKey
                     (PICKER_REQUEST)) {
                 data_type_length = dataManager.getValuesFromDataType(defaultPickerMap
                         .get(PICKER_REQUEST).getValue()).size();
@@ -458,7 +402,13 @@ public class CodePermissionActivity extends BaseActivity {
             // Default value for any state for schema index 8 i.e clain insurance
             if (schemaIndex == 8) {
                 for (int i = 0; i < finalPickersList.size(); i++) {
-                    if (finalPickersList.get(i).get("picker").equals("any_state")) {
+                    HashMap<String, String> finalPicker = finalPickersList.get(i);
+                    if (finalPicker.get("picker").equals("requestor")) {
+                        HashMap<String, String> requestor = finalPickersList.get(i);
+                        requestor.put("value", "y");
+                        requestor.put("key", "requestor");
+                        finalPickersList.set(i, requestor);
+                    } else if (finalPicker.get("picker").equals("any_state")) {
                         HashMap<String, String> anystate = finalPickersList.get(i);
                         anystate.put("value", "99");
                         anystate.put("key", "any_state");
