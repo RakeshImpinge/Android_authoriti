@@ -327,11 +327,11 @@ public class MainActivity extends BaseActivity {
             topic = TOPIC_ABOUT;
         }
         if (!topic.equals("")) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ConstantUtils
-                    .getHelpUrl(topic)));
-            startActivity(browserIntent);
-//            PermissionCodeRequest
-//                    ("authoriti://purpose/file-insurance-claim?accountId=74169e0ede463dc4b6e541b80d1dfd2d119b57aa5387de61319a15194ae5d7d8&schemaVersion=8&customer=Aetna%20Health&customer_code=13&requestor_value=y&data_type=01%2C03%2C05&secret=abc");
+//            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ConstantUtils
+//                    .getHelpUrl(topic)));
+//            startActivity(browserIntent);
+            PermissionCodeRequest
+                    ("authoriti://purpose/file-insurance-claim?accountId=6e21466289dfe8fab5d2df4e7a4ba8c74a02a88624a5796e0f83aeea6a00b1f0&schemaVersion=8&customer=Aetna%20Health&customer_code=13&requestor_value=y&data_type=01%2C02&secret=hellothere");
         }
     }
 
@@ -647,10 +647,6 @@ public class MainActivity extends BaseActivity {
         if (splitUrl.length > 0) {
             String label = splitUrl[0].replace("authoriti://purpose/", "");
             label = label.replace("-", " ");
-
-            if (label.equals("insurance claim")) {
-                label = "file insurance claim";
-            }
 
             List<Purpose> purposes = dataManager.getPurposes();
             String schemaIndex = "";

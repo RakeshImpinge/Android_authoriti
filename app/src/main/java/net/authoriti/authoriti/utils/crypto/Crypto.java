@@ -210,10 +210,14 @@ public class Crypto {
             String[] payloadRanges = SCHEMA_RANGES[schema - 1];
             return encodePayload(payload, payloadRanges);
         }
-
+        // 2b208512a404d8c25a38c1c480db54cadb589830078853a925dac8005c6b8dec1d996e033d612d9af2b44b70061ee0e868bfd14c2dd90b129e1edeb7953e798599y
+        // 2b208512a404d8c25a38c1c480db54cadb589830078853a925dac8005c6b8dec1d996e033d612d9af2b44b70061ee0e868bfd14c2dd90b129e1edeb7953e798599y
         private String encodePayload(String payload, String[] ranges) {
             BigInteger total = new BigInteger("0");
             BigInteger mult = new BigInteger("1");
+
+            System.out.println("Encoding: " + payload);
+            System.out.println("Ranges: " + ranges.length);
 
             int len = payload.length();
             for (int i = len - 1; i >= 0; i--) {
@@ -299,7 +303,7 @@ public class Crypto {
             saltBytes = salt.getBytes();
         }
 
-
+        // yCBMkrIDRKDw
         PKCS5S2ParametersGenerator generator = new PKCS5S2ParametersGenerator(new SHA256Digest());
         generator.init(PBEParametersGenerator.PKCS5PasswordToUTF8Bytes(password.toCharArray()),
                 saltBytes, 4096);
@@ -313,55 +317,10 @@ public class Crypto {
         String privateKey = CryptoUtil.intToBase62(numPrivateKey, -1);
         String publicKey = new EcDSA().getPublicKey(numPrivateKey);
 
+        System.out.println("Private Key: " + privateKey);
+        System.out.println("Public Key: " + publicKey);
 
         return new CryptoKeyPair(privateKey, publicKey, salt);
-    }
-
-    public String addAccountNumberToPayload(String payload, String accountId) {
-        String p = CryptoUtil.cleanup(payload, 10);
-        String a = CryptoUtil.cleanup(accountId, 4);
-
-        BigInteger pInt = CryptoUtil.base62ToInt(p);
-        BigInteger aInt = CryptoUtil.base62ToInt(a);
-
-        BigInteger x = pInt.add(aInt);
-        return CryptoUtil.intToBase62(x, 10);
-    }
-
-//    public String addIdentifierToAccountId(String identifier, String accountId) {
-//        String acc = CryptoUtil.cleanup(accountId, 4);
-//        String _identifier = CryptoUtil.cleanup(identifier.toLowerCase(), identifier.length());
-//
-//        String id = CryptoUtil.cleanup(CryptoUtil.MD5(_identifier), 4);
-//
-//        BigInteger a = CryptoUtil.base62ToInt(acc);
-//        BigInteger b = CryptoUtil.base62ToInt(id);
-//
-//        BigInteger c = a.ic_add(b);
-//
-//        return CryptoUtil.intToBase62(c, 4);
-//    }
-
-    public String getTimeString(int year, int month, int day, int hour, int minute) throws
-            Exception {
-        Calendar c = Calendar.getInstance();
-        c.set(year, month, day, hour, minute);
-        c.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-        Calendar d = Calendar.getInstance();
-        d.set(2017, Calendar.NOVEMBER, 1, 0, 0);
-        d.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-        Date epoch = d.getTime();
-        Date expire = c.getTime();
-
-        long diff = expire.getTime() - epoch.getTime();
-        if (diff <= 0) {
-            throw new Exception("Invalid expiry date received.");
-        }
-
-        long minutes = diff / 60000;
-        return CryptoUtil.intToBase62(BigInteger.valueOf(minutes), 4);
     }
 
     private String sign(String payload, String privateKey) {
