@@ -76,7 +76,7 @@
                 android:layout_toLeftOf="@+id/ivAdd"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:padding="8dp"
-                android:src="@mipmap/ic_cloud_download"
+                android:src="@drawable/ic_download"
                 android:tint="@android:color/white" />
 
 
