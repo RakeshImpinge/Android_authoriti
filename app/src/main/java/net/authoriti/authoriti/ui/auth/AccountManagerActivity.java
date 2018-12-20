@@ -150,6 +150,12 @@ public class AccountManagerActivity extends SecurityActivity implements Security
         Collections.sort(accountList, new Comparator<AccountID>() {
             @Override
             public int compare(AccountID accountID, AccountID t1) {
+                if (accountID.getCustomer().equalsIgnoreCase("")) {
+                    if (t1.getCustomer().equalsIgnoreCase("")) {
+                        return accountID.getCustomer().compareTo(t1.getCustomer());
+                    }
+                    return 5000;
+                }
                 return accountID.getCustomer().compareTo(t1.getCustomer());
             }
         });

@@ -161,7 +161,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        logOut();
+//        logOut();
     }
 
     @AfterViews
