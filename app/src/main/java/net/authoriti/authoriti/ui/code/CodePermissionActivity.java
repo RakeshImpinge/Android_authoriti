@@ -101,8 +101,7 @@ public class CodePermissionActivity extends BaseActivity {
     private void createPickerList() {
         pickersList = dataManager.getScheme().get("" + group.getSchemaIndex());
         for (int i = 0; i < pickersList.size(); i++) {
-            Log.e("Picker Type", pickersList.get(i).getPicker());
-            // Adding default values of Picker is of Time
+            // Adding default values of Picker is of TimePICKER_TIME
             if (pickersList.get(i).getPicker().equals(PICKER_TIME)) {
                 pickersList.set(i, utils.getDefaultTimePicker(pickersList.get(i)));
             }
@@ -138,9 +137,15 @@ public class CodePermissionActivity extends BaseActivity {
                 }
             }
 
+            String pickerKey = pickersList.get(i).getPicker();
+            if (schemaIndex == 3 && pickerKey.equalsIgnoreCase(PICKER_TIME)) {
+                defaultPickerMap.put(pickerKey, new DefaultValue(TIME_1_DAY, TIME_1_DAY, false));
+            }
+
             // updateDefaultValuesFromGroup
-            if (group.getPickerName() != null && !group.getPickerName().equals("")) {
-                if (group.getPickerName().equals(pickersList.get(i).getPicker())) {
+            final String groupPickerName = group.getPickerName();
+            if (groupPickerName != null && !group.getPickerName().equals("")) {
+                if (groupPickerName.equals(pickersList.get(i).getPicker())) {
                     int index = getIndexOfValue(pickersList.get(i).getValues(), group.getValue());
                     if (index != -1) {
                         DefaultValue defaultValue = new DefaultValue(pickersList.get(i).getValues
@@ -148,7 +153,7 @@ public class CodePermissionActivity extends BaseActivity {
                                 (index)
                                 .getTitle(), pickersList.get(i).getValues().get(index).getValue()
                                 , false);
-                        defaultPickerMap.put(group.getPickerName(), defaultValue);
+                        defaultPickerMap.put(groupPickerName, defaultValue);
                     }
                 }
             }
@@ -335,7 +340,6 @@ public class CodePermissionActivity extends BaseActivity {
         } else {
             // data_type List length
             int data_type_length;
-            System.out.println("Setting data_type_length");
             if (schemaIndex == 8) {
                 data_type_length = dataManager.getValuesFromDataType("y").size();
             }
@@ -416,7 +420,6 @@ public class CodePermissionActivity extends BaseActivity {
                     }
                 }
             }
-
 
             CodeGenerateActivity_.intent(mContext).schemaIndex("" + group.getSchemaIndex())
                     .finalPickersList(finalPickersList).isPollingRequest(defParamFromUrl != null)

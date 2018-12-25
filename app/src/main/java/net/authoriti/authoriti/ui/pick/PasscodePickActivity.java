@@ -334,7 +334,7 @@ public class PasscodePickActivity extends BaseActivity {
     }
 
     private void showTimePicker(final OptionItem item, final int position) {
-
+        System.out.println("Showing Time Picker");
         final TimePickerDialog timePickerDialog = new TimePickerDialog(PasscodePickActivity.this,
                 new TimePickerDialog.OnTimeSetListener() {
                     @Override
