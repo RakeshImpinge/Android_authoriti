@@ -332,11 +332,11 @@ public class MainActivity extends BaseActivity {
             topic = TOPIC_ABOUT;
         }
         if (!topic.equals("")) {
-//            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ConstantUtils
-//                    .getHelpUrl(topic)));
-//            startActivity(browserIntent);
-            PermissionCodeRequest
-                    ("authoriti://purpose/file-insurance-claim?accountId=6e21466289dfe8fab5d2df4e7a4ba8c74a02a88624a5796e0f83aeea6a00b1f0&schemaVersion=8&customer=Aetna%20Health&customer_code=13&requestor_value=y&data_type=01%2C02&secret=hellothere");
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ConstantUtils
+                    .getHelpUrl(topic)));
+            startActivity(browserIntent);
+//            PermissionCodeRequest
+//                    ("authoriti://purpose/file-insurance-claim?accountId=6e21466289dfe8fab5d2df4e7a4ba8c74a02a88624a5796e0f83aeea6a00b1f0&schemaVersion=8&customer=Aetna%20Health&customer_code=13&requestor_value=y&data_type=01%2C02&secret=hellothere");
         }
     }
 
@@ -514,7 +514,6 @@ public class MainActivity extends BaseActivity {
                 }
                 defaultSelectedList.put("" + key.trim(), defaultValuesHashMap);
             }
-            Log.e("defaultSelectedList", defaultSelectedList.toString());
             dataManager.setDefaultValues(defaultSelectedList);
         } catch (Exception e) {
             e.printStackTrace();
@@ -665,8 +664,6 @@ public class MainActivity extends BaseActivity {
                         schemaIndex = "" + groupList.get(k).getSchemaIndex();
                         indexGroup = i;
                         indexItem = k;
-                    } else {
-
                     }
                 }
             }
