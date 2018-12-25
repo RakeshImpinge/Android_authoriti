@@ -183,18 +183,30 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
         }
 
 
-        // Its only to display add + button if no self Id is added
+//         Its only to display add + button if no self Id is added
         if (selfAccountCount == 0) {
-            accountList.add(new AccountID());
+            accountList.add(accountList.size(), new AccountID());
         }
-
 
         Collections.sort(accountList, new Comparator<AccountID>() {
             @Override
             public int compare(AccountID accountID, AccountID t1) {
+                if (accountID.getCustomer().equalsIgnoreCase("")) {
+                    if (t1.getCustomer().equalsIgnoreCase("")) {
+                        return accountID.getCustomer().compareTo(t1.getCustomer());
+                    }
+                    return 5000;
+                }
                 return accountID.getCustomer().compareTo(t1.getCustomer());
             }
         });
+
+        int sz = accountList.size();
+
+//        if (selfRegIndex != -1) {
+//            AccountID selfReg = accountList.remove(selfRegIndex);
+//        }
+
         for (int i = 0; i < accountList.size(); i++) {
             if (dataManager.getDefaultAccountID().getTitle().equals(accountList.get(i).getType()) &&
                     dataManager.getDefaultAccountID().getValue().equals(accountList.get(i).getIdentifier())) {

@@ -22,7 +22,7 @@ import java.util.List;
 
 public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHolder> {
 
-    private List<AccountID> countryList;
+    private List<AccountID> customerList;
     private AccountManagerUpdateInterfce updateInterfce;
 
     public int mDefaultPostion = -1;
@@ -51,17 +51,24 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
         }
     }
 
-    public AccountAdaper(List<AccountID> countryList, AccountManagerUpdateInterfce accountManagerUpdateInterfce) {
-        this.countryList = countryList;
+    public AccountAdaper(List<AccountID> customerList, AccountManagerUpdateInterfce accountManagerUpdateInterfce) {
+        System.out.println("Inside Account Adapter");
+        this.customerList = customerList;
+        final int sz = this.customerList.size();
+        System.out.println("Account List size: " + sz);
+        for (int i = 0; i < sz; i++) {
+            System.out.println("Customer List: " + this.customerList.get(i).getCustomer());
+        }
+
         this.updateInterfce = accountManagerUpdateInterfce;
     }
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
-        final AccountID accountID = countryList.get(position);
+        final AccountID accountID = customerList.get(position);
         if (position == 0) {
             holder.rel_header.setVisibility(View.VISIBLE);
-        } else if (!countryList.get(position).getCustomer().equals(countryList.get(position - 1).getCustomer())) {
+        } else if (!customerList.get(position).getCustomer().equals(customerList.get(position - 1).getCustomer())) {
             holder.rel_header.setVisibility(View.VISIBLE);
         } else {
             holder.rel_header.setVisibility(View.GONE);
@@ -75,8 +82,9 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
                 updateInterfce.deleted(accountID.getIdentifier());
             }
         });
-
-        String customer = countryList.get(position).getCustomer();
+        System.out.println("Inside BindViewHolder: " + customerList.size());
+        String customer = customerList.get(position).getCustomer();
+        System.out.println("Inside BindViewHolder: " + customer);
         if (customer.equals("")) {
             holder.lin_add_self_id.setVisibility(View.VISIBLE);
             customer = "Self Registered ID's";
@@ -109,7 +117,7 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
 
     @Override
     public int getItemCount() {
-        return countryList.size();
+        return customerList.size();
     }
 
     @Override
