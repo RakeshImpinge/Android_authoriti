@@ -171,6 +171,7 @@ public class ExportActivity extends BaseActivity implements WebAppInterface.Data
         User user = dataManager.getUser();
         Gson gson = new Gson();
         String userData = gson.toJson(user);
+        System.out.println("User Data: " + userData);
         return userData;
     }
 
