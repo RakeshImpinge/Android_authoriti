@@ -577,7 +577,10 @@ public class MainActivity extends BaseActivity {
     private void startPolling() {
         if (currentId == userAccountIds.size() - 1) currentId = 0;
         else currentId = currentId + 1;
-        pollingApi(userAccountIds.get(currentId).getIdentifier());
+        AccountID accId = userAccountIds.get(currentId);
+        if (!accId.getCustomer().equalsIgnoreCase("")) {
+            pollingApi(accId.getIdentifier());
+        }
     }
 
     Handler handler = new Handler();
@@ -603,13 +606,6 @@ public class MainActivity extends BaseActivity {
                             dismissProgressDialog();
                             PermissionCodeRequest(response.body().getUrl());
                         } else {
-//                            if (currentId == userAccountIds.size() - 1) {
-//                                dismissProgressDialog();
-//                                showAlert("", "No Pending Updates");
-//                            } else {
-//                                handler.removeCallbacks(runnable);
-//                                handler.postDelayed(runnable, 100);
-//                            }
                             if (System.currentTimeMillis() < PollingStopMilliseconds) {
                                 handler.removeCallbacks(runnable);
                                 handler.postDelayed(runnable, 100);
