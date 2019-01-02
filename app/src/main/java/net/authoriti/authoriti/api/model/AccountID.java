@@ -65,6 +65,7 @@ public class AccountID {
     public Boolean getHashed() {
         return this.hashed;
     }
+    public void setHashed(boolean hashed) { this.hashed = hashed; }
 
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
