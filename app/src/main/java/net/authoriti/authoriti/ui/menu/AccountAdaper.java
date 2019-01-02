@@ -52,14 +52,7 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
     }
 
     public AccountAdaper(List<AccountID> customerList, AccountManagerUpdateInterfce accountManagerUpdateInterfce) {
-        System.out.println("Inside Account Adapter");
         this.customerList = customerList;
-        final int sz = this.customerList.size();
-        System.out.println("Account List size: " + sz);
-        for (int i = 0; i < sz; i++) {
-            System.out.println("Customer List: " + this.customerList.get(i).getCustomer());
-        }
-
         this.updateInterfce = accountManagerUpdateInterfce;
     }
 

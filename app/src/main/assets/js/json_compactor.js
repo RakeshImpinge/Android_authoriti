@@ -56,6 +56,8 @@ function SObject(kvs) {
             for (var i in kvs) {
                 var name = kvs[i][0];
                 var schema = kvs[i][1];
+                console.log("Name", name);
+                console.log("Schema", schema);
                 output = output.concat(schema.serialize(json[name]));
             }
             return output;

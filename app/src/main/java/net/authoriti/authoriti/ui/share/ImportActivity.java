@@ -77,6 +77,7 @@ public class ImportActivity extends BaseActivity implements ZXingScannerView.Res
                 public void run() {
                     displayProgressDialog("Importing data");
 //                    initWebView("%21N%27G%28%3DWg%24aSO%25%5DqBCFVO%5C%3DcG95Q%3BguI%5BQ4Np%5C1D.j%29ejRF8u%3Ad4V%23%2BoQ8%23YZ1%21lBb7%3A%3DAg3lgoK_5%27HlFXF%29B%2B-%4075Dh%25%3B%5C%5BHg%24Fi%5E5%25p3%5CS_%28%21%5DkV9UW-SGkl%28M4FDKn%28Fgo%3FrO7i%40ZQ%28Uh%3Cl*Y33%3D%3Aqb14bd9M-H5M04SF%2Bk3LIFSMLlpG24%3Aj%3CCJ%3C%5B%40n%25RYPq%23m%3Dd0%23MD6%3AQkXf%2B4IBd%5Cf%2CYcLs%40A%3Fj%24%26%5EKn_%21_Y%24Is1la%5CC%3BThlYGFoCUS%2F6GAr%29%22d%3AE%3B%28I%28*uAs_UQkCuMpo%3CK.Sg%603uY%22%23%3DrrqUO%3FP5%3E3*3%25L%22DF79%3Bdrgt_A%3EWL%22%22%60%60NjGG%3EtXIn%3Dm%40AR_%5C*%5Bd%3B%5Em7t%3BflGgFEMOX0JPNe%21%2665%2F%2B14ZPQY%26R%5C%5C%5Eo%6017.%29%21W%3EI8Gs3s%28fqi%24EL%22RbE%40%22G%5E%22mkeIboJI%26%60VBV6d%2C%26Nc%28F4");
+                    System.out.println("Raw Result: " + rawResult.getText());
                     initWebView(Base64.encodeToString(rawResult.getText().getBytes(), Base64.DEFAULT));
                 }
             });
@@ -152,6 +153,7 @@ public class ImportActivity extends BaseActivity implements ZXingScannerView.Res
 
     @Override
     public void resultData(String data) {
+        System.out.println("Result Data: " + data);
         JSONObject jsonObject = null;
         try {
             jsonObject = new JSONObject(data);

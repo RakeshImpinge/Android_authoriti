@@ -1,5 +1,6 @@
 package net.authoriti.authoriti.ui.menu;
 
+import android.content.Intent;
 import android.graphics.Paint;
 import android.widget.TextView;
 
@@ -10,6 +11,7 @@ import net.authoriti.authoriti.api.model.AuthLogIn;
 import net.authoriti.authoriti.core.BaseFragment;
 import net.authoriti.authoriti.ui.auth.InviteCodeActivity_;
 import net.authoriti.authoriti.ui.auth.LoginActivity_;
+import net.authoriti.authoriti.ui.share.ExportActivity_;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.Constants;
 
@@ -38,12 +40,15 @@ public class WipeFragment extends BaseFragment {
     @ViewById(R.id.tvWipe)
     TextView tvWipe;
 
+    @ViewById(R.id.tvExport)
+    TextView tvExport;
+
     @AfterViews
     void callAfterViewInjection() {
 
         tvVersion.setText("Version " + BuildConfig.VERSION_NAME + "." + BuildConfig.VERSION_CODE);
-
         tvWipe.setPaintFlags(tvWipe.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        tvExport.setPaintFlags(tvExport.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
     }
 
     @Override
@@ -81,6 +86,11 @@ public class WipeFragment extends BaseFragment {
         InviteCodeActivity_.intent(mContext).flags(FLAG_ACTIVITY_CLEAR_TASK |
                 FLAG_ACTIVITY_NEW_TASK).showBack(false).start();
 
+    }
+
+    @Click(R.id.tvExport)
+    void export() {
+        ExportActivity_.intent(this.mContext).flags(Intent.FLAG_ACTIVITY_NEW_TASK).start();
     }
 
     @Click(R.id.tvWipe)

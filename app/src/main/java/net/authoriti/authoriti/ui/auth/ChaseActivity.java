@@ -8,13 +8,14 @@ import android.text.TextUtils;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.tozny.crypto.android.AesCbcWithIntegrity;
+
 import net.authoriti.authoriti.MainActivity_;
 import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.api.AuthoritiAPI;
 import net.authoriti.authoriti.api.model.AccountID;
 import net.authoriti.authoriti.api.model.AuthLogIn;
 import net.authoriti.authoriti.api.model.User;
-
 import net.authoriti.authoriti.api.model.request.RequestSignUpChase;
 import net.authoriti.authoriti.api.model.response.ResponseSignUpChase;
 import net.authoriti.authoriti.core.SecurityActivity;
@@ -23,9 +24,6 @@ import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiUtils;
 import net.authoriti.authoriti.utils.ViewUtils;
 import net.authoriti.authoriti.utils.crypto.CryptoKeyPair;
-
-import com.tozny.crypto.android.AesCbcWithIntegrity;
-
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
@@ -165,10 +163,10 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
                             .getType())) {
                         isContained = true;
                         break;
-                    } else {
                     }
                 }
                 if (!isContained) {
+                    newAccountIDs.get(i).setHashed(true);
                     newIds.add(newAccountIDs.get(i));
                 }
             }
@@ -177,6 +175,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
             dataManager.setUser(user);
             finish();
         } else {
+            System.out.println("Creating user!");
             User user = new User();
             user.setUserId(responseSignUpChase.getId());
             user.setToken(responseSignUpChase.getToken());
@@ -184,6 +183,11 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
             user.setChaseType(true);
 
             List<AccountID> UserAccountsList = responseSignUpChase.getAccounts();
+            final int sz = UserAccountsList.size();
+            for (int i = 0; i < sz; i++) {
+                System.out.println("Setting hashed to true");
+                UserAccountsList.get(i).setHashed(true);
+            }
             for (AccountID accountID : UserAccountsList) {
                 accountID.setCustomer(customer);
             }
@@ -227,7 +231,6 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
 
                         hideKeyboard();
                         checkFingerPrintAuth();
-
                     }
 
 
@@ -260,7 +263,6 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
     }
 
     private void goHome() {
-
         dataManager.setScheme(null);
 
         Intent intent = new Intent(this, MainActivity_.class);
@@ -269,7 +271,6 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
     }
 
     private void enableFingerPrintAndGoHome() {
-
         removeListener();
 
         if (dataManager != null && dataManager.getUser() != null) {
@@ -285,7 +286,6 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
     }
 
     private void updateLoginState() {
-
         AuthLogIn logIn = new AuthLogIn();
         logIn.setLogin(true);
         dataManager.setAuthLogin(logIn);
@@ -339,9 +339,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
 
         }
 
-        if (!TextUtils.isEmpty(etIdentifier.getText()) && !TextUtils.isEmpty(etPassword.getText()
-        )) {
-
+        if (!TextUtils.isEmpty(etIdentifier.getText()) && !TextUtils.isEmpty(etPassword.getText())) {
             hideKeyboard();
             signUp();
 
@@ -362,19 +360,13 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
 
     @Override
     public void allowButtonClicked() {
-
         hideTouchIDEnabledAlert();
 
         if (fingerPrintNotRegistered) {
-
             Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
             startActivity(intent);
-
-
         } else {
-
             enableFingerPrintAndGoHome();
-
         }
 
 

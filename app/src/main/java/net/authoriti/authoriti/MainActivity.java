@@ -187,8 +187,6 @@ public class MainActivity extends BaseActivity {
                                 (MENU_POLLING).withSelectable(true).withTypeface(typeface),
                         new PrimaryDrawerItem().withName(R.string.menu_account).withIdentifier
                                 (MENU_ACCOUNT).withSelectable(true).withTypeface(typeface),
-                        new PrimaryDrawerItem().withName(R.string.menu_export).withIdentifier
-                                (MENU_EXPORT).withSelectable(true).withTypeface(typeface),
                         new PrimaryDrawerItem().withName(R.string.menu_change_pwd).withIdentifier
                                 (MENU_EXPORT).withSelectable(true).withTypeface(typeface),
                         new PrimaryDrawerItem().withName(R.string.menu_wipe).withIdentifier
@@ -229,10 +227,10 @@ public class MainActivity extends BaseActivity {
         if (SELECTED_MENU_ID == menu_id && menu_id != MENU_POLLING) {
             return;
         }
-        if (menu_id == MENU_EXPORT) {
-            ExportActivity_.intent(getApplicationContext()).flags(Intent.FLAG_ACTIVITY_NEW_TASK).start();
-            return;
-        }
+//        if (menu_id == MENU_EXPORT) {
+//            ExportActivity_.intent(getApplicationContext()).flags(Intent.FLAG_ACTIVITY_NEW_TASK).start();
+//            return;
+//        }
 
         SELECTED_MENU_ID = menu_id;
         Fragment fragment = null;
