@@ -3,6 +3,7 @@ package net.authoriti.authoriti.ui.auth;
 import android.content.Intent;
 import android.provider.Settings;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.text.TextUtils;
 import android.widget.EditText;
@@ -94,6 +95,8 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
         etIdentifier.setHint(customer.toUpperCase() + " USERNAME");
         tvTitle.setText(customer + " is a partner of Authority. Please enter your " + customer +
                 " password so we can authorize you.");
+
+        tiPassword.setTypeface(ResourcesCompat.getFont(getApplicationContext(), R.font.oswald_regular));
 
         KeyboardVisibilityEvent.setEventListener(this, new KeyboardVisibilityEventListener() {
             @Override
@@ -221,7 +224,10 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
                     if (responseSignUpChase.getAccounts() != null && responseSignUpChase.getAccounts
                             ().size() > 0) {
 
-                        AccountConfirmActivity_.intent(this).start();
+//                        AccountConfirmActivity_.intent(this).start();
+                        mFingerPrintAuthHelper.startAuth();
+                        hideKeyboard();
+                        checkFingerPrintAuth();
 
                     } else {
 
@@ -245,25 +251,17 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
     }
 
     private void checkFingerPrintAuth() {
-
         if (isBelowMarshmallow || fingerPrintHardwareNotDetected) {
-
             updateLoginState();
             goHome();
-
         } else {
-
             setListener(this);
             showTouchIDEnableAlert();
-
         }
-
-
     }
 
     private void goHome() {
         dataManager.setScheme(null);
-
         Intent intent = new Intent(this, MainActivity_.class);
         intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);

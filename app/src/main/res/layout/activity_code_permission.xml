@@ -24,6 +24,7 @@
             android:tint="@android:color/white" />
 
         <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/tv_title"
             fontPath="@string/font_oswaldo_regular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -32,9 +33,8 @@
             android:gravity="center"
             android:maxLines="1"
             android:text="@string/app_name"
-            android:textAllCaps="true"
             android:textColor="@android:color/white"
-            android:textSize="18sp" />
+            android:textSize="19sp" />
 
         <ImageButton
             android:id="@+id/ivHelp"
@@ -65,18 +65,18 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp">
 
                 <TextView
                     android:id="@+id/tvTitle"
-                    fontPath="@string/font_oswaldo_light"
+                    fontPath="@string/font_oswaldo_regular"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="CREATE AUTHORITI PERMISSION CODE ™"
+                    android:text="CREATE AUTHORITI PERMISSION CODE™ AUTHORIZATION"
                     android:textColor="@color/colorTextPrimary"
-                    android:textSize="18sp"
+                    android:textSize="16sp"
                     tools:ignore="MissingPrefix" />
 
             </LinearLayout>
@@ -99,12 +99,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginEnd="16dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:text="Click to change the setting or swipe left or right to set as default"
+                    android:layout_marginEnd="16dp"
+                    android:text="@string/swipe_change_msg"
                     android:textAlignment="center"
-                    android:textColor="@color/colorTextPrimary"
                     android:textSize="13sp"
                     tools:ignore="MissingPrefix" />
 
@@ -135,14 +134,14 @@
         card_view:cardElevation="0dp">
 
         <android.support.v7.widget.AppCompatTextView
-            fontPath="@string/font_oswaldo_light"
+            fontPath="@string/font_oswaldo_regular"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:gravity="center"
-            android:text="Generate Permission Code"
+            android:text="Generate Permission Code Authorization"
             android:textAllCaps="true"
             android:textColor="@android:color/white"
-            android:textSize="18sp" />
+            android:textSize="16sp" />
 
     </android.support.v7.widget.CardView>
 

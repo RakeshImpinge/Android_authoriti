@@ -1,11 +1,11 @@
 <resources>
     <string name="app_name">Authoriti</string>
 
-    <string name="menu_code_generate">Generate Permission Code</string>
-    <string name="menu_polling">Check Permission Code Requests</string>
-    <string name="menu_account">MY IDs</string>
+    <string name="menu_code_generate">Generate Permission code™ authorization</string>
+    <string name="menu_polling">Check Permission Code™ Requests</string>
+    <string name="menu_account">Manage My IDs</string>
     <string name="menu_export">Transfer Wallet to New Device</string>
-    <string name="menu_change_pwd">Change Password</string>
+    <string name="menu_change_pwd">Settings</string>
     <string name="menu_wipe">About Us</string>
     <string name="menu_logOut">Logout</string>
 
@@ -26,5 +26,9 @@ Authoriti is the developer of the Authoriti Permission Code™, which gives inst
     <string name="txt_add_account">To complete sign up, you need to add at least one ID to your wallet. \n Please click \"Add\" on top right.</string>
     <string name="hold_steady">HOLD STEADY</string>
     <string name="align_and_tap">ALIGN AND TAP</string>
+    <string name="swipe_change_msg">Click to change, or swipe left or right to set as default</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

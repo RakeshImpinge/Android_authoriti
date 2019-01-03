@@ -58,20 +58,21 @@
             fontPath="@string/font_oswaldo_regular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:paddingTop="16dp"
-            android:text="YOUR PERMISSION CODE"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="6dp"
+            android:paddingTop="5dp"
+            android:text="YOUR PERMISSION CODE™"
             android:textAlignment="center"
             android:textColor="@color/colorTextPrimary"
-            android:textSize="25sp"
+            android:textSize="22sp"
             tools:ignore="MissingPrefix" />
 
         <TextView
             fontPath="@string/font_oswaldo_regular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
             android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
             android:text="Provide code to Authorize this transaction"
             android:textAlignment="center"
             android:textColor="@color/colorTextSecondary"
@@ -89,36 +90,36 @@
                 android:id="@+id/cvWipe"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
                 android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 app:cardBackgroundColor="@android:color/white"
                 app:cardCornerRadius="10dp"
                 app:cardElevation="5dp">
 
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="32dp">
+                    android:padding="20dp">
 
                     <android.support.v7.widget.AppCompatTextView
                         android:id="@+id/tvCode"
                         fontPath="@string/font_iA_bold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="gFR4QHfVHw"
+                        android:layout_centerHorizontal="true"
                         android:textColor="@color/colorTextThird"
-                        android:textSize="30sp" />
+                        android:textSize="28sp" />
 
                     <ImageView
                         android:id="@+id/ivQRCode"
-                        android:layout_width="140dp"
-                        android:layout_height="140dp"
-                        android:layout_marginTop="16dp" />
+                        android:layout_width="210dp"
+                        android:layout_height="210dp"
+                        android:layout_below="@+id/tvCode"
+                        android:layout_centerHorizontal="true"
+                        android:scaleType="fitXY" />
 
-                </LinearLayout>
+                </RelativeLayout>
 
             </android.support.v7.widget.CardView>
 
@@ -127,18 +128,18 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
             android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
             android:background="@drawable/bg_got_it_container">
 
             <android.support.v7.widget.CardView
                 android:id="@+id/cvGotIt"
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
-                android:layout_marginBottom="32dp"
-                android:layout_marginEnd="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="32dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="32dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?selectableItemBackground"

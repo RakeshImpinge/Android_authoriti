@@ -20,6 +20,8 @@ import net.authoriti.authoriti.api.model.request.RequestSync;
 import net.authoriti.authoriti.api.model.response.ResponseComplete;
 import net.authoriti.authoriti.api.model.response.ResponseSync;
 import net.authoriti.authoriti.ui.menu.AccountChaseFragment;
+import net.authoriti.authoriti.ui.menu.SettingFragment;
+import net.authoriti.authoriti.ui.menu.SettingFragment_;
 import net.authoriti.authoriti.ui.share.ExportActivity_;
 import net.authoriti.authoriti.utils.Log;
 
@@ -83,6 +85,7 @@ public class MainActivity extends BaseActivity {
     private Drawer drawer = null;
 
     private Fragment purposeFragment;
+    private Fragment settingFragment;
     private Fragment accountFragment;
     private Fragment wipeFragment;
 
@@ -188,7 +191,7 @@ public class MainActivity extends BaseActivity {
                         new PrimaryDrawerItem().withName(R.string.menu_account).withIdentifier
                                 (MENU_ACCOUNT).withSelectable(true).withTypeface(typeface),
                         new PrimaryDrawerItem().withName(R.string.menu_change_pwd).withIdentifier
-                                (MENU_EXPORT).withSelectable(true).withTypeface(typeface),
+                                (MENU_SETTING).withSelectable(true).withTypeface(typeface),
                         new PrimaryDrawerItem().withName(R.string.menu_wipe).withIdentifier
                                 (MENU_WIPE).withSelectable(true).withTypeface(typeface),
                         new PrimaryDrawerItem().withName(R.string.menu_logOut).withIdentifier
@@ -246,6 +249,11 @@ public class MainActivity extends BaseActivity {
                 accountFragment = AccountChaseFragment_.builder().build();
             }
             fragment = accountFragment;
+        } else if (menu_id == MENU_SETTING) {
+            if (settingFragment == null) {
+                settingFragment = SettingFragment_.builder().build();
+            }
+            fragment = settingFragment;
         } else if (menu_id == MENU_WIPE) {
             if (wipeFragment == null) {
                 wipeFragment = WipeFragment_.builder().build();
@@ -350,7 +358,7 @@ public class MainActivity extends BaseActivity {
 
     @Click(R.id.ivSync)
     void syncButtonClicked() {
-        displayProgressDialog("Downloading wallet items...");
+        displayProgressDialog("Downloading\nwallet items...");
         RequestSync sycnew = new RequestSync();
         List<String> downloadIdList = dataManager.getUser().getDownloadedWalletIDList();
         if (!downloadIdList.contains(dataManager.getUser().getUserId())) {

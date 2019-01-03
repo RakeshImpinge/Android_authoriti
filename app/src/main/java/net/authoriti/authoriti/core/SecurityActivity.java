@@ -7,10 +7,12 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.support.v7.app.AlertDialog;
+
 import net.authoriti.authoriti.utils.Log;
 
 import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.ui.alert.TouchIDAlert;
+
 import com.multidots.fingerprintauth.FingerPrintAuthCallback;
 import com.multidots.fingerprintauth.FingerPrintAuthHelper;
 
@@ -30,11 +32,11 @@ public class SecurityActivity extends BaseActivity implements FingerPrintAuthCal
     AlertDialog alertDialog;
     TouchIDEnableAlertListener listener;
 
-    public void setListener(TouchIDEnableAlertListener listener){
+    public void setListener(TouchIDEnableAlertListener listener) {
         this.listener = listener;
     }
 
-    public void removeListener(){
+    public void removeListener() {
         this.listener = null;
     }
 
@@ -46,17 +48,17 @@ public class SecurityActivity extends BaseActivity implements FingerPrintAuthCal
 
     }
 
-    public void showTouchIdAlert(){
-        if (touchIDAlert == null){
+    public void showTouchIdAlert() {
+        if (touchIDAlert == null) {
             touchIDAlert = new TouchIDAlert(this, R.style.FullScreenDialogStyle);
             touchIDAlert.setListener(this);
         }
         touchIDAlert.show();
     }
 
-    public void dismissTouchIDAlert(){
+    public void dismissTouchIDAlert() {
 
-        if (touchIDAlert != null){
+        if (touchIDAlert != null) {
 
             touchIDAlert.dismiss();
             touchIDAlert = null;
@@ -65,11 +67,11 @@ public class SecurityActivity extends BaseActivity implements FingerPrintAuthCal
 
     }
 
-    public void updateTouchIDAlert(String body){
+    public void updateTouchIDAlert(String body) {
 
-        if (touchIDAlert != null){
+        if (touchIDAlert != null) {
 
-            if (touchIDAlert.getTvBody() != null){
+            if (touchIDAlert.getTvBody() != null) {
 
                 touchIDAlert.getTvBody().setText(body);
 
@@ -79,11 +81,11 @@ public class SecurityActivity extends BaseActivity implements FingerPrintAuthCal
 
     }
 
-    public void showTouchIDEnableAlert(){
+    public void showTouchIDEnableAlert() {
 
-        if(!isFinishing()) {
+        if (!isFinishing()) {
 
-            if (alertDialog == null){
+            if (alertDialog == null) {
 
                 alertDialog = new AlertDialog.Builder(this).create();
 
@@ -94,7 +96,7 @@ public class SecurityActivity extends BaseActivity implements FingerPrintAuthCal
             alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Allow", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
 
-                    if (listener != null){
+                    if (listener != null) {
                         listener.allowButtonClicked();
                     }
 
@@ -103,7 +105,7 @@ public class SecurityActivity extends BaseActivity implements FingerPrintAuthCal
             alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Don't allow", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
 
-                    if (listener != null){
+                    if (listener != null) {
                         listener.dontAllowButtonClicked();
                     }
 
@@ -118,9 +120,9 @@ public class SecurityActivity extends BaseActivity implements FingerPrintAuthCal
         }
     }
 
-    public void hideTouchIDEnabledAlert(){
+    public void hideTouchIDEnabledAlert() {
 
-        if (alertDialog != null){
+        if (alertDialog != null) {
 
             alertDialog.dismiss();
             alertDialog = null;
@@ -209,9 +211,10 @@ public class SecurityActivity extends BaseActivity implements FingerPrintAuthCal
 
     }
 
-    public interface TouchIDEnableAlertListener{
+    public interface TouchIDEnableAlertListener {
 
         void allowButtonClicked();
+
         void dontAllowButtonClicked();
 
     }
