@@ -167,7 +167,7 @@ public class ImportActivity extends BaseActivity implements ZXingScannerView.Res
             jsonObject.put("encryptPrivateKey", AesCbcWithIntegrity.encrypt(privateKey, keys).toString());
             jsonObject.put("encryptPassword",AesCbcWithIntegrity.encrypt(password, keys).toString());
             jsonObject.put("encryptSalt", AesCbcWithIntegrity.encrypt(userSalt, keys).toString());
-
+            jsonObject.put("encryptKey", AesCbcWithIntegrity.keyString(keys));
         } catch (Exception e) {
             e.printStackTrace();
         }
