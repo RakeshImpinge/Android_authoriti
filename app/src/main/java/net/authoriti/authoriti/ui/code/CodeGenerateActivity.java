@@ -74,7 +74,16 @@ public class CodeGenerateActivity extends BaseActivity {
     @AfterViews
     void callAfterViewInjection() {
         String code = generateCode();
-        ivQRCode.setImageBitmap(QRCode.from(code).bitmap());
+
+        int width = ivQRCode.getMeasuredWidth();
+        int height = ivQRCode.getMeasuredHeight();
+        if (width > height) {
+            width = height;
+        } else {
+            height = width;
+        }
+        ivQRCode.setImageBitmap(QRCode.from(code).withSize(800, 800).bitmap());
+
         tvCode.setText(utils.fromHtml(generateHTMLString(code)));
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("permission code", code);

@@ -3,11 +3,13 @@ package net.authoriti.authoriti.ui.auth;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.provider.Settings;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.text.TextUtils;
 import android.view.View;
@@ -79,6 +81,8 @@ public class InviteCodeActivity extends BaseActivity {
 
     @AfterViews
     void callAfterViewInjection() {
+
+        tiCode.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Oswald_Regular.ttf"));
 
         if (showBack) {
             ivBack.setVisibility(View.VISIBLE);

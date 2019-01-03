@@ -10,6 +10,7 @@ import net.authoriti.authoriti.utils.Log;
 
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.api.model.AccountID;
@@ -75,6 +76,10 @@ public class CodePermissionActivity extends BaseActivity {
     @ViewById(R.id.etCode)
     EditText etCode;
 
+    @ViewById(R.id.tv_title)
+    TextView tv_title;
+
+
     HashMap<String, DefaultValue> defaultPickerMap = new HashMap<>();
 
     public static int INTENT_REQUEST_PICK_VALUE = 1;
@@ -94,6 +99,7 @@ public class CodePermissionActivity extends BaseActivity {
         schemaIndex = group.getSchemaIndex();
         createPickerList();
         showSchema();
+        tv_title.setText(group.getLabel());
     }
 
     List<Picker> pickersList = new ArrayList<>();
@@ -122,8 +128,7 @@ public class CodePermissionActivity extends BaseActivity {
                 List<Value> values;
                 if (schemaIndex == 8) {
                     values = dataManager.getValuesFromDataType("y");
-                }
-                else if (defaultPickerMap.containsKey(PICKER_REQUEST)) {
+                } else if (defaultPickerMap.containsKey(PICKER_REQUEST)) {
                     values = dataManager.getValuesFromDataType(defaultPickerMap.get
                             (PICKER_REQUEST).getValue());
                 } else {
@@ -174,7 +179,7 @@ public class CodePermissionActivity extends BaseActivity {
                     DefaultValue defaultValue = new DefaultValue(key
                             , value_decoded, false);
                     defaultPickerMap.put(key, defaultValue);
-                } else if(key.equals(PICKER_REQUEST)) {
+                } else if (key.equals(PICKER_REQUEST)) {
                     try {
                         String customer = URLDecoder.decode(defParamFromUrl.get("customer"), "UTF-8");
                         String code = defParamFromUrl.get("customer_code");
@@ -183,7 +188,7 @@ public class CodePermissionActivity extends BaseActivity {
                     } catch (Exception ignore) {
 
                     }
-                }else {
+                } else {
                     if (defParamFromUrl.containsKey(key)) {
                         ArrayList<String> title = new ArrayList<>();
                         ArrayList<String> value = new ArrayList<>();
@@ -342,8 +347,7 @@ public class CodePermissionActivity extends BaseActivity {
             int data_type_length;
             if (schemaIndex == 8) {
                 data_type_length = dataManager.getValuesFromDataType("y").size();
-            }
-            else if (defaultPickerMap.containsKey(PICKER_REQUEST) && defaultPickerMap.containsKey
+            } else if (defaultPickerMap.containsKey(PICKER_REQUEST) && defaultPickerMap.containsKey
                     (PICKER_REQUEST)) {
                 data_type_length = dataManager.getValuesFromDataType(defaultPickerMap
                         .get(PICKER_REQUEST).getValue()).size();
@@ -440,8 +444,7 @@ public class CodePermissionActivity extends BaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CodeGenerateActivity.CODE) {
             finish();
-        }
-        else if (resultCode == RESULT_OK) {
+        } else if (resultCode == RESULT_OK) {
             defaultPickerMap = (HashMap<String, DefaultValue>) data.getExtras().get
                     ("selected_values");
 
