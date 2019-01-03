@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.zxing.Result;
+import com.tozny.crypto.android.AesCbcWithIntegrity;
 
 import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.core.BaseActivity;
@@ -153,11 +154,21 @@ public class ImportActivity extends BaseActivity implements ZXingScannerView.Res
 
     @Override
     public void resultData(String data) {
-        System.out.println("Result Data: " + data);
         JSONObject jsonObject = null;
         try {
             jsonObject = new JSONObject(data);
-        } catch (JSONException e) {
+            String privateKey = jsonObject.getString("encryptPrivateKey");
+            String password = jsonObject.getString("encryptPassword");
+            String userSalt = jsonObject.getString("encryptSalt");
+
+            String salt = AesCbcWithIntegrity.saltString(AesCbcWithIntegrity.generateSalt());
+            AesCbcWithIntegrity.SecretKeys keys = AesCbcWithIntegrity.generateKeyFromPassword(password, salt);
+
+            jsonObject.put("encryptPrivateKey", AesCbcWithIntegrity.encrypt(privateKey, keys).toString());
+            jsonObject.put("encryptPassword",AesCbcWithIntegrity.encrypt(password, keys).toString());
+            jsonObject.put("encryptSalt", AesCbcWithIntegrity.encrypt(userSalt, keys).toString());
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
         dismissProgressDialog();

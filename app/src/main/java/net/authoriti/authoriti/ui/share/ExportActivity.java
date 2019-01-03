@@ -14,6 +14,7 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 
 import com.google.gson.Gson;
+import com.tozny.crypto.android.AesCbcWithIntegrity;
 
 import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.api.model.User;
@@ -27,6 +28,11 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
+
+import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
+
+import javax.crypto.SecretKey;
 
 
 @EActivity(R.layout.activity_export)
@@ -110,10 +116,36 @@ public class ExportActivity extends BaseActivity implements WebAppInterface.Data
 
     private String userData() {
         User user = dataManager.getUser();
+
+        String privateKey = "";
+        String password = "";
+        String salt = "";
+
+        AesCbcWithIntegrity.SecretKeys keys;
+        String keyStr = dataManager.getUser().getEncryptKey();
+        try {
+            keys = AesCbcWithIntegrity.keys(keyStr);
+
+            AesCbcWithIntegrity.CipherTextIvMac civPrivateKey = new AesCbcWithIntegrity.CipherTextIvMac(user.getEncryptPrivateKey());
+            AesCbcWithIntegrity.CipherTextIvMac civPassword = new AesCbcWithIntegrity.CipherTextIvMac(user.getEncryptPassword());
+            AesCbcWithIntegrity.CipherTextIvMac civSalt = new AesCbcWithIntegrity.CipherTextIvMac(user.getEncryptSalt());
+
+            privateKey = AesCbcWithIntegrity.decryptString(civPrivateKey, keys);
+            password = AesCbcWithIntegrity.decryptString(civPassword, keys);
+            salt = AesCbcWithIntegrity.decryptString(civSalt, keys);
+
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        user.setEncryptPassword(password);
+        user.setEncryptPrivateKey(privateKey);
+        user.setEncryptSalt(salt);
+
         Gson gson = new Gson();
-        String userData = gson.toJson(user);
-        System.out.println("User Data: " + userData);
-        return userData;
+        return gson.toJson(user);
     }
 
     @Override

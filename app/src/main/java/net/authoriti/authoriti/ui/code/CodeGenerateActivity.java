@@ -123,7 +123,6 @@ public class CodeGenerateActivity extends BaseActivity {
     }
 
     private String generateCode() {
-
         AesCbcWithIntegrity.SecretKeys keys;
         String keyStr = dataManager.getUser().getEncryptKey();
         String privateKey = "";

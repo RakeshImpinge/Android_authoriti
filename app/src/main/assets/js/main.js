@@ -29,10 +29,10 @@ var json_schema = SObject([
             ["type", SString()]
         ])
     )],
-    ["encryptKey", SB64Tuple([16, 32], ":", true)],
-    ["encryptPassword", SB64Tuple([16, 32, 16], ":", true)],
-    ["encryptPrivateKey", SB64Tuple([16, 32, 16], ":", true)],
-    ["encryptSalt", SB64Tuple([16, 32, 16], ":", true)],
+//    ["encryptKey", SB64Tuple([16, 32], ":", true)],
+    ["encryptPassword", SString()],
+    ["encryptPrivateKey", SString()],
+    ["encryptSalt", SString()],
     ["fingerPrintAuthEnabled", SBoolean()],
     ["invite_code", SString()],
     ["isChaseType", SBoolean()],

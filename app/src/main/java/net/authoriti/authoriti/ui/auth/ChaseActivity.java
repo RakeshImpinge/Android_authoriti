@@ -206,7 +206,6 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
                 user.setEncryptKey(keyStr);
 
                 try {
-
                     user.setEncryptPrivateKey(AesCbcWithIntegrity.encrypt(keyPair.getPrivateKey(),
                             keys).toString());
                     user.setEncryptSalt(AesCbcWithIntegrity.encrypt(keyPair.getSalt(), keys)

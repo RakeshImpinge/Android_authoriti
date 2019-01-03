@@ -32,7 +32,7 @@ public class User {
 
     private boolean fingerPrintAuthEnabled = false;
 
-    boolean isChaseType = false;
+    private boolean isChaseType = false;
 
     private List<AccountID> unconfirmedAccountIDs;
 
