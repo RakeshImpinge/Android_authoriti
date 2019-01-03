@@ -58,8 +58,7 @@ public class BaseActivity extends AppCompatActivity implements Constants {
 //        }
 
 
-
-        if (!isFinishing()) {
+        if (!isFinishing() && (kProgressHUD == null || !kProgressHUD.isShowing())) {
             kProgressHUD = KProgressHUD.create(this)
                     .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                     .setLabel(message)
@@ -81,7 +80,7 @@ public class BaseActivity extends AppCompatActivity implements Constants {
 //            progress.show();
 //        }
 
-        if (!isFinishing()) {
+        if (!isFinishing() && (kProgressHUD == null || !kProgressHUD.isShowing())) {
             kProgressHUD = KProgressHUD.create(activity)
                     .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                     .setLabel(message)

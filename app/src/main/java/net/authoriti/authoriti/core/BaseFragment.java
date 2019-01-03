@@ -45,7 +45,7 @@ public class BaseFragment extends Fragment implements Constants {
 //            progress.show();
 //        }
 
-        if (!getActivity().isFinishing()) {
+        if (!getActivity().isFinishing() && (kProgressHUD == null || !kProgressHUD.isShowing())) {
             kProgressHUD = KProgressHUD.create(getActivity())
                     .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                     .setLabel(message)
