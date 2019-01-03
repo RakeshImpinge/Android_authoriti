@@ -75,6 +75,9 @@ public class PasscodePickActivity extends BaseActivity {
     @ViewById(R.id.tvTitle)
     TextView tvTitle;
 
+    @ViewById(R.id.tv_title)
+    TextView tv_title;
+
     @ViewById(R.id.rvOptions)
     RecyclerView rvOptions;
 
@@ -87,6 +90,7 @@ public class PasscodePickActivity extends BaseActivity {
         pickerType = picker.getPicker();
         defaultValue = defaultPickerMap.get(pickerType);
         tvTitle.setText(picker.getTitle());
+
 
         addValuesToPicker();
 
@@ -205,6 +209,25 @@ public class PasscodePickActivity extends BaseActivity {
         });
 
         showOptions();
+
+        tv_title.setText(getHeaderTitle(picker.getPicker()));
+    }
+
+    public String getHeaderTitle(String type) {
+        switch (type) {
+            case PICKER_ACCOUNT:
+                return "Please Select A Wallet ID";
+            case PICKER_TIME:
+                return "Pick a expiry time";
+            case PICKER_INDUSTRY:
+                return "Pick an Industry";
+            case PICKER_LOCATION_COUNTRY:
+                return "Pick a Location";
+            case PICKER_LOCATION_STATE:
+                return "Pick a Location";
+            default:
+                return "";
+        }
     }
 
     private void addValuesToPicker() {

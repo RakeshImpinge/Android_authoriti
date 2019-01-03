@@ -32,7 +32,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16sp"
-                    android:text="Get a Permission code™ authorization to:"
+                    android:text="Setting"
                     android:textColor="@color/colorTextPrimary"
                     android:textSize="18sp"
                     tools:ignore="MissingPrefix" />
@@ -46,26 +46,10 @@
                 android:orientation="vertical">
 
                 <android.support.v7.widget.RecyclerView
-                    android:id="@+id/rvPurpose"
+                    android:id="@+id/rvOptions"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:overScrollMode="never" />
-
-
-                <android.support.v7.widget.AppCompatTextView
-                    fontPath="@string/font_oswaldo_light"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
-                    android:text="Click to change the setting or swipe left or right to set as default"
-                    android:textAlignment="center"
-                    android:textColor="@color/colorTextPrimary"
-                    android:textSize="13sp"
-                    android:visibility="gone"
-                    tools:ignore="MissingPrefix" />
 
             </LinearLayout>
         </LinearLayout>

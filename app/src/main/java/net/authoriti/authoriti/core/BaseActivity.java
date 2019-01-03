@@ -16,6 +16,10 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import com.kaopiz.kprogresshud.KProgressHUD;
+
+import net.authoriti.authoriti.MainActivity;
+import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.utils.Constants;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -30,6 +34,7 @@ public class BaseActivity extends AppCompatActivity implements Constants {
     protected Context mContext;
 
     protected ProgressDialog progress;
+    KProgressHUD kProgressHUD;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,26 +48,43 @@ public class BaseActivity extends AppCompatActivity implements Constants {
 
     @UiThread
     protected void displayProgressDialog(String message) {
-        progress = new ProgressDialog(mActivity);
-        progress.setMessage(message);
-        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progress.setIndeterminate(true);
-        progress.setCancelable(false);
-        if (!isFinishing()) {
-            progress.show();
-        }
+//        progress = new ProgressDialog(mActivity);
+//        progress.setMessage(message);
+//        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+//        progress.setIndeterminate(true);
+//        progress.setCancelable(false);
+//        if (!isFinishing()) {
+//            progress.show();
+//        }
+
+
+        kProgressHUD = KProgressHUD.create(this)
+                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                .setLabel(message)
+                .setCancellable(true)
+                .setAnimationSpeed(2)
+                .setDimAmount(0.5f)
+                .show();
     }
 
     @UiThread
     protected void displayProgressDialog(Activity activity, String message) {
-        progress = new ProgressDialog(activity);
-        progress.setMessage(message);
-        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progress.setIndeterminate(true);
-        progress.setCancelable(false);
-        if (!isFinishing()) {
-            progress.show();
-        }
+//        progress = new ProgressDialog(activity);
+//        progress.setMessage(message);
+//        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+//        progress.setIndeterminate(true);
+//        progress.setCancelable(false);
+//        if (!isFinishing()) {
+//            progress.show();
+//        }
+        kProgressHUD = KProgressHUD.create(activity)
+                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                .setLabel(message)
+                .setCancellable(true)
+                .setAnimationSpeed(2)
+                .setDimAmount(0.5f)
+                .show();
+
     }
 
     @UiThread
@@ -76,6 +98,10 @@ public class BaseActivity extends AppCompatActivity implements Constants {
             }
 
             progress = null;
+        }
+
+        if (kProgressHUD != null && kProgressHUD.isShowing()) {
+            kProgressHUD.dismiss();
         }
     }
 
