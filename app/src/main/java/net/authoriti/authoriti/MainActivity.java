@@ -119,7 +119,7 @@ public class MainActivity extends BaseActivity {
     Foreground.Listener listener = new Foreground.Listener() {
         @Override
         public void onBecameForeground() {
-
+            System.out.println("onBecameForeground");
             if (dataManager.getInactiveTime() != null && !dataManager.getInactiveTime().equals
                     ("")) {
                 long currentTime = System.currentTimeMillis() / 1000;
@@ -128,17 +128,12 @@ public class MainActivity extends BaseActivity {
                 long inactiveTime = Long.parseLong(dataManager.getInactiveTime());
                 Log.e("Inactive TimeStamp", String.valueOf(inactiveTime));
 
-                if (currentTime - inactiveTime > 120) {
-
+                if (currentTime - inactiveTime > 60) {
                     logOut();
-
                 } else {
-
                     dataManager.setInactiveTime("");
                 }
-
             } else {
-
                 dataManager.setInactiveTime("");
             }
 
@@ -146,11 +141,8 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public void onBecameBackground() {
-
             long time = System.currentTimeMillis() / 1000;
             dataManager.setInactiveTime(String.valueOf(time));
-            Log.e("Inactive TimeStamp", String.valueOf(time));
-
         }
     };
 
@@ -165,6 +157,12 @@ public class MainActivity extends BaseActivity {
     protected void onStop() {
         super.onStop();
 //        logOut();
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     @AfterViews
@@ -303,7 +301,6 @@ public class MainActivity extends BaseActivity {
     }
 
     private void logOut() {
-
         AuthLogIn logIn = dataManager.loginStatus();
         logIn.setLogin(false);
         dataManager.setAuthLogin(logIn);
@@ -691,337 +688,5 @@ public class MainActivity extends BaseActivity {
             Log.e("Message", "Invalid Url");
         }
     }
-
-
-    private void firstUpdateSchema() {
-//        if (dataManager.getScheme() != null && dataManager.getScheme().getPickers() != null) {
-//
-//            Order order = new Order();
-//            List<String> pickers = new ArrayList<>();
-//
-//            for (Picker picker : dataManager.getScheme().getPickers()) {
-//
-//                pickers.ic_add(picker.getPicker());
-//
-//                switch (picker.getPicker()) {
-//
-//                    case PICKER_ACCOUNT:
-//
-//                        if (dataManager.getUser() != null && dataManager.getUser().getAccountIDs
-//                                () != null && dataManager.getUser().getAccountIDs().size() > 0) {
-//
-//                            Picker picker1 = new Picker(picker.getPicker(), picker.getBytes(),
-//                                    picker.getValues(), picker.getTitle(), picker.getLabel());
-//
-//                            List<Value> values = new ArrayList<>();
-//                            for (AccountID accountID : dataManager.getUser().getAccountIDs()) {
-//
-//                                Value value = new Value(accountID.getIdentifier(), accountID
-//                                        .getType());
-//                                values.ic_add(value);
-//
-//                            }
-//                            picker1.setValues(values);
-//
-//                            if (dataManager.defaultAccountSelected) {
-//
-//                                picker1.setEnableDefault(true);
-//                                picker1.setDefaultIndex(dataManager.defaultAccountIndex);
-//
-//                                dataManager.defaultAccountSelected = false;
-//
-//                            }
-//
-//                            dataManager.setAccountPicker(picker1);
-//
-//
-//                        } else {
-//
-//                            dataManager.setAccountPicker(picker);
-//
-//                        }
-//
-//                        break;
-//
-//                    case PICKER_INDUSTRY:
-//                        dataManager.setIndustryPicker(picker);
-//                        break;
-//
-//                    case PICKER_LOCATION_STATE:
-//                        dataManager.setLocationPicker(picker);
-//                        break;
-//
-//                    case PICKER_LOCATION_COUNTRY:
-//                        dataManager.setCountryPicker(picker);
-//                        break;
-//
-//                    case PICKER_TIME:
-//                        dataManager.setTimePicker(AuthoritiUtils_.getInstance_(mContext)
-//                                .getDefaultTimePicker(picker));
-//                        break;
-//
-//                }
-//            }
-//
-//            order.setPickers(pickers);
-//            dataManager.setPickerOrder(order);
-//        }
-//
-//
-//        if (dataManager.getScheme() != null && dataManager.getScheme().getPickers2() != null) {
-//
-//            Order order = new Order();
-//            List<String> pickers = new ArrayList<>();
-//
-//            for (Picker picker : dataManager.getScheme().getPickers2()) {
-//
-//                pickers.ic_add(picker.getPicker());
-//
-//                switch (picker.getPicker()) {
-//
-//                    case PICKER_ACCOUNT:
-//
-//                        break;
-//
-//                    case PICKER_GEO:
-//                        dataManager.setGeoPicker(picker);
-//                        break;
-//
-//                    case PICKER_REQUEST:
-//                        dataManager.setRequestPicker(picker);
-//                        break;
-//
-//                    case PICKER_DATA_TYPE:
-//                        dataManager.setDataTypePicker(picker);
-//                        break;
-//
-//                    case PICKER_TIME:
-//
-//                        break;
-//
-//                }
-//            }
-//
-//            order.setPickers(pickers);
-//            dataManager.setPickerOrder2(order);
-//        }
-    }
-
-    private void updateSchema() {
-//        if (dataManager.getScheme() != null && dataManager.getScheme().getPickers() != null) {
-//
-//            Order order = new Order();
-//            List<String> pickers = new ArrayList<>();
-//
-//            for (Picker picker : dataManager.getScheme().getPickers()) {
-//
-//                pickers.ic_add(picker.getPicker());
-//
-//                switch (picker.getPicker()) {
-//
-//                    case PICKER_ACCOUNT:
-//
-//                        if (dataManager.getAccountPicker() != null) {
-//
-//                            Picker temp = new Picker();
-//                            temp.setPicker(dataManager.getAccountPicker().getPicker());
-//                            temp.setBytes(dataManager.getAccountPicker().getBytes());
-//                            temp.setValues(dataManager.getAccountPicker().getValues());
-//                            temp.setTitle(picker.getTitle());
-//                            temp.setLabel(picker.getLabel());
-//                            temp.setEnableDefault(dataManager.getAccountPicker()
-// .isEnableDefault());
-//                            temp.setDefaultIndex(dataManager.getAccountPicker().getDefaultIndex
-// ());
-//
-//                            dataManager.setAccountPicker(temp);
-//                        }
-//
-//                        break;
-//
-//                    case PICKER_INDUSTRY:
-//
-//                        if (dataManager.getIndustryPicker() != null) {
-//
-//                            Picker temp = new Picker();
-//                            temp.setPicker(picker.getPicker());
-//                            temp.setBytes(picker.getBytes());
-//                            temp.setValues(picker.getValues());
-//                            temp.setTitle(picker.getTitle());
-//                            temp.setLabel(picker.getLabel());
-//                            temp.setEnableDefault(dataManager.getIndustryPicker().isEnableDefault
-//                                    ());
-//                            temp.setDefaultIndex(dataManager.getIndustryPicker()
-// .getDefaultIndex());
-//
-//                            dataManager.setIndustryPicker(temp);
-//
-//
-//                        } else {
-//
-//                            dataManager.setIndustryPicker(picker);
-//                        }
-//
-//                        break;
-//
-//                    case PICKER_LOCATION_STATE:
-//
-//                        if (dataManager.getLocationPicker() != null) {
-//
-//                            Picker temp = new Picker();
-//                            temp.setPicker(picker.getPicker());
-//                            temp.setBytes(picker.getBytes());
-//                            temp.setValues(picker.getValues());
-//                            temp.setTitle(picker.getTitle());
-//                            temp.setLabel(picker.getLabel());
-//                            temp.setEnableDefault(dataManager.getLocationPicker().isEnableDefault
-//                                    ());
-//                            temp.setDefaultIndex(dataManager.getLocationPicker()
-// .getDefaultIndex());
-//
-//                            dataManager.setLocationPicker(temp);
-//
-//
-//                        } else {
-//
-//                            dataManager.setLocationPicker(picker);
-//                        }
-//
-//                        break;
-//
-//                    case PICKER_LOCATION_COUNTRY:
-//
-//                        dataManager.setCountryPicker(picker);
-//
-//                        break;
-//
-//                    case PICKER_TIME:
-//
-//                        if (dataManager.getTimePicker() != null) {
-//
-//                            Picker temp = new Picker();
-//                            temp.setPicker(picker.getPicker());
-//                            temp.setBytes(picker.getBytes());
-//                            temp.setValues(dataManager.getTimePicker().getValues());
-//                            temp.setTitle(picker.getTitle());
-//                            temp.setLabel(picker.getLabel());
-//                            temp.setEnableDefault(dataManager.getTimePicker().isEnableDefault());
-//                            temp.setDefaultIndex(dataManager.getTimePicker().getDefaultIndex());
-//
-//                            dataManager.setTimePicker(temp);
-//
-//                        }
-//
-//                        break;
-//
-//                }
-//            }
-//
-//            order.setPickers(pickers);
-//            dataManager.setPickerOrder(order);
-//
-//        }
-//
-//        if (dataManager.getScheme() != null && dataManager.getScheme().getPickers2() != null) {
-//
-//            Order order = new Order();
-//            List<String> pickers = new ArrayList<>();
-//
-//            for (Picker picker : dataManager.getScheme().getPickers2()) {
-//
-//                pickers.ic_add(picker.getPicker());
-//
-//                switch (picker.getPicker()) {
-//
-//                    case PICKER_ACCOUNT:
-//
-//                        break;
-//
-//                    case PICKER_GEO:
-//
-//                        if (dataManager.getGeoPicker() != null) {
-//
-//                            Picker temp = new Picker();
-//                            temp.setPicker(picker.getPicker());
-//                            temp.setBytes(picker.getBytes());
-//                            temp.setValues(picker.getValues());
-//                            temp.setTitle(picker.getTitle());
-//                            temp.setLabel(picker.getLabel());
-//                            temp.setEnableDefault(dataManager.getGeoPicker().isEnableDefault());
-//                            temp.setDefaultIndex(dataManager.getGeoPicker().getDefaultIndex());
-//
-//                            dataManager.setGeoPicker(temp);
-//
-//
-//                        } else {
-//
-//                            dataManager.setGeoPicker(picker);
-//                        }
-//
-//                        break;
-//
-//                    case PICKER_REQUEST:
-//
-//                        if (dataManager.getRequestPicker() != null) {
-//
-//                            Picker temp = new Picker();
-//                            temp.setPicker(picker.getPicker());
-//                            temp.setBytes(picker.getBytes());
-//                            temp.setValues(picker.getValues());
-//                            temp.setTitle(picker.getTitle());
-//                            temp.setLabel(picker.getLabel());
-//                            temp.setEnableDefault(dataManager.getRequestPicker()
-// .isEnableDefault());
-//                            temp.setDefaultIndex(dataManager.getRequestPicker().getDefaultIndex
-// ());
-//
-//                            dataManager.setRequestPicker(temp);
-//
-//
-//                        } else {
-//
-//                            dataManager.setRequestPicker(picker);
-//                        }
-//
-//                        break;
-//
-//                    case PICKER_DATA_TYPE:
-//
-//                        if (dataManager.getDataTypePicker() != null) {
-//
-//                            Picker temp = new Picker();
-//                            temp.setPicker(picker.getPicker());
-//                            temp.setBytes(picker.getBytes());
-//                            temp.setValues(picker.getValues());
-//                            temp.setTitle(picker.getTitle());
-//                            temp.setLabel(picker.getLabel());
-//                            temp.setEnableDefault(dataManager.getDataTypePicker().isEnableDefault
-//                                    ());
-//                            temp.setDefaultIndex(dataManager.getDataTypePicker()
-// .getDefaultIndex());
-//
-//                            dataManager.setDataTypePicker(temp);
-//
-//
-//                        } else {
-//
-//                            dataManager.setDataTypePicker(picker);
-//                        }
-//
-//                        break;
-//
-//                    case PICKER_TIME:
-//
-//                        break;
-//
-//                }
-//            }
-//
-//            order.setPickers(pickers);
-//            dataManager.setPickerOrder2(order);
-//
-//        }
-    }
-
 
 }

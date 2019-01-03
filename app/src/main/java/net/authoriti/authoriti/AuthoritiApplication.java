@@ -31,6 +31,11 @@ public class AuthoritiApplication extends Application {
         Fabric.with(this, new Crashlytics());
         context = getApplicationContext();
         Foreground.init(this);
+    }
 
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        System.out.println("Application terminated!");
     }
 }

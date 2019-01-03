@@ -3,6 +3,7 @@ package net.authoriti.authoriti;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import net.authoriti.authoriti.api.model.AuthLogIn;
 import net.authoriti.authoriti.ui.auth.InviteCodeActivity_;
 import net.authoriti.authoriti.ui.auth.LoginActivity_;
 import net.authoriti.authoriti.utils.AuthoritiData;
@@ -27,6 +28,11 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         dataManager = AuthoritiData_.getInstance_(this);
+        AuthLogIn logIn = dataManager.loginStatus();
+        if (logIn != null) {
+            logIn.setLogin(false);
+            dataManager.setAuthLogin(logIn);
+        }
 
         if (dataManager.loginStatus() != null && dataManager.loginStatus().isLogin()) {
             MainActivity_.intent(this).start();
