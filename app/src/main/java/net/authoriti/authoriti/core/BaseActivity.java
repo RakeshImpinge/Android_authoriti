@@ -58,13 +58,16 @@ public class BaseActivity extends AppCompatActivity implements Constants {
 //        }
 
 
-        kProgressHUD = KProgressHUD.create(this)
-                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
-                .setLabel(message)
-                .setCancellable(true)
-                .setAnimationSpeed(2)
-                .setDimAmount(0.5f)
-                .show();
+
+        if (!isFinishing()) {
+            kProgressHUD = KProgressHUD.create(this)
+                    .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                    .setLabel(message)
+                    .setCancellable(true)
+                    .setAnimationSpeed(2)
+                    .setDimAmount(0.5f)
+                    .show();
+        }
     }
 
     @UiThread
@@ -77,14 +80,16 @@ public class BaseActivity extends AppCompatActivity implements Constants {
 //        if (!isFinishing()) {
 //            progress.show();
 //        }
-        kProgressHUD = KProgressHUD.create(activity)
-                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
-                .setLabel(message)
-                .setCancellable(true)
-                .setAnimationSpeed(2)
-                .setDimAmount(0.5f)
-                .show();
 
+        if (!isFinishing()) {
+            kProgressHUD = KProgressHUD.create(activity)
+                    .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                    .setLabel(message)
+                    .setCancellable(true)
+                    .setAnimationSpeed(2)
+                    .setDimAmount(0.5f)
+                    .show();
+        }
     }
 
     @UiThread

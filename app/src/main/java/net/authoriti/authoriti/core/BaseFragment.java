@@ -45,13 +45,15 @@ public class BaseFragment extends Fragment implements Constants {
 //            progress.show();
 //        }
 
-        kProgressHUD = KProgressHUD.create(getActivity())
-                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
-                .setLabel(message)
-                .setCancellable(true)
-                .setAnimationSpeed(2)
-                .setDimAmount(0.5f)
-                .show();
+        if (!getActivity().isFinishing()) {
+            kProgressHUD = KProgressHUD.create(getActivity())
+                    .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                    .setLabel(message)
+                    .setCancellable(true)
+                    .setAnimationSpeed(2)
+                    .setDimAmount(0.5f)
+                    .show();
+        }
     }
 
     @UiThread
