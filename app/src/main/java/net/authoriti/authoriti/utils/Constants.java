@@ -82,6 +82,7 @@ public interface Constants {
     String TOPIC_RESET_PASSWORD = "TOPIC_RESET_PASSWORD";
     String TOPIC_CHASE = "help-account-id";
     String TOPIC_ABOUT = "TOPIC_ABOUT";
+    String TOPIC_SETTINGS = "help-settings";
     String TOPIC_PURPOSE_DETAIL = "TOPIC_PURPOSE_DETAIL";
     String TOPIC_PURPOSE_DETAIL_PICKER = "TOPIC_PURPOSE_DETAIL_PICKER";
 }
