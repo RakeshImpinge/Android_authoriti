@@ -27,6 +27,15 @@ public class AccountID {
     }
 
     private String Customer = "";
+    private String Customer_ID = "";
+
+    public String getCustomer_ID() {
+        return Customer_ID;
+    }
+
+    public void setCustomer_ID(String customer_ID) {
+        Customer_ID = customer_ID;
+    }
 
     public AccountID() {
         this.type = "";
@@ -65,7 +74,10 @@ public class AccountID {
     public Boolean getHashed() {
         return this.hashed;
     }
-    public void setHashed(boolean hashed) { this.hashed = hashed; }
+
+    public void setHashed(boolean hashed) {
+        this.hashed = hashed;
+    }
 
     public void setIdentifier(String identifier) {
         this.identifier = identifier;

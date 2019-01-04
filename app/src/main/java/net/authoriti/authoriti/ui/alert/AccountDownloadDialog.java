@@ -2,6 +2,7 @@ package net.authoriti.authoriti.ui.alert;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -59,6 +60,8 @@ public class AccountDownloadDialog extends AppCompatDialog {
         tiInvitationCode = (TextInputLayout) findViewById(R.id.tiInvitationCode);
         tiUserName = (TextInputLayout) findViewById(R.id.tiUserName);
         tiUserPassword = (TextInputLayout) findViewById(R.id.tiUserPassword);
+        tiUserPassword.setTypeface(Typeface.createFromAsset(getContext().getAssets(), "fonts/Oswald_Regular.ttf"));
+
         etInvitationCode = (EditText) findViewById(R.id.etInvitationCode);
         etUsername = (EditText) findViewById(R.id.etUsername);
         etPasswrd = (EditText) findViewById(R.id.etPasswrd);
