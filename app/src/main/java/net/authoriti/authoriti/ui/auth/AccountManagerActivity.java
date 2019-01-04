@@ -424,4 +424,9 @@ public class AccountManagerActivity extends SecurityActivity implements Security
     public void addSelfSigned() {
         showAccountAddDialog();
     }
+
+    @Override
+    public void syncId(String ID) {
+
+    }
 }

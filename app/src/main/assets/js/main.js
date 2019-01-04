@@ -23,6 +23,7 @@ var json_schema = SObject([
     ["accounts", SList(
         SObject([
             ["Customer", SString()],
+            ["Customer_ID", SString()],
             ["confirmed", SBoolean()],
             ["hashed", SBoolean()],
             ["value", SHex(32, "lower")],

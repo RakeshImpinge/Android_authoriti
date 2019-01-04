@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.widget.RelativeLayout;
 
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 
@@ -21,6 +23,7 @@ import net.authoriti.authoriti.utils.Constants;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 
@@ -38,25 +41,25 @@ public class SettingFragment extends BaseFragment {
     @Bean
     AuthoritiData dataManager;
 
-    SettingAdaper adapter;
+    @ViewById(R.id.rel_export)
+    RelativeLayout rel_export;
 
-    @ViewById(R.id.rvOptions)
-    RecyclerView rvOptions;
+    @ViewById(R.id.rel_change_password)
+    RelativeLayout rel_change_password;
 
-    List<SettingItem> groupItems = new ArrayList<>();
+    @ViewById(R.id.rel_wipe)
+    RelativeLayout rel_wipe;
+
 
     @AfterViews
     void callAfterViewInjection() {
         initItems();
-        adapter = new SettingAdaper(this, groupItems);
-        rvOptions.setLayoutManager(new LinearLayoutManager(mContext));
-        rvOptions.setAdapter(adapter);
+//        adapter = new SettingAdaper(this, groupItems);
+//        rvOptions.setLayoutManager(new LinearLayoutManager(mContext));
+//        rvOptions.setAdapter(adapter);
     }
 
     private void initItems() {
-        groupItems.clear();
-        groupItems.add(new SettingItem("Wipe"));
-        groupItems.add(new SettingItem("Export"));
     }
 
     @Override
@@ -92,4 +95,22 @@ public class SettingFragment extends BaseFragment {
 
         }
     }
+
+
+    @Click(R.id.rel_export)
+    void exportClick() {
+        ExportActivity_.intent(this.mContext).flags(Intent.FLAG_ACTIVITY_NEW_TASK).start();
+    }
+
+    @Click(R.id.rel_change_password)
+    void changePassClick() {
+
+    }
+
+    @Click(R.id.rel_wipe)
+    void wipeClick() {
+        wipeLogOut();
+    }
+
+
 }

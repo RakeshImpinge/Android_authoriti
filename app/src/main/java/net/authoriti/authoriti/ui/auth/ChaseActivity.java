@@ -159,6 +159,8 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
                 System.out.println("Checking: " + newAccountIDs.get(i));
                 boolean isContained = false;
                 newAccountIDs.get(i).setCustomer(responseSignUpChase.getCustomerName());
+                newAccountIDs.get(i).setCustomer_ID(responseSignUpChase.getId());
+
                 for (int k = 0; k < savedAccountIDs.size(); k++) {
                     if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
                             .getIdentifier())
@@ -193,6 +195,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
             }
             for (AccountID accountID : UserAccountsList) {
                 accountID.setCustomer(customer);
+                accountID.setCustomer_ID(responseSignUpChase.getId());
             }
             user.setAccountIDs(UserAccountsList);
 

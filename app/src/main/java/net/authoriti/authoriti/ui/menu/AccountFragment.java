@@ -100,12 +100,13 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
             }
         };
 
+
         LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastReceiver, new
                 IntentFilter(BROADCAST_ADD_BUTTON_CLICKED));
         LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastCloudReceiver, new
                 IntentFilter(BROADCAST_CLOUD_BUTTON_CLICKED));
         LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastSyncReceiver, new
-                IntentFilter(BROADCAST_SYNC_BUTTON_CLICKED));
+                IntentFilter(BROADCAST_SYNC_DONE));
 
 
         adapter = new AccountAdaper(accountList, this);
@@ -314,6 +315,11 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
         showAccountAddDialog();
     }
 
+    @Override
+    public void syncId(String ID) {
+        ((MainActivity) getActivity()).syncButtonClicked(ID);
+    }
+
     private void showAccountDownloadDialog() {
         if (accountDownloadDialog == null) {
             accountDownloadDialog = new AccountDownloadDialog(mActivity);
@@ -408,6 +414,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
             System.out.println("Checking: " + newAccountIDs.get(i));
             boolean isContained = false;
             newAccountIDs.get(i).setCustomer(body.getCustomerName());
+            newAccountIDs.get(i).setCustomer_ID(body.getId());
             for (int k = 0; k < savedAccountIDs.size(); k++) {
                 if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
                         .getIdentifier())

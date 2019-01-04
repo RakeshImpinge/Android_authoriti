@@ -91,14 +91,6 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
     private AccountAddDialog accountAddDialog;
 
 
-    BroadcastReceiver broadcastSyncReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-//            InviteCodeActivity_.intent(getActivity()).showBack(true).isSyncRequired(true)
-//                    .start();
-            showAccounts();
-        }
-    };
     BroadcastReceiver broadcastAddReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -110,6 +102,13 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
         @Override
         public void onReceive(Context context, Intent intent) {
             showAccountDownloadDialog();
+        }
+    };
+
+    BroadcastReceiver broadcastSyncReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            showAccounts();
         }
     };
 
@@ -130,12 +129,12 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
     @Override
     public void onStart() {
         super.onStart();
-        LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastSyncReceiver, new
-                IntentFilter(BROADCAST_SYNC_BUTTON_CLICKED));
         LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastAddReceiver, new
                 IntentFilter(BROADCAST_ADD_BUTTON_CLICKED));
         LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastCloudReceiver, new
                 IntentFilter(BROADCAST_CLOUD_BUTTON_CLICKED));
+        LocalBroadcastManager.getInstance(mContext).registerReceiver(broadcastSyncReceiver, new
+                IntentFilter(BROADCAST_SYNC_DONE));
     }
 
     @Override
@@ -149,9 +148,9 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
     @Override
     public void onPause() {
         super.onPause();
-        LocalBroadcastManager.getInstance(mContext).unregisterReceiver(broadcastSyncReceiver);
         LocalBroadcastManager.getInstance(mContext).unregisterReceiver(broadcastAddReceiver);
         LocalBroadcastManager.getInstance(mContext).unregisterReceiver(broadcastCloudReceiver);
+        LocalBroadcastManager.getInstance(mContext).unregisterReceiver(broadcastSyncReceiver);
     }
 
     public void showAccounts() {
@@ -200,9 +199,6 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
                 return accountID.getCustomer().compareTo(t1.getCustomer());
             }
         });
-
-        int sz = accountList.size();
-
 //        if (selfRegIndex != -1) {
 //            AccountID selfReg = accountList.remove(selfRegIndex);
 //        }
@@ -499,6 +495,11 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
     }
 
     @Override
+    public void syncId(String ID) {
+        ((MainActivity) getActivity()).syncButtonClicked(ID);
+    }
+
+    @Override
     public void accountDownloadDialogOKButtonClicked(String inviteCode, String userName, String password) {
         hideAccountDownloadDialog();
         signUp(inviteCode, userName, password);
@@ -567,6 +568,7 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
             System.out.println("Checking: " + newAccountIDs.get(i));
             boolean isContained = false;
             newAccountIDs.get(i).setCustomer(body.getCustomerName());
+            newAccountIDs.get(i).setCustomer_ID(body.getId());
             for (int k = 0; k < savedAccountIDs.size(); k++) {
                 if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
                         .getIdentifier())

@@ -30,5 +30,8 @@ Authoriti is the developer of the Authoriti Permission Code™, which gives inst
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="export_wallet_to_new_device">Export Wallet to New Device</string>
+    <string name="change_password">Change Password</string>
+    <string name="wipe_all_data_warning_can_not_be_undo">Wipe All Data (warning: can not be undone)</string>
 
 </resources>

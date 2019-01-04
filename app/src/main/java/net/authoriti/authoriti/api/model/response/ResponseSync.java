@@ -28,6 +28,10 @@ public class ResponseSync {
         @SerializedName("customerName")
         private String customerName;
 
+        @SerializedName("userId")
+        private String userId;
+
+
         @SerializedName("accounts")
         private List<AccountID> accounts;
 
@@ -47,5 +51,12 @@ public class ResponseSync {
             this.accounts = accounts;
         }
 
+        public String getUserId() {
+            return userId;
+        }
+
+        public void setUserId(String userId) {
+            this.userId = userId;
+        }
     }
 }

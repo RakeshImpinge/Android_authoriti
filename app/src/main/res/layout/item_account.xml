@@ -34,32 +34,64 @@
             tools:ignore="MissingPrefix" />
 
 
-        <LinearLayout
-            android:id="@+id/lin_add_self_id"
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="15dp"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:layout_centerVertical="true">
 
-            <android.support.v7.widget.AppCompatTextView
-                fontPath="@string/font_oswaldo_regular"
+            <ImageButton
+                android:id="@+id/ivSync"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/iv_add_self"
-                android:text="Add ID"
-                android:textColor="@color/colorPrimary" />
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="4dp"
+                android:src="@drawable/icon_refresh"
+                android:tint="@color/colorPrimary"
+                android:visibility="visible" />
 
-            <ImageView
-                android:layout_width="15dp"
-                android:layout_height="15dp"
-                android:layout_marginLeft="5dp"
-                android:scaleType="fitXY"
-                android:src="@drawable/ic_add"
-                android:tint="@color/colorPrimary" />
-        </LinearLayout>
+            <LinearLayout
+                android:id="@+id/lin_add_self_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="15dp"
+                android:layout_toRightOf="@+id/ivSync"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <android.support.v7.widget.AppCompatTextView
+                        android:id="@+id/txt_add"
+                        fontPath="@string/font_oswaldo_regular"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="Add ID"
+                        android:textColor="@color/colorPrimary" />
+
+                    <ImageView
+                        android:id="@+id/iv_add_self"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="5dp"
+                        android:layout_toRightOf="@+id/txt_add"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/ic_add"
+                        android:tint="@color/colorPrimary" />
+                </RelativeLayout>
+
+            </LinearLayout>
+
+
+        </RelativeLayout>
 
 
     </RelativeLayout>

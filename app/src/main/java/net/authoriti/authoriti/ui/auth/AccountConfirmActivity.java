@@ -421,4 +421,9 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
     public void addSelfSigned() {
 
     }
+
+    @Override
+    public void syncId(String ID) {
+
+    }
 }
