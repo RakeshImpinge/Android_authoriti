@@ -318,6 +318,7 @@ public class MainActivity extends BaseActivity {
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
+        System.out.println("Help clicked");
         String topic = "";
         if (SELECTED_MENU_ID == MENU_CODE) {
             topic = TOPIC_GENERAL;
@@ -329,7 +330,10 @@ public class MainActivity extends BaseActivity {
             }
         } else if (SELECTED_MENU_ID == MENU_WIPE) {
             topic = TOPIC_ABOUT;
+        } else if (SELECTED_MENU_ID == MENU_SETTING) {
+            topic = TOPIC_SETTINGS;
         }
+        System.out.println("Topic: " + topic);
         if (!topic.equals("")) {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ConstantUtils
                     .getHelpUrl(topic)));
