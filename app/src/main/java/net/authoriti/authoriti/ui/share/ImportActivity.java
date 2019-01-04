@@ -157,6 +157,7 @@ public class ImportActivity extends BaseActivity implements ZXingScannerView.Res
         JSONObject jsonObject = null;
         try {
             jsonObject = new JSONObject(data);
+            System.out.println("JSONObject: " + jsonObject);
             String privateKey = jsonObject.getString("encryptPrivateKey");
             String password = jsonObject.getString("encryptPassword");
             String userSalt = jsonObject.getString("encryptSalt");
