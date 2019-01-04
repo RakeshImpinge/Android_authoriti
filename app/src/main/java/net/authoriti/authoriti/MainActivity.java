@@ -100,8 +100,6 @@ public class MainActivity extends BaseActivity {
     @ViewById(R.id.ivAdd)
     ImageButton ivAdd;
 
-    @ViewById(R.id.ivSync)
-    ImageButton ivSync;
 
     @ViewById(R.id.ivCloud)
     ImageButton ivCloud;
@@ -273,12 +271,10 @@ public class MainActivity extends BaseActivity {
         drawer.setSelection(menu_id, false);
         SELECTED_MENU_ID = menu_id;
         if (menu_id == MENU_ACCOUNT) {
-            ivSync.setVisibility(View.VISIBLE);
             ivCloud.setVisibility(View.VISIBLE);
             ivAdd.setVisibility(View.GONE);
         } else {
             ivAdd.setVisibility(View.INVISIBLE);
-            ivSync.setVisibility(View.GONE);
             ivCloud.setVisibility(View.GONE);
         }
     }
@@ -353,17 +349,21 @@ public class MainActivity extends BaseActivity {
         LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(BROADCAST_CLOUD_BUTTON_CLICKED));
     }
 
-    @Click(R.id.ivSync)
-    void syncButtonClicked() {
+    public void syncButtonClicked(final String ID) {
         displayProgressDialog("Downloading\nwallet items...");
         RequestSync sycnew = new RequestSync();
-        List<String> downloadIdList = dataManager.getUser().getDownloadedWalletIDList();
-        if (!downloadIdList.contains(dataManager.getUser().getUserId())) {
-            if (dataManager.getUser().getChaseType()) {
-                downloadIdList.add(dataManager.getUser().getUserId());
+        if (ID == null || ID.equals("")) {
+            List<String> downloadIdList = dataManager.getUser().getDownloadedWalletIDList();
+            if (!downloadIdList.contains(dataManager.getUser().getUserId())) {
+                if (dataManager.getUser().getChaseType()) {
+                    downloadIdList.add(dataManager.getUser().getUserId());
+                }
             }
+        } else {
+            List<String> downloadIdList = new ArrayList<>();
+            downloadIdList.add(ID);
+            sycnew.setUserId(downloadIdList);
         }
-        sycnew.setUserId(downloadIdList);
         AuthoritiAPI.APIService().sync("Bearer " + dataManager.getUser().getToken(), sycnew).enqueue(new Callback<ResponseSync>() {
             @Override
             public void onResponse(Call<ResponseSync> call, Response<ResponseSync> response) {
@@ -379,6 +379,7 @@ public class MainActivity extends BaseActivity {
                             Log.e("Loop", "" + i);
                             boolean isContained = false;
                             newAccountIDs.get(i).setCustomer(responseSync.getCustomerName());
+                            newAccountIDs.get(i).setCustomer(responseSync.getUserId());
                             for (int k = 0; k < savedAccountIDs.size(); k++) {
                                 if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
                                         .getIdentifier())
@@ -397,7 +398,7 @@ public class MainActivity extends BaseActivity {
                     user.setAccountIDs(savedAccountIDs);
                     dataManager.setUser(user);
                     dismissProgressDialog();
-                    LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(BROADCAST_SYNC_BUTTON_CLICKED));
+                    LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(BROADCAST_SYNC_DONE));
                     Toast.makeText(MainActivity.this, "Wallets downloaded successfully", Toast.LENGTH_LONG).show();
                 } else {
                     dismissProgressDialog();

@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -37,6 +38,7 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
         LinearLayout surface;
         TextView txt_delete;
         SwipeLayout swipeLayout;
+        ImageButton ivSync;
 
         MyViewHolder(View view) {
             super(view);
@@ -47,6 +49,7 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
             markDefault = (View) view.findViewById(R.id.markDefault);
             swipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipe);
             lin_add_self_id = (LinearLayout) itemView.findViewById(R.id.lin_add_self_id);
+            ivSync = (ImageButton) itemView.findViewById(R.id.ivSync);
             surface = (LinearLayout) itemView.findViewById(R.id.surface);
         }
     }
@@ -70,7 +73,6 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
         holder.txt_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                System.out.println("AccountId: " + accountID.getIdentifier());
                 holder.swipeLayout.close(true);
                 updateInterfce.deleted(accountID.getIdentifier());
             }
@@ -81,15 +83,24 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
         if (customer.equals("")) {
             holder.lin_add_self_id.setVisibility(View.VISIBLE);
             customer = "Self Registered ID's";
+            holder.ivSync.setVisibility(View.GONE);
         } else {
             holder.lin_add_self_id.setVisibility(View.GONE);
             customer = customer + " ID's";
+            holder.ivSync.setVisibility(View.VISIBLE);
         }
 
         holder.lin_add_self_id.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 updateInterfce.addSelfSigned();
+            }
+        });
+
+        holder.ivSync.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateInterfce.syncId(customerList.get(position).getCustomer_ID());
             }
         });
 

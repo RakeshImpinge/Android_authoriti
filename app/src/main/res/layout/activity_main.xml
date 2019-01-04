@@ -54,20 +54,6 @@
 
 
             <ImageButton
-                android:id="@+id/ivSync"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="2dp"
-                android:layout_toLeftOf="@+id/ivCloud"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="8dp"
-                android:src="@drawable/icon_refresh"
-                android:tint="@android:color/white"
-                android:visibility="visible" />
-
-
-            <ImageButton
                 android:id="@+id/ivCloud"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

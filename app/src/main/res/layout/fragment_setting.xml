@@ -45,11 +45,110 @@
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/rvOptions"
+                <RelativeLayout
+                    android:id="@+id/rel_export"
                     android:layout_width="match_parent"
+                    android:layout_height="59dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        fontPath="@string/font_oswaldo_regular"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="16dp"
+                        android:text="@string/export_wallet_to_new_device"
+                        android:textColor="@color/colorTextPrimary"
+                        android:textSize="18sp"
+                        tools:ignore="MissingPrefix" />
+
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="16dp"
+                        android:src="@drawable/ic_disclosure" />
+
+                </RelativeLayout>
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#E5E5E5" />
+
+                <RelativeLayout
+                    android:id="@+id/rel_change_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="59dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        fontPath="@string/font_oswaldo_regular"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="16dp"
+                        android:text="@string/change_password"
+                        android:textColor="@color/colorTextPrimary"
+                        android:textSize="18sp"
+                        tools:ignore="MissingPrefix" />
+
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="16dp"
+                        android:src="@drawable/ic_disclosure" />
+
+                </RelativeLayout>
+
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:overScrollMode="never" />
+                    android:background="@color/colorHeaderBackground"
+                    android:paddingTop="30dp"
+                    android:paddingBottom="30dp">
+
+
+                    <RelativeLayout
+                        android:id="@+id/rel_wipe"
+                        android:layout_width="match_parent"
+                        android:layout_height="59dp"
+                        android:background="@android:color/white"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            fontPath="@string/font_oswaldo_regular"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="16dp"
+                            android:text="@string/wipe_all_data_warning_can_not_be_undo"
+                            android:textColor="@color/colorTextPrimary"
+                            android:textSize="18sp"
+                            tools:ignore="MissingPrefix" />
+
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="16dp"
+                            android:src="@drawable/ic_disclosure" />
+
+                    </RelativeLayout>
+
+                </RelativeLayout>
 
             </LinearLayout>
         </LinearLayout>
