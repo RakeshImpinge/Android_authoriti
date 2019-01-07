@@ -41,8 +41,10 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -72,6 +74,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
     private AccountAddDialog accountAddDialog;
     BroadcastReceiver broadcastReceiver, broadcastCloudReceiver, broadcastSyncReceiver;
     AccountDownloadDialog accountDownloadDialog;
+
 
 
     @AfterViews
@@ -133,6 +136,8 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
     }
 
     private void showAccounts() {
+        System.out.println("Show Accounts(Self Registered)");
+
         accountList.clear();
         if (dataManager.getUser().getAccountIDs() != null) {
             for (int i = 0; i < dataManager.getUser().getAccountIDs().size(); i++) {
