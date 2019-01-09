@@ -1,6 +1,7 @@
 package net.authoriti.authoriti.ui.auth;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.provider.Settings;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.res.ResourcesCompat;
@@ -95,9 +96,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
         etIdentifier.setHint(customer.toUpperCase() + " USERNAME");
         tvTitle.setText(customer + " is a partner of Authority. Please enter your " + customer +
                 " password so we can authorize you.");
-
-        tiPassword.setTypeface(ResourcesCompat.getFont(getApplicationContext(), R.font.oswald_regular));
-
+        tiPassword.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Oswald_Regular.ttf"));
         KeyboardVisibilityEvent.setEventListener(this, new KeyboardVisibilityEventListener() {
             @Override
             public void onVisibilityChanged(boolean isOpen) {

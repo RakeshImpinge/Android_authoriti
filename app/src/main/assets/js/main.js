@@ -31,13 +31,14 @@ var json_schema = SObject([
         ])
     )],
 //    ["encryptKey", SB64Tuple([16, 32], ":", true)],
-    ["encryptPassword", SString()],
+//    ["encryptPassword", SString()],
     ["encryptPrivateKey", SString()],
     ["encryptSalt", SString()],
     ["fingerPrintAuthEnabled", SBoolean()],
     ["invite_code", SString()],
     ["isChaseType", SBoolean()],
     ["password", SString()],
+    ["identifier", SString()],
     ["token", SJWToken(
         {"alg": "HS256", "typ": "JWT"},
         SJWTPayload([

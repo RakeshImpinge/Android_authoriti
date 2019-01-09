@@ -3,6 +3,7 @@ package net.authoriti.authoriti.core;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
@@ -48,7 +49,7 @@ public class BaseFragment extends Fragment implements Constants {
         if (!getActivity().isFinishing() && (kProgressHUD == null || !kProgressHUD.isShowing())) {
             kProgressHUD = KProgressHUD.create(getActivity())
                     .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
-                    .setLabel(message)
+                    .setBackgroundColor(Color.rgb(224, 230, 233))
                     .setCancellable(true)
                     .setAnimationSpeed(2)
                     .setDimAmount(0.5f)

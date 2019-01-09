@@ -1,6 +1,7 @@
 package net.authoriti.authoriti.ui.auth;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.hardware.fingerprint.FingerprintManager;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.widget.NestedScrollView;
@@ -110,6 +111,9 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
 
         tiAccount.setError(null);
         tiPassword.setError(null);
+
+        tiPassword.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Oswald_Regular.ttf"));
+
 
         if (dataManager != null && dataManager.getUser() != null && dataManager.getUser()
                 .isFingerPrintAuthEnabled()) {
