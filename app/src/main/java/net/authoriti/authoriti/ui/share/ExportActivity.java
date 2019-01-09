@@ -39,6 +39,8 @@ import java.security.GeneralSecurityException;
 
 import javax.crypto.SecretKey;
 
+import tgio.rncryptor.RNCryptorNative;
+
 import static com.tozny.crypto.android.AesCbcWithIntegrity.BASE64_FLAGS;
 
 
@@ -165,27 +167,19 @@ public class ExportActivity extends BaseActivity implements WebAppInterface.Data
 
 
     public String encrypt(String value, String password) {
-        try {
-            AesCbcWithIntegrity.SecretKeys keys = AesCbcWithIntegrity.generateKeyFromPassword
-                    (password, Base64.encodeToString(password.getBytes(), Base64.DEFAULT));
-            AesCbcWithIntegrity.CipherTextIvMac cipherTextIvMac = AesCbcWithIntegrity.encrypt
-                    (value, keys);
-            return cipherTextIvMac.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "";
+        RNCryptorNative rncryptor = new RNCryptorNative();
+        return new String(rncryptor.encrypt(value, password));
     }
 
 
     @Override
     public void resultData(final String data) {
-        dismissProgressDialog();
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                dismissProgressDialog();
                 int width = ivQRCode.getMeasuredWidth();
-                int height = ivQRCode.getMeasuredHeight();
+               int height = ivQRCode.getMeasuredHeight();
                 if (width > height) {
                     width = height;
                 } else {
@@ -196,3 +190,23 @@ public class ExportActivity extends BaseActivity implements WebAppInterface.Data
         });
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

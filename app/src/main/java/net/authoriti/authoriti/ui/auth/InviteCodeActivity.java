@@ -163,9 +163,9 @@ public class InviteCodeActivity extends BaseActivity {
 
     private void checkInviteCode(final boolean isNextClick) {
         if (isNextClick) {
-            displayProgressDialog("Validating Password...");
+            displayProgressDialog("Validating\nPassword");
         } else {
-            displayProgressDialog("Please Wait...");
+            displayProgressDialog("Please Wait");
         }
         AuthoritiAPI.APIService().checkInviteCodeValidate(etCode.getText().toString()).enqueue
                 (new Callback<ResponseInviteCode>() {

@@ -36,6 +36,7 @@ import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
+import tgio.rncryptor.RNCryptorNative;
 
 import static com.tozny.crypto.android.AesCbcWithIntegrity.BASE64_FLAGS;
 
@@ -157,14 +158,19 @@ public class ImportActivity extends BaseActivity implements ZXingScannerView.Res
     }
 
     @Override
-    public void resultData(String data) {
-        dismissProgressDialog();
-        if (data != null && !data.equals("")) {
-            imported_data = data;
-            showAccountPasswordDialog();
-        } else {
-            Toast.makeText(mContext, "Unable to scan please try again", Toast.LENGTH_SHORT).show();
-        }
+    public void resultData(final String data) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                dismissProgressDialog();
+                if (data != null && !data.equals("")) {
+                    imported_data = data;
+                    showAccountPasswordDialog();
+                } else {
+                    Toast.makeText(mContext, "Unable to scan please try again", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     @Override
@@ -211,6 +217,7 @@ public class ImportActivity extends BaseActivity implements ZXingScannerView.Res
                     AesCbcWithIntegrity.SecretKeys keys = AesCbcWithIntegrity.generateKeyFromPassword(password, salt);
                     jsonObject.put("encryptPrivateKey", AesCbcWithIntegrity.encrypt(privateKey, keys).toString());
                     jsonObject.put("encryptPassword", AesCbcWithIntegrity.encrypt(password, keys).toString());
+                    jsonObject.put("encryptSalt", AesCbcWithIntegrity.encrypt(userSalt, keys).toString());
                     jsonObject.put("encryptKey", AesCbcWithIntegrity.keyString(keys));
                     authoritiData.setUserJson(jsonObject);
                     LoginActivity_.intent(getApplicationContext()).flags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK).start();
@@ -218,6 +225,7 @@ public class ImportActivity extends BaseActivity implements ZXingScannerView.Res
                     Toast.makeText(mContext, "Invalid Qr Code", Toast.LENGTH_SHORT).show();
                     hideAccountPasswordDialog();
                     startActivity(getIntent());
+                    finish();
                     overridePendingTransition(0, 0);
                 }
             } else {
@@ -232,22 +240,15 @@ public class ImportActivity extends BaseActivity implements ZXingScannerView.Res
     }
 
     private String decode(String ciphervalue, String password) {
-        try {
-            AesCbcWithIntegrity.SecretKeys keys = AesCbcWithIntegrity.generateKeyFromPassword
-                    (password, Base64.encodeToString(password.getBytes(), Base64.DEFAULT));
-            AesCbcWithIntegrity.CipherTextIvMac cipherTextIvMac_d = new AesCbcWithIntegrity
-                    .CipherTextIvMac(ciphervalue);
-            return AesCbcWithIntegrity.decryptString(cipherTextIvMac_d, keys);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "";
+        RNCryptorNative rncryptor = new RNCryptorNative();
+        return rncryptor.decrypt(ciphervalue, password);
     }
 
     @Override
     public void accountAddDialogCancelButtonClicked() {
         hideAccountPasswordDialog();
         startActivity(getIntent());
+        finish();
         overridePendingTransition(0, 0);
     }
 }
