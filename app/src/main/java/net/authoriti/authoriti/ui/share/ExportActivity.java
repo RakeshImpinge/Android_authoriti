@@ -23,6 +23,7 @@ import net.authoriti.authoriti.api.model.User;
 import net.authoriti.authoriti.core.BaseActivity;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.Constants;
+import net.authoriti.authoriti.utils.CryptLib;
 import net.authoriti.authoriti.utils.WebAppInterface;
 import net.glxn.qrgen.android.QRCode;
 
@@ -39,7 +40,6 @@ import java.security.GeneralSecurityException;
 
 import javax.crypto.SecretKey;
 
-import tgio.rncryptor.RNCryptorNative;
 
 import static com.tozny.crypto.android.AesCbcWithIntegrity.BASE64_FLAGS;
 
@@ -167,8 +167,12 @@ public class ExportActivity extends BaseActivity implements WebAppInterface.Data
 
 
     public String encrypt(String value, String password) {
-        RNCryptorNative rncryptor = new RNCryptorNative();
-        return new String(rncryptor.encrypt(value, password));
+        try {
+            return new CryptLib().encryptPlainTextWithRandomIV(value, password).replace("\n", "");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
 
@@ -179,7 +183,7 @@ public class ExportActivity extends BaseActivity implements WebAppInterface.Data
             public void run() {
                 dismissProgressDialog();
                 int width = ivQRCode.getMeasuredWidth();
-               int height = ivQRCode.getMeasuredHeight();
+                int height = ivQRCode.getMeasuredHeight();
                 if (width > height) {
                     width = height;
                 } else {

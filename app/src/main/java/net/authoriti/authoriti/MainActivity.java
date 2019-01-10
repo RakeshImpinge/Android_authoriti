@@ -261,8 +261,8 @@ public class MainActivity extends BaseActivity {
             userAccountIds.clear();
             PollingStopMilliseconds = System.currentTimeMillis() + (5 * 1000);
             userAccountIds.addAll(dataManager.getUser().getAccountIDs());
-            startPolling();
             displayProgressDialog("Please Wait...");
+            startPolling();
         }
 
         changeFragment(fragment);
@@ -591,7 +591,13 @@ public class MainActivity extends BaseActivity {
         if (!accId.getCustomer().equalsIgnoreCase("")) {
             pollingApi(accId.getIdentifier(), accId.getCustomer());
         } else {
-            dismissProgressDialog();
+            if (System.currentTimeMillis() < PollingStopMilliseconds) {
+                handler.removeCallbacks(runnable);
+                handler.postDelayed(runnable, 100);
+            } else {
+                dismissProgressDialog();
+                showAlert("", "No Pending Updates");
+            }
         }
     }
 
@@ -604,7 +610,6 @@ public class MainActivity extends BaseActivity {
     };
 
     private void pollingApi(final String Id, final String customer) {
-        Log.e("pollingApi", "Started_" + currentId + "_: " + Id);
         String pollingUrl = Constants.API_BASE_URL_POLLING + Id + ".json";
         AuthoritiAPI.APIService().getPollingUrl(pollingUrl).enqueue
                 (new Callback<ResponsePolling>() {
@@ -689,7 +694,7 @@ public class MainActivity extends BaseActivity {
                 }
                 String customer_name = "";
                 try {
-                    customer_name = URLDecoder.decode(hashMap.get("customer"), "UTF-8");
+                    customer_name = URLDecoder.decode(hashMap.get("origin"), "UTF-8");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
