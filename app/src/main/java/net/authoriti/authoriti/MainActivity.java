@@ -64,6 +64,8 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -259,8 +261,8 @@ public class MainActivity extends BaseActivity {
             userAccountIds.clear();
             PollingStopMilliseconds = System.currentTimeMillis() + (5 * 1000);
             userAccountIds.addAll(dataManager.getUser().getAccountIDs());
-            startPolling();
             displayProgressDialog("Please Wait...");
+            startPolling();
         }
 
         changeFragment(fragment);
@@ -383,7 +385,7 @@ public class MainActivity extends BaseActivity {
                             Log.e("Loop", "" + i);
                             boolean isContained = false;
                             newAccountIDs.get(i).setCustomer(responseSync.getCustomerName());
-                            newAccountIDs.get(i).setCustomer(responseSync.getUserId());
+                            newAccountIDs.get(i).setCustomer_ID(responseSync.getUserId());
                             for (int k = 0; k < savedAccountIDs.size(); k++) {
                                 if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
                                         .getIdentifier())
@@ -587,7 +589,15 @@ public class MainActivity extends BaseActivity {
         else currentId = currentId + 1;
         AccountID accId = userAccountIds.get(currentId);
         if (!accId.getCustomer().equalsIgnoreCase("")) {
-            pollingApi(accId.getIdentifier());
+            pollingApi(accId.getIdentifier(), accId.getCustomer());
+        } else {
+            if (System.currentTimeMillis() < PollingStopMilliseconds) {
+                handler.removeCallbacks(runnable);
+                handler.postDelayed(runnable, 100);
+            } else {
+                dismissProgressDialog();
+                showAlert("", "No Pending Updates");
+            }
         }
     }
 
@@ -599,7 +609,7 @@ public class MainActivity extends BaseActivity {
         }
     };
 
-    private void pollingApi(final String Id) {
+    private void pollingApi(final String Id, final String customer) {
         Log.e("pollingApi", "Started_" + currentId + "_: " + Id);
         String pollingUrl = Constants.API_BASE_URL_POLLING + Id + ".json";
         AuthoritiAPI.APIService().getPollingUrl(pollingUrl).enqueue
@@ -612,7 +622,7 @@ public class MainActivity extends BaseActivity {
                                 !response.body().getUrl().equals("")) {
                             removePendingRequest(Id);
                             dismissProgressDialog();
-                            PermissionCodeRequest(response.body().getUrl());
+                            PermissionCodeRequest(response.body().getUrl(), customer);
                         } else {
                             if (System.currentTimeMillis() < PollingStopMilliseconds) {
                                 handler.removeCallbacks(runnable);
@@ -650,7 +660,7 @@ public class MainActivity extends BaseActivity {
     }
 
     // Parse polling url and redirect to next screen
-    private void PermissionCodeRequest(String url) {
+    private void PermissionCodeRequest(String url, String customer) {
         String[] splitUrl = url.split("\\?");
         if (splitUrl.length > 0) {
             String label = splitUrl[0].replace("authoriti://purpose/", "");
@@ -683,10 +693,20 @@ public class MainActivity extends BaseActivity {
                         hashMap.put(splitValue[0].replace("-", ""), splitValue[1].replace("-", ""));
                     }
                 }
+                String customer_name = "";
+                try {
+                    customer_name = URLDecoder.decode(hashMap.get("customer"), "UTF-8");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 if (!hashMap.isEmpty() && indexGroup != -1 && indexItem != -1) {
-                    CodePermissionActivity_.intent(mContext).purposeIndex(indexGroup)
-                            .purposeIndexItem(indexItem).defParamFromUrl(hashMap)
-                            .start();
+                    if (customer_name.toLowerCase().equals(customer.toLowerCase())) {
+                        CodePermissionActivity_.intent(mContext).purposeIndex(indexGroup)
+                                .purposeIndexItem(indexItem).defParamFromUrl(hashMap)
+                                .start();
+                    } else {
+                        Log.e("Message", "Invalid Url");
+                    }
                 }
             }
         } else {

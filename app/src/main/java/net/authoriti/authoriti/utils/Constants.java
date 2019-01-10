@@ -12,6 +12,7 @@ public interface Constants {
     String API_BASE_URL_POLLING =
             "https://s3.amazonaws.com/authoriti-requests-qa/requests/";
     String HELP_BASE = "https://help.authoriti.net";
+    String IDENTIFIER = "authoriti";
 
 
 //    String API_BASE_URL = "https://authoriti-test.crts.io";
@@ -85,4 +86,6 @@ public interface Constants {
     String TOPIC_SETTINGS = "help-settings";
     String TOPIC_PURPOSE_DETAIL = "TOPIC_PURPOSE_DETAIL";
     String TOPIC_PURPOSE_DETAIL_PICKER = "TOPIC_PURPOSE_DETAIL_PICKER";
+
+
 }

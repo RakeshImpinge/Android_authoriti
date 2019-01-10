@@ -22,27 +22,33 @@ import com.tozny.crypto.android.AesCbcWithIntegrity;
 
 import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.core.BaseActivity;
+import net.authoriti.authoriti.ui.alert.AccountPasswordDialog;
 import net.authoriti.authoriti.ui.auth.LoginActivity_;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiData_;
+import net.authoriti.authoriti.utils.Constants;
+import net.authoriti.authoriti.utils.CryptLib;
 import net.authoriti.authoriti.utils.WebAppInterface;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.security.GeneralSecurityException;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
+import static com.tozny.crypto.android.AesCbcWithIntegrity.BASE64_FLAGS;
 
-public class ImportActivity extends BaseActivity implements ZXingScannerView.ResultHandler, WebAppInterface.DataInterface, View.OnClickListener {
+
+public class ImportActivity extends BaseActivity implements ZXingScannerView.ResultHandler, WebAppInterface.DataInterface, View.OnClickListener, AccountPasswordDialog.AccountPasswordDialogListener {
 
     AuthoritiData authoritiData;
     private ZXingScannerView mScannerView;
     WebView webView;
-
+    AccountPasswordDialog dialog;
     ImageView ivClose;
+    String imported_data = "";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,7 +59,6 @@ public class ImportActivity extends BaseActivity implements ZXingScannerView.Res
         webView = (WebView) findViewById(R.id.webview);
         ivClose = (ImageView) findViewById(R.id.ivClose);
         ivClose.setOnClickListener(this);
-
     }
 
     @Override
@@ -153,31 +158,19 @@ public class ImportActivity extends BaseActivity implements ZXingScannerView.Res
     }
 
     @Override
-    public void resultData(String data) {
-        JSONObject jsonObject = null;
-        try {
-            jsonObject = new JSONObject(data);
-            String privateKey = jsonObject.getString("encryptPrivateKey");
-            String password = jsonObject.getString("encryptPassword");
-            String userSalt = jsonObject.getString("encryptSalt");
-
-            String salt = AesCbcWithIntegrity.saltString(AesCbcWithIntegrity.generateSalt());
-            AesCbcWithIntegrity.SecretKeys keys = AesCbcWithIntegrity.generateKeyFromPassword(password, salt);
-
-            jsonObject.put("encryptPrivateKey", AesCbcWithIntegrity.encrypt(privateKey, keys).toString());
-            jsonObject.put("encryptPassword",AesCbcWithIntegrity.encrypt(password, keys).toString());
-            jsonObject.put("encryptSalt", AesCbcWithIntegrity.encrypt(userSalt, keys).toString());
-            jsonObject.put("encryptKey", AesCbcWithIntegrity.keyString(keys));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        dismissProgressDialog();
-        if (jsonObject != null) {
-            authoritiData.setUserJson(jsonObject);
-            LoginActivity_.intent(getApplicationContext()).flags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK).start();
-        } else {
-            Toast.makeText(mContext, "Unable to scan please try again", Toast.LENGTH_SHORT).show();
-        }
+    public void resultData(final String data) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                dismissProgressDialog();
+                if (data != null && !data.equals("")) {
+                    imported_data = data;
+                    showAccountPasswordDialog();
+                } else {
+                    Toast.makeText(mContext, "Unable to scan please try again", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     @Override
@@ -187,5 +180,80 @@ public class ImportActivity extends BaseActivity implements ZXingScannerView.Res
                 onBackPressed();
                 break;
         }
+    }
+
+    private void showAccountPasswordDialog() {
+        if (dialog == null) {
+            dialog = new AccountPasswordDialog(ImportActivity.this);
+            dialog.setListener(this);
+        } else {
+            dialog.init();
+        }
+        if (!isFinishing() && !dialog.isShowing()) {
+            dialog.show();
+        }
+    }
+
+    private void hideAccountPasswordDialog() {
+        if (dialog != null) {
+            dialog.dismiss();
+            dialog = null;
+        }
+    }
+
+
+    @Override
+    public void accountPasswordDialogOKButtonClicked(String password) {
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(imported_data);
+            if (jsonObject != null) {
+                String identifier = jsonObject.getString("identifier");
+                identifier = decode(identifier, password);
+                if (identifier.equals(Constants.IDENTIFIER)) {
+                    String privateKey = decode(jsonObject.getString("encryptPrivateKey"), password);
+                    String userSalt = decode(jsonObject.getString("encryptSalt"), password);
+                    String salt = AesCbcWithIntegrity.saltString(AesCbcWithIntegrity.generateSalt());
+                    AesCbcWithIntegrity.SecretKeys keys = AesCbcWithIntegrity.generateKeyFromPassword(password, salt);
+                    jsonObject.put("encryptPrivateKey", AesCbcWithIntegrity.encrypt(privateKey, keys).toString());
+                    jsonObject.put("encryptPassword", AesCbcWithIntegrity.encrypt(password, keys).toString());
+                    jsonObject.put("encryptSalt", AesCbcWithIntegrity.encrypt(userSalt, keys).toString());
+                    jsonObject.put("encryptKey", AesCbcWithIntegrity.keyString(keys));
+                    authoritiData.setUserJson(jsonObject);
+                    LoginActivity_.intent(getApplicationContext()).flags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK).start();
+                } else {
+                    Toast.makeText(mContext, "Invalid Qr Code", Toast.LENGTH_SHORT).show();
+                    hideAccountPasswordDialog();
+                    startActivity(getIntent());
+                    finish();
+                    overridePendingTransition(0, 0);
+                }
+            } else {
+                Toast.makeText(mContext, "Unable to scan please try again", Toast.LENGTH_SHORT).show();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(mContext, "Unable to scan please try again", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    private String decode(String ciphervalue, String password) {
+        try {
+            return new CryptLib().decryptCipherTextWithRandomIV(ciphervalue, password);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+
+    @Override
+    public void accountAddDialogCancelButtonClicked() {
+        hideAccountPasswordDialog();
+        startActivity(getIntent());
+        finish();
+        overridePendingTransition(0, 0);
     }
 }

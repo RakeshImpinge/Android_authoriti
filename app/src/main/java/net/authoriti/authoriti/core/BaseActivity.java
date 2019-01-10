@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
@@ -61,7 +62,7 @@ public class BaseActivity extends AppCompatActivity implements Constants {
         if (!isFinishing() && (kProgressHUD == null || !kProgressHUD.isShowing())) {
             kProgressHUD = KProgressHUD.create(this)
                     .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
-                    .setLabel(message)
+                    .setBackgroundColor(Color.rgb(224, 230, 233))
                     .setCancellable(true)
                     .setAnimationSpeed(2)
                     .setDimAmount(0.5f)
@@ -83,7 +84,7 @@ public class BaseActivity extends AppCompatActivity implements Constants {
         if (!isFinishing() && (kProgressHUD == null || !kProgressHUD.isShowing())) {
             kProgressHUD = KProgressHUD.create(activity)
                     .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
-                    .setLabel(message)
+                    .setBackgroundColor(Color.rgb(224, 230, 233))
                     .setCancellable(true)
                     .setAnimationSpeed(2)
                     .setDimAmount(0.5f)

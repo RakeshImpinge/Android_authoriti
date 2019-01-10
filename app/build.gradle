@@ -96,6 +96,6 @@ dependencies {
     implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.1.0'
     implementation 'me.dm7.barcodescanner:zxing:1.9.8'
     implementation 'com.kaopiz:kprogresshud:1.2.0'
-
+//    implementation 'com.github.tgio:rncryptor-native:0.0.9'
 
 }
