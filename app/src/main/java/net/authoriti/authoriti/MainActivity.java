@@ -591,8 +591,13 @@ public class MainActivity extends BaseActivity {
         if (!accId.getCustomer().equalsIgnoreCase("")) {
             pollingApi(accId.getIdentifier(), accId.getCustomer());
         } else {
-            dismissProgressDialog();
-            showAlert("", "No Pending Updates");
+            if (System.currentTimeMillis() < PollingStopMilliseconds) {
+                handler.removeCallbacks(runnable);
+                handler.postDelayed(runnable, 100);
+            } else {
+                dismissProgressDialog();
+                showAlert("", "No Pending Updates");
+            }
         }
     }
 
