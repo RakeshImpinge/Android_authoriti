@@ -27,6 +27,7 @@ import net.authoriti.authoriti.ui.auth.LoginActivity_;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiData_;
 import net.authoriti.authoriti.utils.Constants;
+import net.authoriti.authoriti.utils.CryptLib;
 import net.authoriti.authoriti.utils.WebAppInterface;
 
 import org.json.JSONObject;
@@ -36,7 +37,6 @@ import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
-import tgio.rncryptor.RNCryptorNative;
 
 import static com.tozny.crypto.android.AesCbcWithIntegrity.BASE64_FLAGS;
 
@@ -240,9 +240,14 @@ public class ImportActivity extends BaseActivity implements ZXingScannerView.Res
     }
 
     private String decode(String ciphervalue, String password) {
-        RNCryptorNative rncryptor = new RNCryptorNative();
-        return rncryptor.decrypt(ciphervalue, password);
+        try {
+            return new CryptLib().decryptCipherTextWithRandomIV(ciphervalue, password);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
     }
+
 
     @Override
     public void accountAddDialogCancelButtonClicked() {

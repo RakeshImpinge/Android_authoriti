@@ -261,8 +261,8 @@ public class MainActivity extends BaseActivity {
             userAccountIds.clear();
             PollingStopMilliseconds = System.currentTimeMillis() + (5 * 1000);
             userAccountIds.addAll(dataManager.getUser().getAccountIDs());
-            startPolling();
             displayProgressDialog("Please Wait...");
+            startPolling();
         }
 
         changeFragment(fragment);
@@ -592,6 +592,7 @@ public class MainActivity extends BaseActivity {
             pollingApi(accId.getIdentifier(), accId.getCustomer());
         } else {
             dismissProgressDialog();
+            showAlert("", "No Pending Updates");
         }
     }
 
