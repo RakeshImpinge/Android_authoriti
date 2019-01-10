@@ -610,7 +610,6 @@ public class MainActivity extends BaseActivity {
     };
 
     private void pollingApi(final String Id, final String customer) {
-        Log.e("pollingApi", "Started_" + currentId + "_: " + Id);
         String pollingUrl = Constants.API_BASE_URL_POLLING + Id + ".json";
         AuthoritiAPI.APIService().getPollingUrl(pollingUrl).enqueue
                 (new Callback<ResponsePolling>() {
@@ -695,7 +694,7 @@ public class MainActivity extends BaseActivity {
                 }
                 String customer_name = "";
                 try {
-                    customer_name = URLDecoder.decode(hashMap.get("customer"), "UTF-8");
+                    customer_name = URLDecoder.decode(hashMap.get("origin"), "UTF-8");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
