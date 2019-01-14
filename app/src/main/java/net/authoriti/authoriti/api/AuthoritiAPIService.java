@@ -31,6 +31,7 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
+import retrofit2.http.Query;
 import retrofit2.http.Url;
 
 /**
@@ -40,10 +41,10 @@ import retrofit2.http.Url;
 public interface AuthoritiAPIService {
 
     @GET("api/v1/schema")
-    Call<SchemaGroup> getSchemeGroup();
+    Call<SchemaGroup> getSchemeGroup(@Query("client") String client);
 
     @GET("api/v1/purpose")
-    Call<List<Purpose>> getPurposes();
+    Call<List<Purpose>> getPurposes(@Query("client") String client);
 
     @FormUrlEncoded
     @POST("api/v1/invite")

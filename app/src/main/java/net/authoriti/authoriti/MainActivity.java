@@ -224,6 +224,12 @@ public class MainActivity extends BaseActivity {
         menuSelected(MENU_CODE);
     }
 
+
+    private void showHomeScreen() {
+
+    }
+
+
     private void menuSelected(long menu_id) {
         if (SELECTED_MENU_ID == menu_id && menu_id != MENU_POLLING) {
             return;
@@ -439,8 +445,9 @@ public class MainActivity extends BaseActivity {
         loadScheme();
     }
 
+
     private void loadPurposes() {
-        AuthoritiAPI.APIService().getPurposes().enqueue(new Callback<List<Purpose>>() {
+        AuthoritiAPI.APIService().getPurposes(ConstantUtils.isBuildFlavorVnb() ? "vnb" : "").enqueue(new Callback<List<Purpose>>() {
             @Override
             public void onResponse(Call<List<Purpose>> call, Response<List<Purpose>> response) {
                 dismissProgressDialog();
@@ -457,7 +464,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void loadScheme() {
-        AuthoritiAPI.APIService().getSchemeGroup().enqueue(new Callback<SchemaGroup>() {
+        AuthoritiAPI.APIService().getSchemeGroup(ConstantUtils.isBuildFlavorVnb() ? "vnb" : "").enqueue(new Callback<SchemaGroup>() {
             @Override
             public void onResponse(Call<SchemaGroup> call, Response<SchemaGroup> response) {
                 dismissProgressDialog();
