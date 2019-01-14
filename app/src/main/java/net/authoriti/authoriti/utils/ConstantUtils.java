@@ -5,6 +5,7 @@ import android.util.Base64;
 import com.tozny.crypto.android.AesCbcWithIntegrity;
 
 import net.authoriti.authoriti.AuthoritiApplication;
+import net.authoriti.authoriti.BuildConfig;
 
 public class ConstantUtils {
     private static String PASSWORD = AuthoritiApplication.class.getName();
@@ -43,5 +44,13 @@ public class ConstantUtils {
 
     public static String getBaseUrl() {
         return decode(Constants.API_BASE_URL);
+    }
+
+    public static String getBuildFlavor() {
+        return BuildConfig.FLAVOR;
+    }
+
+    public static boolean isBuildFlavorVnb() {
+        return getBuildFlavor().equals(Constants.BUILD_FLAVOUR_VNB);
     }
 }

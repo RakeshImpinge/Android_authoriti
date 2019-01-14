@@ -11,9 +11,11 @@ import net.authoriti.authoriti.api.AuthoritiAPI;
 import net.authoriti.authoriti.api.model.GroupItem;
 import net.authoriti.authoriti.api.model.Purpose;
 import net.authoriti.authoriti.core.BaseFragment;
+import net.authoriti.authoriti.ui.code.CodePermissionActivity_;
 import net.authoriti.authoriti.ui.items.PurposeItem;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiUtils;
+import net.authoriti.authoriti.utils.ConstantUtils;
 import net.authoriti.authoriti.utils.Constants;
 
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
@@ -79,7 +81,7 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
 
     private void loadPurposes() {
         displayProgressDialog("Loading...");
-        AuthoritiAPI.APIService().getPurposes().enqueue(new Callback<List<Purpose>>() {
+        AuthoritiAPI.APIService().getPurposes(ConstantUtils.isBuildFlavorVnb() ? "vnb" : "").enqueue(new Callback<List<Purpose>>() {
             @Override
             public void onResponse(Call<List<Purpose>> call, Response<List<Purpose>> response) {
                 dismissProgressDialog();
@@ -98,19 +100,6 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
 
     private void showPurposes() {
         if (dataManager.getPurposes() != null && dataManager.getPurposes().size() > 0) {
-//            if (adapter == null) {
-//                adapter = new FastItemAdapter<PurposeItem>();
-//            } else {
-//                adapter.clear();
-//            }
-
-//            int defaultIndex = dataManager.getDefaultPurposeIndex();
-//
-//            for (int i = 0; i < dataManager.getPurposes().size(); i++) {
-//                boolean isDefault = defaultIndex == i;
-//                adapter.ic_add(new GroupItem(dataManager.getPurposes().get(i), i, isDefault,
-// this));
-//            }
             groupItems.clear();
             for (int i = 0; i < dataManager.getPurposes().size(); i++) {
                 if (i != 0) {
@@ -130,6 +119,17 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
                 }
             }
             purposeAdaper.notifyDataSetChanged();
+        }
+
+
+        if (ConstantUtils.isBuildFlavorVnb()) {
+            if (dataManager.getScheme() != null && dataManager.getDefaultValues() != null) {
+                CodePermissionActivity_.intent(getActivity()).purposeIndex(0).start();
+                getActivity().finish();
+                getActivity().overridePendingTransition(0, 0);
+            }
+        } else {
+
         }
     }
 

@@ -87,5 +87,7 @@ public interface Constants {
     String TOPIC_PURPOSE_DETAIL = "TOPIC_PURPOSE_DETAIL";
     String TOPIC_PURPOSE_DETAIL_PICKER = "TOPIC_PURPOSE_DETAIL_PICKER";
 
+    public final String BUILD_FLAVOUR_VNB = "vnb";
+    public final String BUILD_FLAVOUR_AUTHORITI = "vnb";
 
 }

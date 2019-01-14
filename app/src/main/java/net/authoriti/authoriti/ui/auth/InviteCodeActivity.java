@@ -74,8 +74,8 @@ public class InviteCodeActivity extends BaseActivity {
     @ViewById(R.id.ivBack)
     ImageView ivBack;
 
-    @ViewById(R.id.scrollView)
-    NestedScrollView scrollView;
+//    @ViewById(R.id.scrollView)
+//    NestedScrollView scrollView;
 
     public static final int PERMISSIONS_REQUEST_CAMERA = 0;
 
@@ -94,12 +94,12 @@ public class InviteCodeActivity extends BaseActivity {
             @Override
             public void onVisibilityChanged(boolean isOpen) {
 
-                if (isOpen) {
-                    scrollView.scrollTo(0, (int) ViewUtils.convertDpToPixel(50, mContext));
-
-                } else {
-                    scrollView.scrollTo(0, 0);
-                }
+//                if (isOpen) {
+//                    scrollView.scrollTo(0, (int) ViewUtils.convertDpToPixel(50, mContext));
+//
+//                } else {
+//                    scrollView.scrollTo(0, 0);
+//                }
             }
         });
 
