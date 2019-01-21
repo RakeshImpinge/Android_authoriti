@@ -120,6 +120,3 @@ dependencies {
     implementation "org.androidannotations:androidannotations-api:$AAVersion"
 
 }
-
-
-
