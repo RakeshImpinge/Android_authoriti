@@ -19,12 +19,13 @@
             android:orientation="vertical">
 
             <LinearLayout
+                android:id="@+id/linheader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/colorHeaderBackground"
                 android:paddingTop="15dp"
                 android:paddingBottom="15dp"
-                android:visibility="visible">
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/tvTitle"

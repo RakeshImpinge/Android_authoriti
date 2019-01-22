@@ -115,6 +115,8 @@ public class MainActivity extends BaseActivity {
 
     long PollingStopMilliseconds = 0;
 
+    public PurposeSchemaStoreInterface purposeSchemaStoreInterface;
+
 
     Foreground.Listener listener = new Foreground.Listener() {
         @Override
@@ -435,12 +437,19 @@ public class MainActivity extends BaseActivity {
         } else {
             super.onBackPressed();
         }
-
     }
+
+
+    int isAllDataLoaded = 0;
 
     @Override
     protected void onResume() {
         super.onResume();
+        if ((dataManager.getPurposes() == null || dataManager.getScheme() == null)) {
+            isAllDataLoaded = 0;
+        } else {
+            isAllDataLoaded = 2;
+        }
         loadPurposes();
         loadScheme();
     }
@@ -453,6 +462,7 @@ public class MainActivity extends BaseActivity {
                 dismissProgressDialog();
                 if (response.code() == 200 && response.body() != null) {
                     dataManager.setPurposes(response.body());
+                    updateDataLoaded();
                 }
             }
 
@@ -482,6 +492,7 @@ public class MainActivity extends BaseActivity {
                         dataManager.setScheme(response.body().getSchema());
                         updateDefaultvalues();
                     }
+                    updateDataLoaded();
                 }
             }
 
@@ -490,6 +501,16 @@ public class MainActivity extends BaseActivity {
                 dismissProgressDialog();
             }
         });
+    }
+
+
+    private void updateDataLoaded() {
+        if (isAllDataLoaded == 0) {
+            isAllDataLoaded = 1;
+        } else if (isAllDataLoaded == 1) {
+            isAllDataLoaded = 2;
+            purposeSchemaStoreInterface.onDataSaved();
+        }
     }
 
     private void addDefaultvalues() {
@@ -719,5 +740,10 @@ public class MainActivity extends BaseActivity {
             Log.e("Message", "Invalid Url");
         }
     }
+
+    public interface PurposeSchemaStoreInterface {
+        public void onDataSaved();
+    }
+
 
 }

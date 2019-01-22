@@ -18,6 +18,7 @@ import android.widget.ImageView;
 
 import net.authoriti.authoriti.BuildConfig;
 import net.authoriti.authoriti.ui.share.ImportActivity;
+import net.authoriti.authoriti.utils.ConstantUtils;
 import net.authoriti.authoriti.utils.Log;
 
 import net.authoriti.authoriti.R;
@@ -102,6 +103,11 @@ public class InviteCodeActivity extends BaseActivity {
 //                }
             }
         });
+
+        if (ConstantUtils.isBuildFlavorVnb()) {
+            etCode.setText("VB131");
+            nextButtonClicked();
+        }
 
     }
 

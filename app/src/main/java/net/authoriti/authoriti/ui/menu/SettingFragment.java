@@ -15,6 +15,7 @@ import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.api.model.AuthLogIn;
 import net.authoriti.authoriti.api.model.SettingItem;
 import net.authoriti.authoriti.core.BaseFragment;
+import net.authoriti.authoriti.ui.auth.ChangePasswordActivity_;
 import net.authoriti.authoriti.ui.auth.InviteCodeActivity_;
 import net.authoriti.authoriti.ui.items.PurposeItem;
 import net.authoriti.authoriti.ui.share.ExportActivity_;
@@ -104,7 +105,7 @@ public class SettingFragment extends BaseFragment {
 
     @Click(R.id.rel_change_password)
     void changePassClick() {
-
+        ChangePasswordActivity_.intent(this.mContext).flags(Intent.FLAG_ACTIVITY_NEW_TASK).start();
     }
 
     @Click(R.id.rel_wipe)

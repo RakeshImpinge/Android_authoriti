@@ -79,10 +79,10 @@ public interface Constants {
     String TOPIC_DLV = "help-dlv";
     String TOPIC_GENERAL = "help-general";
     String TOPIC_ACCOUNT_2018 = "help-account-id";
-    String TOPIC_PASSWORD = "TOPIC_PASSWORD";
-    String TOPIC_RESET_PASSWORD = "TOPIC_RESET_PASSWORD";
+    String TOPIC_PASSWORD = "help-master-password";
+    String TOPIC_RESET_PASSWORD = "help-changepw";
     String TOPIC_CHASE = "help-account-id";
-    String TOPIC_ABOUT = "TOPIC_ABOUT";
+    String TOPIC_ABOUT = "help-about";
     String TOPIC_SETTINGS = "help-settings";
     String TOPIC_PURPOSE_DETAIL = "TOPIC_PURPOSE_DETAIL";
     String TOPIC_PURPOSE_DETAIL_PICKER = "TOPIC_PURPOSE_DETAIL_PICKER";

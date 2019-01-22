@@ -92,7 +92,7 @@ public class SecurityActivity extends BaseActivity implements FingerPrintAuthCal
             }
 
             alertDialog.setTitle("");
-            alertDialog.setMessage("Do you want to allow Authoriti to use Fingerprints?");
+            alertDialog.setMessage("Do you want to allow " + getResources().getString(R.string.app_name) + " to use Fingerprints?");
             alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Allow", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
 

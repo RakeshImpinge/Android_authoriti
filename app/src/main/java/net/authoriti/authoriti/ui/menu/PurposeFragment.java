@@ -2,6 +2,7 @@ package net.authoriti.authoriti.ui.menu;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -37,7 +38,7 @@ import retrofit2.Response;
  */
 
 @EFragment(R.layout.fragment_purpose)
-public class PurposeFragment extends BaseFragment implements PurposeItem.PurposeItemListener {
+public class PurposeFragment extends BaseFragment implements PurposeItem.PurposeItemListener, MainActivity.PurposeSchemaStoreInterface {
 
     FastItemAdapter<PurposeItem> adapter;
 
@@ -59,6 +60,9 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
     @ViewById(R.id.linRoot)
     LinearLayout linRoot;
 
+    @ViewById(R.id.linheader)
+    LinearLayout linheader;
+
 
     @AfterViews
     void callAfterViewInjection() {
@@ -71,6 +75,7 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
         rvPurpose.setNestedScrollingEnabled(false);
         linRoot.requestFocus();
 
+        ((MainActivity) getActivity()).purposeSchemaStoreInterface = this;
 
         if (dataManager.getPurposes() != null) {
             showPurposes();
@@ -81,21 +86,21 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
 
     private void loadPurposes() {
         displayProgressDialog("Loading...");
-        AuthoritiAPI.APIService().getPurposes(ConstantUtils.isBuildFlavorVnb() ? "vnb" : "").enqueue(new Callback<List<Purpose>>() {
-            @Override
-            public void onResponse(Call<List<Purpose>> call, Response<List<Purpose>> response) {
-                dismissProgressDialog();
-                if (response.code() == 200 && response.body() != null) {
-                    dataManager.setPurposes(response.body());
-                    showPurposes();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Purpose>> call, Throwable t) {
-                dismissProgressDialog();
-            }
-        });
+//        AuthoritiAPI.APIService().getPurposes(ConstantUtils.isBuildFlavorVnb() ? "vnb" : "").enqueue(new Callback<List<Purpose>>() {
+//            @Override
+//            public void onResponse(Call<List<Purpose>> call, Response<List<Purpose>> response) {
+//                dismissProgressDialog();
+//                if (response.code() == 200 && response.body() != null) {
+//                    dataManager.setPurposes(response.body());
+//                    showPurposes();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<List<Purpose>> call, Throwable t) {
+//                dismissProgressDialog();
+//            }
+//        });
     }
 
     private void showPurposes() {
@@ -118,19 +123,20 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
                     groupItems.add(item);
                 }
             }
-            purposeAdaper.notifyDataSetChanged();
         }
 
 
         if (ConstantUtils.isBuildFlavorVnb()) {
             if (dataManager.getScheme() != null && dataManager.getDefaultValues() != null) {
                 CodePermissionActivity_.intent(getActivity()).purposeIndex(0).start();
-                getActivity().finish();
+//                getActivity().finish();
                 getActivity().overridePendingTransition(0, 0);
             }
         } else {
-
+            linheader.setVisibility(View.VISIBLE);
+            purposeAdaper.notifyDataSetChanged();
         }
+
     }
 
 
@@ -170,5 +176,11 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
 //        if (dataManager.getScheme() != null) {
 //            utils.initSelectedIndex(mContext);
 //        }
+    }
+
+    @Override
+    public void onDataSaved() {
+        dismissProgressDialog();
+        showPurposes();
     }
 }
