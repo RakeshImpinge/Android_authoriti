@@ -4,7 +4,7 @@ apply plugin: 'io.fabric'
 
 
 def AAVersion = '4.5.2'
-def bitriseCode = System.getenv('BITRISE_BUILD_NUMBRER') ?: "165"
+def bitriseCode = System.getenv('BITRISE_BUILD_NUMBRER') ?: "166"
 android {
     compileSdkVersion 26
     buildToolsVersion '28.0.3'
