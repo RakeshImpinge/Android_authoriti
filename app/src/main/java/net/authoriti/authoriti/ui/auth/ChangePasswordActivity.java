@@ -8,6 +8,7 @@ import android.support.v4.widget.Space;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.tozny.crypto.android.AesCbcWithIntegrity;
@@ -67,12 +68,18 @@ public class ChangePasswordActivity extends BaseActivity {
     @ViewById(R.id.space)
     Space space;
 
+    @ViewById(R.id.change_pwd_logo)
+    ImageView  logo;
 
     @AfterViews
     void callAfterViewInjection() {
         tiCurrentPassword.setError(null);
         tiNewPassword.setError(null);
         tiConfirmPassword.setError(null);
+
+        if (ConstantUtils.isBuildFlavorVnb()) {
+            logo.setImageResource(R.mipmap.icon_valley_wire_auth);
+        }
 
         KeyboardVisibilityEvent.setEventListener(this, new KeyboardVisibilityEventListener() {
             @Override

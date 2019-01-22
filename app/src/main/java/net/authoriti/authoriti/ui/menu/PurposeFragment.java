@@ -129,7 +129,7 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
         if (ConstantUtils.isBuildFlavorVnb()) {
             if (dataManager.getScheme() != null && dataManager.getDefaultValues() != null) {
                 CodePermissionActivity_.intent(getActivity()).purposeIndex(0).start();
-                getActivity().finish();
+//                getActivity().finish();
                 getActivity().overridePendingTransition(0, 0);
             }
         } else {
