@@ -328,7 +328,6 @@ public class MainActivity extends BaseActivity {
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
-        System.out.println("Help clicked");
         String topic = "";
         if (SELECTED_MENU_ID == MENU_CODE) {
             topic = TOPIC_GENERAL;
@@ -646,10 +645,10 @@ public class MainActivity extends BaseActivity {
                                            Response<ResponsePolling>
                                                    response) {
                         if (response.isSuccessful() && response.body().getUrl() != null &&
-                                !response.body().getUrl().equals("")) {
+                                !response.body().getUrl().equals("") &&
+                                PermissionCodeRequest(response.body().getUrl(), customer)) {
                             removePendingRequest(Id);
                             dismissProgressDialog();
-                            PermissionCodeRequest(response.body().getUrl(), customer);
                         } else {
                             if (System.currentTimeMillis() < PollingStopMilliseconds) {
                                 handler.removeCallbacks(runnable);
@@ -687,7 +686,7 @@ public class MainActivity extends BaseActivity {
     }
 
     // Parse polling url and redirect to next screen
-    private void PermissionCodeRequest(String url, String customer) {
+    private boolean PermissionCodeRequest(String url, String customer) {
         String[] splitUrl = url.split("\\?");
         if (splitUrl.length > 0) {
             String label = splitUrl[0].replace("authoriti://purpose/", "");
@@ -725,19 +724,23 @@ public class MainActivity extends BaseActivity {
                     customer_name = URLDecoder.decode(hashMap.get("origin"), "UTF-8");
                 } catch (Exception e) {
                     e.printStackTrace();
+                    return false;
                 }
                 if (!hashMap.isEmpty() && indexGroup != -1 && indexItem != -1) {
                     if (customer_name.toLowerCase().equals(customer.toLowerCase())) {
                         CodePermissionActivity_.intent(mContext).purposeIndex(indexGroup)
                                 .purposeIndexItem(indexItem).defParamFromUrl(hashMap)
                                 .start();
+                        return true;
                     } else {
                         Log.e("Message", "Invalid Url");
+                        return false;
                     }
-                }
-            }
+                } else return false;
+            } else return false;
         } else {
             Log.e("Message", "Invalid Url");
+            return false;
         }
     }
 
