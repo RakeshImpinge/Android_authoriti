@@ -11,6 +11,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import net.authoriti.authoriti.R;
+import net.authoriti.authoriti.utils.ConstantUtils;
+
+import org.androidannotations.annotations.ViewById;
 
 /**
  * Created by mac on 12/29/17.
@@ -34,6 +37,9 @@ public class TouchIDAlert extends AppCompatDialog {
         this.listener = listener;
     }
 
+    @ViewById(R.id.touch_id_label)
+    TextView touchIdLabel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +49,10 @@ public class TouchIDAlert extends AppCompatDialog {
         setContentView(R.layout.touch_id_alert);
         if (getWindow() != null){
             getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        if (ConstantUtils.isBuildFlavorVnb()) {
+            touchIdLabel.setText("Touch ID for \"Valley Auth\"");
         }
 
         tvBody = findViewById(R.id.tvBody);
