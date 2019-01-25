@@ -43,7 +43,6 @@ public class ConstantUtils {
     }
 
     public static String getBaseUrl() {
-        System.out.println("PROD: " + encrypt("https://api.authoriti.net"));
         return decode(Constants.API_BASE_URL);
     }
 
