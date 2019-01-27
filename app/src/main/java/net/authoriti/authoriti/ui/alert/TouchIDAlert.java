@@ -37,9 +37,6 @@ public class TouchIDAlert extends AppCompatDialog {
         this.listener = listener;
     }
 
-    @ViewById(R.id.touch_id_label)
-    TextView touchIdLabel;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +49,7 @@ public class TouchIDAlert extends AppCompatDialog {
         }
 
         if (ConstantUtils.isBuildFlavorVnb()) {
+            TextView touchIdLabel = findViewById(R.id.touch_id_label);
             touchIdLabel.setText("Touch ID for \"Valley Auth\"");
         }
 
