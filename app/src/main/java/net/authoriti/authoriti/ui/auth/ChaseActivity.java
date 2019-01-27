@@ -2,6 +2,7 @@ package net.authoriti.authoriti.ui.auth;
 
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.provider.Settings;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.res.ResourcesCompat;
@@ -24,6 +25,7 @@ import net.authoriti.authoriti.core.SecurityActivity;
 import net.authoriti.authoriti.ui.help.HelpActivity_;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiUtils;
+import net.authoriti.authoriti.utils.Constants;
 import net.authoriti.authoriti.utils.ViewUtils;
 import net.authoriti.authoriti.utils.crypto.CryptoKeyPair;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
@@ -317,7 +319,9 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
-        HelpActivity_.intent(mContext).start();
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.HELP_BASE + "/" +
+                TOPIC_PASSWORD));
+        startActivity(browserIntent);
     }
 
 
