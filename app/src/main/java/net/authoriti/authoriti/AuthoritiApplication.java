@@ -36,6 +36,5 @@ public class AuthoritiApplication extends Application {
     @Override
     public void onTerminate() {
         super.onTerminate();
-        System.out.println("Application terminated!");
     }
 }
