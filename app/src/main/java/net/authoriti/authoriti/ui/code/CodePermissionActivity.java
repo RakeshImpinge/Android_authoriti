@@ -284,11 +284,11 @@ public class CodePermissionActivity extends BaseActivity {
         if (group.getLabel().equalsIgnoreCase("Manage an account")) {
             endPoint = TOPIC_PURPOSE_MANAGE_MY_AC;
         } else if (group.getLabel().equalsIgnoreCase("Transfer funds")) {
-            endPoint = TOPIC_PURPOSE_SEND_MONEY;
+            endPoint = TOPIC_PURPOSE_MOVE_MONEY;
         } else if (group.getLabel().equalsIgnoreCase("Open new account")) {
             endPoint = TOPIC_PURPOSE_OPEN_NEW_AC;
         } else if (group.getLabel().equalsIgnoreCase("Remotely withdraw cash")) {
-            endPoint = TOPIC_PURPOSE_MOVE_MONEY;
+            endPoint = TOPIC_PURPOSE_SEND_MONEY;
         } else if (group.getLabel().equalsIgnoreCase("Trade stocks")) {
             endPoint = TOPIC_PURPOSE_EQUIDITY_TRADE;
         } else if (group.getLabel().equalsIgnoreCase("Share personal information")) {
