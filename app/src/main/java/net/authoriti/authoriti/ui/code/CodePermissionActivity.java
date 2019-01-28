@@ -5,9 +5,12 @@ import android.net.Uri;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+
 import net.authoriti.authoriti.utils.Log;
+
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.api.model.AccountID;
@@ -31,6 +34,9 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,6 +76,10 @@ public class CodePermissionActivity extends BaseActivity {
     @ViewById(R.id.etCode)
     EditText etCode;
 
+    @ViewById(R.id.tv_title)
+    TextView tv_title;
+
+
     HashMap<String, DefaultValue> defaultPickerMap = new HashMap<>();
 
     public static int INTENT_REQUEST_PICK_VALUE = 1;
@@ -87,9 +97,9 @@ public class CodePermissionActivity extends BaseActivity {
         group = dataManager.getPurposes().get(purposeIndex).getGroups().get(purposeIndexItem);
         defaultPickerMap = dataManager.getDefaultValues().get("" + group.getSchemaIndex());
         schemaIndex = group.getSchemaIndex();
-        showSchema();
         createPickerList();
         showSchema();
+        tv_title.setText(group.getLabel());
     }
 
     List<Picker> pickersList = new ArrayList<>();
@@ -97,8 +107,7 @@ public class CodePermissionActivity extends BaseActivity {
     private void createPickerList() {
         pickersList = dataManager.getScheme().get("" + group.getSchemaIndex());
         for (int i = 0; i < pickersList.size(); i++) {
-
-            // Adding default values of Picker is of Time
+            // Adding default values of Picker is of TimePICKER_TIME
             if (pickersList.get(i).getPicker().equals(PICKER_TIME)) {
                 pickersList.set(i, utils.getDefaultTimePicker(pickersList.get(i)));
             }
@@ -117,19 +126,31 @@ public class CodePermissionActivity extends BaseActivity {
             // Adding default values of Picker is of Data Type
             else if (pickersList.get(i).getPicker().equals(PICKER_DATA_TYPE)) {
                 List<Value> values;
-                if (defaultPickerMap.containsKey(PICKER_REQUEST)) {
-                    values = dataManager.getValuesFromDataType(Integer.valueOf(defaultPickerMap.get
-                            (PICKER_REQUEST).getValue().toString()));
+                if (schemaIndex == 8) {
+                    values = dataManager.getValuesFromDataType("y");
+                } else if (defaultPickerMap.containsKey(PICKER_REQUEST)) {
+                    values = dataManager.getValuesFromDataType(defaultPickerMap.get
+                            (PICKER_REQUEST).getValue());
                 } else {
                     values = dataManager.getValuesFromDataType(schemaIndex);
                 }
                 pickersList.get(i).setValues(values);
                 pickersList.set(i, pickersList.get(i));
+
+                for (int j = 0; j < values.size(); j++) {
+                    Log.i("DEFAULT VALUE", values.get(j).getTitle());
+                }
+            }
+
+            String pickerKey = pickersList.get(i).getPicker();
+            if (schemaIndex == 3 && pickerKey.equalsIgnoreCase(PICKER_TIME)) {
+                defaultPickerMap.put(pickerKey, new DefaultValue(TIME_1_DAY, TIME_1_DAY, false));
             }
 
             // updateDefaultValuesFromGroup
-            if (group.getPickerName() != null && !group.getPickerName().equals("")) {
-                if (group.getPickerName().equals(pickersList.get(i).getPicker())) {
+            final String groupPickerName = group.getPickerName();
+            if (groupPickerName != null && !group.getPickerName().equals("")) {
+                if (groupPickerName.equals(pickersList.get(i).getPicker())) {
                     int index = getIndexOfValue(pickersList.get(i).getValues(), group.getValue());
                     if (index != -1) {
                         DefaultValue defaultValue = new DefaultValue(pickersList.get(i).getValues
@@ -137,7 +158,7 @@ public class CodePermissionActivity extends BaseActivity {
                                 (index)
                                 .getTitle(), pickersList.get(i).getValues().get(index).getValue()
                                 , false);
-                        defaultPickerMap.put(group.getPickerName(), defaultValue);
+                        defaultPickerMap.put(groupPickerName, defaultValue);
                     }
                 }
             }
@@ -148,9 +169,25 @@ public class CodePermissionActivity extends BaseActivity {
                 String key = pickersList.get(i).getPicker();
                 if (key.equals(PICKER_DATA_INPUT_TYPE)) {
                     key = pickersList.get(i).getInput();
+                    String value_decoded = "";
+                    try {
+                        value_decoded = URLDecoder.decode(defParamFromUrl.get(key), "UTF-8");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        value_decoded = "";
+                    }
                     DefaultValue defaultValue = new DefaultValue(key
-                            , defParamFromUrl.get(key), false);
+                            , value_decoded, false);
                     defaultPickerMap.put(key, defaultValue);
+                } else if (key.equals(PICKER_REQUEST)) {
+                    try {
+                        String customer = URLDecoder.decode(defParamFromUrl.get("customer"), "UTF-8");
+                        String code = defParamFromUrl.get("customer_code");
+                        DefaultValue defaultValue = new DefaultValue(customer, code, false);
+                        defaultPickerMap.put(key, defaultValue);
+                    } catch (Exception ignore) {
+
+                    }
                 } else {
                     if (defParamFromUrl.containsKey(key)) {
                         ArrayList<String> title = new ArrayList<>();
@@ -180,8 +217,6 @@ public class CodePermissionActivity extends BaseActivity {
                 }
             }
         }
-
-        Log.e("List", pickersList.toString());
     }
 
     ArrayList<Integer> uiFlaseListIndex = new ArrayList<>();
@@ -196,9 +231,9 @@ public class CodePermissionActivity extends BaseActivity {
                 if (pickersList.get(i).getPicker().equals(PICKER_DATA_INPUT_TYPE)) {
                     if (defaultPickerMap.containsKey(pickersList.get(i).getInput())) {
                         adapter_input.add(new CodeEditItem(pickersList.get(i), defaultPickerMap
-                                .get(pickersList.get(i).getInput()).getValue(),schemaIndex));
+                                .get(pickersList.get(i).getInput()).getValue(), schemaIndex));
                     } else {
-                        adapter_input.add(new CodeEditItem(pickersList.get(i), "",schemaIndex));
+                        adapter_input.add(new CodeEditItem(pickersList.get(i), "", schemaIndex));
                     }
                 } else {
                     adapter.add(new CodeItem(pickersList.get(i), defaultPickerMap, group
@@ -208,72 +243,23 @@ public class CodePermissionActivity extends BaseActivity {
                 uiFlaseListIndex.add(i);
             }
         }
-//        if (order != null && order.getPickers() != null && order.getPickers().size() > 0) {
-//
-//            for (String picker : order.getPickers()) {
-//
-//                switch (picker) {
-//
-//                    case PICKER_ACCOUNT:
-//                        if (dataManager.getAccountPicker() != null) {
-//                            if (group.getPickerName() == null || !group.getPickerName()
-//                                    .equals(PICKER_ACCOUNT)) {
-//                                adapter.add(new CodeItem(dataManager.getAccountPicker()));
-//                            }
-//                        }
-//                        break;
-//
-//                    case PICKER_INDUSTRY:
-//                        if (dataManager.getIndustryPicker() != null) {
-//                            if (group.getPickerName() == null || !group.getPickerName()
-//                                    .equals(PICKER_INDUSTRY)) {
-//                                adapter.add(new CodeItem(dataManager.getIndustryPicker()));
-//                            }
-//                        }
-//                        break;
-//                    case PICKER_LOCATION_STATE:
-//                        if (dataManager.getLocationPicker() != null) {
-//                            if (group.getPickerName() == null || !group.getPickerName()
-//                                    .equals(PICKER_LOCATION_STATE)) {
-//                                adapter.add(new CodeItem(dataManager.getLocationPicker()));
-//                            }
-//                        }
-//                        break;
-//                    case PICKER_TIME:
-//                        if (dataManager.getTimePicker() != null) {
-//                            if (group.getPickerName() == null || !group.getPickerName()
-//                                    .equals(PICKER_TIME)) {
-//                                adapter.add(new CodeItem(dataManager.getTimePicker()));
-//                            }
-//                        }
-//                        break;
-//                    case PICKER_GEO:
-//                        if (dataManager.getGeoPicker() != null) {
-//                            if (group.getPickerName() == null || !group.getPickerName()
-//                                    .equals(PICKER_GEO)) {
-//                                adapter.add(new CodeItem(dataManager.getGeoPicker()));
-//                            }
-//                        }
-//                        break;
-//                    case PICKER_REQUEST:
-//                        if (dataManager.getRequestPicker() != null) {
-//                            if (group.getPickerName() == null || !group.getPickerName()
-//                                    .equals(PICKER_REQUEST)) {
-//                                adapter.add(new CodeItem(dataManager.getRequestPicker()));
-//                            }
-//                        }
-//                        break;
-//                    case PICKER_DATA_TYPE:
-//                        if (dataManager.getDataTypePicker() != null) {
-//                            if (group.getPickerName() == null || !group.getPickerName()
-//                                    .equals(PICKER_DATA_TYPE)) {
-//                                adapter.add(new CodeItem(dataManager.getDataTypePicker()));
-//                            }
-//                        }
-//                        break;
-//                }
-//            }
-//        }
+    }
+
+    private void updateSchema() {
+        adapter.clear();
+        uiFlaseListIndex.clear();
+        for (int i = 0; i < pickersList.size(); i++) {
+            if (pickersList.get(i).getUi()) {
+                if (pickersList.get(i).getPicker().equals(PICKER_DATA_INPUT_TYPE)) {
+
+                } else {
+                    adapter.add(new CodeItem(pickersList.get(i), defaultPickerMap, group
+                            .getSchemaIndex()));
+                }
+            } else {
+                uiFlaseListIndex.add(i);
+            }
+        }
     }
 
     public int getIndexOfValue(List<Value> values, String picker_def_value) {
@@ -298,11 +284,11 @@ public class CodePermissionActivity extends BaseActivity {
         if (group.getLabel().equalsIgnoreCase("Manage an account")) {
             endPoint = TOPIC_PURPOSE_MANAGE_MY_AC;
         } else if (group.getLabel().equalsIgnoreCase("Transfer funds")) {
-            endPoint = TOPIC_PURPOSE_SEND_MONEY;
+            endPoint = TOPIC_PURPOSE_MOVE_MONEY;
         } else if (group.getLabel().equalsIgnoreCase("Open new account")) {
             endPoint = TOPIC_PURPOSE_OPEN_NEW_AC;
         } else if (group.getLabel().equalsIgnoreCase("Remotely withdraw cash")) {
-            endPoint = TOPIC_PURPOSE_MOVE_MONEY;
+            endPoint = TOPIC_PURPOSE_SEND_MONEY;
         } else if (group.getLabel().equalsIgnoreCase("Trade stocks")) {
             endPoint = TOPIC_PURPOSE_EQUIDITY_TRADE;
         } else if (group.getLabel().equalsIgnoreCase("Share personal information")) {
@@ -336,7 +322,7 @@ public class CodePermissionActivity extends BaseActivity {
             View childAt = rvEditFields.getChildAt(i);
             AppCompatEditText etCode = ((AppCompatEditText) childAt.findViewById(R.id.etCode));
             if (etCode.getText().toString().trim().length() == 0) {
-                errorMessage = "Pleae enter " + adapter_input.getAdapterItem(i).picker
+                errorMessage = "Please enter " + adapter_input.getAdapterItem(i).picker
                         .getLabel();
                 break;
             } else {
@@ -358,12 +344,13 @@ public class CodePermissionActivity extends BaseActivity {
             showAlert("", errorMessage);
         } else {
             // data_type List length
-            int data_type_length = 0;
-            if (defaultPickerMap.containsKey(PICKER_REQUEST) && defaultPickerMap.containsKey
+            int data_type_length;
+            if (schemaIndex == 8) {
+                data_type_length = dataManager.getValuesFromDataType("y").size();
+            } else if (defaultPickerMap.containsKey(PICKER_REQUEST) && defaultPickerMap.containsKey
                     (PICKER_REQUEST)) {
-                data_type_length = dataManager.getValuesFromDataType(Integer.valueOf
-                        (defaultPickerMap
-                                .get(PICKER_REQUEST).getValue().toString())).size();
+                data_type_length = dataManager.getValuesFromDataType(defaultPickerMap
+                        .get(PICKER_REQUEST).getValue()).size();
             } else {
                 data_type_length = dataManager.getValuesFromDataType(Integer.valueOf(group
                         .getSchemaIndex())).size();
@@ -419,9 +406,28 @@ public class CodePermissionActivity extends BaseActivity {
                 finalPickersList.add(uiFlaseListIndex.get(i), hashMap);
             }
 
+
+            // Default value for any state for schema index 8 i.e clain insurance
+            if (schemaIndex == 8) {
+                for (int i = 0; i < finalPickersList.size(); i++) {
+                    HashMap<String, String> finalPicker = finalPickersList.get(i);
+                    if (finalPicker.get("picker").equals("requestor")) {
+                        HashMap<String, String> requestor = finalPickersList.get(i);
+                        requestor.put("value", "y");
+                        requestor.put("key", "requestor");
+                        finalPickersList.set(i, requestor);
+                    } else if (finalPicker.get("picker").equals("any_state")) {
+                        HashMap<String, String> anystate = finalPickersList.get(i);
+                        anystate.put("value", "99");
+                        anystate.put("key", "any_state");
+                        finalPickersList.set(i, anystate);
+                    }
+                }
+            }
+
             CodeGenerateActivity_.intent(mContext).schemaIndex("" + group.getSchemaIndex())
                     .finalPickersList(finalPickersList).isPollingRequest(defParamFromUrl != null)
-                    .start();
+                    .startForResult(CodeGenerateActivity.CODE);
         }
     }
 
@@ -436,7 +442,9 @@ public class CodePermissionActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
+        if (requestCode == CodeGenerateActivity.CODE) {
+            finish();
+        } else if (resultCode == RESULT_OK) {
             defaultPickerMap = (HashMap<String, DefaultValue>) data.getExtras().get
                     ("selected_values");
 
@@ -446,9 +454,8 @@ public class CodePermissionActivity extends BaseActivity {
                     if (pickersList.get(i).getPicker().equals(PICKER_DATA_TYPE)) {
                         List<Value> values;
                         if (defaultPickerMap.containsKey(PICKER_REQUEST)) {
-                            values = dataManager.getValuesFromDataType(Integer.valueOf
-                                    (defaultPickerMap.get
-                                            (PICKER_REQUEST).getValue().toString()));
+                            values = dataManager.getValuesFromDataType(defaultPickerMap.get
+                                    (PICKER_REQUEST).getValue());
                         } else {
                             values = dataManager.getValuesFromDataType(schemaIndex);
                         }
@@ -457,7 +464,9 @@ public class CodePermissionActivity extends BaseActivity {
                     }
                 }
             }
-            showSchema();
+
+
+            updateSchema();
         }
     }
 }

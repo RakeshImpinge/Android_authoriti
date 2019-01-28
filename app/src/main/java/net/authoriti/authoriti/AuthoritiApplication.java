@@ -31,7 +31,10 @@ public class AuthoritiApplication extends Application {
         Fabric.with(this, new Crashlytics());
         context = getApplicationContext();
         Foreground.init(this);
+    }
 
-//        System.out.println("BASE_URL: " + ConstantUtils.encrypt("https://api.authoriti.net"));
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
     }
 }

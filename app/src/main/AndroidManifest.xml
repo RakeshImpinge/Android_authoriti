@@ -11,8 +11,6 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
-    <uses-permission android:name="android.permission.NFC" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:name=".AuthoritiApplication_"
@@ -22,7 +20,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-
         <activity
             android:name=".SplashActivity_"
             android:theme="@style/SplashTheme">
@@ -32,8 +29,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity android:name=".MainActivity_" />
+        <activity android:name=".ui.share.ExportActivity_" />
+        <activity android:name=".ui.share.ImportActivity" />
+        <activity android:name=".ui.auth.ChangePasswordActivity_" />
         <activity
             android:name=".ui.auth.LoginActivity_"
             android:theme="@style/AppTheme.FullScreen"
@@ -64,7 +63,6 @@
         <activity android:name="com.acuant.mobilesdk.detect.PDF417.CameraPDF417" />
         <activity android:name="com.acuant.mobilesdk.detect.Camera2CardDetectManual" />
         <activity android:name="com.acuant.mobilesdk.detect.Camera2FacialRecognitionManual" />
-
     </application>
 
 </manifest>

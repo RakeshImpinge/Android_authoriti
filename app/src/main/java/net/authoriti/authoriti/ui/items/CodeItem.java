@@ -180,7 +180,7 @@ public class CodeItem extends AbstractItem<CodeItem, CodeItem.ViewHolder> {
 //                            .getPickerSelectedIndex(context, PICKER_REQUEST));
 //                    Value value = values1.get(0);
 //                    List<Value> initValues = new ArrayList<>();
-//                    initValues.add(value);
+//                    initValues.ic_add(value);
 //                    dataManager.setSelectedValuesForDataType(utils.getPickerSelectedIndex
 //                            (context, PICKER_REQUEST), initValues);
 //                    holder.tvSubTitle.setText(value.getTitle());

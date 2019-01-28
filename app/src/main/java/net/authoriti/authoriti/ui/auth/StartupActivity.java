@@ -1,8 +1,10 @@
 package net.authoriti.authoriti.ui.auth;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.text.TextUtils;
 import android.widget.EditText;
@@ -58,6 +60,9 @@ public class StartupActivity extends BaseActivity {
 
     @AfterViews
     void callAfterViewInjection() {
+        tiPassword.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Oswald_Regular.ttf"));
+        tiPasswordConfirm.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Oswald_Regular.ttf"));
+
 
         KeyboardVisibilityEvent.setEventListener(this, new KeyboardVisibilityEventListener() {
             @Override
@@ -121,7 +126,7 @@ public class StartupActivity extends BaseActivity {
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ConstantUtils.getHelpUrl(TOPIC_PASSWORD)));
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ConstantUtils.getHelpUrl(TOPIC_MASTER_PASSWORD)));
         startActivity(browserIntent);
     }
 

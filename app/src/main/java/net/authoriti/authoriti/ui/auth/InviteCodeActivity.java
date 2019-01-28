@@ -1,13 +1,25 @@
 package net.authoriti.authoriti.ui.auth;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.net.Uri;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+
+import net.authoriti.authoriti.BuildConfig;
+import net.authoriti.authoriti.ui.share.ImportActivity;
+import net.authoriti.authoriti.utils.ConstantUtils;
 import net.authoriti.authoriti.utils.Log;
 
 import net.authoriti.authoriti.R;
@@ -30,6 +42,8 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
+
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -64,12 +78,15 @@ public class InviteCodeActivity extends BaseActivity {
     @ViewById(R.id.ivBack)
     ImageView ivBack;
 
-    @ViewById(R.id.scrollView)
-    NestedScrollView scrollView;
+//    @ViewById(R.id.scrollView)
+//    NestedScrollView scrollView;
 
+    public static final int PERMISSIONS_REQUEST_CAMERA = 0;
 
     @AfterViews
     void callAfterViewInjection() {
+
+        tiCode.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Oswald_Regular.ttf"));
 
         if (showBack) {
             ivBack.setVisibility(View.VISIBLE);
@@ -81,15 +98,35 @@ public class InviteCodeActivity extends BaseActivity {
             @Override
             public void onVisibilityChanged(boolean isOpen) {
 
-                if (isOpen) {
-                    scrollView.scrollTo(0, (int) ViewUtils.convertDpToPixel(50, mContext));
-
-                } else {
-                    scrollView.scrollTo(0, 0);
-                }
+//                if (isOpen) {
+//                    scrollView.scrollTo(0, (int) ViewUtils.convertDpToPixel(50, mContext));
+//
+//                } else {
+//                    scrollView.scrollTo(0, 0);
+//                }
             }
         });
 
+        if (ConstantUtils.isBuildFlavorVnb()) {
+            etCode.setText("VB131");
+            nextButtonClicked();
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == PERMISSIONS_REQUEST_CAMERA) {
+            for (int i = 0; i < permissions.length; i++) {
+                if (permissions[i].equalsIgnoreCase(Manifest.permission.CAMERA)) {
+                    if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                        startActivity(new Intent(this, ImportActivity.class));
+                    }
+                    break;
+                }
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @AfterTextChange(R.id.etCode)
@@ -123,30 +160,36 @@ public class InviteCodeActivity extends BaseActivity {
         }
     }
 
-    @Click(R.id.cvNeed)
-    void needButtonClicked() {
-
-        if (TextUtils.isEmpty(etCode.getText())) {
-            StartupActivity_.intent(mContext).start();
-        } else {
-            hideKeyboard();
-            checkInviteCode(false);
-        }
-    }
-
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.HELP_BASE +
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.HELP_BASE + "/" +
                 TOPIC_INVITE));
         startActivity(browserIntent);
     }
 
+    @Click(R.id.cvImport)
+    void importButtonClicked() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
+            startActivity(new Intent(this, ImportActivity.class));
+        } else if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    PERMISSIONS_REQUEST_CAMERA);
+        } else {
+            startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse
+                    ("package:" + BuildConfig.APPLICATION_ID)));
+        }
+    }
+
+
     private void checkInviteCode(final boolean isNextClick) {
         if (isNextClick) {
-            displayProgressDialog("Validating Password...");
+            displayProgressDialog("Validating\nPassword");
         } else {
-            displayProgressDialog("Please Wait...");
+            displayProgressDialog("Please Wait");
         }
         AuthoritiAPI.APIService().checkInviteCodeValidate(etCode.getText().toString()).enqueue
                 (new Callback<ResponseInviteCode>() {

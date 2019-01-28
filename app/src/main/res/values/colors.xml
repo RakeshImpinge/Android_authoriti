@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <color name="colorPrimary">#3DAFDF</color>
-    <color name="colorPrimaryDark">#0979c3</color>
-    <color name="colorAccent">#F41817</color>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <color name="colorPrimary" tools:override="false">#3DAFDF</color>
+    <color name="colorPrimaryDark" tools:override="false">#0979c3</color>
+    <color name="colorAccent" tools:override="false">#F41817</color>
+    <color name="Primary" tools:override="false">#3DAFDF</color>
 
     <color name="colorSignButton">#0979c3</color>
     <color name="colorNeedPasswordButton">#566468</color>
@@ -16,5 +17,6 @@
 
     <color name="colorShadow">#880e2c2e</color>
     <color name="colorHeaderBackground">#F0F3F7</color>
+    <color name="divider_color">#E5E5E5</color>
 
 </resources>

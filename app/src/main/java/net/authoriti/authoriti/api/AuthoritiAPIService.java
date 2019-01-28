@@ -4,12 +4,15 @@ import net.authoriti.authoriti.api.model.Purpose;
 import net.authoriti.authoriti.api.model.SchemaGroup;
 import net.authoriti.authoriti.api.model.request.RequestComplete;
 import net.authoriti.authoriti.api.model.request.RequestSignUp;
+import net.authoriti.authoriti.api.model.request.RequestSignUpChase;
+import net.authoriti.authoriti.api.model.request.RequestSync;
 import net.authoriti.authoriti.api.model.request.RequestUserUpdate;
 import net.authoriti.authoriti.api.model.response.ResponseInviteCode;
 import net.authoriti.authoriti.api.model.response.ResponsePolling;
 import net.authoriti.authoriti.api.model.response.ResponseComplete;
 import net.authoriti.authoriti.api.model.response.ResponseSignUp;
 import net.authoriti.authoriti.api.model.response.ResponseSignUpChase;
+import net.authoriti.authoriti.api.model.response.ResponseSync;
 
 import com.google.gson.JsonObject;
 
@@ -28,6 +31,7 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
+import retrofit2.http.Query;
 import retrofit2.http.Url;
 
 /**
@@ -37,10 +41,10 @@ import retrofit2.http.Url;
 public interface AuthoritiAPIService {
 
     @GET("api/v1/schema")
-    Call<SchemaGroup> getSchemeGroup();
+    Call<SchemaGroup> getSchemeGroup(@Query("client") String client);
 
     @GET("api/v1/purpose")
-    Call<List<Purpose>> getPurposes();
+    Call<List<Purpose>> getPurposes(@Query("client") String client);
 
     @FormUrlEncoded
     @POST("api/v1/invite")
@@ -50,7 +54,10 @@ public interface AuthoritiAPIService {
     Call<ResponseSignUp> signUp(@Body RequestSignUp requestSignUp);
 
     @POST("api/v1/users")
-    Call<ResponseSignUpChase> signUpChase(@Body RequestSignUp requestSignUp);
+    Call<ResponseSignUpChase> signUpChase(@Body RequestSignUpChase requestSignUpChase);
+
+    @POST("api/v1/users/sync")
+    Call<ResponseSync> sync(@Header("Authorization") String token, @Body RequestSync requestSync);
 
     @FormUrlEncoded
     @POST("api/v1/users/confirm")
@@ -75,5 +82,8 @@ public interface AuthoritiAPIService {
 
     @POST("api/v1/pc-request/complete")
     Call<ResponseComplete> completePollingRequest(@Body RequestComplete requestComplete);
+
+    @POST("api/v1/pc-request/remove")
+    Call<ResponseComplete> removePendingPollingRequest(@Body RequestComplete requestComplete);
 
 }

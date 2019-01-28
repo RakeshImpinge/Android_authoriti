@@ -1,11 +1,17 @@
 package net.authoriti.authoriti.ui.auth;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.provider.Settings;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+
+import net.authoriti.authoriti.core.AccountManagerUpdateInterfce;
+import net.authoriti.authoriti.ui.menu.AccountAdaper;
+import net.authoriti.authoriti.utils.Constants;
 import net.authoriti.authoriti.utils.Log;
+
 import android.view.View;
 import android.widget.TextView;
 
@@ -27,7 +33,6 @@ import net.authoriti.authoriti.utils.AuthoritiUtils;
 import net.authoriti.authoriti.utils.crypto.CryptoKeyPair;
 import net.authoriti.authoriti.utils.crypto.CryptoUtil;
 
-import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 import com.tozny.crypto.android.AesCbcWithIntegrity;
 
 import org.androidannotations.annotations.AfterViews;
@@ -39,6 +44,9 @@ import org.androidannotations.annotations.ViewById;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -54,7 +62,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 @EActivity(R.layout.activity_account_manager)
 public class AccountManagerActivity extends SecurityActivity implements SecurityActivity
         .TouchIDEnableAlertListener, AccountAddDialog.AccountAddDialogListener, AccountAddItem
-        .AccountAddItemListener {
+        .AccountAddItemListener, AccountManagerUpdateInterfce {
 
     @Bean
     AuthoritiUtils utils;
@@ -71,7 +79,8 @@ public class AccountManagerActivity extends SecurityActivity implements Security
     @ViewById(R.id.tvEmpty)
     TextView tvEmpty;
 
-    FastItemAdapter<AccountAddItem> adapter;
+    AccountAdaper adapter;
+    List<AccountID> accountList = new ArrayList<>();
 
 
     private AccountAddDialog accountAddDialog;
@@ -92,9 +101,11 @@ public class AccountManagerActivity extends SecurityActivity implements Security
         accountAddDialog = new AccountAddDialog(this);
         accountAddDialog.setListener(this);
 
-        adapter = new FastItemAdapter<AccountAddItem>();
+        adapter = new AccountAdaper(accountList, this);
         rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
         rvAccount.setAdapter(adapter);
+
+        showAccount();
 
     }
 
@@ -117,8 +128,8 @@ public class AccountManagerActivity extends SecurityActivity implements Security
         if (dataManager.accountIDs == null) {
             dataManager.accountIDs = new ArrayList<>();
         }
-
-        AccountID accountID = new AccountID(name, id);
+        Log.e("SaveAccount", "Name: " + id);
+        AccountID accountID = new AccountID(name, id, true);
         dataManager.accountIDs.add(accountID);
 
         showAccount();
@@ -127,27 +138,48 @@ public class AccountManagerActivity extends SecurityActivity implements Security
     }
 
     private void showAccount() {
-
         tvEmpty.setVisibility(View.GONE);
-
-        if (adapter != null) {
-            adapter.clear();
-        } else {
-            adapter = new FastItemAdapter<>();
-        }
-
+        accountList.clear();
         for (int i = 0; i < dataManager.accountIDs.size(); i++) {
-            adapter.add(new AccountAddItem(dataManager.accountIDs.get(i), dataManager
-                    .defaultAccountSelected && i == dataManager.defaultAccountIndex, this));
+            accountList.add(dataManager.accountIDs.get(i));
         }
+
+        // Its only to display add + button if no self Id is added
+        if (accountList.size() == 0) {
+            accountList.add(new AccountID());
+        }
+
+        Collections.sort(accountList, new Comparator<AccountID>() {
+            @Override
+            public int compare(AccountID accountID, AccountID t1) {
+                if (accountID.getCustomer().equalsIgnoreCase("")) {
+                    if (t1.getCustomer().equalsIgnoreCase("")) {
+                        return accountID.getCustomer().compareTo(t1.getCustomer());
+                    }
+                    return 5000;
+                }
+                return accountID.getCustomer().compareTo(t1.getCustomer());
+            }
+        });
+
+        for (int i = 0; i < accountList.size(); i++) {
+            if (dataManager.getDefaultAccountID().getTitle().equals(accountList.get(i).getType()) &&
+                    dataManager.getDefaultAccountID().getValue().equals(accountList.get(i).getIdentifier())) {
+                adapter.mDefaultPostion = i;
+            }
+        }
+
+        adapter.notifyDataSetChanged();
     }
 
     private void signUp() {
         Log.e("Private Key", keyPair.getPrivateKey());
         Log.e("Public Key", keyPair.getPublicKey());
         Log.e("Salt", keyPair.getSalt());
-        RequestSignUp requestSignUp = new RequestSignUp(dataManager.password, keyPair
-                .getPublicKey(), keyPair.getSalt(), dataManager.inviteCode, dataManager.accountIDs);
+
+        RequestSignUp requestSignUp = new RequestSignUp(keyPair
+                .getPublicKey(), dataManager.inviteCode, dataManager.accountIDs);
+        Log.e("Step1", "Completed");
         displayProgressDialog("Sign Up...");
         AuthoritiAPI.APIService().signUp(requestSignUp).enqueue(new Callback<ResponseSignUp>() {
             @Override
@@ -176,9 +208,9 @@ public class AccountManagerActivity extends SecurityActivity implements Security
 
     private void fetchSignUpInfo(ResponseSignUp responseSignUp) {
         User user = responseSignUp.getUser();
+
         user.setUserId(responseSignUp.getUserId());
         user.setToken(responseSignUp.getToken());
-        user.setPassword(dataManager.password);
         user.setInviteCode(dataManager.inviteCode);
         try {
 
@@ -200,13 +232,16 @@ public class AccountManagerActivity extends SecurityActivity implements Security
                 user.setEncryptPassword(AesCbcWithIntegrity.encrypt(dataManager.password, keys)
                         .toString());
 
-                Log.e("getDefaultAccountID", dataManager.getDefaultAccountID().getTitle());
-                Log.e("getDefaultAccountID", dataManager.getDefaultAccountID().getValue());
-
                 for (int i = 0; i < user.getAccountIDs().size(); i++) {
                     AccountID accountID = user.getAccountIDs().get(i);
-                    accountID.setIdentifier(CryptoUtil.hash(accountID.getIdentifier()));
-                    user.getAccountIDs().set(i,accountID);
+                    if (!accountID.getHashed()) {
+                        Log.e("HashCheck", "Not Hashed");
+                        accountID.setIdentifier(CryptoUtil.hash(accountID.getIdentifier()));
+                    } else {
+                        accountID.setIdentifier(accountID.getIdentifier());
+                        Log.e("HashCheck", "Saved: " + accountID.getIdentifier());
+                    }
+                    user.getAccountIDs().set(i, accountID);
                 }
 
                 if (dataManager.defaultAccountSelected) {
@@ -234,7 +269,7 @@ public class AccountManagerActivity extends SecurityActivity implements Security
         finish();
     }
 
-    @Click(R.id.btnAdd)
+    @Click(R.id.ivAdd)
     void addButtonClicked() {
 
         showAccountAddDialog();
@@ -243,7 +278,9 @@ public class AccountManagerActivity extends SecurityActivity implements Security
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
-        HelpActivity_.intent(mContext).start();
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.HELP_BASE + "/" +
+                TOPIC_ACCOUNT_2018));
+        startActivity(browserIntent);
     }
 
 
@@ -380,5 +417,20 @@ public class AccountManagerActivity extends SecurityActivity implements Security
         }
         showAccount();
         updateFinishButton();
+    }
+
+    @Override
+    public void deleted(String accountId) {
+        System.out.println("Deleted: " + accountId);
+    }
+
+    @Override
+    public void addSelfSigned() {
+        showAccountAddDialog();
+    }
+
+    @Override
+    public void syncId(String ID) {
+
     }
 }

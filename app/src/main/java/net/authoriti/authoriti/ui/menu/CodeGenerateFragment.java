@@ -12,6 +12,7 @@ import net.authoriti.authoriti.ui.items.CodeItem;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiUtils;
 import net.authoriti.authoriti.utils.AuthoritiUtils_;
+import net.authoriti.authoriti.utils.ConstantUtils;
 
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 
@@ -60,7 +61,7 @@ public class CodeGenerateFragment extends BaseFragment {
 
     private void loadScheme() {
         displayProgressDialog("Loading...");
-        AuthoritiAPI.APIService().getSchemeGroup().enqueue(new Callback<SchemaGroup>() {
+        AuthoritiAPI.APIService().getSchemeGroup(ConstantUtils.isBuildFlavorVnb() ? "vnb" : "").enqueue(new Callback<SchemaGroup>() {
             @Override
             public void onResponse(Call<SchemaGroup> call, Response<SchemaGroup> response) {
                 dismissProgressDialog();
@@ -86,7 +87,7 @@ public class CodeGenerateFragment extends BaseFragment {
 //
 //            for (Picker picker : dataManager.getScheme().getPickers()) {
 //
-//                pickers.add(picker.getPicker());
+//                pickers.ic_add(picker.getPicker());
 //
 //                switch (picker.getPicker()) {
 //
@@ -103,7 +104,7 @@ public class CodeGenerateFragment extends BaseFragment {
 //
 //                                Value value = new Value(accountID.getIdentifier(), accountID
 //                                        .getType());
-//                                values.add(value);
+//                                values.ic_add(value);
 //
 //                            }
 //                            picker1.setValues(values);

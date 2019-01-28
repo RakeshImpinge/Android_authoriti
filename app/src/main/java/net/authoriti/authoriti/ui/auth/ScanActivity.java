@@ -16,7 +16,9 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+
 import net.authoriti.authoriti.utils.Log;
+
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -44,6 +46,7 @@ import net.authoriti.authoriti.core.BaseActivity;
 import net.authoriti.authoriti.ui.help.HelpActivity_;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.ConstantUtils;
+import net.authoriti.authoriti.utils.crypto.CryptoUtil;
 
 import com.google.gson.JsonObject;
 
@@ -54,6 +57,7 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -322,65 +326,65 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
 
             String builder = "Authentication Result - " + licenseCard.getAuthenticationResult() +
                     ", Authentication Result Summary - " + failureSummary +
-                    ", First Name - " + licenseCard.getNameFirst() +
-                    ", Middle Name - " + licenseCard.getNameMiddle() +
-                    ", Last Name - " + licenseCard.getNameLast() +
-                    ", Name Suffix - " + licenseCard.getNameSuffix() +
-                    ", ID - " + licenseCard.getLicenceID() +
-                    ", License - " + licenseCard.getLicense() +
-                    ", DOB Long - " + licenseCard.getDateOfBirth4() +
-                    ", DOB Short - " + licenseCard.getDateOfBirth() +
-                    ", Date Of Birth Local - " + licenseCard.getDateOfBirthLocal() +
-                    ", Issue Date Long - " + licenseCard.getIssueDate4() +
-                    ", Issue Date Short - " + licenseCard.getIssueDate() +
-                    ", Issue Date Local - " + licenseCard.getIssueDateLocal() +
-                    ", Expiration Date Long - " + licenseCard.getExpirationDate4() +
-                    ", Expiration Date Short - " + licenseCard.getExpirationDate() +
-                    ", Eye Color - " + licenseCard.getEyeColor() +
-                    ", Hair Color - " + licenseCard.getHair() +
-                    ", Height - " + licenseCard.getHeight() +
-                    ", Weight - " + licenseCard.getWeight() +
-                    ", Address - " + licenseCard.getAddress() +
-                    ", Address2 - " + licenseCard.getAddress2() +
-                    ", Address3 - " + licenseCard.getAddress3() +
-                    ", Address4 - " + licenseCard.getAddress4() +
-                    ", Address5 - " + licenseCard.getAddress5() +
-                    ", Address6 - " + licenseCard.getAddress6() +
-                    ", City - " + licenseCard.getCity() +
-                    ", Zip - " + licenseCard.getZip() +
-                    ", State - " + licenseCard.getState() +
-                    ", Country - " + licenseCard.getCounty() +
-                    ", Country Short - " + licenseCard.getCountryShort() +
-                    ", Country Long - " + licenseCard.getIdCountry() +
-                    ", Class - " + licenseCard.getClass() +
-                    ", Restriction - " + licenseCard.getRestriction() +
-                    ", Sex - " + licenseCard.getSex() +
-                    ", Audit - " + licenseCard.getAudit() +
-                    ", Endorsements - " + licenseCard.getEndorsements() +
-                    ", Fee - " + licenseCard.getFee() +
-                    ", CSC - " + licenseCard.getCSC() +
-                    ", SigNum - " + licenseCard.getSigNum() +
-                    ", Text1 - " + licenseCard.getText1() +
-                    ", Text2 - " + licenseCard.getText2() +
-                    ", Text3 - " + licenseCard.getText3() +
-                    ", Type - " + licenseCard.getType() +
-                    ", Doc Type - " + licenseCard.getDocType() +
-                    ", Father Name - " + licenseCard.getFatherName() +
-                    ", Mother Name - " + licenseCard.getMotherName() +
-                    ", NameFirst_NonMRZ - " + licenseCard.getNameFirst_NonMRZ() +
-                    ", NameLast_NonMRZ - " + licenseCard.getNameLast_NonMRZ() +
-                    ", NameLast1 - " + licenseCard.getNameLast1() +
-                    ", NameLast2 - " + licenseCard.getNameLast2() +
-                    ", NameMiddle_NonMRZ - " + licenseCard.getNameMiddle_NonMRZ() +
-                    ", Document Detected Name - " + licenseCard.getDocumentDetectedName() +
-                    ", Docuemtn Detected Name Short - " + licenseCard
-                    .getDocumentDetectedNameShort() +
-                    ", Nationality - " + licenseCard.getNationality() +
-                    ", Original - " + licenseCard.getOriginal() +
-                    ", PlaceOfBirth - " + licenseCard.getPlaceOfBirth() +
-                    ", PlaceOfIssue - " + licenseCard.getPlaceOfIssue() +
-                    ", Social Security - " + licenseCard.getSocialSecurity() +
-                    ", TID - " + licenseCard.getTransactionId();
+                    ", First Name - " + CryptoUtil.hash(licenseCard.getNameFirst()) +
+                    ", Middle Name - " + CryptoUtil.hash(licenseCard.getNameMiddle()) +
+                    ", Last Name - " + CryptoUtil.hash(licenseCard.getNameLast()) +
+                    ", Name Suffix - " + CryptoUtil.hash(licenseCard.getNameSuffix()) +
+                    ", ID - " + CryptoUtil.hash(licenseCard.getLicenceID()) +
+                    ", License - " + CryptoUtil.hash(licenseCard.getLicense()) +
+                    ", DOB Long - " + CryptoUtil.hash(licenseCard.getDateOfBirth4()) +
+                    ", DOB Short - " + CryptoUtil.hash(licenseCard.getDateOfBirth()) +
+                    ", Date Of Birth Local - " + CryptoUtil.hash(licenseCard.getDateOfBirthLocal()) +
+                    ", Issue Date Long - " + CryptoUtil.hash(licenseCard.getIssueDate4()) +
+                    ", Issue Date Short - " + CryptoUtil.hash(licenseCard.getIssueDate()) +
+                    ", Issue Date Local - " + CryptoUtil.hash(licenseCard.getIssueDateLocal()) +
+                    ", Expiration Date Long - " + CryptoUtil.hash(licenseCard.getExpirationDate4()) +
+                    ", Expiration Date Short - " + CryptoUtil.hash(licenseCard.getExpirationDate()) +
+                    ", Eye Color - " + CryptoUtil.hash(licenseCard.getEyeColor()) +
+                    ", Hair Color - " + CryptoUtil.hash(licenseCard.getHair()) +
+                    ", Height - " + CryptoUtil.hash(licenseCard.getHeight()) +
+                    ", Weight - " + CryptoUtil.hash(licenseCard.getWeight()) +
+                    ", Address - " + CryptoUtil.hash(licenseCard.getAddress()) +
+                    ", Address2 - " + CryptoUtil.hash(licenseCard.getAddress2()) +
+                    ", Address3 - " + CryptoUtil.hash(licenseCard.getAddress3()) +
+                    ", Address4 - " + CryptoUtil.hash(licenseCard.getAddress4()) +
+                    ", Address5 - " + CryptoUtil.hash(licenseCard.getAddress5()) +
+                    ", Address6 - " + CryptoUtil.hash(licenseCard.getAddress6()) +
+                    ", City - " + CryptoUtil.hash(licenseCard.getCity()) +
+                    ", Zip - " + CryptoUtil.hash(licenseCard.getZip()) +
+                    ", State - " + CryptoUtil.hash(licenseCard.getState()) +
+                    ", Country - " + CryptoUtil.hash(licenseCard.getCounty()) +
+                    ", Country Short - " + CryptoUtil.hash(licenseCard.getCountryShort()) +
+                    ", Country Long - " + CryptoUtil.hash(licenseCard.getIdCountry()) +
+                    ", Class - " + CryptoUtil.hash(licenseCard.getClass().toString()) +
+                    ", Restriction - " + CryptoUtil.hash(licenseCard.getRestriction()) +
+                    ", Sex - " + CryptoUtil.hash(licenseCard.getSex()) +
+                    ", Audit - " + CryptoUtil.hash(licenseCard.getAudit()) +
+                    ", Endorsements - " + CryptoUtil.hash(licenseCard.getEndorsements()) +
+                    ", Fee - " + CryptoUtil.hash(licenseCard.getFee()) +
+                    ", CSC - " + CryptoUtil.hash(licenseCard.getCSC()) +
+                    ", SigNum - " + CryptoUtil.hash(licenseCard.getSigNum()) +
+                    ", Text1 - " + CryptoUtil.hash(licenseCard.getText1()) +
+                    ", Text2 - " + CryptoUtil.hash(licenseCard.getText2()) +
+                    ", Text3 - " + CryptoUtil.hash(licenseCard.getText3()) +
+                    ", Type - " + CryptoUtil.hash(licenseCard.getType()) +
+                    ", Doc Type - " + CryptoUtil.hash(licenseCard.getDocType()) +
+                    ", Father Name - " + CryptoUtil.hash(licenseCard.getFatherName()) +
+                    ", Mother Name - " + CryptoUtil.hash(licenseCard.getMotherName()) +
+                    ", NameFirst_NonMRZ - " + CryptoUtil.hash(licenseCard.getNameFirst_NonMRZ()) +
+                    ", NameLast_NonMRZ - " + CryptoUtil.hash(licenseCard.getNameLast_NonMRZ()) +
+                    ", NameLast1 - " + CryptoUtil.hash(licenseCard.getNameLast1()) +
+                    ", NameLast2 - " + CryptoUtil.hash(licenseCard.getNameLast2()) +
+                    ", NameMiddle_NonMRZ - " + CryptoUtil.hash(licenseCard.getNameMiddle_NonMRZ()) +
+                    ", Document Detected Name - " + CryptoUtil.hash(licenseCard.getDocumentDetectedName()) +
+                    ", Docuemtn Detected Name Short - " + CryptoUtil.hash(licenseCard
+                    .getDocumentDetectedNameShort()) +
+                    ", Nationality - " + CryptoUtil.hash(licenseCard.getNationality()) +
+                    ", Original - " + CryptoUtil.hash(licenseCard.getOriginal()) +
+                    ", PlaceOfBirth - " + CryptoUtil.hash(licenseCard.getPlaceOfBirth()) +
+                    ", PlaceOfIssue - " + CryptoUtil.hash(licenseCard.getPlaceOfIssue()) +
+                    ", Social Security - " + CryptoUtil.hash(licenseCard.getSocialSecurity()) +
+                    ", TID - " + CryptoUtil.hash(licenseCard.getTransactionId());
 
             saveDLInfo(builder, "DL authentication");
 
@@ -750,7 +754,6 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
         Log.e("CARD Cropping - ", "Finished");
 
         if (!isBack) {
-
             frontBitmap = card_bitmap;
 
             if (card_bitmap == null) {
@@ -759,7 +762,9 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
 
                 ivFront.setImageBitmap(null);
                 capturedFront = false;
-
+            } else if (imageMetrics != null && Boolean.parseBoolean(imageMetrics.get("HAS_GLARE").toString()) && Float.parseFloat(imageMetrics.get("GLARE_GRADE").toString()) < 0.60f) {
+                showAlert("", "We detected too much glare in the image, please try again with different lighting.");
+                capturedFront = false;
             } else {
 
                 ivFront.setImageBitmap(card_bitmap);
@@ -776,7 +781,9 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
 
                 ivBackward.setImageBitmap(null);
                 capturedBack = false;
-
+            } else if (imageMetrics != null && Boolean.parseBoolean(imageMetrics.get("HAS_GLARE").toString()) && Float.parseFloat(imageMetrics.get("GLARE_GRADE").toString()) < 0.60f) {
+                showAlert("", "We detected too much glare in the image, please try again with different lighting.");
+                capturedBack = false;
             } else {
 
                 ivBackward.setImageBitmap(card_bitmap);
@@ -928,7 +935,6 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
     public void didFailWithError(int code, String message) {
         dismissProgressDialog();
         Log.e("Did Failed with Error -", message + " - " + code);
-
         if (isNext) {
             showAlert("", message + " - " + code);
         }
@@ -1009,6 +1015,15 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
     protected void onDestroy() {
         super.onDestroy();
         AcuantAndroidMobileSDKController.cleanup();
+        try {
+            File dir = getCacheDir();
+            File front = new File(dir, "frontSideCardPhoto.JPEG");
+            front.delete();
+            File back = new File(dir, "backSideCardPhoto.JPEG");
+            back.delete();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

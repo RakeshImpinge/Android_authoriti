@@ -11,14 +11,8 @@ import java.util.List;
 
 public class RequestSignUp {
 
-    @SerializedName("password")
-    private String password;
-
     @SerializedName("key")
     private String key;
-
-    @SerializedName("salt")
-    private String salt;
 
     @SerializedName("code")
     private String code;
@@ -26,20 +20,11 @@ public class RequestSignUp {
     @SerializedName("account")
     private List<AccountID> accountIDs;
 
-    public RequestSignUp(String password, String key, String salt, String code, List<AccountID> accountIDs){
-        this.password = password;
+
+    public RequestSignUp(String key, String code, List<AccountID> accountIDs) {
         this.key = key;
-        this.salt = salt;
         this.code = code;
         this.accountIDs = accountIDs;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getKey() {
@@ -48,14 +33,6 @@ public class RequestSignUp {
 
     public void setKey(String key) {
         this.key = key;
-    }
-
-    public String getSalt() {
-        return salt;
-    }
-
-    public void setSalt(String salt) {
-        this.salt = salt;
     }
 
     public String getCode() {
@@ -73,4 +50,5 @@ public class RequestSignUp {
     public void setAccountIDs(List<AccountID> accountIDs) {
         this.accountIDs = accountIDs;
     }
+
 }

@@ -75,6 +75,9 @@ public class PasscodePickActivity extends BaseActivity {
     @ViewById(R.id.tvTitle)
     TextView tvTitle;
 
+    @ViewById(R.id.tv_title)
+    TextView tv_title;
+
     @ViewById(R.id.rvOptions)
     RecyclerView rvOptions;
 
@@ -87,6 +90,7 @@ public class PasscodePickActivity extends BaseActivity {
         pickerType = picker.getPicker();
         defaultValue = defaultPickerMap.get(pickerType);
         tvTitle.setText(picker.getTitle());
+
 
         addValuesToPicker();
 
@@ -133,7 +137,7 @@ public class PasscodePickActivity extends BaseActivity {
 //                                }
 //                            }
 //                        } else {
-//                            values.add(item.getValue());
+//                            values.ic_add(item.getValue());
 //                            item.setChecked(!item.isChecked());
 //                            optionAdapter.notifyAdapterItemChanged(position);
 //                            dataManager.setSelectedValuesForDataType(utils.getPickerSelectedIndex
@@ -180,9 +184,8 @@ public class PasscodePickActivity extends BaseActivity {
                             defaultValue.setValue(picker.getValues().get(position).getValue());
                             defaultPickerMap.put(pickerType, defaultValue);
 
-                            List<Value> values = dataManager.getValuesFromDataType(Integer
-                                    .valueOf(picker
-                                            .getValues().get(position).getValue()));
+                            List<Value> values = dataManager.getValuesFromDataType(picker
+                                    .getValues().get(position).getValue());
                             DefaultValue defaultValueDataType = new DefaultValue(values.get(0)
                                     .getTitle(), values.get(0).getValue(), false);
                             defaultPickerMap.put(PICKER_DATA_TYPE, defaultValueDataType);
@@ -206,6 +209,25 @@ public class PasscodePickActivity extends BaseActivity {
         });
 
         showOptions();
+
+        tv_title.setText(getHeaderTitle(picker.getPicker()));
+    }
+
+    public String getHeaderTitle(String type) {
+        switch (type) {
+            case PICKER_ACCOUNT:
+                return "Please Select A Wallet ID";
+            case PICKER_TIME:
+                return "Pick a expiry time";
+            case PICKER_INDUSTRY:
+                return "Pick an Industry";
+            case PICKER_LOCATION_COUNTRY:
+                return "Pick a Location";
+            case PICKER_LOCATION_STATE:
+                return "Pick a Location";
+            default:
+                return "";
+        }
     }
 
     private void addValuesToPicker() {
@@ -217,7 +239,7 @@ public class PasscodePickActivity extends BaseActivity {
 //            for (AccountID accountID : dataManager.getUser().getAccountIDs()) {
 //                Value value = new Value(accountID.getIdentifier(), accountID
 //                        .getType());
-//                values.add(value);
+//                values.ic_add(value);
 //            }
 //            picker.setValues(values);
 //        } else if (pickerType.equals(PICKER_DATA_TYPE)) {
@@ -335,7 +357,7 @@ public class PasscodePickActivity extends BaseActivity {
     }
 
     private void showTimePicker(final OptionItem item, final int position) {
-
+        System.out.println("Showing Time Picker");
         final TimePickerDialog timePickerDialog = new TimePickerDialog(PasscodePickActivity.this,
                 new TimePickerDialog.OnTimeSetListener() {
                     @Override
@@ -394,6 +416,12 @@ public class PasscodePickActivity extends BaseActivity {
             if (pickerType.equals(PICKER_ACCOUNT)) {
                 if (defaultValue.getValue().equals(picker.getValues().get(i).getValue()) &&
                         defaultValue.getTitle().equals(picker.getValues().get(i).getTitle())) {
+                    optionAdapter.add(new OptionItem(picker.getValues().get(i), true));
+                } else {
+                    optionAdapter.add(new OptionItem(picker.getValues().get(i), false));
+                }
+            } else if (pickerType.equals(PICKER_REQUEST)) {
+                if (value.contains(picker.getValues().get(i).getValue()) && title.contains(picker.getValues().get(i).getTitle())) {
                     optionAdapter.add(new OptionItem(picker.getValues().get(i), true));
                 } else {
                     optionAdapter.add(new OptionItem(picker.getValues().get(i), false));

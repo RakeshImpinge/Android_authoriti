@@ -1,10 +1,12 @@
 <resources>
     <string name="app_name">Authoriti</string>
 
-    <string name="menu_code_generate">Generate Permission Code</string>
-    <string name="menu_account">MY IDs</string>
+    <string name="menu_code_generate">Generate Permission code™ authorization</string>
+    <string name="menu_polling">Check Permission Code™ Requests</string>
+    <string name="menu_account">Manage My IDs</string>
+    <string name="menu_export">Transfer Wallet to New Device</string>
+    <string name="menu_change_pwd">Settings</string>
     <string name="menu_wipe">About Us</string>
-    <string name="menu_polling">Check Permission Code Requests</string>
     <string name="menu_logOut">Logout</string>
 
     <!-- Fonts -->
@@ -18,11 +20,18 @@
     <string name="font_oswaldo_regular">fonts/Oswald_Regular.ttf</string>
     <string name="title_touch_id">Touch ID for \"Authoriti\"</string>
 
-    <string name="text_about">Authoriti is an innovation of CTM Insights. CTM is an early stage technology studio and incubator, focused on finding new approaches to structural problems in cyber security.  We have significant leadership experience dealing with InfoSec at-scale at the world's leading financial institutions.
+    <string name="text_about">Authoriti is an innovation of CTM Insights. CTM is an early stage technology studio and incubator, focused on finding new approaches to structural problems in cyber security.  We have significant leadership experience dealing with InfoSec at-scale at the world\'s leading financial institutions.
 
 Authoriti is the developer of the Authoriti Permission Code™, which gives institutions the confidence that financial transactions are authorized.</string>
     <string name="txt_add_account">To complete sign up, you need to add at least one ID to your wallet. \n Please click \"Add\" on top right.</string>
     <string name="hold_steady">HOLD STEADY</string>
     <string name="align_and_tap">ALIGN AND TAP</string>
+    <string name="swipe_change_msg">Click to change, or swipe left or right to set as default</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="export_wallet_to_new_device">Export Wallet to New Device</string>
+    <string name="change_password">Change Password</string>
+    <string name="wipe_all_data_warning_can_not_be_undo">Wipe All Data (warning: can not be undone)</string>
 
 </resources>

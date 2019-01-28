@@ -2,6 +2,7 @@ package net.authoriti.authoriti.api.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,7 +32,7 @@ public class User {
 
     private boolean fingerPrintAuthEnabled = false;
 
-    boolean isChaseType = false;
+    private boolean isChaseType = false;
 
     private List<AccountID> unconfirmedAccountIDs;
 
@@ -134,5 +135,15 @@ public class User {
 
     public void setFingerPrintAuthEnabled(boolean fingerPrintAuthEnabled) {
         this.fingerPrintAuthEnabled = fingerPrintAuthEnabled;
+    }
+
+    private List<String> downloadedWalletIDList = new ArrayList<>();
+
+    public List<String> getDownloadedWalletIDList() {
+        return downloadedWalletIDList;
+    }
+
+    public void setDownloadedWalletIDList(List<String> downloadedWalletIDList) {
+        this.downloadedWalletIDList = downloadedWalletIDList;
     }
 }

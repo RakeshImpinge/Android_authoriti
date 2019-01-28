@@ -19,20 +19,20 @@
             android:orientation="vertical">
 
             <LinearLayout
+                android:id="@+id/linheader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/colorHeaderBackground"
-                android:paddingBottom="15dp"
                 android:paddingTop="15dp"
-                android:visibility="visible">
+                android:paddingBottom="15dp">
 
                 <TextView
                     android:id="@+id/tvTitle"
                     fontPath="@string/font_oswaldo_regular"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="18sp"
-                    android:text="Get a Permission Code™ to:"
+                    android:layout_marginStart="16sp"
+                    android:text="Get a Permission code™ authorization to:"
                     android:textColor="@color/colorTextPrimary"
                     android:textSize="18sp"
                     tools:ignore="MissingPrefix" />
@@ -57,9 +57,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginEnd="16dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
                     android:text="Click to change the setting or swipe left or right to set as default"
                     android:textAlignment="center"
                     android:textColor="@color/colorTextPrimary"

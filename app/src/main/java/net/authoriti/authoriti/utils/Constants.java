@@ -7,11 +7,12 @@ package net.authoriti.authoriti.utils;
 public interface Constants {
     String DEV = "davjnabB8rvyZZLrMOq3jw==:JDJXMckcsxcMhtMi1QVmEs4DpAFtLn9FMZwASUiH9B4=:qeU5Uk2rFKcoMtK0N1XYosOSfhIar0K8Hgk8rIn4BcEdVmyDMOnYBJtEg4P6hZXg";
     String QA = "16/AtQ1ZYsw2x48wBUNVrA==:EO1rTvhdVo8jfjClM1zcc9Cqrl2c4CugEaJCaoMK+78=:Cao10YznfpfHZxvJLzkzFyU5dhlfaIzubXBh6b6wBsg=";
-    String PROD = "gAPQ6DK4JSI6wXHVkU1MVQ==:wS9PUVfPLAhHTqYGwVK+K+2Z0vLWOG1b+PTFFOlEzUI=:WocKp+q0pF9jG7+QRpl4eI6wZgGOEWjePuXIEdWcjbE=";
+    String PROD = "OUCfUyCJLsvrtuZ+HWMTTA==:Z7psrKA4pogc9O1ZjtGatTPDwpoq6T8hb599+VLZzr0=:SIkVX1tZ6KKTjszqQB0cd/GE/0pqD5OMdpqvvQlNLTA=";
     String API_BASE_URL = PROD;
     String API_BASE_URL_POLLING =
             "https://s3.amazonaws.com/authoriti-requests-prod/requests/";
     String HELP_BASE = "https://help.authoriti.net";
+    String IDENTIFIER = "authoriti";
 
 
 //    String API_BASE_URL = "https://authoriti-test.crts.io";
@@ -20,7 +21,8 @@ public interface Constants {
     // BroadCast Id
     String BROADCAST_CHANGE_MENU = "BROADCAST_CHANGE_MENU";
     String BROADCAST_ADD_BUTTON_CLICKED = "BROADCAST_ADD_BUTTON_CLICKED";
-    String BROADCAST_SYNC_BUTTON_CLICKED = "BROADCAST_SYNC_BUTTON_CLICKED";
+    String BROADCAST_CLOUD_BUTTON_CLICKED = "BROADCAST_ADD_CLOUD_CLICKED";
+    String BROADCAST_SYNC_DONE = "BROADCAST_SYNC_DONE";
 
     // Menu Id
     long MENU_CODE = 1001;
@@ -28,6 +30,9 @@ public interface Constants {
     long MENU_WIPE = 1003;
     long MENU_LOGOUT = 1004;
     long MENU_POLLING = 1005;
+    long MENU_EXPORT = 1006;
+    long MENU_SETTING = 1007;
+
 
     String MENU_ID = "menu_id";
 
@@ -74,10 +79,16 @@ public interface Constants {
     String TOPIC_DLV = "help-dlv";
     String TOPIC_GENERAL = "help-general";
     String TOPIC_ACCOUNT_2018 = "help-account-id";
-    String TOPIC_PASSWORD = "TOPIC_PASSWORD";
-    String TOPIC_RESET_PASSWORD = "TOPIC_RESET_PASSWORD";
+    String TOPIC_PASSWORD = "help-download-initial-wallet";
+    String TOPIC_MASTER_PASSWORD="help-master-password";
+    String TOPIC_RESET_PASSWORD = "help-changepw";
     String TOPIC_CHASE = "help-account-id";
-    String TOPIC_ABOUT = "TOPIC_ABOUT";
+    String TOPIC_ABOUT = "help-about";
+    String TOPIC_SETTINGS = "help-settings";
     String TOPIC_PURPOSE_DETAIL = "TOPIC_PURPOSE_DETAIL";
     String TOPIC_PURPOSE_DETAIL_PICKER = "TOPIC_PURPOSE_DETAIL_PICKER";
+
+    public final String BUILD_FLAVOUR_VNB = "vnb";
+    public final String BUILD_FLAVOUR_AUTHORITI = "vnb";
+
 }

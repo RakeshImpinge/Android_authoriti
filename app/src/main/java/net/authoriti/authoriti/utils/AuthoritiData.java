@@ -21,6 +21,7 @@ import com.google.gson.reflect.TypeToken;
 
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.sharedpreferences.Pref;
+import org.json.JSONObject;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -99,6 +100,10 @@ public class AuthoritiData {
         } else {
             pref.edit().userJson().remove().apply();
         }
+    }
+
+    public void setUserJson(JSONObject user) {
+        pref.edit().userJson().put(user.toString()).apply();
     }
 
     public User getUser() {
@@ -193,6 +198,42 @@ public class AuthoritiData {
         } else {
             key = "" + schemaIndex;
         }
+        if (jsonObject != null) {
+            if (jsonObject.get(key) != null) {
+                JsonArray jsonArray = jsonObject.get(key).getAsJsonArray();
+                Gson gson = new Gson();
+                Type type = new TypeToken<List<Value>>() {
+                }.getType();
+                values = gson.fromJson(jsonArray, type);
+            }
+        }
+        return values;
+    }
+
+    boolean parseInteger(String s) {
+        try {
+            Integer.parseInt(s);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public List<Value> getValuesFromDataType(String key) {
+        if (key.equals("6")) {
+            key = "x";
+        } else if (parseInteger(key)) {
+            if (Integer.parseInt(key) < 10) {
+                key = "0" + Integer.parseInt(key);
+            } else {
+                key = "" + key;
+            }
+        } else {
+            key = key;
+        }
+
+        List<Value> values = new ArrayList<>();
+        JsonObject jsonObject = getDataType();
         if (jsonObject != null) {
             if (jsonObject.get(key) != null) {
                 JsonArray jsonArray = jsonObject.get(key).getAsJsonArray();
@@ -552,9 +593,7 @@ public class AuthoritiData {
     }
 
     public CryptoKeyPair getCryptoKeyPair(String password, String salt) {
-
         Crypto crypto = new Crypto();
-
         return crypto.generateKeyPair(password, salt);
 
     }
@@ -640,4 +679,5 @@ public class AuthoritiData {
     public void setSelectedDataTypeIndex(int selectedDataTypeIndex) {
         this.selectedDataTypeIndex = selectedDataTypeIndex;
     }
+
 }

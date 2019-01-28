@@ -13,10 +13,21 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.Toolbar;
+
+import net.authoriti.authoriti.api.model.User;
+import net.authoriti.authoriti.api.model.request.RequestComplete;
+import net.authoriti.authoriti.api.model.request.RequestSync;
+import net.authoriti.authoriti.api.model.response.ResponseComplete;
+import net.authoriti.authoriti.api.model.response.ResponseSync;
+import net.authoriti.authoriti.ui.menu.AccountChaseFragment;
+import net.authoriti.authoriti.ui.menu.SettingFragment;
+import net.authoriti.authoriti.ui.menu.SettingFragment_;
+import net.authoriti.authoriti.ui.share.ExportActivity_;
 import net.authoriti.authoriti.utils.Log;
+
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import net.authoriti.authoriti.api.AuthoritiAPI;
 import net.authoriti.authoriti.api.model.AccountID;
@@ -53,6 +64,8 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -74,6 +87,7 @@ public class MainActivity extends BaseActivity {
     private Drawer drawer = null;
 
     private Fragment purposeFragment;
+    private Fragment settingFragment;
     private Fragment accountFragment;
     private Fragment wipeFragment;
 
@@ -85,8 +99,12 @@ public class MainActivity extends BaseActivity {
     @ViewById(R.id.toolbar)
     Toolbar toolbar;
 
-    @ViewById(R.id.btnAdd)
-    Button btnAdd;
+    @ViewById(R.id.ivAdd)
+    ImageButton ivAdd;
+
+
+    @ViewById(R.id.ivCloud)
+    ImageButton ivCloud;
 
     @ViewById(R.id.ivHelp)
     ImageButton ivHelp;
@@ -97,11 +115,13 @@ public class MainActivity extends BaseActivity {
 
     long PollingStopMilliseconds = 0;
 
+    public PurposeSchemaStoreInterface purposeSchemaStoreInterface;
+
 
     Foreground.Listener listener = new Foreground.Listener() {
         @Override
         public void onBecameForeground() {
-
+            System.out.println("onBecameForeground");
             if (dataManager.getInactiveTime() != null && !dataManager.getInactiveTime().equals
                     ("")) {
                 long currentTime = System.currentTimeMillis() / 1000;
@@ -110,17 +130,12 @@ public class MainActivity extends BaseActivity {
                 long inactiveTime = Long.parseLong(dataManager.getInactiveTime());
                 Log.e("Inactive TimeStamp", String.valueOf(inactiveTime));
 
-                if (currentTime - inactiveTime > 300) {
-
+                if (currentTime - inactiveTime > 60) {
                     logOut();
-
                 } else {
-
                     dataManager.setInactiveTime("");
                 }
-
             } else {
-
                 dataManager.setInactiveTime("");
             }
 
@@ -128,11 +143,8 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public void onBecameBackground() {
-
             long time = System.currentTimeMillis() / 1000;
             dataManager.setInactiveTime(String.valueOf(time));
-            Log.e("Inactive TimeStamp", String.valueOf(time));
-
         }
     };
 
@@ -143,6 +155,17 @@ public class MainActivity extends BaseActivity {
 
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+//        logOut();
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 
     @AfterViews
     void callAfterViewInjection() {
@@ -163,12 +186,14 @@ public class MainActivity extends BaseActivity {
                         new PrimaryDrawerItem().withName(R.string.menu_code_generate)
                                 .withIdentifier(MENU_CODE).withSelectable(true).withTypeface
                                 (typeface),
-                        new PrimaryDrawerItem().withName(R.string.menu_account).withIdentifier
-                                (MENU_ACCOUNT).withSelectable(true).withTypeface(typeface),
-                        new PrimaryDrawerItem().withName(R.string.menu_wipe).withIdentifier
-                                (MENU_WIPE).withSelectable(true).withTypeface(typeface),
                         new PrimaryDrawerItem().withName(R.string.menu_polling).withIdentifier
                                 (MENU_POLLING).withSelectable(true).withTypeface(typeface),
+                        new PrimaryDrawerItem().withName(R.string.menu_account).withIdentifier
+                                (MENU_ACCOUNT).withSelectable(true).withTypeface(typeface),
+                        new PrimaryDrawerItem().withName(R.string.menu_change_pwd).withIdentifier
+                                (MENU_SETTING).withSelectable(true).withTypeface(typeface),
+                        new PrimaryDrawerItem().withName(R.string.menu_wipe).withIdentifier
+                                (MENU_WIPE).withSelectable(true).withTypeface(typeface),
                         new PrimaryDrawerItem().withName(R.string.menu_logOut).withIdentifier
                                 (MENU_LOGOUT).withSelectable(true).withTypeface(typeface)
                 )
@@ -205,6 +230,7 @@ public class MainActivity extends BaseActivity {
         if (SELECTED_MENU_ID == menu_id && menu_id != MENU_POLLING) {
             return;
         }
+
         SELECTED_MENU_ID = menu_id;
         Fragment fragment = null;
         if (menu_id == MENU_CODE) {
@@ -219,6 +245,11 @@ public class MainActivity extends BaseActivity {
                 accountFragment = AccountChaseFragment_.builder().build();
             }
             fragment = accountFragment;
+        } else if (menu_id == MENU_SETTING) {
+            if (settingFragment == null) {
+                settingFragment = SettingFragment_.builder().build();
+            }
+            fragment = settingFragment;
         } else if (menu_id == MENU_WIPE) {
             if (wipeFragment == null) {
                 wipeFragment = WipeFragment_.builder().build();
@@ -226,10 +257,10 @@ public class MainActivity extends BaseActivity {
             fragment = wipeFragment;
         } else if (menu_id == MENU_POLLING) {
             userAccountIds.clear();
-            PollingStopMilliseconds = System.currentTimeMillis() + (30 * 1000);
+            PollingStopMilliseconds = System.currentTimeMillis() + (5 * 1000);
             userAccountIds.addAll(dataManager.getUser().getAccountIDs());
-            startPolling();
             displayProgressDialog("Please Wait...");
+            startPolling();
         }
 
         changeFragment(fragment);
@@ -240,14 +271,11 @@ public class MainActivity extends BaseActivity {
         drawer.setSelection(menu_id, false);
         SELECTED_MENU_ID = menu_id;
         if (menu_id == MENU_ACCOUNT) {
-            btnAdd.setVisibility(View.VISIBLE);
-            if (!dataManager.getUser().getChaseType()) {
-                btnAdd.setText("Add");
-            } else {
-                btnAdd.setText("Sync");
-            }
+            ivCloud.setVisibility(View.VISIBLE);
+            ivAdd.setVisibility(View.GONE);
         } else {
-            btnAdd.setVisibility(View.INVISIBLE);
+            ivAdd.setVisibility(View.INVISIBLE);
+            ivCloud.setVisibility(View.GONE);
         }
     }
 
@@ -269,7 +297,6 @@ public class MainActivity extends BaseActivity {
     }
 
     private void logOut() {
-
         AuthLogIn logIn = dataManager.loginStatus();
         logIn.setLogin(false);
         dataManager.setAuthLogin(logIn);
@@ -302,27 +329,94 @@ public class MainActivity extends BaseActivity {
             }
         } else if (SELECTED_MENU_ID == MENU_WIPE) {
             topic = TOPIC_ABOUT;
+        } else if (SELECTED_MENU_ID == MENU_SETTING) {
+            topic = TOPIC_SETTINGS;
         }
         if (!topic.equals("")) {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ConstantUtils
                     .getHelpUrl(topic)));
             startActivity(browserIntent);
 //            PermissionCodeRequest
-//                    ("authoriti://purpose/manage-an-account?accountId=some_account_id" +
-//                            "&data_type=00,02,03&time=1 Hour");
+//                    ("authoriti://purpose/file-insurance-claim?accountId=6e21466289dfe8fab5d2df4e7a4ba8c74a02a88624a5796e0f83aeea6a00b1f0&schemaVersion=8&customer=Aetna%20Health&customer_code=13&requestor_value=y&data_type=01%2C02&secret=hellothere");
         }
     }
 
-    @Click(R.id.btnAdd)
+    @Click(R.id.ivAdd)
     void addButtonClicked() {
-        if (dataManager.getUser().getChaseType()) {
-            LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent
-                    (BROADCAST_SYNC_BUTTON_CLICKED));
-        } else {
-            LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent
-                    (BROADCAST_ADD_BUTTON_CLICKED));
-        }
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(BROADCAST_ADD_BUTTON_CLICKED));
     }
+
+    @Click(R.id.ivCloud)
+    void cloudButtonClicked() {
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(BROADCAST_CLOUD_BUTTON_CLICKED));
+    }
+
+    public void syncButtonClicked(final String ID) {
+        displayProgressDialog("Downloading\nwallet items...");
+        RequestSync sycnew = new RequestSync();
+        if (ID == null || ID.equals("")) {
+            List<String> downloadIdList = dataManager.getUser().getDownloadedWalletIDList();
+            if (!downloadIdList.contains(dataManager.getUser().getUserId())) {
+                if (dataManager.getUser().getChaseType()) {
+                    downloadIdList.add(dataManager.getUser().getUserId());
+                }
+            }
+        } else {
+            List<String> downloadIdList = new ArrayList<>();
+            downloadIdList.add(ID);
+            sycnew.setUserId(downloadIdList);
+        }
+        AuthoritiAPI.APIService().sync("Bearer " + dataManager.getUser().getToken(), sycnew).enqueue(new Callback<ResponseSync>() {
+            @Override
+            public void onResponse(Call<ResponseSync> call, Response<ResponseSync> response) {
+                if (response.isSuccessful()) {
+                    User user = dataManager.getUser();
+                    List<AccountID> savedAccountIDs = user.getAccountIDs();
+                    List<AccountID> newIds = new ArrayList<>();
+                    for (ResponseSync.Sync responseSync : response.body().getUpdates()) {
+                        List<AccountID> newAccountIDs = responseSync.getAccounts();
+                        final int newAccounts = newAccountIDs.size();
+                        Log.e("Sync", "Total number of accounts: " + newAccounts);
+                        for (int i = 0; i < newAccounts; i++) {
+                            Log.e("Loop", "" + i);
+                            boolean isContained = false;
+                            newAccountIDs.get(i).setCustomer(responseSync.getCustomerName());
+                            newAccountIDs.get(i).setCustomer_ID(responseSync.getUserId());
+                            for (int k = 0; k < savedAccountIDs.size(); k++) {
+                                if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
+                                        .getIdentifier())
+                                        && savedAccountIDs.get(k).getType().equals(newAccountIDs.get(i)
+                                        .getType())) {
+                                    isContained = true;
+                                    break;
+                                }
+                            }
+                            if (!isContained) {
+                                newIds.add(newAccountIDs.get(i));
+                            }
+                        }
+                    }
+                    savedAccountIDs.addAll(newIds);
+                    user.setAccountIDs(savedAccountIDs);
+                    dataManager.setUser(user);
+                    dismissProgressDialog();
+                    LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(BROADCAST_SYNC_DONE));
+                    Toast.makeText(MainActivity.this, "Wallets downloaded successfully", Toast.LENGTH_LONG).show();
+                } else {
+                    dismissProgressDialog();
+                    Toast.makeText(MainActivity.this, "Wallets downloaded failed. Please try again later!", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSync> call, Throwable t) {
+                t.printStackTrace();
+                dismissProgressDialog();
+                Toast.makeText(MainActivity.this, "Wallets downloaded failed. Please try again later!", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
 
     @Override
     public void onBackPressed() {
@@ -331,35 +425,47 @@ public class MainActivity extends BaseActivity {
         } else {
             super.onBackPressed();
         }
-
     }
+
+
+    int isAllDataLoaded = 0;
 
     @Override
     protected void onResume() {
         super.onResume();
+        if ((dataManager.getPurposes() == null || dataManager.getScheme() == null)) {
+            isAllDataLoaded = 0;
+        } else {
+            isAllDataLoaded = 2;
+        }
+
         loadPurposes();
         loadScheme();
     }
 
+
     private void loadPurposes() {
-        AuthoritiAPI.APIService().getPurposes().enqueue(new Callback<List<Purpose>>() {
+        AuthoritiAPI.APIService().getPurposes(ConstantUtils.isBuildFlavorVnb() ? "vnb" : "").enqueue(new Callback<List<Purpose>>() {
             @Override
             public void onResponse(Call<List<Purpose>> call, Response<List<Purpose>> response) {
                 dismissProgressDialog();
                 if (response.code() == 200 && response.body() != null) {
+                    System.out.println("OnDataSaved: Calling setPurposes!");
                     dataManager.setPurposes(response.body());
+                    updateDataLoaded();
                 }
             }
 
             @Override
             public void onFailure(Call<List<Purpose>> call, Throwable t) {
                 dismissProgressDialog();
+                updateDataLoaded();
             }
         });
     }
 
     private void loadScheme() {
-        AuthoritiAPI.APIService().getSchemeGroup().enqueue(new Callback<SchemaGroup>() {
+        AuthoritiAPI.APIService().getSchemeGroup(ConstantUtils.isBuildFlavorVnb() ? "vnb" : "").enqueue(new Callback<SchemaGroup>() {
             @Override
             public void onResponse(Call<SchemaGroup> call, Response<SchemaGroup> response) {
                 dismissProgressDialog();
@@ -375,15 +481,29 @@ public class MainActivity extends BaseActivity {
                         addDefaultvalues();
                     } else {
                         dataManager.setScheme(response.body().getSchema());
+                        updateDefaultvalues();
                     }
+                    System.out.println("OnDataSaved: Scheme Loaded");
                 }
+                updateDataLoaded();
             }
 
             @Override
             public void onFailure(Call<SchemaGroup> call, Throwable t) {
+                updateDataLoaded();
                 dismissProgressDialog();
             }
         });
+    }
+
+
+    private void updateDataLoaded() {
+        if (isAllDataLoaded == 0) {
+            isAllDataLoaded = 1;
+        } else if (isAllDataLoaded == 1) {
+            isAllDataLoaded = 2;
+            purposeSchemaStoreInterface.onDataSaved();
+        }
     }
 
     private void addDefaultvalues() {
@@ -405,9 +525,66 @@ public class MainActivity extends BaseActivity {
                                 .getType(), dataManager.getUser().getAccountIDs().get(0)
                                 .getIdentifier(), false);
                     } else if (picker.getPicker().equals(PICKER_DATA_TYPE)) {
-                        List<Value> list = dataManager.getValuesFromDataType(Integer.valueOf(key));
-                        defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
-                                false);
+                        if (defaultValuesHashMap.containsKey(PICKER_REQUEST)) {
+                            List<Value> list = dataManager.getValuesFromDataType(defaultValuesHashMap.get(PICKER_REQUEST).getValue());
+                            defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
+                                    false);
+                        } else {
+                            List<Value> list = dataManager.getValuesFromDataType(key);
+                            defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
+                                    false);
+                        }
+                    } else if (picker.getValues() != null && picker.getValues().size() > 0) {
+                        defValue = new DefaultValue(picker.getValues().get(0).getTitle(), picker
+                                .getValues()
+                                .get(0).getValue(), false);
+                    } else {
+                        defValue = new DefaultValue("", "", false);
+                    }
+                    defaultValuesHashMap.put(picker.getPicker(), defValue);
+                }
+                defaultSelectedList.put("" + key.trim(), defaultValuesHashMap);
+            }
+            dataManager.setDefaultValues(defaultSelectedList);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void updateDefaultvalues() {
+        try {
+            Map<String, List<Picker>> schemaHashList = dataManager.getScheme();
+            List<String> keyList = new ArrayList<String>(schemaHashList.keySet());
+            Map<String, HashMap<String, DefaultValue>> defaultSelectedList = dataManager.getDefaultValues();
+            if (defaultSelectedList == null) {
+                defaultSelectedList = new HashMap<>();
+            }
+            for (String key : keyList) {
+                if (defaultSelectedList.containsKey(key)) {
+                    continue;
+                }
+                List<Picker> pickers = schemaHashList.get(key);
+                HashMap<String, DefaultValue> defaultValuesHashMap = new HashMap();
+                for (Picker picker : pickers) {
+                    DefaultValue defValue;
+                    // Adding default values of Picker is of Time
+                    if (picker.getPicker().equals(PICKER_TIME)) {
+                        defValue = new DefaultValue(TIME_15_MINS, TIME_15_MINS, false);
+                    } else if (picker.getPicker().equals(PICKER_ACCOUNT)) {
+                        defValue = new DefaultValue(dataManager.getUser().getAccountIDs().get(0)
+                                .getType(), dataManager.getUser().getAccountIDs().get(0)
+                                .getIdentifier(), false);
+                    } else if (picker.getPicker().equals(PICKER_DATA_TYPE)) {
+                        if (defaultValuesHashMap.containsKey(PICKER_REQUEST)) {
+                            List<Value> list = dataManager.getValuesFromDataType(defaultValuesHashMap.get(PICKER_REQUEST).getValue());
+                            defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
+                                    false);
+                        } else {
+                            List<Value> list = dataManager.getValuesFromDataType(key);
+                            defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
+                                    false);
+                        }
                     } else if (picker.getValues() != null && picker.getValues().size() > 0) {
                         defValue = new DefaultValue(picker.getValues().get(0).getTitle(), picker
                                 .getValues()
@@ -421,7 +598,7 @@ public class MainActivity extends BaseActivity {
             }
             Log.e("defaultSelectedList", defaultSelectedList.toString());
             dataManager.setDefaultValues(defaultSelectedList);
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -431,7 +608,18 @@ public class MainActivity extends BaseActivity {
     private void startPolling() {
         if (currentId == userAccountIds.size() - 1) currentId = 0;
         else currentId = currentId + 1;
-        pollingApi(userAccountIds.get(currentId).getIdentifier());
+        AccountID accId = userAccountIds.get(currentId);
+        if (!accId.getCustomer().equalsIgnoreCase("")) {
+            pollingApi(accId.getIdentifier(), accId.getCustomer());
+        } else {
+            if (System.currentTimeMillis() < PollingStopMilliseconds) {
+                handler.removeCallbacks(runnable);
+                handler.postDelayed(runnable, 100);
+            } else {
+                dismissProgressDialog();
+                showAlert("", "No Pending Updates");
+            }
+        }
     }
 
     Handler handler = new Handler();
@@ -442,8 +630,7 @@ public class MainActivity extends BaseActivity {
         }
     };
 
-    private void pollingApi(String Id) {
-        Log.e("pollingApi", "Started");
+    private void pollingApi(final String Id, final String customer) {
         String pollingUrl = Constants.API_BASE_URL_POLLING + Id + ".json";
         AuthoritiAPI.APIService().getPollingUrl(pollingUrl).enqueue
                 (new Callback<ResponsePolling>() {
@@ -452,13 +639,14 @@ public class MainActivity extends BaseActivity {
                                            Response<ResponsePolling>
                                                    response) {
                         if (response.isSuccessful() && response.body().getUrl() != null &&
-                                !response.body().getUrl().equals("")) {
+                                !response.body().getUrl().equals("") &&
+                                PermissionCodeRequest(response.body().getUrl(), customer)) {
+                            removePendingRequest(Id);
                             dismissProgressDialog();
-                            PermissionCodeRequest(response.body().getUrl());
                         } else {
                             if (System.currentTimeMillis() < PollingStopMilliseconds) {
                                 handler.removeCallbacks(runnable);
-                                handler.postDelayed(runnable, 5000);
+                                handler.postDelayed(runnable, 100);
                             } else {
                                 dismissProgressDialog();
                                 showAlert("", "No Pending Updates");
@@ -468,18 +656,36 @@ public class MainActivity extends BaseActivity {
 
                     @Override
                     public void onFailure(Call<ResponsePolling> call, Throwable t) {
+                        t.printStackTrace();
                         dismissProgressDialog();
                     }
                 });
+    }
 
+    private void removePendingRequest(String accountID) {
+        RequestComplete requestComplete = new RequestComplete(accountID, "");
+        AuthoritiAPI.APIService().removePendingPollingRequest(requestComplete).enqueue
+                (new Callback<ResponseComplete>() {
+                    @Override
+                    public void onResponse(Call<ResponseComplete> call,
+                                           Response<ResponseComplete>
+                                                   response) {
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseComplete> call, Throwable t) {
+
+                    }
+                });
     }
 
     // Parse polling url and redirect to next screen
-    private void PermissionCodeRequest(String url) {
+    private boolean PermissionCodeRequest(String url, String customer) {
         String[] splitUrl = url.split("\\?");
         if (splitUrl.length > 0) {
             String label = splitUrl[0].replace("authoriti://purpose/", "");
             label = label.replace("-", " ");
+
             List<Purpose> purposes = dataManager.getPurposes();
             String schemaIndex = "";
 
@@ -492,8 +698,6 @@ public class MainActivity extends BaseActivity {
                         schemaIndex = "" + groupList.get(k).getSchemaIndex();
                         indexGroup = i;
                         indexItem = k;
-                    } else {
-
                     }
                 }
             }
@@ -509,346 +713,33 @@ public class MainActivity extends BaseActivity {
                         hashMap.put(splitValue[0].replace("-", ""), splitValue[1].replace("-", ""));
                     }
                 }
-                if (!hashMap.isEmpty()) {
-                    CodePermissionActivity_.intent(mContext).purposeIndex(indexGroup)
-                            .purposeIndexItem(indexItem).defParamFromUrl(hashMap)
-                            .start();
+                String customer_name = "";
+                try {
+                    customer_name = URLDecoder.decode(hashMap.get("origin"), "UTF-8");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return false;
                 }
-            }
+                if (!hashMap.isEmpty() && indexGroup != -1 && indexItem != -1) {
+                    if (customer_name.toLowerCase().equals(customer.toLowerCase())) {
+                        CodePermissionActivity_.intent(mContext).purposeIndex(indexGroup)
+                                .purposeIndexItem(indexItem).defParamFromUrl(hashMap)
+                                .start();
+                        return true;
+                    } else {
+                        Log.e("Message", "Invalid Url");
+                        return false;
+                    }
+                } else return false;
+            } else return false;
         } else {
             Log.e("Message", "Invalid Url");
+            return false;
         }
     }
 
-
-    private void firstUpdateSchema() {
-//        if (dataManager.getScheme() != null && dataManager.getScheme().getPickers() != null) {
-//
-//            Order order = new Order();
-//            List<String> pickers = new ArrayList<>();
-//
-//            for (Picker picker : dataManager.getScheme().getPickers()) {
-//
-//                pickers.add(picker.getPicker());
-//
-//                switch (picker.getPicker()) {
-//
-//                    case PICKER_ACCOUNT:
-//
-//                        if (dataManager.getUser() != null && dataManager.getUser().getAccountIDs
-//                                () != null && dataManager.getUser().getAccountIDs().size() > 0) {
-//
-//                            Picker picker1 = new Picker(picker.getPicker(), picker.getBytes(),
-//                                    picker.getValues(), picker.getTitle(), picker.getLabel());
-//
-//                            List<Value> values = new ArrayList<>();
-//                            for (AccountID accountID : dataManager.getUser().getAccountIDs()) {
-//
-//                                Value value = new Value(accountID.getIdentifier(), accountID
-//                                        .getType());
-//                                values.add(value);
-//
-//                            }
-//                            picker1.setValues(values);
-//
-//                            if (dataManager.defaultAccountSelected) {
-//
-//                                picker1.setEnableDefault(true);
-//                                picker1.setDefaultIndex(dataManager.defaultAccountIndex);
-//
-//                                dataManager.defaultAccountSelected = false;
-//
-//                            }
-//
-//                            dataManager.setAccountPicker(picker1);
-//
-//
-//                        } else {
-//
-//                            dataManager.setAccountPicker(picker);
-//
-//                        }
-//
-//                        break;
-//
-//                    case PICKER_INDUSTRY:
-//                        dataManager.setIndustryPicker(picker);
-//                        break;
-//
-//                    case PICKER_LOCATION_STATE:
-//                        dataManager.setLocationPicker(picker);
-//                        break;
-//
-//                    case PICKER_LOCATION_COUNTRY:
-//                        dataManager.setCountryPicker(picker);
-//                        break;
-//
-//                    case PICKER_TIME:
-//                        dataManager.setTimePicker(AuthoritiUtils_.getInstance_(mContext)
-//                                .getDefaultTimePicker(picker));
-//                        break;
-//
-//                }
-//            }
-//
-//            order.setPickers(pickers);
-//            dataManager.setPickerOrder(order);
-//        }
-//
-//
-//        if (dataManager.getScheme() != null && dataManager.getScheme().getPickers2() != null) {
-//
-//            Order order = new Order();
-//            List<String> pickers = new ArrayList<>();
-//
-//            for (Picker picker : dataManager.getScheme().getPickers2()) {
-//
-//                pickers.add(picker.getPicker());
-//
-//                switch (picker.getPicker()) {
-//
-//                    case PICKER_ACCOUNT:
-//
-//                        break;
-//
-//                    case PICKER_GEO:
-//                        dataManager.setGeoPicker(picker);
-//                        break;
-//
-//                    case PICKER_REQUEST:
-//                        dataManager.setRequestPicker(picker);
-//                        break;
-//
-//                    case PICKER_DATA_TYPE:
-//                        dataManager.setDataTypePicker(picker);
-//                        break;
-//
-//                    case PICKER_TIME:
-//
-//                        break;
-//
-//                }
-//            }
-//
-//            order.setPickers(pickers);
-//            dataManager.setPickerOrder2(order);
-//        }
-    }
-
-    private void updateSchema() {
-//        if (dataManager.getScheme() != null && dataManager.getScheme().getPickers() != null) {
-//
-//            Order order = new Order();
-//            List<String> pickers = new ArrayList<>();
-//
-//            for (Picker picker : dataManager.getScheme().getPickers()) {
-//
-//                pickers.add(picker.getPicker());
-//
-//                switch (picker.getPicker()) {
-//
-//                    case PICKER_ACCOUNT:
-//
-//                        if (dataManager.getAccountPicker() != null) {
-//
-//                            Picker temp = new Picker();
-//                            temp.setPicker(dataManager.getAccountPicker().getPicker());
-//                            temp.setBytes(dataManager.getAccountPicker().getBytes());
-//                            temp.setValues(dataManager.getAccountPicker().getValues());
-//                            temp.setTitle(picker.getTitle());
-//                            temp.setLabel(picker.getLabel());
-//                            temp.setEnableDefault(dataManager.getAccountPicker()
-// .isEnableDefault());
-//                            temp.setDefaultIndex(dataManager.getAccountPicker().getDefaultIndex
-// ());
-//
-//                            dataManager.setAccountPicker(temp);
-//                        }
-//
-//                        break;
-//
-//                    case PICKER_INDUSTRY:
-//
-//                        if (dataManager.getIndustryPicker() != null) {
-//
-//                            Picker temp = new Picker();
-//                            temp.setPicker(picker.getPicker());
-//                            temp.setBytes(picker.getBytes());
-//                            temp.setValues(picker.getValues());
-//                            temp.setTitle(picker.getTitle());
-//                            temp.setLabel(picker.getLabel());
-//                            temp.setEnableDefault(dataManager.getIndustryPicker().isEnableDefault
-//                                    ());
-//                            temp.setDefaultIndex(dataManager.getIndustryPicker()
-// .getDefaultIndex());
-//
-//                            dataManager.setIndustryPicker(temp);
-//
-//
-//                        } else {
-//
-//                            dataManager.setIndustryPicker(picker);
-//                        }
-//
-//                        break;
-//
-//                    case PICKER_LOCATION_STATE:
-//
-//                        if (dataManager.getLocationPicker() != null) {
-//
-//                            Picker temp = new Picker();
-//                            temp.setPicker(picker.getPicker());
-//                            temp.setBytes(picker.getBytes());
-//                            temp.setValues(picker.getValues());
-//                            temp.setTitle(picker.getTitle());
-//                            temp.setLabel(picker.getLabel());
-//                            temp.setEnableDefault(dataManager.getLocationPicker().isEnableDefault
-//                                    ());
-//                            temp.setDefaultIndex(dataManager.getLocationPicker()
-// .getDefaultIndex());
-//
-//                            dataManager.setLocationPicker(temp);
-//
-//
-//                        } else {
-//
-//                            dataManager.setLocationPicker(picker);
-//                        }
-//
-//                        break;
-//
-//                    case PICKER_LOCATION_COUNTRY:
-//
-//                        dataManager.setCountryPicker(picker);
-//
-//                        break;
-//
-//                    case PICKER_TIME:
-//
-//                        if (dataManager.getTimePicker() != null) {
-//
-//                            Picker temp = new Picker();
-//                            temp.setPicker(picker.getPicker());
-//                            temp.setBytes(picker.getBytes());
-//                            temp.setValues(dataManager.getTimePicker().getValues());
-//                            temp.setTitle(picker.getTitle());
-//                            temp.setLabel(picker.getLabel());
-//                            temp.setEnableDefault(dataManager.getTimePicker().isEnableDefault());
-//                            temp.setDefaultIndex(dataManager.getTimePicker().getDefaultIndex());
-//
-//                            dataManager.setTimePicker(temp);
-//
-//                        }
-//
-//                        break;
-//
-//                }
-//            }
-//
-//            order.setPickers(pickers);
-//            dataManager.setPickerOrder(order);
-//
-//        }
-//
-//        if (dataManager.getScheme() != null && dataManager.getScheme().getPickers2() != null) {
-//
-//            Order order = new Order();
-//            List<String> pickers = new ArrayList<>();
-//
-//            for (Picker picker : dataManager.getScheme().getPickers2()) {
-//
-//                pickers.add(picker.getPicker());
-//
-//                switch (picker.getPicker()) {
-//
-//                    case PICKER_ACCOUNT:
-//
-//                        break;
-//
-//                    case PICKER_GEO:
-//
-//                        if (dataManager.getGeoPicker() != null) {
-//
-//                            Picker temp = new Picker();
-//                            temp.setPicker(picker.getPicker());
-//                            temp.setBytes(picker.getBytes());
-//                            temp.setValues(picker.getValues());
-//                            temp.setTitle(picker.getTitle());
-//                            temp.setLabel(picker.getLabel());
-//                            temp.setEnableDefault(dataManager.getGeoPicker().isEnableDefault());
-//                            temp.setDefaultIndex(dataManager.getGeoPicker().getDefaultIndex());
-//
-//                            dataManager.setGeoPicker(temp);
-//
-//
-//                        } else {
-//
-//                            dataManager.setGeoPicker(picker);
-//                        }
-//
-//                        break;
-//
-//                    case PICKER_REQUEST:
-//
-//                        if (dataManager.getRequestPicker() != null) {
-//
-//                            Picker temp = new Picker();
-//                            temp.setPicker(picker.getPicker());
-//                            temp.setBytes(picker.getBytes());
-//                            temp.setValues(picker.getValues());
-//                            temp.setTitle(picker.getTitle());
-//                            temp.setLabel(picker.getLabel());
-//                            temp.setEnableDefault(dataManager.getRequestPicker()
-// .isEnableDefault());
-//                            temp.setDefaultIndex(dataManager.getRequestPicker().getDefaultIndex
-// ());
-//
-//                            dataManager.setRequestPicker(temp);
-//
-//
-//                        } else {
-//
-//                            dataManager.setRequestPicker(picker);
-//                        }
-//
-//                        break;
-//
-//                    case PICKER_DATA_TYPE:
-//
-//                        if (dataManager.getDataTypePicker() != null) {
-//
-//                            Picker temp = new Picker();
-//                            temp.setPicker(picker.getPicker());
-//                            temp.setBytes(picker.getBytes());
-//                            temp.setValues(picker.getValues());
-//                            temp.setTitle(picker.getTitle());
-//                            temp.setLabel(picker.getLabel());
-//                            temp.setEnableDefault(dataManager.getDataTypePicker().isEnableDefault
-//                                    ());
-//                            temp.setDefaultIndex(dataManager.getDataTypePicker()
-// .getDefaultIndex());
-//
-//                            dataManager.setDataTypePicker(temp);
-//
-//
-//                        } else {
-//
-//                            dataManager.setDataTypePicker(picker);
-//                        }
-//
-//                        break;
-//
-//                    case PICKER_TIME:
-//
-//                        break;
-//
-//                }
-//            }
-//
-//            order.setPickers(pickers);
-//            dataManager.setPickerOrder2(order);
-//
-//        }
+    public interface PurposeSchemaStoreInterface {
+        public void onDataSaved();
     }
 
 

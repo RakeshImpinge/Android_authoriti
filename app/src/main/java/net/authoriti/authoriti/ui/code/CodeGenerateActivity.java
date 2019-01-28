@@ -45,6 +45,7 @@ import retrofit2.Response;
 @EActivity(R.layout.activity_code_generate)
 public class CodeGenerateActivity extends BaseActivity {
 
+    public static final int CODE = 234;
     private Crypto crypto;
 
     @Extra
@@ -73,7 +74,16 @@ public class CodeGenerateActivity extends BaseActivity {
     @AfterViews
     void callAfterViewInjection() {
         String code = generateCode();
-        ivQRCode.setImageBitmap(QRCode.from(code).bitmap());
+
+        int width = ivQRCode.getMeasuredWidth();
+        int height = ivQRCode.getMeasuredHeight();
+        if (width > height) {
+            width = height;
+        } else {
+            height = width;
+        }
+        ivQRCode.setImageBitmap(QRCode.from(code).withSize(800, 800).bitmap());
+
         tvCode.setText(utils.fromHtml(generateHTMLString(code)));
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("permission code", code);
@@ -122,7 +132,6 @@ public class CodeGenerateActivity extends BaseActivity {
     }
 
     private String generateCode() {
-
         AesCbcWithIntegrity.SecretKeys keys;
         String keyStr = dataManager.getUser().getEncryptKey();
         String privateKey = "";
@@ -250,6 +259,7 @@ public class CodeGenerateActivity extends BaseActivity {
     @Click({R.id.ivClose, R.id.cvGotIt})
     void closeButtonClicked() {
         finish();
+        Log.e("GoBack", "from here");
     }
 
 //

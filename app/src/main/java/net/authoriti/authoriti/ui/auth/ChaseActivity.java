@@ -1,30 +1,40 @@
 package net.authoriti.authoriti.ui.auth;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Typeface;
+import android.net.Uri;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.text.TextUtils;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.tozny.crypto.android.AesCbcWithIntegrity;
+
+import net.authoriti.authoriti.BuildConfig;
 import net.authoriti.authoriti.MainActivity_;
 import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.api.AuthoritiAPI;
 import net.authoriti.authoriti.api.model.AccountID;
 import net.authoriti.authoriti.api.model.AuthLogIn;
 import net.authoriti.authoriti.api.model.User;
-import net.authoriti.authoriti.api.model.request.RequestSignUp;
+import net.authoriti.authoriti.api.model.request.RequestSignUpChase;
 import net.authoriti.authoriti.api.model.response.ResponseSignUpChase;
 import net.authoriti.authoriti.core.SecurityActivity;
 import net.authoriti.authoriti.ui.help.HelpActivity_;
+import net.authoriti.authoriti.ui.share.ImportActivity;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiUtils;
+import net.authoriti.authoriti.utils.Constants;
 import net.authoriti.authoriti.utils.ViewUtils;
 import net.authoriti.authoriti.utils.crypto.CryptoKeyPair;
-
-import com.tozny.crypto.android.AesCbcWithIntegrity;
-
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
@@ -86,6 +96,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
     private CryptoKeyPair keyPair;
 
     private boolean saveSuccess = false;
+    public static final int PERMISSIONS_REQUEST_CAMERA = 0;
 
     @Extra
     boolean isSyncRequired = false;
@@ -95,7 +106,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
         etIdentifier.setHint(customer.toUpperCase() + " USERNAME");
         tvTitle.setText(customer + " is a partner of Authority. Please enter your " + customer +
                 " password so we can authorize you.");
-
+        tiPassword.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Oswald_Regular.ttf"));
         KeyboardVisibilityEvent.setEventListener(this, new KeyboardVisibilityEventListener() {
             @Override
             public void onVisibilityChanged(boolean isOpen) {
@@ -110,15 +121,30 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
         });
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == PERMISSIONS_REQUEST_CAMERA) {
+            for (int i = 0; i < permissions.length; i++) {
+                if (permissions[i].equalsIgnoreCase(Manifest.permission.CAMERA)) {
+                    if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                        startActivity(new Intent(this, ImportActivity.class));
+                    }
+                    break;
+                }
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
     private void signUp() {
 
-        AccountID accountID = new AccountID("", etIdentifier.getText().toString());
+        AccountID accountID = new AccountID("", etIdentifier.getText().toString(), false);
         List<AccountID> accountIDs = new ArrayList<>();
         accountIDs.add(accountID);
 
         keyPair = dataManager.getCryptoKeyPair(etIdentifier.getText().toString(), "");
 
-        RequestSignUp requestSignUp = new RequestSignUp(etPassword.getText().toString(), keyPair
+        RequestSignUpChase requestSignUp = new RequestSignUpChase(etPassword.getText().toString(), keyPair
                 .getPublicKey(), keyPair.getSalt(), dataManager.inviteCode, accountIDs);
 
         displayProgressDialog("Sign Up...");
@@ -148,12 +174,17 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
     private void fetchSignUpInfo(ResponseSignUpChase responseSignUpChase) {
         if (isSyncRequired) {
             User user = dataManager.getUser();
+            user.setToken(responseSignUpChase.getToken());
             List<AccountID> savedAccountIDs = user.getAccountIDs();
             List<AccountID> newAccountIDs = responseSignUpChase.getAccounts();
             List<AccountID> newIds = new ArrayList<>();
 
             for (int i = 0; i < newAccountIDs.size(); i++) {
+                System.out.println("Checking: " + newAccountIDs.get(i));
                 boolean isContained = false;
+                newAccountIDs.get(i).setCustomer(responseSignUpChase.getCustomerName());
+                newAccountIDs.get(i).setCustomer_ID(responseSignUpChase.getId());
+
                 for (int k = 0; k < savedAccountIDs.size(); k++) {
                     if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
                             .getIdentifier())
@@ -161,10 +192,10 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
                             .getType())) {
                         isContained = true;
                         break;
-                    } else {
                     }
                 }
                 if (!isContained) {
+                    newAccountIDs.get(i).setHashed(true);
                     newIds.add(newAccountIDs.get(i));
                 }
             }
@@ -173,13 +204,24 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
             dataManager.setUser(user);
             finish();
         } else {
+            System.out.println("Creating user!");
             User user = new User();
             user.setUserId(responseSignUpChase.getId());
             user.setToken(responseSignUpChase.getToken());
-            user.setPassword(etPassword.getText().toString());
             user.setInviteCode(dataManager.inviteCode);
             user.setChaseType(true);
-            user.setAccountIDs(responseSignUpChase.getAccounts());
+
+            List<AccountID> UserAccountsList = responseSignUpChase.getAccounts();
+            final int sz = UserAccountsList.size();
+            for (int i = 0; i < sz; i++) {
+                System.out.println("Setting hashed to true");
+                UserAccountsList.get(i).setHashed(true);
+            }
+            for (AccountID accountID : UserAccountsList) {
+                accountID.setCustomer(customer);
+                accountID.setCustomer_ID(responseSignUpChase.getId());
+            }
+            user.setAccountIDs(UserAccountsList);
 
             try {
 
@@ -194,7 +236,6 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
                 user.setEncryptKey(keyStr);
 
                 try {
-
                     user.setEncryptPrivateKey(AesCbcWithIntegrity.encrypt(keyPair.getPrivateKey(),
                             keys).toString());
                     user.setEncryptSalt(AesCbcWithIntegrity.encrypt(keyPair.getSalt(), keys)
@@ -210,7 +251,10 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
                     if (responseSignUpChase.getAccounts() != null && responseSignUpChase.getAccounts
                             ().size() > 0) {
 
-                        AccountConfirmActivity_.intent(this).start();
+//                        AccountConfirmActivity_.intent(this).start();
+                        mFingerPrintAuthHelper.startAuth();
+                        hideKeyboard();
+                        checkFingerPrintAuth();
 
                     } else {
 
@@ -219,7 +263,6 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
 
                         hideKeyboard();
                         checkFingerPrintAuth();
-
                     }
 
 
@@ -235,33 +278,23 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
     }
 
     private void checkFingerPrintAuth() {
-
         if (isBelowMarshmallow || fingerPrintHardwareNotDetected) {
-
             updateLoginState();
             goHome();
-
         } else {
-
             setListener(this);
             showTouchIDEnableAlert();
-
         }
-
-
     }
 
     private void goHome() {
-
         dataManager.setScheme(null);
-
         Intent intent = new Intent(this, MainActivity_.class);
         intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
 
     private void enableFingerPrintAndGoHome() {
-
         removeListener();
 
         if (dataManager != null && dataManager.getUser() != null) {
@@ -277,7 +310,6 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
     }
 
     private void updateLoginState() {
-
         AuthLogIn logIn = new AuthLogIn();
         logIn.setLogin(true);
         dataManager.setAuthLogin(logIn);
@@ -310,7 +342,9 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
-        HelpActivity_.intent(mContext).start();
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.HELP_BASE + "/" +
+                TOPIC_PASSWORD));
+        startActivity(browserIntent);
     }
 
 
@@ -331,12 +365,26 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
 
         }
 
-        if (!TextUtils.isEmpty(etIdentifier.getText()) && !TextUtils.isEmpty(etPassword.getText()
-        )) {
-
+        if (!TextUtils.isEmpty(etIdentifier.getText()) && !TextUtils.isEmpty(etPassword.getText())) {
             hideKeyboard();
             signUp();
 
+        }
+    }
+
+    @Click(R.id.cvImport)
+    void importButtonClicked() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
+            startActivity(new Intent(this, ImportActivity.class));
+        } else if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    PERMISSIONS_REQUEST_CAMERA);
+        } else {
+            startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse
+                    ("package:" + BuildConfig.APPLICATION_ID)));
         }
     }
 
@@ -354,19 +402,13 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
 
     @Override
     public void allowButtonClicked() {
-
         hideTouchIDEnabledAlert();
 
         if (fingerPrintNotRegistered) {
-
             Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
             startActivity(intent);
-
-
         } else {
-
             enableFingerPrintAndGoHome();
-
         }
 
 
@@ -388,6 +430,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
         if (isSyncRequired) {
             InviteCodeActivity_.intent(getApplicationContext()).showBack(true).isSyncRequired
                     (true).start();
+            finish();
         } else {
             super.onBackPressed();
         }

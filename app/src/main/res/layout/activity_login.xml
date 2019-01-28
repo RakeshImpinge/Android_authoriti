@@ -70,7 +70,7 @@
                                 android:layout_height="40dp"
                                 android:backgroundTint="@color/colorPrimary"
                                 android:textCursorDrawable="@color/colorPrimary"
-                                android:hint="Select your account"
+                                android:hint="Account/ID"
                                 android:imeOptions="actionNext"
                                 android:inputType="text"
                                 android:maxLines="1"
@@ -92,6 +92,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
                                 android:layout_marginEnd="8dp"
+                                android:visibility="gone"
                                 android:tint="@android:color/black"
                                 android:src="@android:drawable/arrow_down_float"/>
 
@@ -100,30 +101,32 @@
                     </RelativeLayout>
 
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_gravity="end"
-                        android:gravity="center">
+                    <!--<LinearLayout-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:orientation="horizontal"-->
+                        <!--android:layout_gravity="end"-->
+                        <!--android:gravity="center">-->
 
-                        <android.support.v7.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:inputType="text"
-                            android:text="MAKE DEFAULT"
-                            android:textSize="12sp"
-                            android:textColor="@color/colorPrimary"
-                            fontPath="@string/font_oswaldo_regular"/>
+                        <!--<android.support.v7.widget.AppCompatTextView-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:inputType="text"-->
+                            <!--android:text="MAKE DEFAULT"-->
+                            <!--android:visibility="gone"-->
+                            <!--android:textSize="12sp"-->
+                            <!--android:textColor="@color/colorPrimary"-->
+                            <!--fontPath="@string/font_oswaldo_regular"/>-->
 
-                        <android.support.v7.widget.AppCompatCheckBox
-                            android:id="@+id/checkbox"
-                            android:theme="@style/CheckBoxTheme"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="false"/>
+                        <!--<android.support.v7.widget.AppCompatCheckBox-->
+                            <!--android:id="@+id/checkbox"-->
+                            <!--android:theme="@style/CheckBoxTheme"-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:visibility="gone"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:checked="false"/>-->
 
-                    </LinearLayout>
+                    <!--</LinearLayout>-->
 
                     <android.support.design.widget.TextInputLayout
                         android:id="@+id/tiPassword"
@@ -162,6 +165,7 @@
                             android:inputType="text"
                             android:text="RESET PASSWORD"
                             android:textSize="12sp"
+                            android:visibility="gone"
                             android:clickable="true"
                             android:focusable="true"
                             android:textColor="@color/colorPrimary"

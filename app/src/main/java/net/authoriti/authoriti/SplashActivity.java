@@ -2,15 +2,24 @@ package net.authoriti.authoriti;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 
+import com.tozny.crypto.android.AesCbcWithIntegrity;
+
+import net.authoriti.authoriti.api.model.AuthLogIn;
 import net.authoriti.authoriti.ui.auth.InviteCodeActivity_;
 import net.authoriti.authoriti.ui.auth.LoginActivity_;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiData_;
 import net.authoriti.authoriti.utils.ConstantUtils;
+import net.authoriti.authoriti.utils.CryptLib;
 import net.authoriti.authoriti.utils.Log;
 
 import org.androidannotations.annotations.EActivity;
+
+import java.security.NoSuchAlgorithmException;
+
+import javax.crypto.NoSuchPaddingException;
 
 
 /**
@@ -26,9 +35,13 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.e("Test", "Log");
 
         dataManager = AuthoritiData_.getInstance_(this);
+        AuthLogIn logIn = dataManager.loginStatus();
+        if (logIn != null) {
+            logIn.setLogin(false);
+            dataManager.setAuthLogin(logIn);
+        }
 
         if (dataManager.loginStatus() != null && dataManager.loginStatus().isLogin()) {
             MainActivity_.intent(this).start();

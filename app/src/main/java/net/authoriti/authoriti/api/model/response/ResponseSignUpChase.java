@@ -31,6 +31,10 @@ public class ResponseSignUpChase {
     @SerializedName("token")
     private String token;
 
+    @SerializedName("customerName")
+    private String customerName;
+
+
     public String getId() {
         return id;
     }
@@ -78,5 +82,13 @@ public class ResponseSignUpChase {
 
     public void setAccounts(List<AccountID> accounts) {
         this.accounts = accounts;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
     }
 }
