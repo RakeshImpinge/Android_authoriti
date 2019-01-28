@@ -74,27 +74,17 @@ public class Crypto {
                     break;
                 default:
                     if (schemaVersion.equalsIgnoreCase("8")) {
-                        Log.e("SCHEMA_VERSION", schemaVersion);
-                        Log.e("ANY_STATE", payload);
                         payload = payload + value;
-                        Log.e("AFTER", payload);
                     }
-                    else System.out.println("TODO: handle picker " + picker + ". received value: " +
-                            value);
-
             }
         }
 
         public void addTime(long expiresAt) throws Exception {
-            Log.i(TAG, "Expires At: " + expiresAt);
-
             long difference = expiresAt - 1530403200000l;
             long minutes = TimeUnit.MINUTES.convert(difference, TimeUnit.MILLISECONDS);
 
             // 1537974156094
             // 1530403200000l
-
-            Log.i(TAG, "Minutes (new): " + minutes);
 
             String encodedTime = "";
             if (schemaVersion.equalsIgnoreCase("5")) {
@@ -108,7 +98,6 @@ public class Crypto {
                     encodedTime = "lllll";
                 }
             }
-            Log.i(TAG, "Time: " + encodedTime);
             payload = encodedTime + payload;
         }
 
@@ -216,9 +205,6 @@ public class Crypto {
             BigInteger total = new BigInteger("0");
             BigInteger mult = new BigInteger("1");
 
-            System.out.println("Encoding: " + payload);
-            System.out.println("Ranges: " + ranges.length);
-
             int len = payload.length();
             for (int i = len - 1; i >= 0; i--) {
                 char d = payload.charAt(i);
@@ -296,14 +282,16 @@ public class Crypto {
 
     public CryptoKeyPair generateKeyPair(String password, String salt) {
         byte[] saltBytes;
-        if (salt == null) {
-            saltBytes = CryptoUtil.generateRandomBytes(64);
-            salt = new String(saltBytes);
-        } else {
-            saltBytes = salt.getBytes();
-        }
+//        if (salt == null) {
+//            saltBytes = CryptoUtil.generateRandomBytes(64);
+//            salt = new String(saltBytes);
+//        } else {
+//            saltBytes = salt.getBytes();
+//        }
 
-        // yCBMkrIDRKDw
+        saltBytes = CryptoUtil.generateRandomBytes(64);
+        salt = new String(saltBytes);
+
         PKCS5S2ParametersGenerator generator = new PKCS5S2ParametersGenerator(new SHA256Digest());
         generator.init(PBEParametersGenerator.PKCS5PasswordToUTF8Bytes(password.toCharArray()),
                 saltBytes, 4096);
@@ -316,9 +304,6 @@ public class Crypto {
 
         String privateKey = CryptoUtil.intToBase62(numPrivateKey, -1);
         String publicKey = new EcDSA().getPublicKey(numPrivateKey);
-
-        System.out.println("Private Key: " + privateKey);
-        System.out.println("Public Key: " + publicKey);
 
         return new CryptoKeyPair(privateKey, publicKey, salt);
     }

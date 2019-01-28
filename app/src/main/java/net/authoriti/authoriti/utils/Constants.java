@@ -79,7 +79,8 @@ public interface Constants {
     String TOPIC_DLV = "help-dlv";
     String TOPIC_GENERAL = "help-general";
     String TOPIC_ACCOUNT_2018 = "help-account-id";
-    String TOPIC_PASSWORD = "help-master-password";
+    String TOPIC_PASSWORD = "help-download-initial-wallet";
+    String TOPIC_MASTER_PASSWORD="help-master-password";
     String TOPIC_RESET_PASSWORD = "help-changepw";
     String TOPIC_CHASE = "help-account-id";
     String TOPIC_ABOUT = "help-about";

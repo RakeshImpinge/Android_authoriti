@@ -67,7 +67,7 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
     @AfterViews
     void callAfterViewInjection() {
         purposeAdaper = new PurposeAdaper(getContext(), groupItems);
-        adapter = new FastItemAdapter<PurposeItem>();
+        adapter = new FastItemAdapter<>();
         rvPurpose.setLayoutManager(new LinearLayoutManager(mContext));
         rvPurpose.setAdapter(purposeAdaper);
 
@@ -104,39 +104,39 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
     }
 
     private void showPurposes() {
-        if (dataManager.getPurposes() != null && dataManager.getPurposes().size() > 0) {
+        final int nPurposes = dataManager.getPurposes().size();
+        if (dataManager.getPurposes() != null && nPurposes > 0) {
             groupItems.clear();
-            for (int i = 0; i < dataManager.getPurposes().size(); i++) {
+            for (int i = 0; i < nPurposes; i++) {
                 if (i != 0) {
                     GroupItem heading = new GroupItem();
                     heading.setHeading(1);
                     heading.setLabel(dataManager.getPurposes().get(i).getLabel());
                     groupItems.add(heading);
                 }
-                for (int j = 0; j < dataManager.getPurposes().get(i).getGroups().size(); j++) {
+                final int nGroupPurposeSize = dataManager.getPurposes().get(i).getGroups().size();
+                for (int j = 0; j < nGroupPurposeSize; j++) {
                     GroupItem item = new GroupItem();
                     item.setHeading(0);
                     item.setIndexGroup(i);
                     item.setIndexItem(j);
-                    item.setLabel(dataManager.getPurposes().get(i).getGroups().get(j)
-                            .getLabel());
+                    final String label = dataManager.getPurposes().get(i).getGroups().get(j).getLabel();
+                    item.setLabel(label);
                     groupItems.add(item);
                 }
             }
+            purposeAdaper.notifyDataSetChanged();
         }
-
 
         if (ConstantUtils.isBuildFlavorVnb()) {
             if (dataManager.getScheme() != null && dataManager.getDefaultValues() != null) {
                 CodePermissionActivity_.intent(getActivity()).purposeIndex(0).start();
-//                getActivity().finish();
                 getActivity().overridePendingTransition(0, 0);
             }
         } else {
             linheader.setVisibility(View.VISIBLE);
             purposeAdaper.notifyDataSetChanged();
         }
-
     }
 
 

@@ -279,7 +279,7 @@ public class AccountManagerActivity extends SecurityActivity implements Security
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.HELP_BASE + "/" +
-                TOPIC_PASSWORD));
+                TOPIC_ACCOUNT_2018));
         startActivity(browserIntent);
     }
 
