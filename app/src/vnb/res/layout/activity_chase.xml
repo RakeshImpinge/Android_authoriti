@@ -115,6 +115,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
+                    android:orientation="vertical"
                     android:layout_weight="0.65">
 
                     <android.support.v7.widget.CardView
@@ -186,11 +187,23 @@
                                     android:textSize="15sp" />
 
                             </android.support.design.widget.TextInputLayout>
-
                         </LinearLayout>
 
-
                     </android.support.v7.widget.CardView>
+
+                    <android.support.v7.widget.AppCompatTextView
+                        android:id="@+id/cvImport"
+                        fontPath="@string/font_oswaldo_regular"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginLeft="15dp"
+                        android:drawableLeft="@drawable/ic_qrcode_scan_grey600_18dp"
+                        android:drawablePadding="5dp"
+                        android:gravity="center"
+                        android:text="Import Wallet"
+                        android:textColor="@color/colorPrimary" />
 
                 </LinearLayout>
             </LinearLayout>
