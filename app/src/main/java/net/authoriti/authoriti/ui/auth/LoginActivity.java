@@ -129,7 +129,8 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
 
                 if (isOpen) {
 
-                    space.setVisibility(View.VISIBLE);
+                    if (space != null)
+                        space.setVisibility(View.VISIBLE);
 
                     scrollView.post(new Runnable() {
                         @Override
@@ -139,8 +140,8 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
                     });
 
                 } else {
-
-                    space.setVisibility(View.GONE);
+                    if (space != null)
+                        space.setVisibility(View.GONE);
 
                     scrollView.post(new Runnable() {
                         @Override

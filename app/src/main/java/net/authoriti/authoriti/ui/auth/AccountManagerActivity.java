@@ -1,6 +1,7 @@
 package net.authoriti.authoriti.ui.auth;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.provider.Settings;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 
 import net.authoriti.authoriti.core.AccountManagerUpdateInterfce;
 import net.authoriti.authoriti.ui.menu.AccountAdaper;
+import net.authoriti.authoriti.utils.Constants;
 import net.authoriti.authoriti.utils.Log;
 
 import android.view.View;
@@ -276,7 +278,9 @@ public class AccountManagerActivity extends SecurityActivity implements Security
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
-        HelpActivity_.intent(mContext).start();
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.HELP_BASE + "/" +
+                TOPIC_ACCOUNT_2018));
+        startActivity(browserIntent);
     }
 
 

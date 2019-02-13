@@ -2,6 +2,7 @@ package net.authoriti.authoriti.ui.menu;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -11,9 +12,11 @@ import net.authoriti.authoriti.api.AuthoritiAPI;
 import net.authoriti.authoriti.api.model.GroupItem;
 import net.authoriti.authoriti.api.model.Purpose;
 import net.authoriti.authoriti.core.BaseFragment;
+import net.authoriti.authoriti.ui.code.CodePermissionActivity_;
 import net.authoriti.authoriti.ui.items.PurposeItem;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiUtils;
+import net.authoriti.authoriti.utils.ConstantUtils;
 import net.authoriti.authoriti.utils.Constants;
 
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
@@ -35,7 +38,7 @@ import retrofit2.Response;
  */
 
 @EFragment(R.layout.fragment_purpose)
-public class PurposeFragment extends BaseFragment implements PurposeItem.PurposeItemListener {
+public class PurposeFragment extends BaseFragment implements PurposeItem.PurposeItemListener, MainActivity.PurposeSchemaStoreInterface {
 
     FastItemAdapter<PurposeItem> adapter;
 
@@ -57,11 +60,14 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
     @ViewById(R.id.linRoot)
     LinearLayout linRoot;
 
+    @ViewById(R.id.linheader)
+    LinearLayout linheader;
+
 
     @AfterViews
     void callAfterViewInjection() {
         purposeAdaper = new PurposeAdaper(getContext(), groupItems);
-        adapter = new FastItemAdapter<PurposeItem>();
+        adapter = new FastItemAdapter<>();
         rvPurpose.setLayoutManager(new LinearLayoutManager(mContext));
         rvPurpose.setAdapter(purposeAdaper);
 
@@ -69,6 +75,7 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
         rvPurpose.setNestedScrollingEnabled(false);
         linRoot.requestFocus();
 
+        ((MainActivity) getActivity()).purposeSchemaStoreInterface = this;
 
         if (dataManager.getPurposes() != null) {
             showPurposes();
@@ -79,56 +86,55 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
 
     private void loadPurposes() {
         displayProgressDialog("Loading...");
-        AuthoritiAPI.APIService().getPurposes().enqueue(new Callback<List<Purpose>>() {
-            @Override
-            public void onResponse(Call<List<Purpose>> call, Response<List<Purpose>> response) {
-                dismissProgressDialog();
-                if (response.code() == 200 && response.body() != null) {
-                    dataManager.setPurposes(response.body());
-                    showPurposes();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Purpose>> call, Throwable t) {
-                dismissProgressDialog();
-            }
-        });
+//        AuthoritiAPI.APIService().getPurposes(ConstantUtils.isBuildFlavorVnb() ? "vnb" : "").enqueue(new Callback<List<Purpose>>() {
+//            @Override
+//            public void onResponse(Call<List<Purpose>> call, Response<List<Purpose>> response) {
+//                dismissProgressDialog();
+//                if (response.code() == 200 && response.body() != null) {
+//                    dataManager.setPurposes(response.body());
+//                    showPurposes();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<List<Purpose>> call, Throwable t) {
+//                dismissProgressDialog();
+//            }
+//        });
     }
 
     private void showPurposes() {
-        if (dataManager.getPurposes() != null && dataManager.getPurposes().size() > 0) {
-//            if (adapter == null) {
-//                adapter = new FastItemAdapter<PurposeItem>();
-//            } else {
-//                adapter.clear();
-//            }
-
-//            int defaultIndex = dataManager.getDefaultPurposeIndex();
-//
-//            for (int i = 0; i < dataManager.getPurposes().size(); i++) {
-//                boolean isDefault = defaultIndex == i;
-//                adapter.ic_add(new GroupItem(dataManager.getPurposes().get(i), i, isDefault,
-// this));
-//            }
+        final int nPurposes = dataManager.getPurposes().size();
+        if (dataManager.getPurposes() != null && nPurposes > 0) {
             groupItems.clear();
-            for (int i = 0; i < dataManager.getPurposes().size(); i++) {
+            for (int i = 0; i < nPurposes; i++) {
                 if (i != 0) {
                     GroupItem heading = new GroupItem();
                     heading.setHeading(1);
                     heading.setLabel(dataManager.getPurposes().get(i).getLabel());
                     groupItems.add(heading);
                 }
-                for (int j = 0; j < dataManager.getPurposes().get(i).getGroups().size(); j++) {
+                final int nGroupPurposeSize = dataManager.getPurposes().get(i).getGroups().size();
+                for (int j = 0; j < nGroupPurposeSize; j++) {
                     GroupItem item = new GroupItem();
                     item.setHeading(0);
                     item.setIndexGroup(i);
                     item.setIndexItem(j);
-                    item.setLabel(dataManager.getPurposes().get(i).getGroups().get(j)
-                            .getLabel());
+                    final String label = dataManager.getPurposes().get(i).getGroups().get(j).getLabel();
+                    item.setLabel(label);
                     groupItems.add(item);
                 }
             }
+            purposeAdaper.notifyDataSetChanged();
+        }
+
+        if (ConstantUtils.isBuildFlavorVnb()) {
+            if (dataManager.getScheme() != null && dataManager.getDefaultValues() != null) {
+                CodePermissionActivity_.intent(getActivity()).purposeIndex(0).start();
+                getActivity().overridePendingTransition(0, 0);
+            }
+        } else {
+            linheader.setVisibility(View.VISIBLE);
             purposeAdaper.notifyDataSetChanged();
         }
     }
@@ -170,5 +176,11 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
 //        if (dataManager.getScheme() != null) {
 //            utils.initSelectedIndex(mContext);
 //        }
+    }
+
+    @Override
+    public void onDataSaved() {
+        dismissProgressDialog();
+        showPurposes();
     }
 }

@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical">
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.35">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="63dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:src="@mipmap/icon_valley_wire_auth" />
+
+                    <android.support.v7.widget.AppCompatTextView
+                        android:id="@+id/tvpowered"
+                        fontPath="@string/font_oswaldo_regular"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:maxLines="2"
+                        android:text="Powered By"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:id="@+id/iv_logo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="33dp"
+                        android:layout_above="@+id/center"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:src="@drawable/logo_blue" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="0.65">
+
+                <android.support.v7.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    app:cardCornerRadius="4dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="16dp"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <android.support.v7.widget.AppCompatTextView
+                            android:id="@+id/tvTitle"
+                            fontPath="@string/font_oswaldo_regular"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:gravity="center"
+                            android:text="Welcome Back!"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="17sp" />
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="24dp">
+
+                            <android.support.design.widget.TextInputLayout
+                                android:id="@+id/tiAccount"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                app:errorEnabled="true"
+                                app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+
+                                <android.support.v7.widget.AppCompatEditText
+                                    android:id="@+id/etAccount"
+                                    fontPath="@string/font_oswaldo_regular"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="40dp"
+                                    android:backgroundTint="@color/colorPrimary"
+                                    android:hint="Account/ID"
+                                    android:imeOptions="actionNext"
+                                    android:inputType="text"
+                                    android:maxLength="100"
+                                    android:maxLines="1"
+                                    android:textCursorDrawable="@color/colorPrimary"
+                                    android:textSize="15sp" />
+
+                            </android.support.design.widget.TextInputLayout>
+
+                            <LinearLayout
+                                android:id="@+id/spinner"
+                                android:layout_width="match_parent"
+                                android:layout_height="45dp"
+                                android:layout_marginTop="8dp"
+                                android:clickable="true"
+                                android:gravity="end">
+
+                                <ImageView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:layout_marginEnd="8dp"
+                                    android:src="@android:drawable/arrow_down_float"
+                                    android:tint="@android:color/black"
+                                    android:visibility="gone" />
+
+                            </LinearLayout>
+
+                        </RelativeLayout>
+
+
+                        <!--<LinearLayout-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:orientation="horizontal"-->
+                        <!--android:layout_gravity="end"-->
+                        <!--android:gravity="center">-->
+
+                        <!--<android.support.v7.widget.AppCompatTextView-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:inputType="text"-->
+                        <!--android:text="MAKE DEFAULT"-->
+                        <!--android:visibility="gone"-->
+                        <!--android:textSize="12sp"-->
+                        <!--android:textColor="@color/colorPrimary"-->
+                        <!--fontPath="@string/font_oswaldo_regular"/>-->
+
+                        <!--<android.support.v7.widget.AppCompatCheckBox-->
+                        <!--android:id="@+id/checkbox"-->
+                        <!--android:theme="@style/CheckBoxTheme"-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:visibility="gone"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:checked="false"/>-->
+
+                        <!--</LinearLayout>-->
+
+                        <android.support.design.widget.TextInputLayout
+                            android:id="@+id/tiPassword"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            app:errorEnabled="true"
+                            app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+
+                            <android.support.v7.widget.AppCompatEditText
+                                android:id="@+id/etPassword"
+                                fontPath="@string/font_oswaldo_regular"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:backgroundTint="@color/colorPrimary"
+                                android:hint="Enter your password"
+                                android:imeOptions="actionDone"
+                                android:inputType="textPassword"
+                                android:maxLength="100"
+                                android:maxLines="1"
+                                android:textCursorDrawable="@color/colorPrimary"
+                                android:textSize="15sp" />
+
+                        </android.support.design.widget.TextInputLayout>
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp">
+
+                            <android.support.v7.widget.AppCompatButton
+                                android:id="@+id/btnReset"
+                                style="@android:style/Widget.Holo.Button.Borderless"
+                                fontPath="@string/font_oswaldo_regular"
+                                android:layout_width="wrap_content"
+                                android:layout_height="30dp"
+                                android:layout_alignParentEnd="true"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:inputType="text"
+                                android:text="RESET PASSWORD"
+                                android:textColor="@color/colorPrimary"
+                                android:textSize="12sp"
+                                android:visibility="gone" />
+
+                        </RelativeLayout>
+
+                        <android.support.v7.widget.CardView
+                            android:id="@+id/cvSign"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="8dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?attr/selectableItemBackground"
+                            app:cardBackgroundColor="@color/colorPrimary"
+                            app:cardCornerRadius="4dp"
+                            app:cardElevation="4dp">
+
+                            <android.support.v7.widget.AppCompatTextView
+                                fontPath="@string/font_oswaldo_regular"
+                                android:layout_width="match_parent"
+                                android:layout_height="50dp"
+                                android:gravity="center"
+                                android:text="SIGN IN"
+                                android:textColor="@android:color/white"
+                                android:textSize="17sp" />
+
+                        </android.support.v7.widget.CardView>
+
+
+                    </LinearLayout>
+
+
+                </android.support.v7.widget.CardView>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="20dp"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <android.support.v7.widget.AppCompatTextView
+                        fontPath="@string/font_oswaldo_regular"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="New to Authoriti or have a new device?"
+                        android:textColor="#555555"
+                        android:textSize="12sp" />
+
+                    <android.support.v7.widget.CardView
+                        android:id="@+id/cvSet"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        app:cardBackgroundColor="@color/colorTextThird"
+                        app:cardCornerRadius="4dp"
+                        app:cardElevation="4dp">
+
+                        <android.support.v7.widget.AppCompatTextView
+                            fontPath="@string/font_oswaldo_regular"
+                            android:layout_width="85dp"
+                            android:layout_height="35dp"
+                            android:gravity="center"
+                            android:text="Setup"
+                            android:textColor="@android:color/white"
+                            android:textSize="15sp" />
+
+                    </android.support.v7.widget.CardView>
+
+                </LinearLayout>
+            </RelativeLayout>
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+</LinearLayout>

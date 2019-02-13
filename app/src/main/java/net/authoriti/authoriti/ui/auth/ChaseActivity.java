@@ -1,9 +1,15 @@
 package net.authoriti.authoriti.ui.auth;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.text.TextUtils;
@@ -12,6 +18,7 @@ import android.widget.TextView;
 
 import com.tozny.crypto.android.AesCbcWithIntegrity;
 
+import net.authoriti.authoriti.BuildConfig;
 import net.authoriti.authoriti.MainActivity_;
 import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.api.AuthoritiAPI;
@@ -22,8 +29,10 @@ import net.authoriti.authoriti.api.model.request.RequestSignUpChase;
 import net.authoriti.authoriti.api.model.response.ResponseSignUpChase;
 import net.authoriti.authoriti.core.SecurityActivity;
 import net.authoriti.authoriti.ui.help.HelpActivity_;
+import net.authoriti.authoriti.ui.share.ImportActivity;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiUtils;
+import net.authoriti.authoriti.utils.Constants;
 import net.authoriti.authoriti.utils.ViewUtils;
 import net.authoriti.authoriti.utils.crypto.CryptoKeyPair;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
@@ -87,6 +96,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
     private CryptoKeyPair keyPair;
 
     private boolean saveSuccess = false;
+    public static final int PERMISSIONS_REQUEST_CAMERA = 0;
 
     @Extra
     boolean isSyncRequired = false;
@@ -109,6 +119,21 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
                 }
             }
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == PERMISSIONS_REQUEST_CAMERA) {
+            for (int i = 0; i < permissions.length; i++) {
+                if (permissions[i].equalsIgnoreCase(Manifest.permission.CAMERA)) {
+                    if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                        startActivity(new Intent(this, ImportActivity.class));
+                    }
+                    break;
+                }
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     private void signUp() {
@@ -317,7 +342,9 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
-        HelpActivity_.intent(mContext).start();
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.HELP_BASE + "/" +
+                TOPIC_PASSWORD));
+        startActivity(browserIntent);
     }
 
 
@@ -342,6 +369,22 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
             hideKeyboard();
             signUp();
 
+        }
+    }
+
+    @Click(R.id.cvImport)
+    void importButtonClicked() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
+            startActivity(new Intent(this, ImportActivity.class));
+        } else if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    PERMISSIONS_REQUEST_CAMERA);
+        } else {
+            startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse
+                    ("package:" + BuildConfig.APPLICATION_ID)));
         }
     }
 
