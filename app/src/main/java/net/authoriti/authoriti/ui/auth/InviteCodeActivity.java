@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -41,6 +42,8 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
+
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -111,6 +114,21 @@ public class InviteCodeActivity extends BaseActivity {
 
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == PERMISSIONS_REQUEST_CAMERA) {
+            for (int i = 0; i < permissions.length; i++) {
+                if (permissions[i].equalsIgnoreCase(Manifest.permission.CAMERA)) {
+                    if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                        startActivity(new Intent(this, ImportActivity.class));
+                    }
+                    break;
+                }
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
     @AfterTextChange(R.id.etCode)
     void codeChanged() {
         if (!TextUtils.isEmpty(etCode.getText())) {
@@ -145,7 +163,7 @@ public class InviteCodeActivity extends BaseActivity {
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.HELP_BASE +
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.HELP_BASE + "/" +
                 TOPIC_INVITE));
         startActivity(browserIntent);
     }

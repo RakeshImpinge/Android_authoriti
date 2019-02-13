@@ -226,20 +226,10 @@ public class MainActivity extends BaseActivity {
         menuSelected(MENU_CODE);
     }
 
-
-    private void showHomeScreen() {
-
-    }
-
-
     private void menuSelected(long menu_id) {
         if (SELECTED_MENU_ID == menu_id && menu_id != MENU_POLLING) {
             return;
         }
-//        if (menu_id == MENU_EXPORT) {
-//            ExportActivity_.intent(getApplicationContext()).flags(Intent.FLAG_ACTIVITY_NEW_TASK).start();
-//            return;
-//        }
 
         SELECTED_MENU_ID = menu_id;
         Fragment fragment = null;
@@ -328,7 +318,6 @@ public class MainActivity extends BaseActivity {
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
-        System.out.println("Help clicked");
         String topic = "";
         if (SELECTED_MENU_ID == MENU_CODE) {
             topic = TOPIC_GENERAL;
@@ -343,7 +332,6 @@ public class MainActivity extends BaseActivity {
         } else if (SELECTED_MENU_ID == MENU_SETTING) {
             topic = TOPIC_SETTINGS;
         }
-        System.out.println("Topic: " + topic);
         if (!topic.equals("")) {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ConstantUtils
                     .getHelpUrl(topic)));
@@ -450,6 +438,7 @@ public class MainActivity extends BaseActivity {
         } else {
             isAllDataLoaded = 2;
         }
+
         loadPurposes();
         loadScheme();
     }
@@ -461,6 +450,7 @@ public class MainActivity extends BaseActivity {
             public void onResponse(Call<List<Purpose>> call, Response<List<Purpose>> response) {
                 dismissProgressDialog();
                 if (response.code() == 200 && response.body() != null) {
+                    System.out.println("OnDataSaved: Calling setPurposes!");
                     dataManager.setPurposes(response.body());
                     updateDataLoaded();
                 }
@@ -469,6 +459,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onFailure(Call<List<Purpose>> call, Throwable t) {
                 dismissProgressDialog();
+                updateDataLoaded();
             }
         });
     }
@@ -492,12 +483,14 @@ public class MainActivity extends BaseActivity {
                         dataManager.setScheme(response.body().getSchema());
                         updateDefaultvalues();
                     }
-                    updateDataLoaded();
+                    System.out.println("OnDataSaved: Scheme Loaded");
                 }
+                updateDataLoaded();
             }
 
             @Override
             public void onFailure(Call<SchemaGroup> call, Throwable t) {
+                updateDataLoaded();
                 dismissProgressDialog();
             }
         });
@@ -646,10 +639,10 @@ public class MainActivity extends BaseActivity {
                                            Response<ResponsePolling>
                                                    response) {
                         if (response.isSuccessful() && response.body().getUrl() != null &&
-                                !response.body().getUrl().equals("")) {
+                                !response.body().getUrl().equals("") &&
+                                PermissionCodeRequest(response.body().getUrl(), customer)) {
                             removePendingRequest(Id);
                             dismissProgressDialog();
-                            PermissionCodeRequest(response.body().getUrl(), customer);
                         } else {
                             if (System.currentTimeMillis() < PollingStopMilliseconds) {
                                 handler.removeCallbacks(runnable);
@@ -687,7 +680,7 @@ public class MainActivity extends BaseActivity {
     }
 
     // Parse polling url and redirect to next screen
-    private void PermissionCodeRequest(String url, String customer) {
+    private boolean PermissionCodeRequest(String url, String customer) {
         String[] splitUrl = url.split("\\?");
         if (splitUrl.length > 0) {
             String label = splitUrl[0].replace("authoriti://purpose/", "");
@@ -725,19 +718,23 @@ public class MainActivity extends BaseActivity {
                     customer_name = URLDecoder.decode(hashMap.get("origin"), "UTF-8");
                 } catch (Exception e) {
                     e.printStackTrace();
+                    return false;
                 }
                 if (!hashMap.isEmpty() && indexGroup != -1 && indexItem != -1) {
                     if (customer_name.toLowerCase().equals(customer.toLowerCase())) {
                         CodePermissionActivity_.intent(mContext).purposeIndex(indexGroup)
                                 .purposeIndexItem(indexItem).defParamFromUrl(hashMap)
                                 .start();
+                        return true;
                     } else {
                         Log.e("Message", "Invalid Url");
+                        return false;
                     }
-                }
-            }
+                } else return false;
+            } else return false;
         } else {
             Log.e("Message", "Invalid Url");
+            return false;
         }
     }
 

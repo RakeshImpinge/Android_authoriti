@@ -24,8 +24,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/colorHeaderBackground"
                 android:paddingTop="15dp"
-                android:paddingBottom="15dp"
-                android:visibility="gone">
+                android:paddingBottom="15dp">
 
                 <TextView
                     android:id="@+id/tvTitle"
