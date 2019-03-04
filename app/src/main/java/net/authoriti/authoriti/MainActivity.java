@@ -483,7 +483,6 @@ public class MainActivity extends BaseActivity {
                         dataManager.setScheme(response.body().getSchema());
                         updateDefaultvalues();
                     }
-                    System.out.println("OnDataSaved: Scheme Loaded");
                 }
                 updateDataLoaded();
             }
@@ -596,7 +595,6 @@ public class MainActivity extends BaseActivity {
                 }
                 defaultSelectedList.put("" + key.trim(), defaultValuesHashMap);
             }
-            Log.e("defaultSelectedList", defaultSelectedList.toString());
             dataManager.setDefaultValues(defaultSelectedList);
         } catch (Exception e) {
             e.printStackTrace();
@@ -727,13 +725,11 @@ public class MainActivity extends BaseActivity {
                                 .start();
                         return true;
                     } else {
-                        Log.e("Message", "Invalid Url");
                         return false;
                     }
                 } else return false;
             } else return false;
         } else {
-            Log.e("Message", "Invalid Url");
             return false;
         }
     }
