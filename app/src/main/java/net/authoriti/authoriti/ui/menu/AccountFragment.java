@@ -390,14 +390,14 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                 if (response.code() == 200 && response.body() != null) {
                     userInfo(response.body());
                 } else {
-                    showAlert("", "Failed. Try Again Later.");
+                    showAlert("", "Failed. Please Try Again Later.");
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseSignUpChase> call, Throwable t) {
                 dismissProgressDialog();
-                showAlert("", "Failed. Try Again Later.");
+                showAlert("", "Failed. Please Try Again Later.");
             }
         });
 
