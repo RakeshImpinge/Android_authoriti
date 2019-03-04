@@ -397,7 +397,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
             @Override
             public void onFailure(Call<ResponseSignUpChase> call, Throwable t) {
                 dismissProgressDialog();
-                showAlert("", "SFailed. Try Again Later.");
+                showAlert("", "Failed. Try Again Later.");
             }
         });
 
