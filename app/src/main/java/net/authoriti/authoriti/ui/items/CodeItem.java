@@ -14,6 +14,7 @@ import net.authoriti.authoriti.utils.AuthoritiData_;
 import net.authoriti.authoriti.utils.AuthoritiUtils_;
 
 import com.daimajia.swipe.SwipeLayout;
+import com.microblink.util.Log;
 import com.mikepenz.fastadapter.items.AbstractItem;
 
 import java.util.HashMap;
@@ -29,9 +30,7 @@ import static net.authoriti.authoriti.utils.Constants.TIME_CUSTOM_TIME;
  */
 
 public class CodeItem extends AbstractItem<CodeItem, CodeItem.ViewHolder> {
-
     public Picker picker;
-    private int selectedIndex;
     HashMap<String, DefaultValue> defaultPickerMap;
     int schemaIndex;
 
@@ -213,15 +212,6 @@ public class CodeItem extends AbstractItem<CodeItem, CodeItem.ViewHolder> {
         holder.tvDefault.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                holder.markDefault.setVisibility(View.VISIBLE);
-//                holder.swipeLayout.close(true);
-//                if (picker.getPicker().equals(PICKER_DATA_TYPE)) {
-//                    dataManager.saveDefaultValuesForDataType(context, utils
-//                            .getPickerSelectedIndex(context, PICKER_REQUEST), dataManager
-//                            .getSelectedValuesForDataType(utils.getPickerSelectedIndex(context,
-//                                    PICKER_REQUEST)));
-//                }
-//                utils.setDefaultPickerItemIndex(context, picker.getPicker(), selectedIndex);
                 DefaultValue defaultValue = defaultPickerMap.get(picker.getPicker());
                 holder.markDefault.setVisibility(View.VISIBLE);
                 holder.swipeLayout.close(true);

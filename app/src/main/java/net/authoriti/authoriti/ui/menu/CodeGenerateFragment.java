@@ -209,7 +209,7 @@ public class CodeGenerateFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-
+        System.out.println("onResume");
         if (dataManager.getScheme() != null && adapter != null) {
 
             if (mActivity != null && !mActivity.isFinishing()) {

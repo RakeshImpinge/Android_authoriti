@@ -88,10 +88,10 @@ public class CodePermissionActivity extends BaseActivity {
 
     @AfterViews
     void callAfterViewInjection() {
-        adapter = new FastItemAdapter<CodeItem>();
+        adapter = new FastItemAdapter<>();
         rvPermission.setLayoutManager(new LinearLayoutManager(mContext));
         rvPermission.setAdapter(adapter);
-        adapter_input = new FastItemAdapter<CodeEditItem>();
+        adapter_input = new FastItemAdapter<>();
         rvEditFields.setLayoutManager(new LinearLayoutManager(mContext));
         rvEditFields.setAdapter(adapter_input);
         group = dataManager.getPurposes().get(purposeIndex).getGroups().get(purposeIndexItem);
@@ -106,12 +106,12 @@ public class CodePermissionActivity extends BaseActivity {
 
     private void createPickerList() {
         pickersList = dataManager.getScheme().get("" + group.getSchemaIndex());
-        for (int i = 0; i < pickersList.size(); i++) {
+        final int szPickerList = pickersList.size();
+        for (int i = 0; i < szPickerList; i++) {
             // Adding default values of Picker is of TimePICKER_TIME
             if (pickersList.get(i).getPicker().equals(PICKER_TIME)) {
                 pickersList.set(i, utils.getDefaultTimePicker(pickersList.get(i)));
             }
-
             // Adding default values of Picker is of Account Type
             else if (pickersList.get(i).getPicker().equals(PICKER_ACCOUNT)) {
                 List<Value> values = new ArrayList<>();
@@ -122,7 +122,6 @@ public class CodePermissionActivity extends BaseActivity {
                 }
                 pickersList.get(i).setValues(values);
             }
-
             // Adding default values of Picker is of Data Type
             else if (pickersList.get(i).getPicker().equals(PICKER_DATA_TYPE)) {
                 List<Value> values;
@@ -134,12 +133,9 @@ public class CodePermissionActivity extends BaseActivity {
                 } else {
                     values = dataManager.getValuesFromDataType(schemaIndex);
                 }
+
                 pickersList.get(i).setValues(values);
                 pickersList.set(i, pickersList.get(i));
-
-                for (int j = 0; j < values.size(); j++) {
-                    Log.i("DEFAULT VALUE", values.get(j).getTitle());
-                }
             }
 
             String pickerKey = pickersList.get(i).getPicker();
@@ -158,6 +154,7 @@ public class CodePermissionActivity extends BaseActivity {
                                 (index)
                                 .getTitle(), pickersList.get(i).getValues().get(index).getValue()
                                 , false);
+                        System.out.println("DefaulgPickerMap: " + groupPickerName + " : " + defaultValue.getTitle());
                         defaultPickerMap.put(groupPickerName, defaultValue);
                     }
                 }
@@ -174,7 +171,6 @@ public class CodePermissionActivity extends BaseActivity {
                         value_decoded = URLDecoder.decode(defParamFromUrl.get(key), "UTF-8");
                     } catch (Exception e) {
                         e.printStackTrace();
-                        value_decoded = "";
                     }
                     DefaultValue defaultValue = new DefaultValue(key
                             , value_decoded, false);
@@ -185,8 +181,44 @@ public class CodePermissionActivity extends BaseActivity {
                         String code = defParamFromUrl.get("customer_code");
                         DefaultValue defaultValue = new DefaultValue(customer, code, false);
                         defaultPickerMap.put(key, defaultValue);
+                        System.out.println("Customer: " + customer);
                     } catch (Exception ignore) {
+                        System.out.println("Exception: " + ignore.toString());
+                    }
+                } else if (key.equals(PICKER_DATA_TYPE)) {
+                    try {
+                        String code = defParamFromUrl.get("customer_code");
+                        List<Value> possibleValues = dataManager.getValuesFromDataType(defaultPickerMap.get
+                                (PICKER_REQUEST).getValue());
+                        HashMap<String, String> possibleValuesMap = new HashMap<>();
+                        for (Value val: possibleValues) {
+                            System.out.println("Adding: " + val.getValue() + "," + val.getTitle());
+                            possibleValuesMap.put(val.getValue(), val.getTitle());
+                        }
 
+                        String[] data_types = URLDecoder.decode(defParamFromUrl.get(key), "UTF-8").split(",");
+                        int len = data_types.length;
+
+                        StringBuilder values = new StringBuilder("");
+                        StringBuilder titles = new StringBuilder("");
+
+                        for (int k = 0; k < len; k++) {
+                            if (data_types[k].length() < 2) {
+                                data_types[k] = "0" + data_types[k];
+                            }
+
+                            if (k != 0) {
+                                values.append(",");
+                                titles.append(",");
+                            }
+
+                            values.append(data_types[k]);
+                            titles.append(possibleValuesMap.get(data_types[k]));
+                        }
+
+
+                        defaultPickerMap.put(key, new DefaultValue(titles.toString(), values.toString(), false));
+                    } catch (Exception ignore) {
                     }
                 } else {
                     if (defParamFromUrl.containsKey(key)) {
@@ -196,14 +228,18 @@ public class CodePermissionActivity extends BaseActivity {
                             if ((defParamFromUrl.get
                                     (pickersList.get(i).getPicker())).contains(pickersList.get(i)
                                     .getValues().get(k).getValue())) {
-                                title.add(pickersList.get(i).getValues
+                                String titleVal = pickersList.get(i).getValues
                                         ().get
                                         (k)
-                                        .getTitle());
-                                value.add(pickersList.get(i).getValues
+                                        .getTitle();
+
+                                String valueVal = pickersList.get(i).getValues
                                         ().get
                                         (k)
-                                        .getValue());
+                                        .getValue();
+
+                                title.add(titleVal);
+                                value.add(valueVal);
                             }
                         }
                         if (title.size() > 0) {
@@ -216,6 +252,14 @@ public class CodePermissionActivity extends BaseActivity {
                     }
                 }
             }
+        }
+
+        System.out.println("Default Picker Map");
+
+        for (String key: defaultPickerMap.keySet()) {
+            System.out.println("Key: " + key);
+            DefaultValue value = defaultPickerMap.get(key);
+            System.out.println("Default Value: " + value.getValue() + " : " + value.getTitle());
         }
     }
 
@@ -352,8 +396,7 @@ public class CodePermissionActivity extends BaseActivity {
                 data_type_length = dataManager.getValuesFromDataType(defaultPickerMap
                         .get(PICKER_REQUEST).getValue()).size();
             } else {
-                data_type_length = dataManager.getValuesFromDataType(Integer.valueOf(group
-                        .getSchemaIndex())).size();
+                data_type_length = dataManager.getValuesFromDataType(group.getSchemaIndex()).size();
             }
 
             ArrayList<HashMap<String, String>> finalPickersList = new ArrayList<HashMap<String,
