@@ -121,14 +121,10 @@ public class MainActivity extends BaseActivity {
     Foreground.Listener listener = new Foreground.Listener() {
         @Override
         public void onBecameForeground() {
-            System.out.println("onBecameForeground");
             if (dataManager.getInactiveTime() != null && !dataManager.getInactiveTime().equals
                     ("")) {
                 long currentTime = System.currentTimeMillis() / 1000;
-                Log.e("Active TimeStamp", String.valueOf(currentTime));
-
                 long inactiveTime = Long.parseLong(dataManager.getInactiveTime());
-                Log.e("Inactive TimeStamp", String.valueOf(inactiveTime));
 
                 if (currentTime - inactiveTime > 60) {
                     logOut();

@@ -416,7 +416,6 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
         }
 
         for (int i = 0; i < newAccountIDs.size(); i++) {
-            System.out.println("Checking: " + newAccountIDs.get(i));
             boolean isContained = false;
             newAccountIDs.get(i).setCustomer(body.getCustomerName());
             newAccountIDs.get(i).setCustomer_ID(body.getId());

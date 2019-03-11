@@ -128,7 +128,6 @@ public class AccountManagerActivity extends SecurityActivity implements Security
         if (dataManager.accountIDs == null) {
             dataManager.accountIDs = new ArrayList<>();
         }
-        Log.e("SaveAccount", "Name: " + id);
         AccountID accountID = new AccountID(name, id, true);
         dataManager.accountIDs.add(accountID);
 
@@ -173,13 +172,8 @@ public class AccountManagerActivity extends SecurityActivity implements Security
     }
 
     private void signUp() {
-        Log.e("Private Key", keyPair.getPrivateKey());
-        Log.e("Public Key", keyPair.getPublicKey());
-        Log.e("Salt", keyPair.getSalt());
-
         RequestSignUp requestSignUp = new RequestSignUp(keyPair
                 .getPublicKey(), dataManager.inviteCode, dataManager.accountIDs);
-        Log.e("Step1", "Completed");
         displayProgressDialog("Sign Up...");
         AuthoritiAPI.APIService().signUp(requestSignUp).enqueue(new Callback<ResponseSignUp>() {
             @Override
@@ -198,7 +192,6 @@ public class AccountManagerActivity extends SecurityActivity implements Security
 
             @Override
             public void onFailure(Call<ResponseSignUp> call, Throwable t) {
-
                 dismissProgressDialog();
                 showAlert("", "Sign Up Failed. Try Again Later.");
             }

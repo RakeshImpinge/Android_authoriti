@@ -180,7 +180,6 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
             List<AccountID> newIds = new ArrayList<>();
 
             for (int i = 0; i < newAccountIDs.size(); i++) {
-                System.out.println("Checking: " + newAccountIDs.get(i));
                 boolean isContained = false;
                 newAccountIDs.get(i).setCustomer(responseSignUpChase.getCustomerName());
                 newAccountIDs.get(i).setCustomer_ID(responseSignUpChase.getId());
@@ -204,7 +203,6 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
             dataManager.setUser(user);
             finish();
         } else {
-            System.out.println("Creating user!");
             User user = new User();
             user.setUserId(responseSignUpChase.getId());
             user.setToken(responseSignUpChase.getToken());
@@ -214,7 +212,6 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
             List<AccountID> UserAccountsList = responseSignUpChase.getAccounts();
             final int sz = UserAccountsList.size();
             for (int i = 0; i < sz; i++) {
-                System.out.println("Setting hashed to true");
                 UserAccountsList.get(i).setHashed(true);
             }
             for (AccountID accountID : UserAccountsList) {
