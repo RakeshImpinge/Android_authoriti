@@ -78,13 +78,11 @@ public class Crypto {
                     }
             }
         }
-
+        // 0jCKT9sAsA
+        // 0jCKT9sAsA
         public void addTime(long expiresAt) throws Exception {
             long difference = expiresAt - 1530403200000l;
             long minutes = TimeUnit.MINUTES.convert(difference, TimeUnit.MILLISECONDS);
-
-            // 1537974156094
-            // 1530403200000l
 
             String encodedTime = "";
             if (schemaVersion.equalsIgnoreCase("5")) {
@@ -98,6 +96,7 @@ public class Crypto {
                     encodedTime = "lllll";
                 }
             }
+            System.out.println("Adding time: " + encodedTime);
             payload = encodedTime + payload;
         }
 
@@ -187,8 +186,9 @@ public class Crypto {
                     encodedPayload = encodePayload(payload, 6);
                     break;
             }
-
+            System.out.println("Encoded Payload: " + encodedPayload);
             final String signedCode = sign(encodedPayload, privateKey);
+            System.out.println("Signature: " + signedCode);
             System.out.println("Adding: "+ extra);
             final String passcode = addDataToCode(extra, signedCode);
             Log.i(TAG, "PC: " + passcode);

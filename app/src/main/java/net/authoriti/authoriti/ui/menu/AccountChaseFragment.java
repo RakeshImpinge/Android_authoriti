@@ -86,25 +86,8 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
     AccountDownloadDialog accountDownloadDialog;
 
     AccountID selectedAccountId;
-    int selectedPosition;
 
     private AccountAddDialog accountAddDialog;
-    private List<String> vnbArray = Arrays.asList(new String[]{
-            "91a73fd806ab2c005c13b4dc19130a884e909dea3f72d46e30266fe1a1f588d8",
-            "3538a1ef2e113da64249eea7bd068b585ec7ce5df73b2d1e319d8c9bf47eb314",
-            "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5",
-            "83cf8b609de60036a8277bd0e96135751bbc07eb234256d4b65b893360651bf2",
-            "0668f3355ad95c524de6088e0df1b34d50fca2b93e68f50bb66c00b8537dfab7",
-            "d21fa1e12112aa1fb854d8b834d13a139214ead691a4ca41409f83d774849a27",
-            "0668f3355ad95c524de6088e0df1b34d50fca2b93e68f50bb66c00b8537dfab7",
-            "5f4d696aa9a696bcac61d4d3c40b4173c1af8cac406a1ced826a38d121459f77",
-            "4e1a5c35f12d3166c216b76fa790642f8617a3d67194eb2ae96bd6c4a6a62524",
-            "3873c24c431b70ed2255dc01e877a8b839661711c091cc0a5c53402de5714c4c",
-            "29a74ee6df56a4dbf73049e5185895b85649a584d28aef6e2b931710476198ff",
-            "3873c24c431b70ed2255dc01e877a8b839661711c091cc0a5c53402de5714c4c",
-            "29a74ee6df56a4dbf73049e5185895b85649a584d28aef6e2b931710476198ff"
-    });
-
     BroadcastReceiver broadcastAddReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -177,11 +160,6 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
             for (int i = 0; i < user.getAccountIDs().size(); i++) {
                 AccountID accountID = user.getAccountIDs().get(i);
                 final String id = accountID.getIdentifier();
-                if (vnbArray.contains(id)) {
-                    accountID.setCustomer("Valley National Bank");
-                    accountID.setCustomer_ID(dataManager.getUser().getUserId());
-                    dataManager.getUser().getAccountIDs().set(i, accountID);
-                }
                 user.getAccountIDs().set(i, accountID);
 
                 if (dataManager.getDefaultAccountID().getTitle().equals(user.getAccountIDs().get
@@ -272,7 +250,6 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
     }
 
     private void updateAccount(String id, boolean setDefault) {
-        Log.e("AccountChaseFragmentUp", id);
         AccountID accountID = new AccountID(selectedAccountId.getType(), id, true);
         User user = dataManager.getUser();
         user.getAccountIDs().add(accountID);
@@ -564,7 +541,7 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
             @Override
             public void onFailure(Call<ResponseSignUpChase> call, Throwable t) {
                 dismissProgressDialog();
-                showAlert("", "SFailed. Try Again Later.");
+                showAlert("", "Failed. Try Again Later.");
             }
         });
 
