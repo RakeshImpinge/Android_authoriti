@@ -9,10 +9,10 @@ public class CryptoKeyPair {
     private String publicKey = null;
     private String salt = null;
 
-    public CryptoKeyPair(String privateKey, String publicKey, String salt) {
+    CryptoKeyPair(String privateKey, String publicKey, String salt) {
         this.privateKey = privateKey;
         this.publicKey = publicKey;
-        this.salt = "NOT-NEEDED-NOW";
+        this.salt = salt;
     }
 
     public String getPrivateKey() {

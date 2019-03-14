@@ -154,16 +154,16 @@ public class CodePermissionActivity extends BaseActivity {
                                 (index)
                                 .getTitle(), pickersList.get(i).getValues().get(index).getValue()
                                 , false);
-                        System.out.println("DefaulgPickerMap: " + groupPickerName + " : " + defaultValue.getTitle());
                         defaultPickerMap.put(groupPickerName, defaultValue);
                     }
                 }
             }
 
             // Updating the default values from the poll schema url like this :
-            // authoriti://purpose/purpose-name?picker1=value&picker2=value
+            // "authoriti://purpose/manage-an-account?accountId=2f434c9c9c1581d407d440d298e2407e2aaf64acc079abce90d9715f5e4dd8d1&schemaVersion=6&origin=Etrade&requestor_value=x&data_type=02%2C03"
             if (defParamFromUrl != null && !defParamFromUrl.isEmpty()) {
                 String key = pickersList.get(i).getPicker();
+                System.out.println("----> : " + key);
                 if (key.equals(PICKER_DATA_INPUT_TYPE)) {
                     key = pickersList.get(i).getInput();
                     String value_decoded = "";
@@ -186,10 +186,11 @@ public class CodePermissionActivity extends BaseActivity {
                         System.out.println("Exception: " + ignore.toString());
                     }
                 } else if (key.equals(PICKER_DATA_TYPE)) {
+                    System.out.println("----> : Here we go!");
                     try {
-                        String code = defParamFromUrl.get("customer_code");
-                        List<Value> possibleValues = dataManager.getValuesFromDataType(defaultPickerMap.get
-                                (PICKER_REQUEST).getValue());
+                        String requestorValue = defParamFromUrl.get("requestor_value");
+                        System.out.println("---> Requestor Value: " + requestorValue);
+                        List<Value> possibleValues = dataManager.getValuesFromDataType(requestorValue);
                         HashMap<String, String> possibleValuesMap = new HashMap<>();
                         for (Value val: possibleValues) {
                             System.out.println("Adding: " + val.getValue() + "," + val.getTitle());

@@ -8,6 +8,7 @@ import org.spongycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.spongycastle.crypto.params.KeyParameter;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -23,7 +24,7 @@ import net.authoriti.authoriti.utils.Log;
  */
 
 public class Crypto {
-    public static final String TAG = "PAYLOAD_GENERATOR";
+    private static final String TAG = "PAYLOAD_GENERATOR";
 
     public class PayloadGenerator {
         private BigInteger BASE = new BigInteger("62");
@@ -78,6 +79,7 @@ public class Crypto {
                     }
             }
         }
+
         // 0jCKT9sAsA
         // 0jCKT9sAsA
         public void addTime(long expiresAt) throws Exception {
@@ -189,7 +191,7 @@ public class Crypto {
             System.out.println("Encoded Payload: " + encodedPayload);
             final String signedCode = sign(encodedPayload, privateKey);
             System.out.println("Signature: " + signedCode);
-            System.out.println("Adding: "+ extra);
+            System.out.println("Adding: " + extra);
             final String passcode = addDataToCode(extra, signedCode);
             Log.i(TAG, "PC: " + passcode);
             return passcode;
@@ -199,6 +201,7 @@ public class Crypto {
             String[] payloadRanges = SCHEMA_RANGES[schema - 1];
             return encodePayload(payload, payloadRanges);
         }
+
         // 2b208512a404d8c25a38c1c480db54cadb589830078853a925dac8005c6b8dec1d996e033d612d9af2b44b70061ee0e868bfd14c2dd90b129e1edeb7953e798599y
         // 2b208512a404d8c25a38c1c480db54cadb589830078853a925dac8005c6b8dec1d996e033d612d9af2b44b70061ee0e868bfd14c2dd90b129e1edeb7953e798599y
         private String encodePayload(String payload, String[] ranges) {
@@ -282,15 +285,15 @@ public class Crypto {
 
     public CryptoKeyPair generateKeyPair(String password, String salt) {
         byte[] saltBytes;
-//        if (salt == null) {
-//            saltBytes = CryptoUtil.generateRandomBytes(64);
-//            salt = new String(saltBytes);
-//        } else {
-//            saltBytes = salt.getBytes();
-//        }
-
-        saltBytes = CryptoUtil.generateRandomBytes(64);
-        salt = new String(saltBytes);
+        if (salt == null || salt.trim().length() == 0) {
+            saltBytes = CryptoUtil.generateRandomBytes(64);
+        } else {
+            saltBytes = salt.getBytes();
+        }
+        try {
+            salt = new String(saltBytes, "UTF-8");
+        } catch (Exception ignore) {
+        }
 
         PKCS5S2ParametersGenerator generator = new PKCS5S2ParametersGenerator(new SHA256Digest());
         generator.init(PBEParametersGenerator.PKCS5PasswordToUTF8Bytes(password.toCharArray()),
@@ -304,6 +307,10 @@ public class Crypto {
 
         String privateKey = CryptoUtil.intToBase62(numPrivateKey, -1);
         String publicKey = new EcDSA().getPublicKey(numPrivateKey);
+
+        if (privateKey.length() != 6 || publicKey.length() != 12) {
+            return generateKeyPair(password, null);
+        }
 
         return new CryptoKeyPair(privateKey, publicKey, salt);
     }

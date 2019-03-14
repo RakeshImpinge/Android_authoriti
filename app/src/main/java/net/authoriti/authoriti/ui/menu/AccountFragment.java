@@ -390,14 +390,14 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                 if (response.code() == 200 && response.body() != null) {
                     userInfo(response.body());
                 } else {
-                    showAlert("", "Failed. Try Again Later.");
+                    showAlert("", "Failed. Please Try Again Later.");
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseSignUpChase> call, Throwable t) {
                 dismissProgressDialog();
-                showAlert("", "SFailed. Try Again Later.");
+                showAlert("", "Failed. Please Try Again Later.");
             }
         });
 
@@ -416,7 +416,6 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
         }
 
         for (int i = 0; i < newAccountIDs.size(); i++) {
-            System.out.println("Checking: " + newAccountIDs.get(i));
             boolean isContained = false;
             newAccountIDs.get(i).setCustomer(body.getCustomerName());
             newAccountIDs.get(i).setCustomer_ID(body.getId());
