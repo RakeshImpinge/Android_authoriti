@@ -163,7 +163,6 @@ public class CodePermissionActivity extends BaseActivity {
             // "authoriti://purpose/manage-an-account?accountId=2f434c9c9c1581d407d440d298e2407e2aaf64acc079abce90d9715f5e4dd8d1&schemaVersion=6&origin=Etrade&requestor_value=x&data_type=02%2C03"
             if (defParamFromUrl != null && !defParamFromUrl.isEmpty()) {
                 String key = pickersList.get(i).getPicker();
-                System.out.println("----> : " + key);
                 if (key.equals(PICKER_DATA_INPUT_TYPE)) {
                     key = pickersList.get(i).getInput();
                     String value_decoded = "";
@@ -181,19 +180,15 @@ public class CodePermissionActivity extends BaseActivity {
                         String code = defParamFromUrl.get("customer_code");
                         DefaultValue defaultValue = new DefaultValue(customer, code, false);
                         defaultPickerMap.put(key, defaultValue);
-                        System.out.println("Customer: " + customer);
                     } catch (Exception ignore) {
-                        System.out.println("Exception: " + ignore.toString());
+
                     }
                 } else if (key.equals(PICKER_DATA_TYPE)) {
-                    System.out.println("----> : Here we go!");
                     try {
                         String requestorValue = defParamFromUrl.get("requestor_value");
-                        System.out.println("---> Requestor Value: " + requestorValue);
                         List<Value> possibleValues = dataManager.getValuesFromDataType(requestorValue);
                         HashMap<String, String> possibleValuesMap = new HashMap<>();
                         for (Value val: possibleValues) {
-                            System.out.println("Adding: " + val.getValue() + "," + val.getTitle());
                             possibleValuesMap.put(val.getValue(), val.getTitle());
                         }
 
@@ -253,14 +248,6 @@ public class CodePermissionActivity extends BaseActivity {
                     }
                 }
             }
-        }
-
-        System.out.println("Default Picker Map");
-
-        for (String key: defaultPickerMap.keySet()) {
-            System.out.println("Key: " + key);
-            DefaultValue value = defaultPickerMap.get(key);
-            System.out.println("Default Value: " + value.getValue() + " : " + value.getTitle());
         }
     }
 

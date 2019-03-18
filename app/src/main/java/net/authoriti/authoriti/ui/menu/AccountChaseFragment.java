@@ -42,6 +42,7 @@ import com.tozny.crypto.android.AesCbcWithIntegrity;
 import net.authoriti.authoriti.utils.Constants;
 import net.authoriti.authoriti.utils.crypto.CryptoKeyPair;
 import net.authoriti.authoriti.utils.crypto.CryptoUtil;
+import net.authoriti.authoriti.utils.crypto.EcDSA;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -87,7 +88,9 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
 
     AccountID selectedAccountId;
 
+    private static final String TAG = "AccountChaseFragment";
     private AccountAddDialog accountAddDialog;
+
     BroadcastReceiver broadcastAddReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -264,19 +267,6 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
         }
 
         dataManager.setUser(user);
-//        Picker accountPicker = dataManager.getAccountPicker();
-//        List<Value> values = accountPicker.getValues();
-//        Value value = new Value(id, selectedAccountId.getType());
-//        values.ic_add(value);
-//        if (setDefault) {
-//
-//            accountPicker.setEnableDefault(true);
-//            accountPicker.setDefaultIndex(values.size() - 1);
-//
-//        }
-//
-//        dataManager.setAccountPicker(accountPicker);
-
         if (setDefault) {
             dataManager.setDefaultAccountID(new Value(id, selectedAccountId.getType()));
         }
@@ -412,7 +402,7 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
             utils.updateDefaultvalues(getActivity(), PICKER_ACCOUNT, new Value(CryptoUtil.hash
                     (id), name), true);
         }
-        Log.e("AddAccount", id);
+
         AccountID accountID = new AccountID(name, id, true);
         accountID.setIdentifier(accountID.getIdentifier());
         dataManager.accountIDs.add(accountID);
@@ -507,21 +497,25 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
 
         AesCbcWithIntegrity.SecretKeys keys;
         String keyStr = dataManager.getUser().getEncryptKey();
-        String privateKey = "";
+        String publicKey = "";
+        String salt = "";
         try {
+            User user = dataManager.getUser();
+
             keys = AesCbcWithIntegrity.keys(keyStr);
             AesCbcWithIntegrity.CipherTextIvMac civ = new AesCbcWithIntegrity.CipherTextIvMac
-                    (dataManager.getUser().getEncryptPrivateKey());
-            privateKey = AesCbcWithIntegrity.decryptString(civ, keys);
+                    (user.getEncryptPrivateKey());
+            salt = user.getEncryptSalt();
+            publicKey= new EcDSA().getPublicKey(CryptoUtil.base62ToInt(AesCbcWithIntegrity.decryptString(civ, keys)));
         } catch (GeneralSecurityException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        String dummyPublicKey = privateKey;
+
         RequestSignUpChase requestSignUp = new RequestSignUpChase(password,
-                dummyPublicKey,
-                "",
+                publicKey,
+                salt,
                 inviteCode, accountIDs);
 
         displayProgressDialog("Please wait...");
@@ -544,7 +538,6 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
                 showAlert("", "Failed. Try Again Later.");
             }
         });
-
     }
 
     private void userInfo(ResponseSignUpChase body) {
