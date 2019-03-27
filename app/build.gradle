@@ -4,16 +4,16 @@ apply plugin: 'io.fabric'
 
 
 def AAVersion = '4.5.2'
-def bitriseCode = System.getenv('$BITRISE_BUILD_NUMBER') ?: "229"
+def bitriseCode = System.getenv('$BITRISE_BUILD_NUMBER') ?: "242"
 android {
     compileSdkVersion 26
     buildToolsVersion '28.0.3'
-    defaultConfig {
+    defaultConfig { 
         applicationId 'net.authoriti.authoriti'
         minSdkVersion 17
         targetSdkVersion 26
         versionCode Integer.parseInt("$bitriseCode")
-        versionName "1.17"
+        versionName "1.20"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
@@ -94,7 +94,7 @@ dependencies {
     implementation('com.mikepenz:materialdrawer:5.9.0@aar') {
         transitive = true
     }
-    implementation 'com.github.simbiose:Encryption:2.0.1'
+//    implementation 'com.github.simbiose:Encryption:2.0.1'
     //    compile 'com.acuant.mobilesdk:acuantMobileSDK:5.0'
     implementation project(':acuantMobileSDK')
     implementation 'com.microblink:pdf417.mobi:6.4.0@aar'

@@ -550,24 +550,27 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
         if (!downloadIdList.contains(body.getId())) {
             downloadIdList.add(body.getId());
         }
-
-        for (int i = 0; i < newAccountIDs.size(); i++) {
-            System.out.println("Checking: " + newAccountIDs.get(i));
+        final int nAccounts = newAccountIDs.size();
+        for (int i = 0; i < nAccounts; i++) {
             boolean isContained = false;
+
             newAccountIDs.get(i).setCustomer(body.getCustomerName());
             newAccountIDs.get(i).setCustomer_ID(body.getId());
-            for (int k = 0; k < savedAccountIDs.size(); k++) {
-                if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
-                        .getIdentifier())
-                        && savedAccountIDs.get(k).getType().equals(newAccountIDs.get(i)
-                        .getType())) {
+
+            AccountID newAcc = newAccountIDs.get(i);
+            final int nSavedAccounts = savedAccountIDs.size();
+            for (int k = 0; k < nSavedAccounts; k++) {
+                AccountID saved = savedAccountIDs.get(k);
+                if (saved.getIdentifier().equals(newAcc.getIdentifier()) &&
+                    saved.getType().equals(newAcc.getType()) &&
+                    saved.getCustomer_ID().equals(newAcc.getCustomer_ID())) {
                     isContained = true;
                     break;
-                } else {
                 }
             }
+
             if (!isContained) {
-                newIds.add(newAccountIDs.get(i));
+                newIds.add(newAcc);
             }
         }
         savedAccountIDs.addAll(newIds);
