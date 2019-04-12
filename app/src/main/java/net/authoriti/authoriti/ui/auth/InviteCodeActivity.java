@@ -198,6 +198,9 @@ public class InviteCodeActivity extends BaseActivity {
                                            Response<ResponseInviteCode>
                                                    response) {
                         dismissProgressDialog();
+
+                        System.out.println("Response.body: " + response.body());
+
                         if (response.code() == 200 && response.body() != null) {
                             fetchInviteCodeResult(response.body(), isNextClick);
                         } else {
@@ -228,7 +231,6 @@ public class InviteCodeActivity extends BaseActivity {
             dataManager.inviteCode = etCode.getText().toString();
             dataManager.showSkip = responseInviteCode.isSkipDLV();
             dataManager.ignoreAcuant = responseInviteCode.ignoreAcuant();
-            Log.i(TAG, "Skip Acuant: " + dataManager.ignoreAcuant);
             if (isSyncRequired) {
                 if (responseInviteCode.getCustomer() != null) {
                     ChaseActivity_.intent(mContext).customer(responseInviteCode.getCustomer())
