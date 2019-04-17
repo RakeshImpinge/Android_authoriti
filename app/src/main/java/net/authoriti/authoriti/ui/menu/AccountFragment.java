@@ -415,7 +415,15 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
             downloadIdList.add(body.getId());
         }
 
-        for (int i = 0; i < newAccountIDs.size(); i++) {
+        if (newAccountIDs == null) {
+            System.out.println("oops! Invalid username password combination. Please try again!");
+            showAlert("", "Invalid username password combination. Please try again!");
+            return;
+        }
+
+        int sz = newAccountIDs.size();
+
+        for (int i = 0; i < sz; i++) {
             boolean isContained = false;
             newAccountIDs.get(i).setCustomer(body.getCustomerName());
             newAccountIDs.get(i).setCustomer_ID(body.getId());

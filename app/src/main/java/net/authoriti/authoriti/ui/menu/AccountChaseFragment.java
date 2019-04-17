@@ -547,6 +547,11 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
         List<AccountID> newAccountIDs = body.getAccounts();
         List<AccountID> newIds = new ArrayList<>();
         List<String> downloadIdList = user.getDownloadedWalletIDList();
+        if (newAccountIDs == null) {
+            System.out.println("oops! Invalid username password combination. Please try again!");
+            showAlert("", "Invalid username password combination. Please try again!");
+            return;
+        }
         if (!downloadIdList.contains(body.getId())) {
             downloadIdList.add(body.getId());
         }
