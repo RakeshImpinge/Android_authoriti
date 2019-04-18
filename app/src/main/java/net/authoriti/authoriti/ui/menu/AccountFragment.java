@@ -136,29 +136,24 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
     }
 
     private void showAccounts() {
-        System.out.println("Show Accounts(Self Registered)");
-
         accountList.clear();
         if (dataManager.getUser().getAccountIDs() != null) {
-            for (int i = 0; i < dataManager.getUser().getAccountIDs().size(); i++) {
-                AccountID accountID = dataManager.getUser().getAccountIDs().get(i);
-                if (dataManager.getDefaultAccountID().getTitle().equals(accountID.getType()) &&
-                        dataManager.getDefaultAccountID().getValue().equals(accountID
-                                .getIdentifier())) {
-                }
-                accountList.add(dataManager.getUser().getAccountIDs().get(i));
-            }
+            accountList.addAll(dataManager.getUser().getAccountIDs());
         }
+
         Collections.sort(accountList, new Comparator<AccountID>() {
             @Override
             public int compare(AccountID accountID, AccountID t1) {
-                if (accountID.getCustomer().equalsIgnoreCase("")) {
-                    if (t1.getCustomer().equalsIgnoreCase("")) {
-                        return accountID.getCustomer().compareTo(t1.getCustomer());
-                    }
-                    return 5000;
+                String s1 = accountID.getCustomer();
+                if (s1.trim().equalsIgnoreCase("")) {
+                    s1 = "ZZZZZZZZZZ";
                 }
-                return accountID.getCustomer().compareTo(t1.getCustomer());
+
+                String s2 = t1.getCustomer();
+                if (s2.trim().equalsIgnoreCase("")){
+                    s2 = "ZZZZZZZZZZ";
+                }
+                return s1.compareTo(s2);
             }
         });
 

@@ -57,6 +57,10 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
     public AccountAdaper(List<AccountID> customerList, AccountManagerUpdateInterfce accountManagerUpdateInterfce) {
         this.customerList = customerList;
         this.updateInterfce = accountManagerUpdateInterfce;
+
+        for (AccountID acc: this.customerList) {
+            System.out.println("Acc: " + acc.getType() + "; " + acc.getIdentifier());
+        }
     }
 
     @Override
@@ -77,9 +81,8 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
                 updateInterfce.deleted(accountID.getIdentifier());
             }
         });
-        System.out.println("Inside BindViewHolder: " + customerList.size());
+
         String customer = customerList.get(position).getCustomer();
-        System.out.println("Inside BindViewHolder: " + customer);
         if (customer.equals("")) {
             holder.lin_add_self_id.setVisibility(View.VISIBLE);
             customer = "Self Registered ID's";
