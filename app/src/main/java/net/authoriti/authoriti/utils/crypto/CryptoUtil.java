@@ -1,6 +1,9 @@
 package net.authoriti.authoriti.utils.crypto;
 
+import com.tozny.crypto.android.AesCbcWithIntegrity;
+
 import java.math.BigInteger;
+import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 
 /**
@@ -151,8 +154,13 @@ public class CryptoUtil {
     public static byte[] generateRandomBytes(int length) {
         SecureRandom random = new SecureRandom();
         byte[] bytes = new byte[length];
-
         random.nextBytes(bytes);
+
+        for (int i = 0; i < length; i++) {
+            if (bytes[i] == 0) {
+                bytes[i] = 3;
+            }
+        }
 
         return bytes;
     }
