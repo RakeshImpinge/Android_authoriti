@@ -43,6 +43,9 @@ public interface AuthoritiAPIService {
     @GET("api/v1/schema")
     Call<SchemaGroup> getSchemeGroup(@Query("client") String client);
 
+    @GET("api/v1/version")
+    Call<JsonObject> getMinimuVersion();
+
     @GET("api/v1/purpose")
     Call<List<Purpose>> getPurposes(@Query("client") String client);
 

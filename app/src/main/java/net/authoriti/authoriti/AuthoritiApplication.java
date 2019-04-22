@@ -31,7 +31,6 @@ public class AuthoritiApplication extends Application {
         Fabric.with(this, new Crashlytics());
         context = getApplicationContext();
         Foreground.init(this);
-        System.out.println("URL: " + ConstantUtils.encrypt("https://qa.authoriti.net"));
     }
 
     @Override
