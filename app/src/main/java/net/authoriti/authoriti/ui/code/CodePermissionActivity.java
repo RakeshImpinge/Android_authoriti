@@ -354,7 +354,11 @@ public class CodePermissionActivity extends BaseActivity {
             View childAt = rvEditFields.getChildAt(i);
             AppCompatEditText etCode = ((AppCompatEditText) childAt.findViewById(R.id.etCode));
             if (etCode.getText().toString().trim().length() == 0) {
-                errorMessage = "Please enter " + adapter_input.getAdapterItem(i).picker
+                if (adapter_input.getAdapterItem(i).picker
+                        .getLabel().equalsIgnoreCase("amount")) {
+                    errorMessage = "Please enter a valid amount.";
+                }
+                else errorMessage = "Please enter " + adapter_input.getAdapterItem(i).picker
                         .getLabel();
                 break;
             } else {
