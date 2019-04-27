@@ -146,6 +146,7 @@ public class InviteCodeActivity extends BaseActivity {
 
     @Click(R.id.cvNext)
     void nextButtonClicked() {
+        System.out.println("InviteCodeActivity: Next clicked");
         if (TextUtils.isEmpty(etCode.getText())) {
             if (isSyncRequired) {
                 tiCode.setError(utils.getSpannableStringForEditTextError("This field is required",

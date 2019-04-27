@@ -148,7 +148,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
                 .getPublicKey(), keyPair.getSalt(), dataManager.inviteCode, accountIDs);
 
         displayProgressDialog("Sign Up...");
-
+        System.out.println("ChaseActivity: SignupChase");
         AuthoritiAPI.APIService().signUpChase(requestSignUp).enqueue(new Callback<ResponseSignUpChase>() {
             @Override
             public void onResponse(Call<ResponseSignUpChase> call, Response<ResponseSignUpChase>

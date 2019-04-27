@@ -519,7 +519,7 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
                 inviteCode, accountIDs);
 
         displayProgressDialog("Please wait...");
-
+        System.out.println("AccountChaseFragment: SignupChase");
         AuthoritiAPI.APIService().signUpChase(requestSignUp).enqueue(new Callback<ResponseSignUpChase>() {
             @Override
             public void onResponse(Call<ResponseSignUpChase> call, Response<ResponseSignUpChase>
