@@ -188,13 +188,16 @@ public class AccountChaseFragment extends BaseFragment implements AccountConfirm
         Collections.sort(accountList, new Comparator<AccountID>() {
             @Override
             public int compare(AccountID accountID, AccountID t1) {
-                if (accountID.getCustomer().equalsIgnoreCase("")) {
-                    if (t1.getCustomer().equalsIgnoreCase("")) {
-                        return accountID.getCustomer().compareTo(t1.getCustomer());
-                    }
-                    return 5000;
+                String s1 = accountID.getCustomer();
+                if (s1.trim().equalsIgnoreCase("")) {
+                    s1 = "ZZZZZZZZZZ";
                 }
-                return accountID.getCustomer().compareTo(t1.getCustomer());
+
+                String s2 = t1.getCustomer();
+                if (s2.trim().equalsIgnoreCase("")){
+                    s2 = "ZZZZZZZZZZ";
+                }
+                return s1.compareTo(s2);
             }
         });
 //        if (selfRegIndex != -1) {
