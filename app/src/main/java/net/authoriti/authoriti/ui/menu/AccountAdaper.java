@@ -27,7 +27,7 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
     private AccountManagerUpdateInterfce updateInterfce;
 
     public int mDefaultPostion = -1;
-
+    private static final String SELF_REGISTERED = "Self Registered ID's";
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView tvTitle;
@@ -57,14 +57,23 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
     public AccountAdaper(List<AccountID> customerList, AccountManagerUpdateInterfce accountManagerUpdateInterfce) {
         this.customerList = customerList;
         this.updateInterfce = accountManagerUpdateInterfce;
-
-        for (AccountID acc: this.customerList) {
-            System.out.println("Acc: " + acc.getType() + "; " + acc.getIdentifier());
-        }
     }
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
+        if (position == customerList.size()) {
+            holder.ivSync.setVisibility(View.GONE);
+            holder.lin_add_self_id.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    updateInterfce.addSelfSigned();
+                }
+            });
+            holder.txt_header.setText(SELF_REGISTERED);
+            holder.surface.setVisibility(View.GONE);
+            return;
+        }
+
         final AccountID accountID = customerList.get(position);
         if (position == 0) {
             holder.rel_header.setVisibility(View.VISIBLE);
@@ -83,9 +92,10 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
         });
 
         String customer = customerList.get(position).getCustomer();
+
         if (customer.equals("")) {
             holder.lin_add_self_id.setVisibility(View.VISIBLE);
-            customer = "Self Registered ID's";
+            customer = SELF_REGISTERED;
             holder.ivSync.setVisibility(View.GONE);
         } else {
             holder.lin_add_self_id.setVisibility(View.GONE);
@@ -124,7 +134,15 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
 
     @Override
     public int getItemCount() {
-        return customerList.size();
+        final int sz = customerList.size();
+
+        for (int i = 0; i < sz; i++) {
+            if (customerList.get(i).getCustomer().equalsIgnoreCase("")) {
+                return sz;
+            }
+        }
+
+        return sz+1;
     }
 
     @Override

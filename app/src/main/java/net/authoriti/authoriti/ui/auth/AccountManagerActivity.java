@@ -3,12 +3,14 @@ package net.authoriti.authoriti.ui.auth;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.Settings;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import net.authoriti.authoriti.core.AccountManagerUpdateInterfce;
 import net.authoriti.authoriti.ui.menu.AccountAdaper;
+import net.authoriti.authoriti.ui.menu.AccountFragment;
 import net.authoriti.authoriti.utils.Constants;
 import net.authoriti.authoriti.utils.Log;
 
@@ -104,9 +106,12 @@ public class AccountManagerActivity extends SecurityActivity implements Security
         adapter = new AccountAdaper(accountList, this);
         rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
         rvAccount.setAdapter(adapter);
-
         showAccount();
 
+//        getSupportFragmentManager()
+//                .beginTransaction()
+//                .add(R.id.frame_container, new AccountFragment())
+//                .commit();
     }
 
     private void updateFinishButton() {
@@ -137,11 +142,9 @@ public class AccountManagerActivity extends SecurityActivity implements Security
     }
 
     private void showAccount() {
-        tvEmpty.setVisibility(View.GONE);
+//        tvEmpty.setVisibility(View.GONE);
         accountList.clear();
-        for (int i = 0; i < dataManager.accountIDs.size(); i++) {
-            accountList.add(dataManager.accountIDs.get(i));
-        }
+        accountList.addAll(dataManager.accountIDs);
 
         // Its only to display add + button if no self Id is added
         if (accountList.size() == 0) {
@@ -262,12 +265,18 @@ public class AccountManagerActivity extends SecurityActivity implements Security
         finish();
     }
 
-    @Click(R.id.ivAdd)
-    void addButtonClicked() {
-
-        showAccountAddDialog();
-
+    @Click(R.id.ivCloud)
+    void cloudButtonClicked() {
+        System.out.println("Cloud Button Clicked");
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(BROADCAST_CLOUD_BUTTON_CLICKED));
     }
+
+//    @Click(R.id.ivAdd)
+//    void addButtonClicked() {
+//
+//        showAccountAddDialog();
+//
+//    }
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
@@ -279,32 +288,23 @@ public class AccountManagerActivity extends SecurityActivity implements Security
 
     @Click(R.id.cvFinish)
     void finishButtonClicked() {
-
         signUp();
-
     }
 
     private void updateLoginState() {
-
         AuthLogIn logIn = new AuthLogIn();
         logIn.setLogin(true);
         dataManager.setAuthLogin(logIn);
     }
 
     private void checkFingerPrintAuth() {
-
         if (isBelowMarshmallow || fingerPrintHardwareNotDetected) {
-
             updateLoginState();
             goHome();
-
         } else {
-
             setListener(this);
             showTouchIDEnableAlert();
-
         }
-
     }
 
     private void goHome() {
@@ -315,11 +315,8 @@ public class AccountManagerActivity extends SecurityActivity implements Security
     }
 
     private void enableFingerPrintAndGoHome() {
-
         removeListener();
-
         if (dataManager != null && dataManager.getUser() != null) {
-
             User user = dataManager.getUser();
             user.setFingerPrintAuthEnabled(true);
             dataManager.setUser(user);
@@ -327,7 +324,6 @@ public class AccountManagerActivity extends SecurityActivity implements Security
             updateLoginState();
             goHome();
         }
-
     }
 
     @Override
@@ -343,40 +339,29 @@ public class AccountManagerActivity extends SecurityActivity implements Security
 
     @Override
     public void dontAllowButtonClicked() {
-
         hideTouchIDEnabledAlert();
 
         updateLoginState();
         goHome();
-
     }
 
     private void showAccountAddDialog() {
-
         if (accountAddDialog == null) {
-
             accountAddDialog = new AccountAddDialog(this);
             accountAddDialog.setListener(this);
-
         } else {
-
             accountAddDialog.init();
         }
 
         if (!isFinishing() && !accountAddDialog.isShowing()) {
-
             accountAddDialog.show();
         }
-
     }
 
     private void hideAccountAddDialog() {
-
         if (accountAddDialog != null) {
-
             accountAddDialog.dismiss();
             accountAddDialog = null;
-
         }
     }
 
@@ -387,17 +372,13 @@ public class AccountManagerActivity extends SecurityActivity implements Security
 
     @Override
     public void accountAddDialogOKButtonClicked(String name, String id, boolean setDefault) {
-
         saveAccount(name, id, setDefault);
         hideAccountAddDialog();
-
     }
 
     @Override
     public void accountAddDialogCancelButtonClicked() {
-
         hideAccountAddDialog();
-
     }
 
     @Override

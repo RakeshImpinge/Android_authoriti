@@ -1,6 +1,5 @@
 package net.authoriti.authoriti;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -23,10 +22,7 @@ import net.authoriti.authoriti.api.model.request.RequestComplete;
 import net.authoriti.authoriti.api.model.request.RequestSync;
 import net.authoriti.authoriti.api.model.response.ResponseComplete;
 import net.authoriti.authoriti.api.model.response.ResponseSync;
-import net.authoriti.authoriti.ui.menu.AccountChaseFragment;
-import net.authoriti.authoriti.ui.menu.SettingFragment;
 import net.authoriti.authoriti.ui.menu.SettingFragment_;
-import net.authoriti.authoriti.ui.share.ExportActivity_;
 import net.authoriti.authoriti.utils.Log;
 
 import android.view.View;
@@ -46,7 +42,6 @@ import net.authoriti.authoriti.api.model.response.ResponsePolling;
 import net.authoriti.authoriti.core.BaseActivity;
 import net.authoriti.authoriti.ui.auth.LoginActivity_;
 import net.authoriti.authoriti.ui.code.CodePermissionActivity_;
-import net.authoriti.authoriti.ui.menu.AccountChaseFragment_;
 import net.authoriti.authoriti.ui.menu.AccountFragment_;
 import net.authoriti.authoriti.ui.menu.PurposeFragment_;
 import net.authoriti.authoriti.ui.menu.WipeFragment_;
@@ -69,7 +64,6 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,8 +87,9 @@ public class MainActivity extends BaseActivity {
 
     private Fragment purposeFragment;
     private Fragment settingFragment;
-    private Fragment accountFragment;
     private Fragment wipeFragment;
+
+    Fragment accountFragment;
 
     BroadcastReceiver broadcastReceiver;
 
@@ -240,11 +235,7 @@ public class MainActivity extends BaseActivity {
             }
             fragment = purposeFragment;
         } else if (menu_id == MENU_ACCOUNT) {
-            if (!dataManager.getUser().getChaseType()) {
-                accountFragment = AccountFragment_.builder().build();
-            } else {
-                accountFragment = AccountChaseFragment_.builder().build();
-            }
+            accountFragment = AccountFragment_.builder().build();
             fragment = accountFragment;
         } else if (menu_id == MENU_SETTING) {
             if (settingFragment == null) {
@@ -323,11 +314,7 @@ public class MainActivity extends BaseActivity {
         if (SELECTED_MENU_ID == MENU_CODE) {
             topic = TOPIC_GENERAL;
         } else if (SELECTED_MENU_ID == MENU_ACCOUNT) {
-            if (!dataManager.getUser().getChaseType()) {
-                topic = TOPIC_ACCOUNT_2018;
-            } else {
-                topic = TOPIC_CHASE;
-            }
+            topic = TOPIC_CHASE;
         } else if (SELECTED_MENU_ID == MENU_WIPE) {
             topic = TOPIC_ABOUT;
         } else if (SELECTED_MENU_ID == MENU_SETTING) {

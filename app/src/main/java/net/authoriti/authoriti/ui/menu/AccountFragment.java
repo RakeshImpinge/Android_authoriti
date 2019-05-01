@@ -75,7 +75,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
     BroadcastReceiver broadcastReceiver, broadcastCloudReceiver, broadcastSyncReceiver;
     AccountDownloadDialog accountDownloadDialog;
 
-
+    private static final String TAG = "AccountFragment";
 
     @AfterViews
     void callAfterViewInjection() {
@@ -122,8 +122,11 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
     @Override
     public void onResume() {
         super.onResume();
-        ((MainActivity) getActivity()).updateMenuToolbar(Constants.MENU_ACCOUNT);
+        try {
+            ((MainActivity) getActivity()).updateMenuToolbar(Constants.MENU_ACCOUNT);
+        } catch (Exception ignore){
 
+        }
     }
 
     @Override
