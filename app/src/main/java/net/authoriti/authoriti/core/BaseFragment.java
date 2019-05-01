@@ -46,7 +46,7 @@ public class BaseFragment extends Fragment implements Constants {
 //            progress.show();
 //        }
 
-        if (!getActivity().isFinishing() && (kProgressHUD == null || !kProgressHUD.isShowing())) {
+        if (getActivity() != null && !getActivity().isFinishing() && (kProgressHUD == null || !kProgressHUD.isShowing())) {
             kProgressHUD = KProgressHUD.create(getActivity())
                     .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                     .setBackgroundColor(Color.rgb(224, 230, 233))

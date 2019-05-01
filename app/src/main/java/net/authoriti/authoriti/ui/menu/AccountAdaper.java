@@ -22,7 +22,7 @@ import java.util.List;
  */
 
 public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHolder> {
-
+    private boolean signupInProgress = false;
     private List<AccountID> customerList;
     private AccountManagerUpdateInterfce updateInterfce;
 
@@ -54,9 +54,10 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
         }
     }
 
-    public AccountAdaper(List<AccountID> customerList, AccountManagerUpdateInterfce accountManagerUpdateInterfce) {
+    public AccountAdaper(List<AccountID> customerList, AccountManagerUpdateInterfce accountManagerUpdateInterfce, boolean signupInProgress) {
         this.customerList = customerList;
         this.updateInterfce = accountManagerUpdateInterfce;
+        this.signupInProgress = signupInProgress;
     }
 
     @Override
@@ -100,7 +101,9 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
         } else {
             holder.lin_add_self_id.setVisibility(View.GONE);
             customer = customer + " ID's";
-            holder.ivSync.setVisibility(View.VISIBLE);
+
+            if (!signupInProgress)
+                holder.ivSync.setVisibility(View.VISIBLE);
         }
 
         holder.lin_add_self_id.setOnClickListener(new View.OnClickListener() {

@@ -22,6 +22,7 @@ import net.authoriti.authoriti.api.model.request.RequestComplete;
 import net.authoriti.authoriti.api.model.request.RequestSync;
 import net.authoriti.authoriti.api.model.response.ResponseComplete;
 import net.authoriti.authoriti.api.model.response.ResponseSync;
+import net.authoriti.authoriti.ui.menu.AccountFragment;
 import net.authoriti.authoriti.ui.menu.SettingFragment_;
 import net.authoriti.authoriti.utils.Log;
 
@@ -236,6 +237,7 @@ public class MainActivity extends BaseActivity {
             fragment = purposeFragment;
         } else if (menu_id == MENU_ACCOUNT) {
             accountFragment = AccountFragment_.builder().build();
+            ((AccountFragment) accountFragment).signupInProgress = false;
             fragment = accountFragment;
         } else if (menu_id == MENU_SETTING) {
             if (settingFragment == null) {
