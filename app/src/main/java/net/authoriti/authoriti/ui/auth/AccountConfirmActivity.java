@@ -88,7 +88,7 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
         accountAddDialog = new AccountAddDialog(this);
         accountAddDialog.setListener(this);
         System.out.println("Creating accountList: " + accountList.size());
-        adapter = new AccountAdaper(accountList, this);
+        adapter = new AccountAdaper(accountList, this, false);
         rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
         rvAccount.setAdapter(adapter);
 

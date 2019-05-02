@@ -22,12 +22,12 @@ import java.util.List;
  */
 
 public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHolder> {
-
+    private boolean signupInProgress = false;
     private List<AccountID> customerList;
     private AccountManagerUpdateInterfce updateInterfce;
 
     public int mDefaultPostion = -1;
-
+    private static final String SELF_REGISTERED = "Self Registered ID's";
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView tvTitle;
@@ -54,13 +54,27 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
         }
     }
 
-    public AccountAdaper(List<AccountID> customerList, AccountManagerUpdateInterfce accountManagerUpdateInterfce) {
+    public AccountAdaper(List<AccountID> customerList, AccountManagerUpdateInterfce accountManagerUpdateInterfce, boolean signupInProgress) {
         this.customerList = customerList;
         this.updateInterfce = accountManagerUpdateInterfce;
+        this.signupInProgress = signupInProgress;
     }
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
+        if (position == customerList.size()) {
+            holder.ivSync.setVisibility(View.GONE);
+            holder.lin_add_self_id.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    updateInterfce.addSelfSigned();
+                }
+            });
+            holder.txt_header.setText(SELF_REGISTERED);
+            holder.surface.setVisibility(View.GONE);
+            return;
+        }
+
         final AccountID accountID = customerList.get(position);
         if (position == 0) {
             holder.rel_header.setVisibility(View.VISIBLE);
@@ -77,17 +91,19 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
                 updateInterfce.deleted(accountID.getIdentifier());
             }
         });
-        System.out.println("Inside BindViewHolder: " + customerList.size());
+
         String customer = customerList.get(position).getCustomer();
-        System.out.println("Inside BindViewHolder: " + customer);
+
         if (customer.equals("")) {
             holder.lin_add_self_id.setVisibility(View.VISIBLE);
-            customer = "Self Registered ID's";
+            customer = SELF_REGISTERED;
             holder.ivSync.setVisibility(View.GONE);
         } else {
             holder.lin_add_self_id.setVisibility(View.GONE);
             customer = customer + " ID's";
-            holder.ivSync.setVisibility(View.VISIBLE);
+
+            if (!signupInProgress)
+                holder.ivSync.setVisibility(View.VISIBLE);
         }
 
         holder.lin_add_self_id.setOnClickListener(new View.OnClickListener() {
@@ -121,7 +137,15 @@ public class AccountAdaper extends RecyclerView.Adapter<AccountAdaper.MyViewHold
 
     @Override
     public int getItemCount() {
-        return customerList.size();
+        final int sz = customerList.size();
+
+        for (int i = 0; i < sz; i++) {
+            if (customerList.get(i).getCustomer().equalsIgnoreCase("")) {
+                return sz;
+            }
+        }
+
+        return sz+1;
     }
 
     @Override

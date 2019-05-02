@@ -3,18 +3,12 @@ package net.authoriti.authoriti.ui.auth;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.Settings;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v4.content.LocalBroadcastManager;
 
 import net.authoriti.authoriti.core.AccountManagerUpdateInterfce;
-import net.authoriti.authoriti.ui.menu.AccountAdaper;
+import net.authoriti.authoriti.ui.menu.AccountFragment;
+import net.authoriti.authoriti.ui.menu.AccountFragment_;
 import net.authoriti.authoriti.utils.Constants;
-import net.authoriti.authoriti.utils.Log;
-
-import android.view.View;
-import android.widget.TextView;
-
 import net.authoriti.authoriti.MainActivity_;
 import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.api.AuthoritiAPI;
@@ -26,10 +20,10 @@ import net.authoriti.authoriti.api.model.request.RequestSignUp;
 import net.authoriti.authoriti.api.model.response.ResponseSignUp;
 import net.authoriti.authoriti.core.SecurityActivity;
 import net.authoriti.authoriti.ui.alert.AccountAddDialog;
-import net.authoriti.authoriti.ui.help.HelpActivity_;
 import net.authoriti.authoriti.ui.items.AccountAddItem;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiUtils;
+import net.authoriti.authoriti.utils.crypto.Crypto;
 import net.authoriti.authoriti.utils.crypto.CryptoKeyPair;
 import net.authoriti.authoriti.utils.crypto.CryptoUtil;
 
@@ -39,13 +33,8 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.ViewById;
 
-import java.io.UnsupportedEncodingException;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -66,194 +55,102 @@ public class AccountManagerActivity extends SecurityActivity implements Security
 
     @Bean
     AuthoritiUtils utils;
-
     @Bean
     AuthoritiData dataManager;
 
-    @ViewById(R.id.cvFinish)
-    CardView cvFinish;
-
-    @ViewById(R.id.rvAccount)
-    RecyclerView rvAccount;
-
-    @ViewById(R.id.tvEmpty)
-    TextView tvEmpty;
-
-    AccountAdaper adapter;
-    List<AccountID> accountList = new ArrayList<>();
-
-
     private AccountAddDialog accountAddDialog;
-
     private CryptoKeyPair keyPair;
 
-    private boolean saveSuccess = false;
 
     @AfterViews
     void callAfterViewInjection() {
-
-        keyPair = dataManager.getCryptoKeyPair(dataManager.password, "");
-
         dataManager.accountIDs = new ArrayList<>();
-
-        updateFinishButton();
 
         accountAddDialog = new AccountAddDialog(this);
         accountAddDialog.setListener(this);
 
-        adapter = new AccountAdaper(accountList, this);
-        rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
-        rvAccount.setAdapter(adapter);
+        generateKeypair();
 
-        showAccount();
+        AccountFragment accountFragment = AccountFragment_.builder().build();
+        accountFragment.signupInProgress = true;
 
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frame_container, accountFragment)
+                .commitAllowingStateLoss();
     }
 
-    private void updateFinishButton() {
-        if (dataManager.accountIDs != null && dataManager.accountIDs.size() > 0) {
-            cvFinish.setEnabled(true);
-            cvFinish.setAlpha(1.0f);
-        } else {
-            cvFinish.setEnabled(false);
-            cvFinish.setAlpha(0.1f);
-        }
-    }
 
-    private void saveAccount(String name, String id, boolean setDefault) {
-        if (setDefault) {
-            dataManager.defaultAccountSelected = true;
-            dataManager.defaultAccountIndex = dataManager.accountIDs.size();
-        }
+    public void fetchSignUpInfo(ResponseSignUp responseSignUp, User currentUser) {
+        List<AccountID> existingAccounts = dataManager.getUser().getAccountIDs();
 
-        if (dataManager.accountIDs == null) {
-            dataManager.accountIDs = new ArrayList<>();
-        }
-        AccountID accountID = new AccountID(name, id, true);
-        dataManager.accountIDs.add(accountID);
-
-        showAccount();
-
-        updateFinishButton();
-    }
-
-    private void showAccount() {
-        tvEmpty.setVisibility(View.GONE);
-        accountList.clear();
-        for (int i = 0; i < dataManager.accountIDs.size(); i++) {
-            accountList.add(dataManager.accountIDs.get(i));
-        }
-
-        // Its only to display add + button if no self Id is added
-        if (accountList.size() == 0) {
-            accountList.add(new AccountID());
-        }
-
-        Collections.sort(accountList, new Comparator<AccountID>() {
-            @Override
-            public int compare(AccountID accountID, AccountID t1) {
-                if (accountID.getCustomer().equalsIgnoreCase("")) {
-                    if (t1.getCustomer().equalsIgnoreCase("")) {
-                        return accountID.getCustomer().compareTo(t1.getCustomer());
-                    }
-                    return 5000;
-                }
-                return accountID.getCustomer().compareTo(t1.getCustomer());
-            }
-        });
-
-        for (int i = 0; i < accountList.size(); i++) {
-            if (dataManager.getDefaultAccountID().getTitle().equals(accountList.get(i).getType()) &&
-                    dataManager.getDefaultAccountID().getValue().equals(accountList.get(i).getIdentifier())) {
-                adapter.mDefaultPostion = i;
-            }
-        }
-
-        adapter.notifyDataSetChanged();
-    }
-
-    private void signUp() {
-        RequestSignUp requestSignUp = new RequestSignUp(keyPair
-                .getPublicKey(), dataManager.inviteCode, dataManager.accountIDs);
-        displayProgressDialog("Sign Up...");
-        AuthoritiAPI.APIService().signUp(requestSignUp).enqueue(new Callback<ResponseSignUp>() {
-            @Override
-            public void onResponse(Call<ResponseSignUp> call, Response<ResponseSignUp> response) {
-                dismissProgressDialog();
-                if (response.code() == 200 && response.body() != null) {
-                    saveSuccess = true;
-                    mFingerPrintAuthHelper.startAuth();
-                    hideKeyboard();
-                    fetchSignUpInfo(response.body());
-                    checkFingerPrintAuth();
-                } else {
-                    showAlert("", "Sign Up Failed. Try Again Later.");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseSignUp> call, Throwable t) {
-                dismissProgressDialog();
-                showAlert("", "Sign Up Failed. Try Again Later.");
-            }
-        });
-
-    }
-
-    private void fetchSignUpInfo(ResponseSignUp responseSignUp) {
         User user = responseSignUp.getUser();
 
-        user.setUserId(responseSignUp.getUserId());
-        user.setToken(responseSignUp.getToken());
+        user.setUserId(currentUser.getUserId());
+        user.setToken(currentUser.getToken());
+
+        user.setEncryptKey(currentUser.getEncryptKey());
+        user.setEncryptSalt(currentUser.getEncryptSalt());
+        user.setEncryptPassword(currentUser.getEncryptPassword());
+        user.setEncryptPrivateKey(currentUser.getEncryptPrivateKey());
+
+        user.setPassword(currentUser.getPassword());
+
         user.setInviteCode(dataManager.inviteCode);
+
         try {
-
-            AesCbcWithIntegrity.SecretKeys keys;
-
-            String salt = AesCbcWithIntegrity.saltString(AesCbcWithIntegrity.generateSalt());
-            keys = AesCbcWithIntegrity.generateKeyFromPassword(dataManager.password, salt);
-
-            String keyStr = AesCbcWithIntegrity.keyString(keys);
-
-            user.setEncryptKey(keyStr);
-
-            try {
-
-                user.setEncryptPrivateKey(AesCbcWithIntegrity.encrypt(keyPair.getPrivateKey(),
-                        keys).toString());
-                user.setEncryptSalt(AesCbcWithIntegrity.encrypt(keyPair.getSalt(), keys).toString
-                        ());
-                user.setEncryptPassword(AesCbcWithIntegrity.encrypt(dataManager.password, keys)
-                        .toString());
-
-                for (int i = 0; i < user.getAccountIDs().size(); i++) {
-                    AccountID accountID = user.getAccountIDs().get(i);
-                    if (!accountID.getHashed()) {
-                        Log.e("HashCheck", "Not Hashed");
-                        accountID.setIdentifier(CryptoUtil.hash(accountID.getIdentifier()));
-                    } else {
-                        accountID.setIdentifier(accountID.getIdentifier());
-                        Log.e("HashCheck", "Saved: " + accountID.getIdentifier());
-                    }
-                    user.getAccountIDs().set(i, accountID);
+            int szUserAccounts = user.getAccountIDs().size();
+            for (int i = 0; i < szUserAccounts; i++) {
+                AccountID accountID = user.getAccountIDs().get(i);
+                if (!accountID.getHashed()) {
+                    accountID.setIdentifier(CryptoUtil.hash(accountID.getIdentifier()));
+                } else {
+                    accountID.setIdentifier(accountID.getIdentifier());
                 }
-
-                if (dataManager.defaultAccountSelected) {
-                    dataManager.setDefaultAccountID(new Value(user.getAccountIDs().get
-                            (dataManager.defaultAccountIndex)
-                            .getIdentifier(), user.getAccountIDs().get
-                            (dataManager.defaultAccountIndex).getType()
-                    ));
-                }
-                dataManager.setUser(user);
-
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+                user.getAccountIDs().set(i, accountID);
             }
 
-        } catch (GeneralSecurityException e) {
+            if (dataManager.defaultAccountSelected) {
+                dataManager.setDefaultAccountID(new Value(user.getAccountIDs().get
+                        (dataManager.defaultAccountIndex)
+                        .getIdentifier(), user.getAccountIDs().get
+                        (dataManager.defaultAccountIndex).getType()
+                ));
+            }
+            if (existingAccounts != null) {
+                user.getAccountIDs().addAll(existingAccounts);
+            }
+            dataManager.setUser(user);
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
+    private void generateKeypair() {
+        AesCbcWithIntegrity.SecretKeys keys;
+
+        try {
+            String salt = AesCbcWithIntegrity.saltString(AesCbcWithIntegrity.generateSalt());
+            keyPair = new Crypto().generateKeyPair(dataManager.password, null);
+            System.out.println("Generated keypair: " + keyPair.getPrivateKey());
+
+            keys = AesCbcWithIntegrity.generateKeyFromPassword(dataManager.password, salt);
+            String keyStr = AesCbcWithIntegrity.keyString(keys);
+
+            User user = new User();
+            user.setEncryptPrivateKey(AesCbcWithIntegrity.encrypt(keyPair.getPrivateKey(),
+                    keys).toString());
+            user.setEncryptSalt(AesCbcWithIntegrity.encrypt(keyPair.getSalt(), keys).toString
+                    ());
+            user.setEncryptPassword(AesCbcWithIntegrity.encrypt(dataManager.password, keys)
+                    .toString());
+            user.setEncryptKey(keyStr);
+
+            user.setAccountIDs(new ArrayList<AccountID>());
+
+            dataManager.setUser(user);
+        } catch (Exception ignore) {
+        }
 
     }
 
@@ -262,12 +159,11 @@ public class AccountManagerActivity extends SecurityActivity implements Security
         finish();
     }
 
-    @Click(R.id.ivAdd)
-    void addButtonClicked() {
-
-        showAccountAddDialog();
-
+    @Click(R.id.ivCloud)
+    void cloudButtonClicked() {
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(BROADCAST_CLOUD_BUTTON_CLICKED));
     }
+
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
@@ -276,35 +172,20 @@ public class AccountManagerActivity extends SecurityActivity implements Security
         startActivity(browserIntent);
     }
 
-
-    @Click(R.id.cvFinish)
-    void finishButtonClicked() {
-
-        signUp();
-
-    }
-
     private void updateLoginState() {
-
         AuthLogIn logIn = new AuthLogIn();
         logIn.setLogin(true);
         dataManager.setAuthLogin(logIn);
     }
 
-    private void checkFingerPrintAuth() {
-
+    public void checkFingerPrintAuth() {
         if (isBelowMarshmallow || fingerPrintHardwareNotDetected) {
-
             updateLoginState();
             goHome();
-
         } else {
-
             setListener(this);
             showTouchIDEnableAlert();
-
         }
-
     }
 
     private void goHome() {
@@ -315,11 +196,8 @@ public class AccountManagerActivity extends SecurityActivity implements Security
     }
 
     private void enableFingerPrintAndGoHome() {
-
         removeListener();
-
         if (dataManager != null && dataManager.getUser() != null) {
-
             User user = dataManager.getUser();
             user.setFingerPrintAuthEnabled(true);
             dataManager.setUser(user);
@@ -327,7 +205,6 @@ public class AccountManagerActivity extends SecurityActivity implements Security
             updateLoginState();
             goHome();
         }
-
     }
 
     @Override
@@ -343,40 +220,29 @@ public class AccountManagerActivity extends SecurityActivity implements Security
 
     @Override
     public void dontAllowButtonClicked() {
-
         hideTouchIDEnabledAlert();
 
         updateLoginState();
         goHome();
-
     }
 
     private void showAccountAddDialog() {
-
         if (accountAddDialog == null) {
-
             accountAddDialog = new AccountAddDialog(this);
             accountAddDialog.setListener(this);
-
         } else {
-
             accountAddDialog.init();
         }
 
         if (!isFinishing() && !accountAddDialog.isShowing()) {
-
             accountAddDialog.show();
         }
-
     }
 
     private void hideAccountAddDialog() {
-
         if (accountAddDialog != null) {
-
             accountAddDialog.dismiss();
             accountAddDialog = null;
-
         }
     }
 
@@ -387,17 +253,12 @@ public class AccountManagerActivity extends SecurityActivity implements Security
 
     @Override
     public void accountAddDialogOKButtonClicked(String name, String id, boolean setDefault) {
-
-        saveAccount(name, id, setDefault);
         hideAccountAddDialog();
-
     }
 
     @Override
     public void accountAddDialogCancelButtonClicked() {
-
         hideAccountAddDialog();
-
     }
 
     @Override
@@ -408,8 +269,6 @@ public class AccountManagerActivity extends SecurityActivity implements Security
             dataManager.defaultAccountSelected = false;
             dataManager.defaultAccountIndex = -1;
         }
-        showAccount();
-        updateFinishButton();
     }
 
     @Override

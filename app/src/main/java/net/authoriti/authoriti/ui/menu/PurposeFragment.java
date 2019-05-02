@@ -134,7 +134,9 @@ public class PurposeFragment extends BaseFragment implements PurposeItem.Purpose
                 getActivity().overridePendingTransition(0, 0);
             }
         } else {
-            linheader.setVisibility(View.VISIBLE);
+            if (linheader != null)
+                linheader.setVisibility(View.VISIBLE);
+
             purposeAdaper.notifyDataSetChanged();
         }
     }

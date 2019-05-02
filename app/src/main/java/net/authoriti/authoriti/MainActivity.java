@@ -2,6 +2,7 @@ package net.authoriti.authoriti;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Typeface;
@@ -9,9 +10,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 
 import net.authoriti.authoriti.api.model.User;
@@ -19,10 +22,8 @@ import net.authoriti.authoriti.api.model.request.RequestComplete;
 import net.authoriti.authoriti.api.model.request.RequestSync;
 import net.authoriti.authoriti.api.model.response.ResponseComplete;
 import net.authoriti.authoriti.api.model.response.ResponseSync;
-import net.authoriti.authoriti.ui.menu.AccountChaseFragment;
-import net.authoriti.authoriti.ui.menu.SettingFragment;
+import net.authoriti.authoriti.ui.menu.AccountFragment;
 import net.authoriti.authoriti.ui.menu.SettingFragment_;
-import net.authoriti.authoriti.ui.share.ExportActivity_;
 import net.authoriti.authoriti.utils.Log;
 
 import android.view.View;
@@ -42,7 +43,6 @@ import net.authoriti.authoriti.api.model.response.ResponsePolling;
 import net.authoriti.authoriti.core.BaseActivity;
 import net.authoriti.authoriti.ui.auth.LoginActivity_;
 import net.authoriti.authoriti.ui.code.CodePermissionActivity_;
-import net.authoriti.authoriti.ui.menu.AccountChaseFragment_;
 import net.authoriti.authoriti.ui.menu.AccountFragment_;
 import net.authoriti.authoriti.ui.menu.PurposeFragment_;
 import net.authoriti.authoriti.ui.menu.WipeFragment_;
@@ -50,6 +50,7 @@ import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.ConstantUtils;
 import net.authoriti.authoriti.utils.Constants;
 
+import com.google.gson.JsonObject;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -64,7 +65,6 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,8 +88,9 @@ public class MainActivity extends BaseActivity {
 
     private Fragment purposeFragment;
     private Fragment settingFragment;
-    private Fragment accountFragment;
     private Fragment wipeFragment;
+
+    Fragment accountFragment;
 
     BroadcastReceiver broadcastReceiver;
 
@@ -235,11 +236,8 @@ public class MainActivity extends BaseActivity {
             }
             fragment = purposeFragment;
         } else if (menu_id == MENU_ACCOUNT) {
-            if (!dataManager.getUser().getChaseType()) {
-                accountFragment = AccountFragment_.builder().build();
-            } else {
-                accountFragment = AccountChaseFragment_.builder().build();
-            }
+            accountFragment = AccountFragment_.builder().build();
+            ((AccountFragment) accountFragment).signupInProgress = false;
             fragment = accountFragment;
         } else if (menu_id == MENU_SETTING) {
             if (settingFragment == null) {
@@ -318,11 +316,7 @@ public class MainActivity extends BaseActivity {
         if (SELECTED_MENU_ID == MENU_CODE) {
             topic = TOPIC_GENERAL;
         } else if (SELECTED_MENU_ID == MENU_ACCOUNT) {
-            if (!dataManager.getUser().getChaseType()) {
-                topic = TOPIC_ACCOUNT_2018;
-            } else {
-                topic = TOPIC_CHASE;
-            }
+            topic = TOPIC_CHASE;
         } else if (SELECTED_MENU_ID == MENU_WIPE) {
             topic = TOPIC_ABOUT;
         } else if (SELECTED_MENU_ID == MENU_SETTING) {
@@ -437,6 +431,7 @@ public class MainActivity extends BaseActivity {
 
         loadPurposes();
         loadScheme();
+        checkVersion();
     }
 
 
@@ -446,7 +441,6 @@ public class MainActivity extends BaseActivity {
             public void onResponse(Call<List<Purpose>> call, Response<List<Purpose>> response) {
                 dismissProgressDialog();
                 if (response.code() == 200 && response.body() != null) {
-                    System.out.println("OnDataSaved: Calling setPurposes!");
                     dataManager.setPurposes(response.body());
                     updateDataLoaded();
                 }
@@ -491,6 +485,49 @@ public class MainActivity extends BaseActivity {
         });
     }
 
+    private void checkVersion() {
+        Log.i(TAG, "Checking Version");
+        try {
+            AuthoritiAPI.APIService().getMinimuVersion().enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    if (response.code() == 200 && response.body() != null) {
+                        int version = response.body().get("minimum").getAsInt();
+                        if (version > 2) {
+                            showErrorAlert("Warning!", "You are using an expired version of " + (ConstantUtils.isBuildFlavorVnb() ? "Valley" : "Authoriti") + "! Please go to the AppStore to update it");
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable throwable) {
+                    // ignore
+                    Log.i(TAG, "Error: " + call);
+                }
+            });
+        } catch (Exception e) {
+            Log.e(TAG, "Error: " + e);
+        }
+    }
+
+    @UiThread
+    protected void showErrorAlert(String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Exit", new DialogInterface
+                .OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                finish();
+            }
+        });
+
+        try {
+            alertDialog.show();
+        } catch (Exception ignore) {
+
+        }
+    }
 
     private void updateDataLoaded() {
         if (isAllDataLoaded == 0) {

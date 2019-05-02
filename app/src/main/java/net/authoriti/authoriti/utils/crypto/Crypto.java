@@ -1,5 +1,7 @@
 package net.authoriti.authoriti.utils.crypto;
 
+import android.os.Build;
+
 import net.authoriti.authoriti.utils.Constants;
 
 import org.spongycastle.crypto.PBEParametersGenerator;
@@ -10,6 +12,7 @@ import org.spongycastle.crypto.params.KeyParameter;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -291,7 +294,13 @@ public class Crypto {
             saltBytes = salt.getBytes();
         }
         try {
+            if (Build.VERSION.SDK_INT >= 26) {
+                Base64.Encoder encoder = Base64.getUrlEncoder().withoutPadding();
+                salt = encoder.encodeToString(saltBytes);
+                System.out.println("Encoded String: " + salt);
+            } else {
             salt = new String(saltBytes, "UTF-8");
+            }
         } catch (Exception ignore) {
         }
 

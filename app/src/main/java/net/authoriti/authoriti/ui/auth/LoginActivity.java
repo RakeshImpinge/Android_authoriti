@@ -236,23 +236,17 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
 
     @Click(R.id.cvSign)
     void signButtonClicked() {
-
         if (TextUtils.isEmpty(etAccount.getText())) {
-
             tiAccount.setError(utils.getSpannableStringForEditTextError("Choose your account",
                     this));
-
         }
 
         if (TextUtils.isEmpty(etPassword.getText())) {
-
             tiPassword.setError(utils.getSpannableStringForEditTextError("This field is " +
                     "required", this));
-
         }
 
         if (!TextUtils.isEmpty(etAccount.getText()) && !TextUtils.isEmpty(etPassword.getText())) {
-
             hideKeyboard();
 
             if (dataManager.getUser() != null && dataManager.getUser().getAccountIDs() != null &&

@@ -210,7 +210,7 @@ public class AuthoritiData {
         return values;
     }
 
-    boolean parseInteger(String s) {
+    private boolean parseInteger(String s) {
         try {
             Integer.parseInt(s);
             return true;
@@ -566,6 +566,8 @@ public class AuthoritiData {
         setGeoPicker(null);
         setRequestPicker(null);
         setDataTypePicker(null);
+        inviteCode = null;
+        password = "";
 
         accountIDs = null;
         defaultAccountSelected = false;

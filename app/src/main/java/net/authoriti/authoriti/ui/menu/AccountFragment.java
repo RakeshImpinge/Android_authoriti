@@ -5,9 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import net.authoriti.authoriti.MainActivity;
@@ -16,6 +18,7 @@ import net.authoriti.authoriti.api.AuthoritiAPI;
 import net.authoriti.authoriti.api.model.AccountID;
 import net.authoriti.authoriti.api.model.User;
 import net.authoriti.authoriti.api.model.Value;
+import net.authoriti.authoriti.api.model.request.RequestSignUp;
 import net.authoriti.authoriti.api.model.request.RequestSignUpChase;
 import net.authoriti.authoriti.api.model.request.RequestUserUpdate;
 import net.authoriti.authoriti.api.model.response.ResponseSignUp;
@@ -24,6 +27,7 @@ import net.authoriti.authoriti.core.AccountManagerUpdateInterfce;
 import net.authoriti.authoriti.core.BaseFragment;
 import net.authoriti.authoriti.ui.alert.AccountAddDialog;
 import net.authoriti.authoriti.ui.alert.AccountDownloadDialog;
+import net.authoriti.authoriti.ui.auth.AccountManagerActivity;
 import net.authoriti.authoriti.ui.items.AccountAddItem;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiUtils;
@@ -61,25 +65,28 @@ import retrofit2.Response;
 @EFragment(R.layout.fragment_account)
 public class AccountFragment extends BaseFragment implements AccountAddItem
         .AccountAddItemListener, AccountAddDialog.AccountAddDialogListener, AccountManagerUpdateInterfce, AccountDownloadDialog.AccountDownloadDialogListener {
-
-
     @Bean
     AuthoritiUtils utils;
     @Bean
     AuthoritiData dataManager;
+
     @ViewById(R.id.rvAccount)
     RecyclerView rvAccount;
+
+    @ViewById(R.id.cvFinish)
+    CardView cvFinish;
+
     AccountAdaper adapter;
     List<AccountID> accountList = new ArrayList<>();
     private AccountAddDialog accountAddDialog;
     BroadcastReceiver broadcastReceiver, broadcastCloudReceiver, broadcastSyncReceiver;
     AccountDownloadDialog accountDownloadDialog;
 
-
+    private static final String TAG = "AccountFragment";
+    public Boolean signupInProgress = false;
 
     @AfterViews
     void callAfterViewInjection() {
-
         broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -112,7 +119,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                 IntentFilter(BROADCAST_SYNC_DONE));
 
 
-        adapter = new AccountAdaper(accountList, this);
+        adapter = new AccountAdaper(accountList, this, signupInProgress);
         rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
         rvAccount.setAdapter(adapter);
 
@@ -122,8 +129,9 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
     @Override
     public void onResume() {
         super.onResume();
-        ((MainActivity) getActivity()).updateMenuToolbar(Constants.MENU_ACCOUNT);
-
+        if (!signupInProgress) {
+            ((MainActivity) getActivity()).updateMenuToolbar(Constants.MENU_ACCOUNT);
+        }
     }
 
     @Override
@@ -136,33 +144,30 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
     }
 
     private void showAccounts() {
-        System.out.println("Show Accounts(Self Registered)");
-
         accountList.clear();
-        if (dataManager.getUser().getAccountIDs() != null) {
-            for (int i = 0; i < dataManager.getUser().getAccountIDs().size(); i++) {
-                AccountID accountID = dataManager.getUser().getAccountIDs().get(i);
-                if (dataManager.getDefaultAccountID().getTitle().equals(accountID.getType()) &&
-                        dataManager.getDefaultAccountID().getValue().equals(accountID
-                                .getIdentifier())) {
-                }
-                accountList.add(dataManager.getUser().getAccountIDs().get(i));
-            }
+        accountList.addAll(dataManager.getUser().getAccountIDs());
+
+        if (signupInProgress) {
+            accountList.addAll(dataManager.accountIDs);
         }
+
         Collections.sort(accountList, new Comparator<AccountID>() {
             @Override
             public int compare(AccountID accountID, AccountID t1) {
-                if (accountID.getCustomer().equalsIgnoreCase("")) {
-                    if (t1.getCustomer().equalsIgnoreCase("")) {
-                        return accountID.getCustomer().compareTo(t1.getCustomer());
-                    }
-                    return 5000;
+                String s1 = accountID.getCustomer();
+                if (s1.trim().equalsIgnoreCase("")) {
+                    s1 = "ZZZZZZZZZZ";
                 }
-                return accountID.getCustomer().compareTo(t1.getCustomer());
+
+                String s2 = t1.getCustomer();
+                if (s2.trim().equalsIgnoreCase("")) {
+                    s2 = "ZZZZZZZZZZ";
+                }
+                return s1.compareTo(s2);
             }
         });
-
-        for (int i = 0; i < accountList.size(); i++) {
+        final int sz = accountList.size();
+        for (int i = 0; i < sz; i++) {
             if (dataManager.getDefaultAccountID().getTitle().equals(accountList.get(i).getType()) &&
                     dataManager.getDefaultAccountID().getValue().equals(accountList.get(i).getIdentifier())) {
                 adapter.mDefaultPostion = i;
@@ -170,11 +175,27 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
         }
 
         adapter.notifyDataSetChanged();
+        if (signupInProgress) {
+            updateFinishButton();
+        }
     }
 
     private void saveAccount(final String name, final String id, final boolean setDefault) {
+        if (signupInProgress) {
+            if (setDefault) {
+                dataManager.defaultAccountSelected = true;
+                dataManager.defaultAccountIndex = dataManager.accountIDs.size();
+            }
+
+            if (dataManager.accountIDs == null) {
+                dataManager.accountIDs = new ArrayList<>();
+            }
+            AccountID accountID = new AccountID(name, id, true);
+            dataManager.accountIDs.add(accountID);
+            showAccounts();
+            return;
+        }
         RequestUserUpdate request = new RequestUserUpdate();
-        Log.e("AccountFragment", id);
         AccountID accountID = new AccountID(name, id, true);
         List<AccountID> accountIDs = new ArrayList<>();
         accountIDs.add(accountID);
@@ -200,7 +221,6 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                 showAlert("", "Account Save Failed.");
             }
         });
-
     }
 
     private void addAccount(String name, String id, boolean setDefault) {
@@ -215,7 +235,6 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
         }
         showAccounts();
     }
-
 
     private void deleteAccount(int position) {
         User user = dataManager.getUser();
@@ -239,24 +258,18 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
         showAccounts();
     }
 
-
     private void showAccountAddDialog() {
-
         if (accountAddDialog == null) {
-
             accountAddDialog = new AccountAddDialog(mActivity);
             accountAddDialog.setListener(this);
 
         } else {
-
             accountAddDialog.init();
         }
 
         if (!mActivity.isFinishing() && !accountAddDialog.isShowing()) {
-
             accountAddDialog.show();
         }
-
     }
 
     private void hideAccountAddDialog() {
@@ -271,40 +284,54 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
 
     @Click(R.id.cvFinish)
     void finishButtonClicked() {
-
+        if (signupInProgress) {
+            signupSelfRegistered();
+            return;
+        }
         Intent intent = new Intent(BROADCAST_CHANGE_MENU);
         intent.putExtra(MENU_ID, MENU_CODE);
         LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-
     }
 
     @Override
     public void itemDelete(int position) {
-
         if (dataManager.getUser().getAccountIDs().size() == 1) {
             showAlert("", "You must have at least one Account/ID!");
         } else {
             deleteAccount(position);
         }
-
     }
 
     @Override
     public void accountAddDialogOKButtonClicked(String name, String id, boolean setDefault) {
-
         hideAccountAddDialog();
         saveAccount(name, id, setDefault);
     }
 
     @Override
     public void accountAddDialogCancelButtonClicked() {
-
         hideAccountAddDialog();
-
     }
 
     @Override
     public void deleted(String accountId) {
+        if (signupInProgress) {
+            int sz = dataManager.accountIDs.size();
+            for (int i = 0; i < sz; i++) {
+                if (dataManager.accountIDs.get(i).getIdentifier().equalsIgnoreCase(accountId)) {
+                    dataManager.accountIDs.remove(i);
+                    if (dataManager.defaultAccountSelected &&
+                            (dataManager.defaultAccountIndex) == i) {
+                        dataManager.defaultAccountSelected = false;
+                        dataManager.defaultAccountIndex = -1;
+                    }
+                    showAccounts();
+                    break;
+                }
+            }
+
+            return;
+        }
         List<AccountID> accountIDS = dataManager.getUser().getAccountIDs();
         int nAccounts = accountIDS.size();
         for (int i = 0; i < nAccounts; i++) {
@@ -355,8 +382,21 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
         hideAccountDownloadDialog();
     }
 
-    private void signUp(String inviteCode, final String userName, String password) {
+    private void updateFinishButton() {
+        cvFinish.setEnabled(true);
+        cvFinish.setAlpha(1.0f);
 
+        if (signupInProgress) {
+            int totalAccountsCount = (dataManager.accountIDs == null ? 0 : dataManager.accountIDs.size()) + dataManager.getUser().getAccountIDs().size();
+
+            if (totalAccountsCount == 0) {
+                cvFinish.setEnabled(false);
+                cvFinish.setAlpha(0.1f);
+            }
+        }
+    }
+
+    private void signUp(String inviteCode, final String userName, String password) {
         AccountID accountID = new AccountID("", userName, false);
         List<AccountID> accountIDs = new ArrayList<>();
         accountIDs.add(accountID);
@@ -381,7 +421,6 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                 inviteCode, accountIDs);
 
         displayProgressDialog("Please wait...");
-
         AuthoritiAPI.APIService().signUpChase(requestSignUp).enqueue(new Callback<ResponseSignUpChase>() {
             @Override
             public void onResponse(Call<ResponseSignUpChase> call, Response<ResponseSignUpChase>
@@ -400,7 +439,6 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                 showAlert("", "Failed. Please Try Again Later.");
             }
         });
-
     }
 
     private void userInfo(ResponseSignUpChase body) {
@@ -408,6 +446,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
         user.setToken(body.getToken());
 
         List<AccountID> savedAccountIDs = user.getAccountIDs();
+
         List<AccountID> newAccountIDs = body.getAccounts();
         List<AccountID> newIds = new ArrayList<>();
         List<String> downloadIdList = user.getDownloadedWalletIDList();
@@ -415,18 +454,25 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
             downloadIdList.add(body.getId());
         }
 
-        for (int i = 0; i < newAccountIDs.size(); i++) {
+        if (newAccountIDs == null) {
+            showAlert("", "Invalid username password combination. Please try again!");
+            return;
+        }
+
+        int sz = newAccountIDs.size();
+
+        for (int i = 0; i < sz; i++) {
             boolean isContained = false;
             newAccountIDs.get(i).setCustomer(body.getCustomerName());
             newAccountIDs.get(i).setCustomer_ID(body.getId());
-            for (int k = 0; k < savedAccountIDs.size(); k++) {
+            final int savedAccountsSz = savedAccountIDs.size();
+            for (int k = 0; k < savedAccountsSz; k++) {
                 if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
                         .getIdentifier())
                         && savedAccountIDs.get(k).getType().equals(newAccountIDs.get(i)
                         .getType())) {
                     isContained = true;
                     break;
-                } else {
                 }
             }
             if (!isContained) {
@@ -440,4 +486,51 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
         showAccounts();
     }
 
+    private void signupSelfRegistered() {
+        final AccountManagerActivity activity = (AccountManagerActivity)getActivity();
+
+        if (dataManager.accountIDs.size() == 0) {
+            activity.mFingerPrintAuthHelper.startAuth();
+            activity.checkFingerPrintAuth();
+            return;
+        }
+        AesCbcWithIntegrity.SecretKeys keys;
+        String keyStr = dataManager.getUser().getEncryptKey();
+        String privateKey = "";
+        try {
+            keys = AesCbcWithIntegrity.keys(keyStr);
+            AesCbcWithIntegrity.CipherTextIvMac civ = new AesCbcWithIntegrity.CipherTextIvMac
+                    (dataManager.getUser().getEncryptPrivateKey());
+            privateKey = AesCbcWithIntegrity.decryptString(civ, keys);
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        String publicKey = new EcDSA().getPublicKey(CryptoUtil.base62ToInt(privateKey));
+
+        RequestSignUp requestSignUp = new RequestSignUp(publicKey, dataManager.inviteCode, dataManager.accountIDs);
+        displayProgressDialog("Sign Up...");
+        AuthoritiAPI.APIService().signUp(requestSignUp).enqueue(new Callback<ResponseSignUp>() {
+            @Override
+            public void onResponse(Call<ResponseSignUp> call, Response<ResponseSignUp> response) {
+                dismissProgressDialog();
+                if (response.code() == 200 && response.body() != null) {
+                    hideKeyboard();
+
+                    activity.mFingerPrintAuthHelper.startAuth();
+                    activity.fetchSignUpInfo(response.body(), dataManager.getUser());
+                    activity.checkFingerPrintAuth();
+                } else {
+                    showAlert("", "Sign Up Failed. Try Again Later.");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSignUp> call, Throwable t) {
+                dismissProgressDialog();
+                showAlert("", "Sign Up Failed. Try Again Later.");
+            }
+        });
+    }
 }
