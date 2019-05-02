@@ -2,6 +2,8 @@ package net.authoriti.authoriti.ui.code;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,6 +54,9 @@ public class CodeGenerateActivity extends BaseActivity {
     String schemaIndex = "";
 
     @Extra
+    Boolean callAuthorization = false;
+
+    @Extra
     boolean isPollingRequest = false;
 
     @Extra
@@ -71,8 +76,12 @@ public class CodeGenerateActivity extends BaseActivity {
 
     String userIndentifier = "";
 
+    @ViewById(R.id.ivCall)
+    ImageButton ivCall;
+
     @AfterViews
     void callAfterViewInjection() {
+
         String code = generateCode();
 
         int width = ivQRCode.getMeasuredWidth();
@@ -93,6 +102,12 @@ public class CodeGenerateActivity extends BaseActivity {
 
         if (isPollingRequest) {
             completePollingRequest(userIndentifier, code);
+        }
+
+        if (callAuthorization) {
+            ivCall.setVisibility(View.VISIBLE);
+        } else {
+            ivCall.setVisibility(View.GONE);
         }
     }
 

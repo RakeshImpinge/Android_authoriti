@@ -8,7 +8,7 @@ public interface Constants {
     String DEV = "davjnabB8rvyZZLrMOq3jw==:JDJXMckcsxcMhtMi1QVmEs4DpAFtLn9FMZwASUiH9B4=:qeU5Uk2rFKcoMtK0N1XYosOSfhIar0K8Hgk8rIn4BcEdVmyDMOnYBJtEg4P6hZXg";
     String QA = "WSNTO7K0zcMl0pE/kL8L4g==:91JmJhXx2OQPfLr/0aCesZktWi72LMccgjw0zLzkIJg=:J28cEDRsdvjgcFVrtRdE6dUjc5VZUDKPKIKe+UoUm1Y=";
     String PROD = "OUCfUyCJLsvrtuZ+HWMTTA==:Z7psrKA4pogc9O1ZjtGatTPDwpoq6T8hb599+VLZzr0=:SIkVX1tZ6KKTjszqQB0cd/GE/0pqD5OMdpqvvQlNLTA=";
-    String API_BASE_URL = QA;
+    String API_BASE_URL = DEV;
     String API_BASE_URL_POLLING =
             "https://s3.amazonaws.com/authoriti-requests-qa/requests/";
     String HELP_BASE = "https://help.authoriti.net";
@@ -76,7 +76,7 @@ public interface Constants {
     String TOPIC_GENERAL = "help-general";
     String TOPIC_ACCOUNT_2018 = "help-account-id";
     String TOPIC_PASSWORD = "help-download-initial-wallet";
-    String TOPIC_MASTER_PASSWORD="help-master-password";
+    String TOPIC_MASTER_PASSWORD = "help-master-password";
     String TOPIC_RESET_PASSWORD = "help-changepw";
     String TOPIC_CHASE = "help-account-id";
     String TOPIC_ABOUT = "help-about";

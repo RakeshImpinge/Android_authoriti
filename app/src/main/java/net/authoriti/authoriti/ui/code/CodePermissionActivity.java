@@ -460,7 +460,7 @@ public class CodePermissionActivity extends BaseActivity {
                 }
             }
 
-            CodeGenerateActivity_.intent(mContext).schemaIndex("" + group.getSchemaIndex())
+            CodeGenerateActivity_.intent(mContext).schemaIndex("" + group.getSchemaIndex()).callAuthorization(group.getCallAuthorization())
                     .finalPickersList(finalPickersList).isPollingRequest(defParamFromUrl != null)
                     .startForResult(CodeGenerateActivity.CODE);
         }

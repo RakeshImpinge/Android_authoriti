@@ -25,6 +25,8 @@ public class Purpose {
     @SerializedName("value")
     private String value;
 
+
+
     public String getLabel() {
         return label;
     }
@@ -64,4 +66,5 @@ public class Purpose {
     public void setGroups(List<Group> groups) {
         this.groups = groups;
     }
+
 }
