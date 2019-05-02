@@ -559,12 +559,20 @@ public class MainActivity extends BaseActivity {
                     } else if (picker.getPicker().equals(PICKER_DATA_TYPE)) {
                         if (defaultValuesHashMap.containsKey(PICKER_REQUEST)) {
                             List<Value> list = dataManager.getValuesFromDataType(defaultValuesHashMap.get(PICKER_REQUEST).getValue());
-                            defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
-                                    false);
+                            if (list.size() == 0) {
+                                defValue = new DefaultValue("", "", false);
+                            } else {
+                                defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
+                                        false);
+                            }
                         } else {
                             List<Value> list = dataManager.getValuesFromDataType(key);
-                            defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
-                                    false);
+                            if (list.size() == 0) {
+                                defValue = new DefaultValue("", "", false);
+                            } else {
+                                defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
+                                        false);
+                            }
                         }
                     } else if (picker.getValues() != null && picker.getValues().size() > 0) {
                         defValue = new DefaultValue(picker.getValues().get(0).getTitle(), picker
@@ -612,6 +620,7 @@ public class MainActivity extends BaseActivity {
                             List<Value> list = dataManager.getValuesFromDataType(defaultValuesHashMap.get(PICKER_REQUEST).getValue());
                             if (list.size() == 0) {
                                 defValue = new DefaultValue("", "", false);
+
                             } else {
                                 defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
                                         false);

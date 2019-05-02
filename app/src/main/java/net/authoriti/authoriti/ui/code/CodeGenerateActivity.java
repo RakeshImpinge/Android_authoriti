@@ -1,7 +1,13 @@
 package net.authoriti.authoriti.ui.code;
 
+import android.Manifest;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -14,6 +20,7 @@ import net.authoriti.authoriti.api.AuthoritiAPI;
 import net.authoriti.authoriti.api.model.request.RequestComplete;
 import net.authoriti.authoriti.api.model.response.ResponseComplete;
 import net.authoriti.authoriti.core.BaseActivity;
+import net.authoriti.authoriti.ui.share.ImportActivity;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiUtils;
 import net.authoriti.authoriti.utils.crypto.Crypto;
@@ -48,6 +55,8 @@ import retrofit2.Response;
 public class CodeGenerateActivity extends BaseActivity {
 
     public static final int CODE = 234;
+    public static final int PERMISSIONS_REQUEST_CALL = 1;
+
     private Crypto crypto;
 
     @Extra
@@ -106,6 +115,12 @@ public class CodeGenerateActivity extends BaseActivity {
 
         if (callAuthorization) {
             ivCall.setVisibility(View.VISIBLE);
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
+                    == PackageManager.PERMISSION_DENIED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.CALL_PHONE},
+                        PERMISSIONS_REQUEST_CALL);
+            }
         } else {
             ivCall.setVisibility(View.GONE);
         }
@@ -275,6 +290,24 @@ public class CodeGenerateActivity extends BaseActivity {
     void closeButtonClicked() {
         finish();
         Log.e("GoBack", "from here");
+    }
+
+
+    @Click(R.id.ivCall)
+    void callButtonClicked() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
+                == PackageManager.PERMISSION_GRANTED) {
+            Intent callIntent = new Intent(Intent.ACTION_CALL);
+            callIntent.setData(Uri.parse("tel:123456789"));
+            startActivity(callIntent);
+        } else if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
+                == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    PERMISSIONS_REQUEST_CALL);
+        } else {
+            Toast.makeText(mContext, "Please allow call permission from setting", Toast.LENGTH_SHORT).show();
+        }
     }
 
 //
