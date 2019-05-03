@@ -52,7 +52,7 @@ public interface Constants {
     String TIME_CUSTOM_DATE = "Custom Date/Time";
 
     String ACUANT_LICENSE_KEY = "FAD9B2F0E7F1";
-    String AUTHORIZE_CALL_NUMBER = "512.798.3750";
+    String AUTHORIZE_CALL_NUMBER = "7203866660";
 
     String TOPIC_PURPOSE_MANAGE_MY_AC = "help-phone-inquiry";
     String TOPIC_PURPOSE_SEND_MONEY = "help-send-cash";
