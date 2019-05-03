@@ -7,6 +7,7 @@ import net.authoriti.authoriti.api.model.request.RequestSignUp;
 import net.authoriti.authoriti.api.model.request.RequestSignUpChase;
 import net.authoriti.authoriti.api.model.request.RequestSync;
 import net.authoriti.authoriti.api.model.request.RequestUserUpdate;
+import net.authoriti.authoriti.api.model.response.ResponseCallAuthentication;
 import net.authoriti.authoriti.api.model.response.ResponseInviteCode;
 import net.authoriti.authoriti.api.model.response.ResponsePolling;
 import net.authoriti.authoriti.api.model.response.ResponseComplete;
@@ -92,6 +93,6 @@ public interface AuthoritiAPIService {
     Call<ResponseComplete> removePendingPollingRequest(@Body RequestComplete requestComplete);
 
     @POST("api/v1/call-authorization")
-    Call<ResponseComplete> callAuthorization(@Body Map<String, String> your_variable_name);
+    Call<ResponseCallAuthentication> callAuthorization(@Body Map<String, String> your_variable_name);
 
 }

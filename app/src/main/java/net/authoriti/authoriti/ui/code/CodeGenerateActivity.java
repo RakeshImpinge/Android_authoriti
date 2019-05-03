@@ -22,6 +22,7 @@ import android.util.Log;
 import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.api.AuthoritiAPI;
 import net.authoriti.authoriti.api.model.request.RequestComplete;
+import net.authoriti.authoriti.api.model.response.ResponseCallAuthentication;
 import net.authoriti.authoriti.api.model.response.ResponseComplete;
 import net.authoriti.authoriti.core.BaseActivity;
 import net.authoriti.authoriti.utils.AuthoritiData;
@@ -94,6 +95,7 @@ public class CodeGenerateActivity extends BaseActivity {
     ImageButton ivCall;
 
     HashMap<String, String> pickerValues = new HashMap();
+
 
     @AfterViews
     void callAfterViewInjection() {
@@ -211,8 +213,13 @@ public class CodeGenerateActivity extends BaseActivity {
                 payloadGenerator.add(key_root, hashMap.get("value"));
             }
 
-            pickerValues.put(key_root, hashMap.get("value"));
-
+            if (!key_root.equals(PICKER_TIME)) {
+                if (key_root.equals(PICKER_DATA_INPUT_TYPE)) {
+                    pickerValues.put(hashMap.get("key"), hashMap.get("value"));
+                } else {
+                    pickerValues.put(key_root, hashMap.get("value"));
+                }
+            }
         }
 
         final String code = payloadGenerator.generate();
@@ -367,7 +374,7 @@ public class CodeGenerateActivity extends BaseActivity {
                     }
                     handler = null;
                 }
-            }, 10000);
+            }, 2000);
         }
     }
 
@@ -375,13 +382,19 @@ public class CodeGenerateActivity extends BaseActivity {
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("cid", accountID);
         hashMap.put("permissionCode", permissionCode);
+        hashMap.put("schemaVersion", schemaIndex);
+        if (dataManager.getUser().getAccountFromID(accountID) != null && dataManager.getUser().getAccountFromID(accountID).getCustomer() != null) {
+            hashMap.put("customerName", dataManager.getUser().getAccountFromID(accountID).getCustomer());
+        } else {
+            hashMap.put("customerName", "");
+        }
         hashMap.putAll(pickerValues);
         Log.e("callAuthorization", hashMap.toString());
         AuthoritiAPI.APIService().callAuthorization(hashMap).enqueue
-                (new Callback<ResponseComplete>() {
+                (new Callback<ResponseCallAuthentication>() {
                     @Override
-                    public void onResponse(Call<ResponseComplete> call,
-                                           Response<ResponseComplete>
+                    public void onResponse(Call<ResponseCallAuthentication> call,
+                                           Response<ResponseCallAuthentication>
                                                    response) {
                         Log.e("callAuthorization", "" + response.isSuccessful());
 
@@ -393,7 +406,7 @@ public class CodeGenerateActivity extends BaseActivity {
                     }
 
                     @Override
-                    public void onFailure(Call<ResponseComplete> call, Throwable t) {
+                    public void onFailure(Call<ResponseCallAuthentication> call, Throwable t) {
 
                     }
                 });
