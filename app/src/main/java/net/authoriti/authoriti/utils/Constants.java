@@ -53,6 +53,9 @@ public interface Constants {
 
     String ACUANT_LICENSE_KEY = "FAD9B2F0E7F1";
 
+    String AUTHORIZE_CALL_NUMBER = "+916283725831";
+
+
     String TOPIC_PURPOSE_MANAGE_MY_AC = "help-phone-inquiry";
     String TOPIC_PURPOSE_SEND_MONEY = "help-send-cash";
     String TOPIC_PURPOSE_MOVE_MONEY = "help-move-money";

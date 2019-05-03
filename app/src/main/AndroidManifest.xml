@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:name=".AuthoritiApplication_"
@@ -21,6 +22,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
+
+
         <activity
             android:name=".SplashActivity_"
             android:theme="@style/SplashTheme">
@@ -55,6 +58,12 @@
         <activity android:name=".ui.help.HelpActivity_" />
         <activity android:name=".ui.auth.ResetPasswordActivity_" />
         <activity android:name=".ui.code.CodePermissionActivity_" />
+
+        <!--<receiver android:name=".utils.OutgoingCallReceiver">-->
+        <!--<intent-filter>-->
+        <!--<action android:name="android.intent.action.NEW_OUTGOING_CALL" />-->
+        <!--</intent-filter>-->
+        <!--</receiver>-->
 
         <meta-data
             android:name="io.fabric.ApiKey"
