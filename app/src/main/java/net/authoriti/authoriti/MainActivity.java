@@ -127,7 +127,7 @@ public class MainActivity extends BaseActivity {
                 long currentTime = System.currentTimeMillis() / 1000;
                 long inactiveTime = Long.parseLong(dataManager.getInactiveTime());
 
-                if (currentTime - inactiveTime > 60) {
+                if (currentTime - inactiveTime > INACTIVITY_TIME_OUT) {
                     logOut();
                 } else {
                     dataManager.setInactiveTime("");

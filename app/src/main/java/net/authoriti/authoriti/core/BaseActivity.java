@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -21,9 +22,23 @@ import com.kaopiz.kprogresshud.KProgressHUD;
 
 import net.authoriti.authoriti.MainActivity;
 import net.authoriti.authoriti.R;
+import net.authoriti.authoriti.api.model.AuthLogIn;
+import net.authoriti.authoriti.ui.auth.LoginActivity;
+import net.authoriti.authoriti.ui.auth.LoginActivity_;
+import net.authoriti.authoriti.utils.AuthoritiData;
+import net.authoriti.authoriti.utils.AuthoritiData_;
 import net.authoriti.authoriti.utils.Constants;
+import net.authoriti.authoriti.utils.Log;
+
+import org.androidannotations.annotations.Bean;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 /**
  * Created by mac on 11/25/17.
@@ -37,6 +52,11 @@ public class BaseActivity extends AppCompatActivity implements Constants {
     protected ProgressDialog progress;
     KProgressHUD kProgressHUD;
 
+    private Timer timer;
+
+    AuthoritiData localDataManager;
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +64,7 @@ public class BaseActivity extends AppCompatActivity implements Constants {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         mActivity = this;
         mContext = this;
+        localDataManager = AuthoritiData_.getInstance_(this);
 
     }
 
@@ -186,5 +207,73 @@ public class BaseActivity extends AppCompatActivity implements Constants {
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
+    @Override
+    protected void onResume() {
+        startTimer();
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        finishTimer();
+        super.onPause();
+    }
+
+    @Override
+    public void onUserInteraction() {
+        restartTimer();
+        super.onUserInteraction();
+    }
+
+    private class LogOutTimerTask extends TimerTask {
+        @Override
+        public void run() {
+            if (!isFinishing())
+                logOut();
+        }
+    }
+
+    private void logOut() {
+        if (localDataManager.loginStatus()!=null && localDataManager.loginStatus().isLogin()) {
+            AuthLogIn logIn = localDataManager.loginStatus();
+            logIn.setLogin(false);
+            localDataManager.setAuthLogin(logIn);
+            Intent intent = new Intent(this, LoginActivity_.class);
+            intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }
+    }
+
+
+    private void startTimer() {
+        if (localDataManager.loginStatus()!=null && localDataManager.loginStatus().isLogin()) {
+            timer = new Timer();
+            LogOutTimerTask logoutTimeTask = new LogOutTimerTask();
+            timer.schedule(logoutTimeTask, INACTIVITY_TIME_OUT * 1000);
+        }
+    }
+
+    private void finishTimer() {
+        if (localDataManager.loginStatus()!=null && localDataManager.loginStatus().isLogin()) {
+            if (timer != null) {
+                timer.cancel();
+                Log.i("Main", "cancel timer");
+                timer = null;
+            }
+        }
+    }
+
+    private void restartTimer() {
+        if (localDataManager.loginStatus()!=null && localDataManager.loginStatus().isLogin()) {
+            if (timer != null) {
+                timer.cancel();
+                timer = null;
+            }
+            timer = new Timer();
+            LogOutTimerTask logoutTimeTask = new LogOutTimerTask();
+            timer.schedule(logoutTimeTask, INACTIVITY_TIME_OUT * 1000);
+        }
     }
 }

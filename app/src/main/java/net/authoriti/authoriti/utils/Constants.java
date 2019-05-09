@@ -14,6 +14,10 @@ public interface Constants {
     String HELP_BASE = "https://help.authoriti.net";
     String IDENTIFIER = "authoriti";
 
+    // Auto logout user if no interaction with app
+    int INACTIVITY_TIME_OUT = 60;
+
+
     // BroadCast Id
     String BROADCAST_CHANGE_MENU = "BROADCAST_CHANGE_MENU";
     String BROADCAST_ADD_BUTTON_CLICKED = "BROADCAST_ADD_BUTTON_CLICKED";
