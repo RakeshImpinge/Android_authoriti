@@ -96,6 +96,7 @@ public class CodeGenerateActivity extends BaseActivity {
 
     HashMap<String, String> pickerValues = new HashMap();
 
+    Boolean isCallAuthorizationRequestSent = false;
 
     @AfterViews
     void callAfterViewInjection() {
@@ -354,6 +355,10 @@ public class CodeGenerateActivity extends BaseActivity {
                     break;
                 case TelephonyManager.CALL_STATE_IDLE:
                     isConnected = false;
+                    if (isCallAuthorizationRequestSent) {
+                        isCallAuthorizationRequestSent = false;
+                        callAuthorizationDeleteRequest(userIndentifier);
+                    }
                     break;
 
             }
@@ -368,8 +373,9 @@ public class CodeGenerateActivity extends BaseActivity {
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Log.e("callAuthorization", "Is Call established : " + isConnected);
-                    if (isConnected) {
+                    if (isConnected && !isCallAuthorizationRequestSent) {
+                        Log.e("callAuthorization", "Is Call established : " + isConnected);
+                        isCallAuthorizationRequestSent = true;
                         callAuthorizationRequest(userIndentifier, permissionCode);
                     }
                     handler = null;
@@ -407,9 +413,38 @@ public class CodeGenerateActivity extends BaseActivity {
 
                     @Override
                     public void onFailure(Call<ResponseCallAuthentication> call, Throwable t) {
-
+                        Log.e("callAuthorization", "" + t.getMessage());
                     }
                 });
     }
 
+    private void callAuthorizationDeleteRequest(String accountID) {
+        AuthoritiAPI.APIService().callAuthorizationDelete(accountID).enqueue
+                (new Callback<ResponseCallAuthentication>() {
+                    @Override
+                    public void onResponse(Call<ResponseCallAuthentication> call,
+                                           Response<ResponseCallAuthentication>
+                                                   response) {
+                        Log.e("callDeleteRequest", "" + response.isSuccessful());
+
+                        if (response.isSuccessful()) {
+
+                        } else {
+
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseCallAuthentication> call, Throwable t) {
+                        Log.e("callDeleteRequest", "" + t.getMessage());
+                    }
+                });
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+    }
 }
