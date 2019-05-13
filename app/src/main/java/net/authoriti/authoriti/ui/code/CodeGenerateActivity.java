@@ -317,6 +317,41 @@ public class CodeGenerateActivity extends BaseActivity {
 
     @Click(R.id.ivCall)
     void callButtonClicked() {
+        isConnected = true;
+        callAuthorizationAPI();
+    }
+
+
+    public boolean isConnected;
+    PhoneStateListener listener = new PhoneStateListener() {
+        @Override
+        public void onCallStateChanged(int state, String incomingNumber) {
+            super.onCallStateChanged(state, incomingNumber);
+            switch (state) {
+                case TelephonyManager.CALL_STATE_RINGING:
+                    isConnected = false;
+                    break;
+//                case TelephonyManager.CALL_STATE_OFFHOOK:
+//                    isConnected = true;
+//                    callAuthorizationAPI();
+//                    break;
+                case TelephonyManager.CALL_STATE_IDLE:
+                    isConnected = false;
+                    if (isCallAuthorizationRequestSent) {
+                        isCallAuthorizationRequestSent = false;
+                        callAuthorizationDeleteRequest(userIndentifier);
+                    }
+                    break;
+
+            }
+        }
+    };
+
+    private void callAuthorizationAPI() {
+        callAuthorizationRequest(userIndentifier, permissionCode);
+    }
+
+    private void makePhoneCall() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
                 == PackageManager.PERMISSION_GRANTED) {
             Intent callIntent = new Intent(Intent.ACTION_CALL);
@@ -338,53 +373,8 @@ public class CodeGenerateActivity extends BaseActivity {
         }
     }
 
-
-    public boolean isConnected;
-    PhoneStateListener listener = new PhoneStateListener() {
-        @Override
-        public void onCallStateChanged(int state, String incomingNumber) {
-            super.onCallStateChanged(state, incomingNumber);
-            switch (state) {
-                case TelephonyManager.CALL_STATE_RINGING:
-                    isConnected = false;
-                    break;
-                case TelephonyManager.CALL_STATE_OFFHOOK:
-                    isConnected = true;
-                    Log.e("callAuthorization", "CALL_STATE_OFFHOOK");
-                    callAuthorizationAPI();
-                    break;
-                case TelephonyManager.CALL_STATE_IDLE:
-                    isConnected = false;
-                    if (isCallAuthorizationRequestSent) {
-                        isCallAuthorizationRequestSent = false;
-                        callAuthorizationDeleteRequest(userIndentifier);
-                    }
-                    break;
-
-            }
-        }
-    };
-
-    android.os.Handler handler;
-
-    private void callAuthorizationAPI() {
-        if (handler == null) {
-            handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (isConnected && !isCallAuthorizationRequestSent) {
-                        Log.e("callAuthorization", "Is Call established : " + isConnected);
-                        isCallAuthorizationRequestSent = true;
-                        callAuthorizationRequest(userIndentifier, permissionCode);
-                    }
-                    handler = null;
-                }
-            }, 2000);
-        }
-    }
-
     private void callAuthorizationRequest(String accountID, String permissionCode) {
+        displayProgressDialog("");
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("cid", accountID);
         hashMap.put("permissionCode", permissionCode);
@@ -403,16 +393,13 @@ public class CodeGenerateActivity extends BaseActivity {
                                            Response<ResponseCallAuthentication>
                                                    response) {
                         Log.e("callAuthorization", "" + response.isSuccessful());
-
-                        if (response.isSuccessful()) {
-
-                        } else {
-
-                        }
+                        dismissProgressDialog();
+                        makePhoneCall();
                     }
 
                     @Override
                     public void onFailure(Call<ResponseCallAuthentication> call, Throwable t) {
+                        dismissProgressDialog();
                         Log.e("callAuthorization", "" + t.getMessage());
                     }
                 });
