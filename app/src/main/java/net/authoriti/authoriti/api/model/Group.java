@@ -20,6 +20,10 @@ public class Group {
     @SerializedName("value")
     private String value;
 
+    @SerializedName("callAuthorization")
+    private Boolean callAuthorization;
+
+
     public String getPickerName() {
         return picker;
     }
@@ -50,5 +54,13 @@ public class Group {
 
     public void setSchemaIndex(int schemaIndex) {
         this.schemaIndex = schemaIndex;
+    }
+
+    public Boolean getCallAuthorization() {
+        return callAuthorization == null ? false : callAuthorization;
+    }
+
+    public void setCallAuthorization(Boolean callAuthorization) {
+        this.callAuthorization = callAuthorization;
     }
 }

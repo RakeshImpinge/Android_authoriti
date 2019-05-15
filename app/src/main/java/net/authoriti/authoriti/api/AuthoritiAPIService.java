@@ -7,6 +7,7 @@ import net.authoriti.authoriti.api.model.request.RequestSignUp;
 import net.authoriti.authoriti.api.model.request.RequestSignUpChase;
 import net.authoriti.authoriti.api.model.request.RequestSync;
 import net.authoriti.authoriti.api.model.request.RequestUserUpdate;
+import net.authoriti.authoriti.api.model.response.ResponseCallAuthentication;
 import net.authoriti.authoriti.api.model.response.ResponseInviteCode;
 import net.authoriti.authoriti.api.model.response.ResponsePolling;
 import net.authoriti.authoriti.api.model.response.ResponseComplete;
@@ -17,6 +18,7 @@ import net.authoriti.authoriti.api.model.response.ResponseSync;
 import com.google.gson.JsonObject;
 
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -24,6 +26,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.Field;
+import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
@@ -31,6 +34,7 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 import retrofit2.http.Url;
 
@@ -88,5 +92,11 @@ public interface AuthoritiAPIService {
 
     @POST("api/v1/pc-request/remove")
     Call<ResponseComplete> removePendingPollingRequest(@Body RequestComplete requestComplete);
+
+    @POST("api/v1/call-authorization")
+    Call<ResponseCallAuthentication> callAuthorization(@Body Map<String, String> your_variable_name);
+
+    @DELETE("api/v1/call-authorization/{id}")
+    Call<ResponseCallAuthentication> callAuthorizationDelete(@Path("id") String id);
 
 }

@@ -1,7 +1,19 @@
 package net.authoriti.authoriti.ui.code;
 
+import android.Manifest;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -10,10 +22,12 @@ import android.util.Log;
 import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.api.AuthoritiAPI;
 import net.authoriti.authoriti.api.model.request.RequestComplete;
+import net.authoriti.authoriti.api.model.response.ResponseCallAuthentication;
 import net.authoriti.authoriti.api.model.response.ResponseComplete;
 import net.authoriti.authoriti.core.BaseActivity;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiUtils;
+import net.authoriti.authoriti.utils.Constants;
 import net.authoriti.authoriti.utils.crypto.Crypto;
 
 import com.tozny.crypto.android.AesCbcWithIntegrity;
@@ -46,10 +60,15 @@ import retrofit2.Response;
 public class CodeGenerateActivity extends BaseActivity {
 
     public static final int CODE = 234;
+    public static final int PERMISSIONS_REQUEST_CALL = 1;
+
     private Crypto crypto;
 
     @Extra
     String schemaIndex = "";
+
+    @Extra
+    Boolean callAuthorization = false;
 
     @Extra
     boolean isPollingRequest = false;
@@ -70,10 +89,19 @@ public class CodeGenerateActivity extends BaseActivity {
     TextView tvCode;
 
     String userIndentifier = "";
+    String permissionCode = "";
+
+    @ViewById(R.id.ivCall)
+    ImageButton ivCall;
+
+    HashMap<String, String> pickerValues = new HashMap();
+
+    Boolean isCallAuthorizationRequestSent = false;
 
     @AfterViews
     void callAfterViewInjection() {
-        String code = generateCode();
+
+        permissionCode = generateCode();
 
         int width = ivQRCode.getMeasuredWidth();
         int height = ivQRCode.getMeasuredHeight();
@@ -82,17 +110,29 @@ public class CodeGenerateActivity extends BaseActivity {
         } else {
             height = width;
         }
-        ivQRCode.setImageBitmap(QRCode.from(code).withSize(800, 800).bitmap());
+        ivQRCode.setImageBitmap(QRCode.from(permissionCode).withSize(800, 800).bitmap());
 
-        tvCode.setText(utils.fromHtml(generateHTMLString(code)));
+        tvCode.setText(utils.fromHtml(generateHTMLString(permissionCode)));
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("permission code", code);
+        ClipData clip = ClipData.newPlainText("permission code", permissionCode);
         clipboard.setPrimaryClip(clip);
 
         Toast.makeText(this, "Code copied to clipboard", Toast.LENGTH_SHORT).show();
 
         if (isPollingRequest) {
-            completePollingRequest(userIndentifier, code);
+            completePollingRequest(userIndentifier, permissionCode);
+        }
+
+        if (callAuthorization) {
+            ivCall.setVisibility(View.VISIBLE);
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
+                    == PackageManager.PERMISSION_DENIED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.CALL_PHONE, Manifest.permission.READ_PHONE_STATE},
+                        PERMISSIONS_REQUEST_CALL);
+            }
+        } else {
+            ivCall.setVisibility(View.GONE);
         }
     }
 
@@ -151,11 +191,13 @@ public class CodeGenerateActivity extends BaseActivity {
         for (HashMap<String, String> hashMap : finalPickersList) {
             // Skip if key is blank
             if (hashMap.get("key").equals("")) continue;
+
             String key_root = hashMap.get("picker");
             if (key_root.equals(PICKER_ACCOUNT)) {
                 payloadGenerator = crypto.init(hashMap.get("value"), schemaIndex, privateKey);
                 userIndentifier = hashMap.get("value");
             } else if (key_root.equals(PICKER_TIME)) {
+                Log.i("CodeGenerateActivity", hashMap.get("key") + ": " + hashMap.get("value"));
                 Calendar newCalendar = timeFormat(hashMap.get("value"));
                 try {
                     payloadGenerator.addTime(newCalendar.getTime().getTime());
@@ -172,6 +214,14 @@ public class CodeGenerateActivity extends BaseActivity {
             } else {
                 payloadGenerator.add(key_root, hashMap.get("value"));
             }
+
+            if (!key_root.equals(PICKER_TIME)) {
+                if (key_root.equals(PICKER_DATA_INPUT_TYPE)) {
+                    pickerValues.put(hashMap.get("key"), hashMap.get("value"));
+                } else {
+                    pickerValues.put(key_root, hashMap.get("value"));
+                }
+            }
         }
 
         final String code = payloadGenerator.generate();
@@ -182,6 +232,7 @@ public class CodeGenerateActivity extends BaseActivity {
     }
 
     private Calendar timeFormat(String value) {
+        Log.i("CodeGenerateActivity", value);
         Calendar newCalendar = Calendar.getInstance();
         newCalendar.setTimeZone(TimeZone.getTimeZone("UTC"));
 
@@ -225,7 +276,7 @@ public class CodeGenerateActivity extends BaseActivity {
             case TIME_CUSTOM_TIME:
 
                 minutes = Long.parseLong(value);
-
+                Log.i("CodeGenerateActivity", "minutes: " + minutes);
                 day = (int) (minutes / (24 * 60));
                 hour = (int) (minutes % (24 * 60) / 60);
                 minute = (int) (minutes % (24 * 60) % 60);
@@ -249,6 +300,11 @@ public class CodeGenerateActivity extends BaseActivity {
                                 .HOUR_OF_DAY) + hour, newCalendar.get(Calendar.MINUTE) + minute);
 
                 break;
+            default:
+                newCalendar.set(newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH),
+                        newCalendar.get(Calendar.DAY_OF_MONTH), newCalendar.get(Calendar
+                                .HOUR_OF_DAY), newCalendar.get(Calendar.MINUTE) + Integer.parseInt(value));
+                break;
 
         }
 //        newCalendar.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -262,249 +318,127 @@ public class CodeGenerateActivity extends BaseActivity {
         Log.e("GoBack", "from here");
     }
 
-//
-//    private String generateInitialPayload() {
-//
-//        StringBuilder payload = new StringBuilder();
-//
-//        if (order != null && order.getPickers() != null && order.getPickers().size() > 0) {
-//
-//            for (String picker : order.getPickers()) {
-//
-//                switch (picker) {
-//
-//                    case PICKER_ACCOUNT:
-//
-//                        payload.append(accountPayload());
-//
-//                        break;
-//
-//                    case PICKER_INDUSTRY:
-//
-//                        payload.append(industryPayload());
-//
-//                        break;
-//
-//                    case PICKER_LOCATION_COUNTRY:
-//
-//                        payload.append(countryPayload());
-//
-//                        break;
-//
-//                    case PICKER_LOCATION_STATE:
-//
-//                        if (dataManager.getLocationPicker() != null) {
-//
-//
-//                            payload.append(getIndividualPayload(dataManager.getLocationPicker()));
-//
-//                        }
-//
-//                        break;
-//
-//                    case PICKER_TIME:
-//
-//                        if (dataManager.getTimePicker() != null) {
-//
-//                            payload.append(timePayload(dataManager.getTimePicker()));
-//                        }
-//
-//                        break;
-//
-//                    case PICKER_REQUEST:
-//
-//                        if (dataManager.getRequestPicker() != null) {
-//
-//                            payload.append(getIndividualPayload(dataManager.getRequestPicker()));
-//                        }
-//
-//                        break;
-//
-//                    case PICKER_GEO:
-//
-//                        if (dataManager.getGeoPicker() != null) {
-//
-//                            String tempPayload = crypto.encodeGeo(getIndividualPayload
-//                                    (dataManager.getGeoPicker()), payload.toString());
-//                            payload = new StringBuilder(tempPayload);
-//                        }
-//                        break;
-//
-//                    case PICKER_DATA_TYPE:
-//
-//                        if (dataManager.getDataTypePicker() != null) {
-//
-//                            String tempPayload = crypto.encodeDataTypes(dataTypePayload(),
-//                                    payload.toString());
-//                            payload = new StringBuilder(tempPayload);
-//                        }
-//
-//                        break;
-//                }
-//
-//            }
-//
-//        }
-//
-//        Log.e("Initial Payload", payload.toString());
-//
-//        return payload.toString();
-//
-//    }
-//
-//    private String generatePayload() {
-//
-//        String payload = "";
-//
-//        Value value = getValueForPicker(dataManager.getAccountPicker());
-//        String trimValue = dataManager.getValidString(value.getValue());
-//
-//        if (purpose.getSchemaIndex() == 2) {
-//            payload = crypto.addIdentifierToAccountId(dataManager.getValidString(codeExtra),
-//                    trimValue);
-//            payload = crypto.addAccountNumberToPayload(generateInitialPayload(), payload);
-//        } else {
-//            payload = crypto.addAccountNumberToPayload(generateInitialPayload(), trimValue);
-//
-//        }
-//
-//        Log.e("Payload", payload);
-//
-//        return payload;
-//
-//    }
-//
-//    private String generateCode() {
-//
-//        String code = "";
-//
-//        AesCbcWithIntegrity.SecretKeys keys;
-//        String keyStr = dataManager.getUser().getEncryptKey();
-//
-//        try {
-//
-//            keys = AesCbcWithIntegrity.keys(keyStr);
-//            AesCbcWithIntegrity.CipherTextIvMac civ = new AesCbcWithIntegrity.CipherTextIvMac
-//                    (dataManager.getUser().getEncryptPrivateKey());
-//
-//            try {
-//
-//                String privateKey = AesCbcWithIntegrity.decryptString(civ, keys);
-//                code = crypto.sign(generatePayload(), privateKey);
-//
-//                Log.e("Code", code);
-//
-//            } catch (UnsupportedEncodingException e) {
-//                e.printStackTrace();
-//            } catch (GeneralSecurityException e) {
-//                e.printStackTrace();
-//            }
-//
-//        } catch (InvalidKeyException e) {
-//            e.printStackTrace();
-//        }
-//
-//
-//        return code;
-//    }
-//
-//    private String accountPayload() {
-//        return String.valueOf(purpose.getSchemaIndex());
-//    }
-//
-//    private String industryPayload() {
-//        if (purpose.getPickerName() != null && purpose.getValue() != null) {
-//            return purpose.getValue();
-//        } else {
-//            if (dataManager.getIndustryPicker() != null) {
-//                return getIndividualPayload(dataManager.getIndustryPicker());
-//            } else {
-//                return "";
-//            }
-//        }
-//    }
-//
-//    private String dataTypePayload() {
-//
-//        List<Value> values = dataManager.getValuesFromDataType(utils.getPickerSelectedIndex(this,
-//                PICKER_REQUEST));
-//
-//        StringBuilder bitMask = new StringBuilder();
-//
-//        if (values != null) {
-//
-//            for (Value value : values) {
-//
-//                if (checkDataType(value)) {
-//                    bitMask.append("1");
-//                } else {
-//                    bitMask.append("0");
-//                }
-//            }
-//
-//        }
-//
-//        Log.e("DataType Payload - ", bitMask.toString());
-//
-//        return bitMask.toString();
-//    }
-//
-//    private boolean checkDataType(Value value) {
-//
-//        List<Value> selectedValues = dataManager.getSelectedValuesForDataType(utils
-//                .getPickerSelectedIndex(this, PICKER_REQUEST));
-//        if (selectedValues != null) {
-//
-//            for (Value value1 : selectedValues) {
-//
-//                if (value.getValue().equals(value1.getValue()) && value.getTitle().equals
-//                        (value1.getTitle())) {
-//                    return true;
-//                }
-//            }
-//
-//        }
-//
-//        return false;
-//    }
-//
-//    private String getIndividualPayload(Picker picker) {
-//
-//        Value value = getValueForPicker(picker);
-//
-//        Log.e("Selected Value - ", value.getTitle());
-//        return value.getValue();
-//
-//    }
-//
-//
-//    private String countryPayload() {
-//
-//        return "1";
-//    }
-//
-//    private Value getValueForPicker(Picker picker) {
-//        int selectedIndex;
-//
-//        if (utils.presentSelectedIndex(this, picker.getPicker())) {
-//
-//            selectedIndex = utils.getPickerSelectedIndex(this, picker.getPicker());
-//
-//        } else {
-//
-//            if (picker.isEnableDefault() && picker.getDefaultIndex() != -1) {
-//
-//                selectedIndex = utils.getPickerDefaultIndex(this, picker.getPicker());
-//
-//            } else {
-//
-//                selectedIndex = utils.getPickerSelectedIndex(this, picker.getPicker());
-//
-//            }
-//        }
-//
-//        return picker.getValues().get(selectedIndex);
-//    }
+
+    TelephonyManager tm;
 
 
+    @Click(R.id.ivCall)
+    void callButtonClicked() {
+        isConnected = true;
+        callAuthorizationAPI();
+    }
+
+
+    public boolean isConnected;
+    PhoneStateListener listener = new PhoneStateListener() {
+        @Override
+        public void onCallStateChanged(int state, String incomingNumber) {
+            super.onCallStateChanged(state, incomingNumber);
+            switch (state) {
+                case TelephonyManager.CALL_STATE_RINGING:
+                    isConnected = false;
+                    break;
+//                case TelephonyManager.CALL_STATE_OFFHOOK:
+//                    isConnected = true;
+//                    callAuthorizationAPI();
+//                    break;
+                case TelephonyManager.CALL_STATE_IDLE:
+                    isConnected = false;
+                    if (isCallAuthorizationRequestSent) {
+                        isCallAuthorizationRequestSent = false;
+                        callAuthorizationDeleteRequest(userIndentifier);
+                    }
+                    break;
+
+            }
+        }
+    };
+
+    private void callAuthorizationAPI() {
+        callAuthorizationRequest(userIndentifier, permissionCode);
+    }
+
+    private void makePhoneCall() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
+                == PackageManager.PERMISSION_GRANTED) {
+            Intent callIntent = new Intent(Intent.ACTION_CALL);
+            callIntent.setData(Uri.parse("tel:" + Constants.AUTHORIZE_CALL_NUMBER));
+            startActivity(callIntent);
+
+            if (tm == null) {
+                tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+                tm.listen(listener, PhoneStateListener.LISTEN_CALL_STATE);
+            }
+
+        } else if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
+                == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CALL_PHONE, Manifest.permission.READ_PHONE_STATE},
+                    PERMISSIONS_REQUEST_CALL);
+        } else {
+            Toast.makeText(mContext, "Please allow call permission from setting", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void callAuthorizationRequest(String accountID, String permissionCode) {
+        displayProgressDialog("");
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("cid", accountID);
+        hashMap.put("permissionCode", permissionCode);
+        hashMap.put("schemaVersion", schemaIndex);
+        if (dataManager.getUser().getAccountFromID(accountID) != null && dataManager.getUser().getAccountFromID(accountID).getCustomer() != null) {
+            hashMap.put("customerName", dataManager.getUser().getAccountFromID(accountID).getCustomer());
+        } else {
+            hashMap.put("customerName", "");
+        }
+        hashMap.putAll(pickerValues);
+        Log.e("callAuthorization", hashMap.toString());
+        AuthoritiAPI.APIService().callAuthorization(hashMap).enqueue
+                (new Callback<ResponseCallAuthentication>() {
+                    @Override
+                    public void onResponse(Call<ResponseCallAuthentication> call,
+                                           Response<ResponseCallAuthentication>
+                                                   response) {
+                        Log.e("callAuthorization", "" + response.isSuccessful());
+                        dismissProgressDialog();
+                        makePhoneCall();
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseCallAuthentication> call, Throwable t) {
+                        dismissProgressDialog();
+                        Log.e("callAuthorization", "" + t.getMessage());
+                    }
+                });
+    }
+
+    private void callAuthorizationDeleteRequest(String accountID) {
+        AuthoritiAPI.APIService().callAuthorizationDelete(accountID).enqueue
+                (new Callback<ResponseCallAuthentication>() {
+                    @Override
+                    public void onResponse(Call<ResponseCallAuthentication> call,
+                                           Response<ResponseCallAuthentication>
+                                                   response) {
+                        Log.e("callDeleteRequest", "" + response.isSuccessful());
+
+                        if (response.isSuccessful()) {
+
+                        } else {
+
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseCallAuthentication> call, Throwable t) {
+                        Log.e("callDeleteRequest", "" + t.getMessage());
+                    }
+                });
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+    }
 }

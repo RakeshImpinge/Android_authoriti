@@ -14,6 +14,10 @@ public interface Constants {
     String HELP_BASE = "https://help.authoriti.net";
     String IDENTIFIER = "authoriti";
 
+    // Auto logout user if no interaction with app
+    int INACTIVITY_TIME_OUT = 60;
+
+
     // BroadCast Id
     String BROADCAST_CHANGE_MENU = "BROADCAST_CHANGE_MENU";
     String BROADCAST_ADD_BUTTON_CLICKED = "BROADCAST_ADD_BUTTON_CLICKED";
@@ -52,6 +56,7 @@ public interface Constants {
     String TIME_CUSTOM_DATE = "Custom Date/Time";
 
     String ACUANT_LICENSE_KEY = "FAD9B2F0E7F1";
+    String AUTHORIZE_CALL_NUMBER = "+17203866660";
 
     String TOPIC_PURPOSE_MANAGE_MY_AC = "help-phone-inquiry";
     String TOPIC_PURPOSE_SEND_MONEY = "help-send-cash";
@@ -76,7 +81,7 @@ public interface Constants {
     String TOPIC_GENERAL = "help-general";
     String TOPIC_ACCOUNT_2018 = "help-account-id";
     String TOPIC_PASSWORD = "help-download-initial-wallet";
-    String TOPIC_MASTER_PASSWORD="help-master-password";
+    String TOPIC_MASTER_PASSWORD = "help-master-password";
     String TOPIC_RESET_PASSWORD = "help-changepw";
     String TOPIC_CHASE = "help-account-id";
     String TOPIC_ABOUT = "help-about";
