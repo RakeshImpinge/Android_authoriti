@@ -123,7 +123,6 @@ public class CodeGenerateActivity extends BaseActivity {
             completePollingRequest(userIndentifier, permissionCode);
         }
 
-        callAuthorization = true;
         if (callAuthorization) {
             ivCall.setVisibility(View.VISIBLE);
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
