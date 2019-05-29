@@ -211,7 +211,11 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                 if (response.code() == 200 && response.body() != null) {
                     addAccount(name, id, setDefault);
                 } else {
-                    showAlert("", "Account Save Failed.");
+                    if (response.message() != null && !response.message().equals("")) {
+                        showAlert("", response.message());
+                    } else {
+                        showAlert("", "Account Save Failed.");
+                    }
                 }
             }
 
@@ -429,7 +433,11 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                 if (response.code() == 200 && response.body() != null) {
                     userInfo(response.body());
                 } else {
-                    showAlert("", "Failed. Please Try Again Later.");
+                    if (response.message() != null && !response.message().equals("")) {
+                        showAlert("", response.message());
+                    } else {
+                        showAlert("", "Failed. Please Try Again Later.");
+                    }
                 }
             }
 
@@ -522,7 +530,11 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                     activity.fetchSignUpInfo(response.body(), dataManager.getUser());
                     activity.checkFingerPrintAuth();
                 } else {
-                    showAlert("", "Sign Up Failed. Try Again Later.");
+                    if (response.message() != null && !response.message().equals("")) {
+                        showAlert("", response.message());
+                    } else {
+                        showAlert("", "Sign Up Failed. Try Again Later.");
+                    }
                 }
             }
 

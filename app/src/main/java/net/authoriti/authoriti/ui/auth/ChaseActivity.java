@@ -157,7 +157,11 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
                 if (response.code() == 200 && response.body() != null) {
                     fetchSignUpInfo(response.body());
                 } else {
-                    showAlert("", "Sign Up Failed. Try Again Later.");
+                    if (response.message() != null && !response.message().equals("")) {
+                        showAlert("", response.message());
+                    } else {
+                        showAlert("", "Sign Up Failed. Try Again Later.");
+                    }
                 }
             }
 

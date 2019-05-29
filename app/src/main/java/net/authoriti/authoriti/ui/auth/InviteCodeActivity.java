@@ -192,7 +192,7 @@ public class InviteCodeActivity extends BaseActivity {
         } else {
             displayProgressDialog("Please Wait");
         }
-        AuthoritiAPI.APIService().checkInviteCodeValidate(etCode.getText().toString()).enqueue
+        AuthoritiAPI.APIService().checkInviteCodeValidate(etCode.getText().toString().trim()).enqueue
                 (new Callback<ResponseInviteCode>() {
                     @Override
                     public void onResponse(Call<ResponseInviteCode> call,
@@ -206,7 +206,11 @@ public class InviteCodeActivity extends BaseActivity {
                             fetchInviteCodeResult(response.body(), isNextClick);
                         } else {
                             if (isNextClick) {
-                                showAlert("", "Invalid Password.");
+                                if (response.message() != null && !response.message().equals("")) {
+                                    showAlert("", response.message());
+                                } else {
+                                    showAlert("", "Invalid Password.");
+                                }
                             } else {
                                 StartupActivity_.intent(mContext).start();
                             }
