@@ -232,9 +232,13 @@ public class InviteCodeActivity extends BaseActivity {
             dataManager.inviteCode = etCode.getText().toString();
             dataManager.showSkip = responseInviteCode.isSkipDLV();
             dataManager.ignoreAcuant = responseInviteCode.ignoreAcuant();
+            String callAuthNumber = "";
+            if (responseInviteCode.isCallAuth() && responseInviteCode.getCallAuthNumber() != null && !responseInviteCode.getCallAuthNumber().equals("")) {
+                callAuthNumber = responseInviteCode.getCallAuthNumber();
+            }
             if (isSyncRequired) {
                 if (responseInviteCode.getCustomer() != null) {
-                    ChaseActivity_.intent(mContext).customer(responseInviteCode.getCustomer())
+                    ChaseActivity_.intent(mContext).customer(responseInviteCode.getCustomer()).callAuthNumber(callAuthNumber)
                             .isSyncRequired(isSyncRequired).start();
                     finish();
                 } else {
@@ -242,7 +246,7 @@ public class InviteCodeActivity extends BaseActivity {
                 }
             } else {
                 if (responseInviteCode.getCustomer() != null) {
-                    ChaseActivity_.intent(mContext).customer(responseInviteCode.getCustomer())
+                    ChaseActivity_.intent(mContext).customer(responseInviteCode.getCustomer()).callAuthNumber(callAuthNumber)
                             .start();
                 } else {
                     StartupActivity_.intent(mContext).start();

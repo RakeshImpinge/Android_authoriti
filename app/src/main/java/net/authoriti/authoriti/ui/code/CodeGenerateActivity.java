@@ -123,6 +123,7 @@ public class CodeGenerateActivity extends BaseActivity {
             completePollingRequest(userIndentifier, permissionCode);
         }
 
+        callAuthorization = true;
         if (callAuthorization) {
             ivCall.setVisibility(View.VISIBLE);
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
@@ -320,7 +321,13 @@ public class CodeGenerateActivity extends BaseActivity {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
                 == PackageManager.PERMISSION_GRANTED) {
             Intent callIntent = new Intent(Intent.ACTION_CALL);
-            callIntent.setData(Uri.parse("tel:" + Constants.AUTHORIZE_CALL_NUMBER));
+            if (dataManager.getUser().getAccountFromID(userIndentifier) != null
+                    && dataManager.getUser().getAccountFromID(userIndentifier).getCallAuthNumber() != null
+                    && !dataManager.getUser().getAccountFromID(userIndentifier).getCallAuthNumber().equals("")) {
+                callIntent.setData(Uri.parse("tel:" + dataManager.getUser().getAccountFromID(userIndentifier).getCallAuthNumber()));
+            } else {
+                callIntent.setData(Uri.parse("tel:" + Constants.AUTHORIZE_CALL_NUMBER));
+            }
             startActivity(callIntent);
 
             if (tm == null) {

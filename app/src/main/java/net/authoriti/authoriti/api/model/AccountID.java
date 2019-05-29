@@ -15,10 +15,11 @@ public class AccountID {
     @SerializedName("hashed")
     private Boolean hashed;
 
+    private String callAuthNumber;
+
     private boolean confirmed = true;
 
     public String getCustomer() {
-
         return Customer;
     }
 
@@ -89,5 +90,14 @@ public class AccountID {
 
     public void setConfirmed(boolean confirmed) {
         this.confirmed = confirmed;
+    }
+
+
+    public String getCallAuthNumber() {
+        return callAuthNumber;
+    }
+
+    public void setCallAuthNumber(String callAuthNumber) {
+        this.callAuthNumber = callAuthNumber;
     }
 }

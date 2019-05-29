@@ -75,6 +75,9 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
     @Extra
     String customer;
 
+    @Extra
+    String callAuthNumber;
+
     @ViewById(R.id.tvTitle)
     TextView tvTitle;
 
@@ -183,7 +186,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
                 boolean isContained = false;
                 newAccountIDs.get(i).setCustomer(responseSignUpChase.getCustomerName());
                 newAccountIDs.get(i).setCustomer_ID(responseSignUpChase.getId());
-
+                newAccountIDs.get(i).setCallAuthNumber(callAuthNumber);
                 for (int k = 0; k < savedAccountIDs.size(); k++) {
                     if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
                             .getIdentifier())
@@ -216,6 +219,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
             }
             for (AccountID accountID : UserAccountsList) {
                 accountID.setCustomer(customer);
+                accountID.setCallAuthNumber(callAuthNumber);
                 accountID.setCustomer_ID(responseSignUpChase.getId());
             }
             user.setAccountIDs(UserAccountsList);

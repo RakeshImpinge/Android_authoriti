@@ -461,10 +461,16 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
 
         int sz = newAccountIDs.size();
 
+        String callAuthNumber = "";
+        if (body.isCallAuth() && body.getCallAuthNumber() != null && !body.getCallAuthNumber().equals("")) {
+            callAuthNumber = body.getCallAuthNumber();
+        }
+
         for (int i = 0; i < sz; i++) {
             boolean isContained = false;
             newAccountIDs.get(i).setCustomer(body.getCustomerName());
             newAccountIDs.get(i).setCustomer_ID(body.getId());
+            newAccountIDs.get(i).setCallAuthNumber(callAuthNumber);
             final int savedAccountsSz = savedAccountIDs.size();
             for (int k = 0; k < savedAccountsSz; k++) {
                 if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
@@ -487,7 +493,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
     }
 
     private void signupSelfRegistered() {
-        final AccountManagerActivity activity = (AccountManagerActivity)getActivity();
+        final AccountManagerActivity activity = (AccountManagerActivity) getActivity();
 
         if (dataManager.accountIDs.size() == 0) {
             activity.mFingerPrintAuthHelper.startAuth();
