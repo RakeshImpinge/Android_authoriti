@@ -77,6 +77,15 @@ public class User {
         return accountIDs;
     }
 
+    public AccountID getAccountFromID(String id) {
+        for (AccountID account : accountIDs) {
+            if (account.getIdentifier().equals(id)) {
+                return account;
+            }
+        }
+        return null;
+    }
+
     public void setAccountIDs(List<AccountID> accountIDs) {
         this.accountIDs = accountIDs;
     }

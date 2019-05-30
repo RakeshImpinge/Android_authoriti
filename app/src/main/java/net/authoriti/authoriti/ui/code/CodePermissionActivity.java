@@ -86,6 +86,8 @@ public class CodePermissionActivity extends BaseActivity {
 
     int schemaIndex = -1;
 
+    public boolean isRequestClickAvailable = false;
+
     @AfterViews
     void callAfterViewInjection() {
         adapter = new FastItemAdapter<>();
@@ -159,6 +161,12 @@ public class CodePermissionActivity extends BaseActivity {
                 }
             }
 
+            // Automate “Firm Holding Data” data if user if account ID belongs to a customer
+            if (pickersList.get(i).getPicker().equals(PICKER_REQUEST)) {
+                updateRequesterValueCustomer();
+            }
+
+
             // Updating the default values from the poll schema url like this :
             // "authoriti://purpose/manage-an-account?accountId=2f434c9c9c1581d407d440d298e2407e2aaf64acc079abce90d9715f5e4dd8d1&schemaVersion=6&origin=Etrade&requestor_value=x&data_type=02%2C03"
             if (defParamFromUrl != null && !defParamFromUrl.isEmpty()) {
@@ -188,7 +196,7 @@ public class CodePermissionActivity extends BaseActivity {
                         String requestorValue = defParamFromUrl.get("requestor_value");
                         List<Value> possibleValues = dataManager.getValuesFromDataType(requestorValue);
                         HashMap<String, String> possibleValuesMap = new HashMap<>();
-                        for (Value val: possibleValues) {
+                        for (Value val : possibleValues) {
                             possibleValuesMap.put(val.getValue(), val.getTitle());
                         }
 
@@ -251,6 +259,7 @@ public class CodePermissionActivity extends BaseActivity {
         }
     }
 
+
     ArrayList<Integer> uiFlaseListIndex = new ArrayList<>();
 
     private void showSchema() {
@@ -269,7 +278,7 @@ public class CodePermissionActivity extends BaseActivity {
                     }
                 } else {
                     adapter.add(new CodeItem(pickersList.get(i), defaultPickerMap, group
-                            .getSchemaIndex()));
+                            .getSchemaIndex(), this));
                 }
             } else {
                 uiFlaseListIndex.add(i);
@@ -286,7 +295,7 @@ public class CodePermissionActivity extends BaseActivity {
 
                 } else {
                     adapter.add(new CodeItem(pickersList.get(i), defaultPickerMap, group
-                            .getSchemaIndex()));
+                            .getSchemaIndex(), this));
                 }
             } else {
                 uiFlaseListIndex.add(i);
@@ -357,8 +366,7 @@ public class CodePermissionActivity extends BaseActivity {
                 if (adapter_input.getAdapterItem(i).picker
                         .getLabel().equalsIgnoreCase("amount")) {
                     errorMessage = "Please enter a valid amount.";
-                }
-                else errorMessage = "Please enter " + adapter_input.getAdapterItem(i).picker
+                } else errorMessage = "Please enter " + adapter_input.getAdapterItem(i).picker
                         .getLabel();
                 break;
             } else {
@@ -500,9 +508,42 @@ public class CodePermissionActivity extends BaseActivity {
                 }
             }
 
+            updateRequesterValueCustomer();
 
             updateSchema();
         }
     }
+
+    private void updateRequesterValueCustomer() {
+        List<Picker> pickersList = dataManager.getScheme().get("" + group.getSchemaIndex());
+        for (int i = 0; i < pickersList.size(); i++) {
+            if (pickersList.get(i).getPicker().equals(PICKER_REQUEST)) {
+                AccountID accountID = dataManager.getUser().getAccountFromID(defaultPickerMap.get(PICKER_ACCOUNT).getValue());
+                String accountCustomerName = accountID.getCustomer();
+                Value newRequestorValue = null;
+                if (accountCustomerName != null && !accountCustomerName.equals("")) {
+                    for (Value value : pickersList.get(i).getValues()) {
+                        if (value.getTitle().equalsIgnoreCase(accountCustomerName)) {
+                            newRequestorValue = value;
+                            break;
+                        }
+                    }
+                }
+                if (newRequestorValue != null) {
+                    DefaultValue defaultValue = new DefaultValue(newRequestorValue.getTitle(), newRequestorValue.getValue(), false);
+                    defaultPickerMap.put(PICKER_REQUEST, defaultValue);
+                    isRequestClickAvailable = false;
+                } else {
+                    isRequestClickAvailable = true;
+                }
+            }
+
+        }
+
+        if (adapter != null) {
+            adapter.notifyAdapterDataSetChanged();
+        }
+    }
+
 }
 

@@ -1,8 +1,10 @@
 package net.authoriti.authoriti.ui.items;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.authoriti.authoriti.R;
@@ -33,16 +35,18 @@ public class CodeItem extends AbstractItem<CodeItem, CodeItem.ViewHolder> {
     public Picker picker;
     HashMap<String, DefaultValue> defaultPickerMap;
     int schemaIndex;
+    Activity activity;
 
     public CodeItem(Picker picker) {
         this.picker = picker;
     }
 
     public CodeItem(Picker picker, HashMap<String, DefaultValue> defaultPickerMap,
-                    int schemaIndex) {
+                    int schemaIndex, Activity activity) {
         this.picker = picker;
         this.defaultPickerMap = defaultPickerMap;
         this.schemaIndex = schemaIndex;
+        this.activity = activity;
     }
 
     @Override
@@ -275,12 +279,22 @@ public class CodeItem extends AbstractItem<CodeItem, CodeItem.ViewHolder> {
         holder.swipeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PasscodePickActivity_.intent(context).picker(picker).defaultPickerMap
-                        (defaultPickerMap).schemaIndex(schemaIndex).startForResult
-                        (CodePermissionActivity
-                                .INTENT_REQUEST_PICK_VALUE);
+                if (activity instanceof CodePermissionActivity && !((CodePermissionActivity) (activity)).isRequestClickAvailable && picker.getPicker().equals(PICKER_REQUEST)) {
+
+                } else {
+                    PasscodePickActivity_.intent(context).picker(picker).defaultPickerMap
+                            (defaultPickerMap).schemaIndex(schemaIndex).startForResult
+                            (CodePermissionActivity
+                                    .INTENT_REQUEST_PICK_VALUE);
+                }
             }
         });
+
+        if (activity instanceof CodePermissionActivity && !((CodePermissionActivity) (activity)).isRequestClickAvailable && picker.getPicker().equals(PICKER_REQUEST)) {
+            holder.ivArrow.setVisibility(View.INVISIBLE);
+        } else {
+            holder.ivArrow.setVisibility(View.VISIBLE);
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -289,10 +303,12 @@ public class CodeItem extends AbstractItem<CodeItem, CodeItem.ViewHolder> {
         SwipeLayout swipeLayout;
         TextView tvDefault;
         View markDefault;
+        ImageView ivArrow;
 
         public ViewHolder(View itemView) {
             super(itemView);
             tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
+            ivArrow = (ImageView) itemView.findViewById(R.id.ivArrow);
             tvSubTitle = (TextView) itemView.findViewById(R.id.tvSubTitle);
             swipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipe);
             tvDefault = (TextView) itemView.findViewById(R.id.tvDefault);

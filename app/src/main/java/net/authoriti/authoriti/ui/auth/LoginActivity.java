@@ -282,7 +282,7 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
 
                         } else {
 
-                            showAlert("Oops!", "Invalid username or password!");
+                            showAlert("", "Invalid username or password!");
                         }
 
                     } catch (UnsupportedEncodingException e) {

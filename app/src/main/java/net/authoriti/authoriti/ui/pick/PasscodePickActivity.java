@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import net.authoriti.authoriti.R;
+import net.authoriti.authoriti.api.model.AccountID;
 import net.authoriti.authoriti.api.model.DefaultValue;
 import net.authoriti.authoriti.api.model.Picker;
 import net.authoriti.authoriti.api.model.Value;
@@ -38,6 +39,8 @@ import org.androidannotations.annotations.ViewById;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -412,31 +415,71 @@ public class PasscodePickActivity extends BaseActivity {
         } else {
             optionAdapter.clear();
         }
-        for (int i = 0; i < picker.getValues().size(); i++) {
-            if (pickerType.equals(PICKER_ACCOUNT)) {
-                if (defaultValue.getValue().equals(picker.getValues().get(i).getValue()) &&
-                        defaultValue.getTitle().equals(picker.getValues().get(i).getTitle())) {
-                    optionAdapter.add(new OptionItem(picker.getValues().get(i), true));
-                } else {
-                    optionAdapter.add(new OptionItem(picker.getValues().get(i), false));
+
+        // Show heading for account picker
+        if (pickerType.equals(PICKER_ACCOUNT)) {
+            List<Value> accountNewList = new ArrayList<Value>();
+            List<AccountID> accountIDS = dataManager.getUser().getAccountIDs();
+            Collections.sort(accountIDS, new Comparator<AccountID>() {
+                @Override
+                public int compare(AccountID accountID, AccountID t1) {
+                    String s1 = accountID.getCustomer();
+                    if (s1.trim().equalsIgnoreCase("")) {
+                        s1 = "ZZZZZZZZZZ";
+                    }
+
+                    String s2 = t1.getCustomer();
+                    if (s2.trim().equalsIgnoreCase("")) {
+                        s2 = "ZZZZZZZZZZ";
+                    }
+                    return s1.compareTo(s2);
                 }
-            } else if (pickerType.equals(PICKER_REQUEST)) {
-                if (value.contains(picker.getValues().get(i).getValue()) && title.contains(picker.getValues().get(i).getTitle())) {
-                    optionAdapter.add(new OptionItem(picker.getValues().get(i), true));
+            });
+
+            for (int i = 0; i < accountIDS.size(); i++) {
+                int position = i;
+                String customerName = "";
+                if (position == 0 || !accountIDS.get(position).getCustomer().equals(accountIDS.get(position - 1).getCustomer())) {
+                    customerName = accountIDS.get(position).getCustomer();
+                    if (customerName.equals("")) {
+                        customerName = "Self Registered ID's";
+                    } else {
+                        customerName = customerName + " ID's";
+                    }
                 } else {
-                    optionAdapter.add(new OptionItem(picker.getValues().get(i), false));
+                    customerName = "";
                 }
-            } else if (pickerType.equals(PICKER_DATA_TYPE)) {
-                if (value.contains(picker.getValues().get(i).getValue())) {
-                    optionAdapter.add(new OptionItem(picker.getValues().get(i), true));
+
+                Value value = new Value(accountIDS.get(i).getIdentifier(), accountIDS.get(i).getType());
+                accountNewList.add(value);
+                if (defaultValue.getValue().equals(accountIDS.get(i).getIdentifier())
+                        && defaultValue.getTitle().equals(accountIDS.get(i).getType())) {
+                    optionAdapter.add(new OptionItem(value, true, customerName));
                 } else {
-                    optionAdapter.add(new OptionItem(picker.getValues().get(i), false));
+                    optionAdapter.add(new OptionItem(value, false, customerName));
                 }
-            } else {
-                if (defaultValue.getValue().equals(picker.getValues().get(i).getValue())) {
-                    optionAdapter.add(new OptionItem(picker.getValues().get(i), true));
+            }
+            picker.setValues(accountNewList);
+        } else {
+            for (int i = 0; i < picker.getValues().size(); i++) {
+                if (pickerType.equals(PICKER_REQUEST)) {
+                    if (value.contains(picker.getValues().get(i).getValue()) && title.contains(picker.getValues().get(i).getTitle())) {
+                        optionAdapter.add(new OptionItem(picker.getValues().get(i), true));
+                    } else {
+                        optionAdapter.add(new OptionItem(picker.getValues().get(i), false));
+                    }
+                } else if (pickerType.equals(PICKER_DATA_TYPE)) {
+                    if (value.contains(picker.getValues().get(i).getValue())) {
+                        optionAdapter.add(new OptionItem(picker.getValues().get(i), true));
+                    } else {
+                        optionAdapter.add(new OptionItem(picker.getValues().get(i), false));
+                    }
                 } else {
-                    optionAdapter.add(new OptionItem(picker.getValues().get(i), false));
+                    if (defaultValue.getValue().equals(picker.getValues().get(i).getValue())) {
+                        optionAdapter.add(new OptionItem(picker.getValues().get(i), true));
+                    } else {
+                        optionAdapter.add(new OptionItem(picker.getValues().get(i), false));
+                    }
                 }
             }
         }
