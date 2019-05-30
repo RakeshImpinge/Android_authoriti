@@ -15,7 +15,7 @@ public class AccountID {
     @SerializedName("hashed")
     private Boolean hashed;
 
-    private String callAuthNumber;
+    private String callAuthNumber="";
 
     private boolean confirmed = true;
 

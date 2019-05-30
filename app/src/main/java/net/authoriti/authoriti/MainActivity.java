@@ -372,6 +372,10 @@ public class MainActivity extends BaseActivity {
                             boolean isContained = false;
                             newAccountIDs.get(i).setCustomer(responseSync.getCustomerName());
                             newAccountIDs.get(i).setCustomer_ID(responseSync.getUserId());
+                            if (responseSync.isCallAuth() && responseSync.getCallAuthNumber() != null && !responseSync.getCallAuthNumber().equals("")) {
+                                newAccountIDs.get(i).setCallAuthNumber(responseSync.getCallAuthNumber());
+                            }
+
                             for (int k = 0; k < savedAccountIDs.size(); k++) {
                                 if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
                                         .getIdentifier())
