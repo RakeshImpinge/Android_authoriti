@@ -33,6 +33,7 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +62,9 @@ public class AccountManagerActivity extends SecurityActivity implements Security
     private AccountAddDialog accountAddDialog;
     private CryptoKeyPair keyPair;
 
+    @Extra
+    String licenceID = "";
+
 
     @AfterViews
     void callAfterViewInjection() {
@@ -78,6 +82,10 @@ public class AccountManagerActivity extends SecurityActivity implements Security
                 .beginTransaction()
                 .replace(R.id.frame_container, accountFragment)
                 .commitAllowingStateLoss();
+
+        if (licenceID != null && !licenceID.equals("")) {
+            accountFragment.licenceID = licenceID;
+        }
     }
 
 
@@ -85,10 +93,13 @@ public class AccountManagerActivity extends SecurityActivity implements Security
         List<AccountID> existingAccounts = dataManager.getUser().getAccountIDs();
 
         User user = responseSignUp.getUser();
-
-        user.setUserId(currentUser.getUserId());
-        user.setToken(currentUser.getToken());
-
+        if (currentUser.getUserId() == null || currentUser.getToken() == null) {
+            user.setUserId(responseSignUp.getUserId());
+            user.setToken(responseSignUp.getToken());
+        } else {
+            user.setUserId(currentUser.getUserId());
+            user.setToken(currentUser.getToken());
+        }
         user.setEncryptKey(currentUser.getEncryptKey());
         user.setEncryptSalt(currentUser.getEncryptSalt());
         user.setEncryptPassword(currentUser.getEncryptPassword());

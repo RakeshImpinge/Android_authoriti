@@ -84,6 +84,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
 
     private static final String TAG = "AccountFragment";
     public Boolean signupInProgress = false;
+    public String licenceID = "";
 
     @AfterViews
     void callAfterViewInjection() {
@@ -123,7 +124,13 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
         rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
         rvAccount.setAdapter(adapter);
 
-        showAccounts();
+        if (signupInProgress && !licenceID.equals("")) {
+            String hashedLicense  = CryptoUtil.hash(licenceID.replaceFirst("^0+(?!$)", ""));
+            saveAccount("License", hashedLicense, false);
+        } else {
+            showAccounts();
+        }
+
     }
 
     @Override
@@ -495,7 +502,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
     }
 
     private void signupSelfRegistered() {
-        final AccountManagerActivity activity = (AccountManagerActivity)getActivity();
+        final AccountManagerActivity activity = (AccountManagerActivity) getActivity();
 
         if (dataManager.accountIDs.size() == 0) {
             activity.mFingerPrintAuthHelper.startAuth();
