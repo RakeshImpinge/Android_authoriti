@@ -211,6 +211,7 @@ public class AccountManagerActivity extends SecurityActivity implements Security
         if (dataManager != null && dataManager.getUser() != null) {
             User user = dataManager.getUser();
             user.setFingerPrintAuthEnabled(true);
+            user.setFingerPrintAuthStatus(TOUCH_ENABLED);
             dataManager.setUser(user);
 
             updateLoginState();
@@ -220,6 +221,8 @@ public class AccountManagerActivity extends SecurityActivity implements Security
 
     @Override
     public void allowButtonClicked() {
+
+
         hideTouchIDEnabledAlert();
         if (fingerPrintNotRegistered) {
             Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
@@ -231,6 +234,10 @@ public class AccountManagerActivity extends SecurityActivity implements Security
 
     @Override
     public void dontAllowButtonClicked() {
+        User user = dataManager.getUser();
+        user.setFingerPrintAuthStatus(TOUCH_DISABLED);
+        dataManager.setUser(user);
+
         hideTouchIDEnabledAlert();
 
         updateLoginState();

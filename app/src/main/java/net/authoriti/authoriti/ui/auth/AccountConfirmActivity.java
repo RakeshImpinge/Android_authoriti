@@ -283,6 +283,7 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
 
             User user = dataManager.getUser();
             user.setFingerPrintAuthEnabled(true);
+            user.setFingerPrintAuthStatus(TOUCH_ENABLED);
             dataManager.setUser(user);
 
             updateLoginState();
@@ -361,6 +362,9 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
 
     @Override
     public void dontAllowButtonClicked() {
+        User user = dataManager.getUser();
+        user.setFingerPrintAuthStatus(TOUCH_DISABLED);
+        dataManager.setUser(user);
 
         hideTouchIDEnabledAlert();
 

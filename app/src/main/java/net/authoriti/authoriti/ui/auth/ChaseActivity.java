@@ -302,6 +302,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
 
             User user = dataManager.getUser();
             user.setFingerPrintAuthEnabled(true);
+            user.setFingerPrintAuthStatus(TOUCH_ENABLED);
             dataManager.setUser(user);
 
             updateLoginState();
@@ -412,11 +413,13 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
             enableFingerPrintAndGoHome();
         }
 
-
     }
 
     @Override
     public void dontAllowButtonClicked() {
+        User user = dataManager.getUser();
+        user.setFingerPrintAuthStatus(TOUCH_DISABLED);
+        dataManager.setUser(user);
 
         hideTouchIDEnabledAlert();
 

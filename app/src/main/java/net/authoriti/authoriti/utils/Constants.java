@@ -87,4 +87,8 @@ public interface Constants {
     public final String BUILD_FLAVOUR_VNB = "vnb";
     public final String BUILD_FLAVOUR_AUTHORITI = "vnb";
 
+    String TOUCH_ENABLED = "enabled";
+    String TOUCH_DISABLED = "disabled";
+    String TOUCH_NOT_CONFIGURED = "";
+
 }

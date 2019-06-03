@@ -1,21 +1,25 @@
 package net.authoriti.authoriti.ui.auth;
 
 import android.content.Intent;
+import android.hardware.fingerprint.FingerprintManager;
 import android.net.Uri;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.Space;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.tozny.crypto.android.AesCbcWithIntegrity;
 
 import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.api.model.User;
-import net.authoriti.authoriti.core.BaseActivity;
+import net.authoriti.authoriti.core.SecurityActivity;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiUtils;
 import net.authoriti.authoriti.utils.ConstantUtils;
@@ -35,7 +39,7 @@ import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 
 @EActivity(R.layout.activity_change_password)
-public class ChangePasswordActivity extends BaseActivity {
+public class ChangePasswordActivity extends SecurityActivity implements PopupWindow.OnDismissListener {
 
 
     @Bean
@@ -69,7 +73,15 @@ public class ChangePasswordActivity extends BaseActivity {
     Space space;
 
     @ViewById(R.id.change_pwd_logo)
-    ImageView  logo;
+    ImageView logo;
+
+    @ViewById(R.id.checkboxFingerPrint)
+    CheckBox checkboxFingerPrint;
+
+    private boolean fingerPrintAuthEnabled = false;
+
+    @ViewById(R.id.linCheckBox)
+    LinearLayout linCheckBox;
 
     @AfterViews
     void callAfterViewInjection() {
@@ -104,31 +116,60 @@ public class ChangePasswordActivity extends BaseActivity {
                 }
             }
         });
+
+        if (dataManager != null && dataManager.getUser() != null && dataManager.getUser()
+                .isFingerPrintAuthEnabled()) {
+            mFingerPrintAuthHelper.startAuth();
+            fingerPrintAuthEnabled = true;
+            linCheckBox.setVisibility(View.VISIBLE);
+        } else {
+            linCheckBox.setVisibility(View.GONE);
+        }
+
     }
 
 
     @Click(R.id.cvReset)
     void resetButtonClicked() {
+        if (checkboxFingerPrint.isChecked()) {
+            showTouchIdAlert();
+        } else {
+            changePassword();
+        }
+    }
 
+    private void changePassword() {
         hideKeyboard();
 
-        if (TextUtils.isEmpty(etCurrentPassword.getText())) {
+        boolean isInputValid = true;
+
+        if (TextUtils.isEmpty(etCurrentPassword.getText()) && !checkboxFingerPrint.isChecked()) {
             tiCurrentPassword.setError(utils.getSpannableStringForEditTextError("This field is " +
                     "required", this));
+            if (isInputValid) {
+                isInputValid = false;
+            }
         }
 
         if (TextUtils.isEmpty(etNewPassword.getText())) {
             tiNewPassword.setError(utils.getSpannableStringForEditTextError("This field is " +
                     "required", this));
+            if (isInputValid) {
+                isInputValid = false;
+            }
         }
 
         if (TextUtils.isEmpty(etConfirmPassword.getText())) {
             tiConfirmPassword.setError(utils.getSpannableStringForEditTextError("This field is " +
                     "required", this));
+            if (isInputValid) {
+                isInputValid = false;
+            }
         }
 
-        if (!TextUtils.isEmpty(etCurrentPassword.getText()) && !TextUtils.isEmpty(etNewPassword
-                .getText()) && !TextUtils.isEmpty(etConfirmPassword.getText())) {
+
+        if (isInputValid) {
+
             User user = dataManager.getUser();
 
             if (user != null && user.getAccountIDs() != null && user.getAccountIDs().size() > 0) {
@@ -148,7 +189,7 @@ public class ChangePasswordActivity extends BaseActivity {
                                 .CipherTextIvMac(dataManager.getUser().getEncryptPassword());
                         password = AesCbcWithIntegrity.decryptString(civ, keys);
 
-                        if (password.equals(etCurrentPassword.getText().toString())) {
+                        if (password.equals(etCurrentPassword.getText().toString()) || checkboxFingerPrint.isChecked()) {
 
                             if (etNewPassword.getText().toString().equals(etConfirmPassword
                                     .getText().toString())) {
@@ -216,5 +257,44 @@ public class ChangePasswordActivity extends BaseActivity {
     void helpButtonClicked() {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ConstantUtils.getHelpUrl(TOPIC_RESET_PASSWORD)));
         startActivity(browserIntent);
+    }
+
+    public void onCheckboxClicked(View view) {
+        boolean checked = ((CheckBox) view).isChecked();
+        switch (view.getId()) {
+            case R.id.checkboxFingerPrint:
+                if (checked) {
+                    tiCurrentPassword.setVisibility(View.GONE);
+                } else {
+                    tiCurrentPassword.setVisibility(View.VISIBLE);
+                }
+                break;
+        }
+    }
+
+    @Override
+    public void onDismiss() {
+
+    }
+
+    @Override
+    public void onAuthSuccess(FingerprintManager.CryptoObject cryptoObject) {
+        super.onAuthSuccess(cryptoObject);
+        changePassword();
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (fingerPrintAuthEnabled) {
+            mFingerPrintAuthHelper.startAuth();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mFingerPrintAuthHelper.stopAuth();
     }
 }
