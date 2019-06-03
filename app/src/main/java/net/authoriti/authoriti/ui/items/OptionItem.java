@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import net.authoriti.authoriti.R;
@@ -24,10 +25,17 @@ public class OptionItem extends AbstractItem<OptionItem, OptionItem.ViewHolder> 
 
     private Value value;
     private boolean checked;
+    private String customerName = "";
 
     public OptionItem(Value value, boolean checked) {
         this.value = value;
         this.checked = checked;
+    }
+
+    public OptionItem(Value value, boolean checked, String customerName) {
+        this.value = value;
+        this.checked = checked;
+        this.customerName = customerName;
     }
 
     public void setValue(Value value) {
@@ -84,11 +92,20 @@ public class OptionItem extends AbstractItem<OptionItem, OptionItem.ViewHolder> 
         } else {
             holder.llDate.setVisibility(View.INVISIBLE);
         }
+
+        if (!customerName.equals("")) {
+            holder.rel_header.setVisibility(View.VISIBLE);
+            holder.txt_header.setText(customerName);
+        } else {
+            holder.txt_header.setText("");
+            holder.rel_header.setVisibility(View.GONE);
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvOption;
+        RelativeLayout rel_header;
+        TextView tvOption, txt_header;
         ImageView ivCheck;
         View llDate;
         TextView tvDate;
@@ -96,7 +113,9 @@ public class OptionItem extends AbstractItem<OptionItem, OptionItem.ViewHolder> 
         public ViewHolder(View itemView) {
             super(itemView);
 
+            rel_header = (RelativeLayout) itemView.findViewById(R.id.rel_header);
             tvOption = (TextView) itemView.findViewById(R.id.tvOption);
+            txt_header = (TextView) itemView.findViewById(R.id.txt_header);
             ivCheck = (ImageView) itemView.findViewById(R.id.ivCheck);
             llDate = itemView.findViewById(R.id.llDate);
             tvDate = (TextView) itemView.findViewById(R.id.tvDate);

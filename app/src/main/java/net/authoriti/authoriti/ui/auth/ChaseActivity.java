@@ -160,7 +160,11 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
                 if (response.code() == 200 && response.body() != null) {
                     fetchSignUpInfo(response.body());
                 } else {
-                    showAlert("", "Sign Up Failed. Try Again Later.");
+                    if (response.message() != null && !response.message().equals("")) {
+                        showAlert("", response.message());
+                    } else {
+                        showAlert("", "Sign Up Failed. Try Again Later.");
+                    }
                 }
             }
 
@@ -302,6 +306,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
 
             User user = dataManager.getUser();
             user.setFingerPrintAuthEnabled(true);
+            user.setFingerPrintAuthStatus(TOUCH_ENABLED);
             dataManager.setUser(user);
 
             updateLoginState();
@@ -412,11 +417,13 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
             enableFingerPrintAndGoHome();
         }
 
-
     }
 
     @Override
     public void dontAllowButtonClicked() {
+        User user = dataManager.getUser();
+        user.setFingerPrintAuthStatus(TOUCH_DISABLED);
+        dataManager.setUser(user);
 
         hideTouchIDEnabledAlert();
 

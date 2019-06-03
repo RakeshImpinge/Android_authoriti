@@ -84,6 +84,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
 
     private static final String TAG = "AccountFragment";
     public Boolean signupInProgress = false;
+    public String licenceID = "";
 
     @AfterViews
     void callAfterViewInjection() {
@@ -123,7 +124,13 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
         rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
         rvAccount.setAdapter(adapter);
 
-        showAccounts();
+        if (signupInProgress && !licenceID.equals("")) {
+            String hashedLicense  = CryptoUtil.hash(licenceID.replaceFirst("^0+(?!$)", ""));
+            saveAccount("License", hashedLicense, false);
+        } else {
+            showAccounts();
+        }
+
     }
 
     @Override
@@ -211,7 +218,11 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                 if (response.code() == 200 && response.body() != null) {
                     addAccount(name, id, setDefault);
                 } else {
-                    showAlert("", "Account Save Failed.");
+                    if (response.message() != null && !response.message().equals("")) {
+                        showAlert("", response.message());
+                    } else {
+                        showAlert("", "Account Save Failed.");
+                    }
                 }
             }
 
@@ -429,7 +440,11 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                 if (response.code() == 200 && response.body() != null) {
                     userInfo(response.body());
                 } else {
-                    showAlert("", "Failed. Please Try Again Later.");
+                    if (response.message() != null && !response.message().equals("")) {
+                        showAlert("", response.message());
+                    } else {
+                        showAlert("", "Failed. Please Try Again Later.");
+                    }
                 }
             }
 
@@ -528,7 +543,11 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                     activity.fetchSignUpInfo(response.body(), dataManager.getUser());
                     activity.checkFingerPrintAuth();
                 } else {
-                    showAlert("", "Sign Up Failed. Try Again Later.");
+                    if (response.message() != null && !response.message().equals("")) {
+                        showAlert("", response.message());
+                    } else {
+                        showAlert("", "Sign Up Failed. Try Again Later.");
+                    }
                 }
             }
 

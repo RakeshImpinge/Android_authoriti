@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
@@ -22,6 +23,7 @@ import net.authoriti.authoriti.api.model.request.RequestComplete;
 import net.authoriti.authoriti.api.model.request.RequestSync;
 import net.authoriti.authoriti.api.model.response.ResponseComplete;
 import net.authoriti.authoriti.api.model.response.ResponseSync;
+import net.authoriti.authoriti.core.SecurityActivity;
 import net.authoriti.authoriti.ui.menu.AccountFragment;
 import net.authoriti.authoriti.ui.menu.SettingFragment_;
 import net.authoriti.authoriti.utils.Log;
@@ -79,7 +81,8 @@ import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 @EActivity(R.layout.activity_main)
-public class MainActivity extends BaseActivity {
+public class MainActivity extends SecurityActivity implements SecurityActivity
+        .TouchIDEnableAlertListener {
 
     private static String TAG = "Authoriti/" + MainActivity.class.getName();
 
@@ -149,7 +152,6 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Foreground.get(getApplication()).addListener(listener);
-
     }
 
     @Override
@@ -436,6 +438,15 @@ public class MainActivity extends BaseActivity {
         loadPurposes();
         loadScheme();
         checkVersion();
+
+        if (dataManager.getUser().getFingerPrintAuthStatus().equals(TOUCH_NOT_CONFIGURED) && !dataManager.getUser().isFingerPrintAuthEnabled()) {
+            if (isBelowMarshmallow || fingerPrintHardwareNotDetected) {
+
+            } else {
+                setListener(this);
+                showTouchIDEnableAlert();
+            }
+        }
     }
 
 
@@ -624,7 +635,6 @@ public class MainActivity extends BaseActivity {
                             List<Value> list = dataManager.getValuesFromDataType(defaultValuesHashMap.get(PICKER_REQUEST).getValue());
                             if (list.size() == 0) {
                                 defValue = new DefaultValue("", "", false);
-
                             } else {
                                 defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
                                         false);
@@ -792,5 +802,27 @@ public class MainActivity extends BaseActivity {
         public void onDataSaved();
     }
 
+
+    @Override
+    public void allowButtonClicked() {
+        hideTouchIDEnabledAlert();
+        if (fingerPrintNotRegistered) {
+            Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
+            startActivity(intent);
+        } else {
+            removeListener();
+            User user = dataManager.getUser();
+            user.setFingerPrintAuthEnabled(true);
+            user.setFingerPrintAuthStatus(TOUCH_ENABLED);
+            dataManager.setUser(user);
+        }
+    }
+
+    @Override
+    public void dontAllowButtonClicked() {
+        User user = dataManager.getUser();
+        user.setFingerPrintAuthStatus(TOUCH_DISABLED);
+        dataManager.setUser(user);
+    }
 
 }

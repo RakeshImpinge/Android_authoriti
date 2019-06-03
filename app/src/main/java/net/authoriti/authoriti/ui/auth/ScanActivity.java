@@ -116,6 +116,8 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
 
     private DriversLicenseCard licenseCard;
 
+    String licenceID = "";
+
     @Bean
     AuthoritiData dataManager;
 
@@ -264,8 +266,8 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
         if (card == null || card.isEmpty()) {
             showAlert("", "No data found for this license card.");
         } else {
-
             licenseCard = (DriversLicenseCard) card;
+            licenceID = licenseCard.getLicenceID();
             Log.e("First Name ", licenseCard.getNameFirst());
             Log.e("Middle Name", licenseCard.getNameMiddle());
             Log.e("Last Name ", licenseCard.getNameLast());
@@ -398,7 +400,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
             }
 
             if (isSkip) {
-                AccountManagerActivity_.intent(mContext).start();
+                AccountManagerActivity_.intent(mContext).licenceID(licenceID).start();
             }
         }
 
@@ -479,7 +481,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
 
             if (facialData.facialMatch) {
 
-                AccountManagerActivity_.intent(mContext).start();
+                AccountManagerActivity_.intent(mContext).licenceID(licenceID).start();
 
             } else {
 
@@ -697,7 +699,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
 //        isSkip = true;
 //        isNext = false;
 
-        AccountManagerActivity_.intent(mContext).start();
+        AccountManagerActivity_.intent(mContext).licenceID(licenceID).start();
     }
 
     @Click(R.id.cvNext)
@@ -940,7 +942,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
         }
 
         if (isSkip) {
-            AccountManagerActivity_.intent(mContext).start();
+            AccountManagerActivity_.intent(mContext).licenceID(licenceID).start();
         }
 
     }
@@ -1030,7 +1032,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
     public void onFacialRecognitionCompleted(final Bitmap faceBitmap) {
         Log.e("Facial Recognition ", "Completed");
         if (isSkip) {
-            AccountManagerActivity_.intent(mContext).start();
+            AccountManagerActivity_.intent(mContext).licenceID(licenceID).start();
         } else {
             if (faceBitmap != null) {
                 processFaceValidation(faceBitmap);

@@ -32,6 +32,12 @@ public class User {
 
     private boolean fingerPrintAuthEnabled = false;
 
+    // enabled - Enabled by user
+    // enabled - Disabled by user
+    // blank - Enabled by user
+    private String fingerPrintAuthStatus = "";
+
+
     private boolean isChaseType = false;
 
     private List<AccountID> unconfirmedAccountIDs;
@@ -154,5 +160,13 @@ public class User {
 
     public void setDownloadedWalletIDList(List<String> downloadedWalletIDList) {
         this.downloadedWalletIDList = downloadedWalletIDList;
+    }
+
+    public String getFingerPrintAuthStatus() {
+        return fingerPrintAuthStatus;
+    }
+
+    public void setFingerPrintAuthStatus(String fingerPrintAuthStatus) {
+        this.fingerPrintAuthStatus = fingerPrintAuthStatus;
     }
 }
