@@ -413,15 +413,17 @@ public class CodePermissionActivity extends BaseActivity {
                     hashMap.put("key", "" + adapterPicker.getPicker());
                 }
 
-                // For account name
-                if (adapterPicker.getPicker().equals(PICKER_ACCOUNT)) {
-                    hashMap.put("value", defaultPickerMap.get(adapterPicker.getPicker())
-                            .getValue());
-
+                // For custom time & Custom date sending mins in value
+                if (adapterPicker.getPicker().equals(PICKER_TIME)) {
+                    String timeValue = defaultPickerMap.get(adapterPicker.getPicker())
+                            .getValue();
+                    if (defaultPickerMap.get(adapterPicker.getPicker()).getValue().equals(TIME_CUSTOM_TIME) || defaultPickerMap.get(adapterPicker.getPicker()).getValue().equals(TIME_CUSTOM_DATE)) {
+                        timeValue = defaultPickerMap.get(adapterPicker.getPicker()).getTitle();
+                    }
+                    hashMap.put("value", timeValue);
                 } else {
                     hashMap.put("value", defaultPickerMap.get(adapterPicker.getPicker())
-                            .getValue
-                                    ());
+                            .getValue());
                 }
                 finalPickersList.add(hashMap);
             }
@@ -468,7 +470,7 @@ public class CodePermissionActivity extends BaseActivity {
                 }
             }
 
-            CodeGenerateActivity_.intent(mContext).schemaIndex("" + group.getSchemaIndex())
+            CodeGenerateActivity_.intent(mContext).schemaIndex("" + group.getSchemaIndex()).callAuthorization(group.getCallAuthorization())
                     .finalPickersList(finalPickersList).isPollingRequest(defParamFromUrl != null)
                     .startForResult(CodeGenerateActivity.CODE);
         }

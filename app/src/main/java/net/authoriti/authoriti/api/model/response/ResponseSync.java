@@ -31,6 +31,11 @@ public class ResponseSync {
         @SerializedName("userId")
         private String userId;
 
+        @SerializedName("callAuth")
+        private boolean callAuth;
+
+        @SerializedName("callAuthNumber")
+        private String callAuthNumber;
 
         @SerializedName("accounts")
         private List<AccountID> accounts;
@@ -57,6 +62,22 @@ public class ResponseSync {
 
         public void setUserId(String userId) {
             this.userId = userId;
+        }
+
+        public boolean isCallAuth() {
+            return callAuth;
+        }
+
+        public void setCallAuth(boolean callAuth) {
+            this.callAuth = callAuth;
+        }
+
+        public String getCallAuthNumber() {
+            return callAuthNumber;
+        }
+
+        public void setCallAuthNumber(String callAuthNumber) {
+            this.callAuthNumber = callAuthNumber;
         }
     }
 }

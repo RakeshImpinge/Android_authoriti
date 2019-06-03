@@ -34,6 +34,11 @@ public class ResponseSignUpChase {
     @SerializedName("customerName")
     private String customerName;
 
+    @SerializedName("callAuth")
+    private boolean callAuth;
+
+    @SerializedName("callAuthNumber")
+    private String callAuthNumber;
 
     public String getId() {
         return id;
@@ -90,5 +95,21 @@ public class ResponseSignUpChase {
 
     public void setCustomerName(String customerName) {
         this.customerName = customerName;
+    }
+
+    public boolean isCallAuth() {
+        return callAuth;
+    }
+
+    public void setCallAuth(boolean callAuth) {
+        this.callAuth = callAuth;
+    }
+
+    public String getCallAuthNumber() {
+        return callAuthNumber;
+    }
+
+    public void setCallAuthNumber(String callAuthNumber) {
+        this.callAuthNumber = callAuthNumber;
     }
 }

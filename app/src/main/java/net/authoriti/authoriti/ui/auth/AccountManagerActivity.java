@@ -5,29 +5,27 @@ import android.net.Uri;
 import android.provider.Settings;
 import android.support.v4.content.LocalBroadcastManager;
 
-import net.authoriti.authoriti.core.AccountManagerUpdateInterfce;
-import net.authoriti.authoriti.ui.menu.AccountFragment;
-import net.authoriti.authoriti.ui.menu.AccountFragment_;
-import net.authoriti.authoriti.utils.Constants;
+import com.tozny.crypto.android.AesCbcWithIntegrity;
+
 import net.authoriti.authoriti.MainActivity_;
 import net.authoriti.authoriti.R;
-import net.authoriti.authoriti.api.AuthoritiAPI;
 import net.authoriti.authoriti.api.model.AccountID;
 import net.authoriti.authoriti.api.model.AuthLogIn;
 import net.authoriti.authoriti.api.model.User;
 import net.authoriti.authoriti.api.model.Value;
-import net.authoriti.authoriti.api.model.request.RequestSignUp;
 import net.authoriti.authoriti.api.model.response.ResponseSignUp;
+import net.authoriti.authoriti.core.AccountManagerUpdateInterfce;
 import net.authoriti.authoriti.core.SecurityActivity;
 import net.authoriti.authoriti.ui.alert.AccountAddDialog;
 import net.authoriti.authoriti.ui.items.AccountAddItem;
+import net.authoriti.authoriti.ui.menu.AccountFragment;
+import net.authoriti.authoriti.ui.menu.AccountFragment_;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiUtils;
+import net.authoriti.authoriti.utils.Constants;
 import net.authoriti.authoriti.utils.crypto.Crypto;
 import net.authoriti.authoriti.utils.crypto.CryptoKeyPair;
 import net.authoriti.authoriti.utils.crypto.CryptoUtil;
-
-import com.tozny.crypto.android.AesCbcWithIntegrity;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -37,10 +35,6 @@ import org.androidannotations.annotations.Extra;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;

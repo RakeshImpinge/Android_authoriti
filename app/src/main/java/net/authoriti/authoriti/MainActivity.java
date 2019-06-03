@@ -130,7 +130,7 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
                 long currentTime = System.currentTimeMillis() / 1000;
                 long inactiveTime = Long.parseLong(dataManager.getInactiveTime());
 
-                if (currentTime - inactiveTime > 60) {
+                if (currentTime - inactiveTime > INACTIVITY_TIME_OUT) {
                     logOut();
                 } else {
                     dataManager.setInactiveTime("");
@@ -374,6 +374,10 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
                             boolean isContained = false;
                             newAccountIDs.get(i).setCustomer(responseSync.getCustomerName());
                             newAccountIDs.get(i).setCustomer_ID(responseSync.getUserId());
+                            if (responseSync.isCallAuth() && responseSync.getCallAuthNumber() != null && !responseSync.getCallAuthNumber().equals("")) {
+                                newAccountIDs.get(i).setCallAuthNumber(responseSync.getCallAuthNumber());
+                            }
+
                             for (int k = 0; k < savedAccountIDs.size(); k++) {
                                 if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
                                         .getIdentifier())
