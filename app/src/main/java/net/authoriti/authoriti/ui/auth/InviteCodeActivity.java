@@ -212,7 +212,6 @@ public class InviteCodeActivity extends BaseActivity {
                                 try {
                                     JSONObject jObjError = new JSONObject(response.errorBody().string());
                                     message = jObjError.getString("message");
-                                    showAlert("", response.message());
                                 } catch (Exception e) {
                                     message = "";
                                     e.printStackTrace();

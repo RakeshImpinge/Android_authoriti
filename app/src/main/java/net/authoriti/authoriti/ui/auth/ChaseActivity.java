@@ -166,7 +166,6 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
                     try {
                         JSONObject jObjError = new JSONObject(response.errorBody().string());
                         message = jObjError.getString("message");
-                        showAlert("", response.message());
                     } catch (Exception e) {
                         message = "";
                         e.printStackTrace();

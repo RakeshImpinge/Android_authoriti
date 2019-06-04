@@ -223,7 +223,6 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                     try {
                         JSONObject jObjError = new JSONObject(response.errorBody().string());
                         message = jObjError.getString("message");
-                        showAlert("", response.message());
                     } catch (Exception e) {
                         message = "";
                         e.printStackTrace();
@@ -454,7 +453,6 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                     try {
                         JSONObject jObjError = new JSONObject(response.errorBody().string());
                         message = jObjError.getString("message");
-                        showAlert("", response.message());
                     } catch (Exception e) {
                         message = "";
                         e.printStackTrace();
@@ -566,7 +564,6 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                     try {
                         JSONObject jObjError = new JSONObject(response.errorBody().string());
                         message = jObjError.getString("message");
-                        showAlert("", response.message());
                     } catch (Exception e) {
                         message = "";
                         e.printStackTrace();

@@ -218,7 +218,6 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
                     try {
                         JSONObject jObjError = new JSONObject(response.errorBody().string());
                         message = jObjError.getString("message");
-                        showAlert("", response.message());
                     } catch (Exception e) {
                         message = "";
                         e.printStackTrace();
