@@ -15,6 +15,7 @@ import android.support.v4.widget.NestedScrollView;
 import android.text.TextUtils;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.tozny.crypto.android.AesCbcWithIntegrity;
 
@@ -45,6 +46,7 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
+import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
@@ -160,8 +162,17 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
                 if (response.code() == 200 && response.body() != null) {
                     fetchSignUpInfo(response.body());
                 } else {
-                    if (response.message() != null && !response.message().equals("")) {
+                    String message = "";
+                    try {
+                        JSONObject jObjError = new JSONObject(response.errorBody().string());
+                        message = jObjError.getString("message");
                         showAlert("", response.message());
+                    } catch (Exception e) {
+                        message = "";
+                        e.printStackTrace();
+                    }
+                    if (!message.equals("")) {
+                        showAlert("", message);
                     } else {
                         showAlert("", "Sign Up Failed. Try Again Later.");
                     }

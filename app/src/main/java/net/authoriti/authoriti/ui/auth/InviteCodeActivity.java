@@ -42,6 +42,7 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
+import org.json.JSONObject;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -207,8 +208,17 @@ public class InviteCodeActivity extends BaseActivity {
                             fetchInviteCodeResult(response.body(), isNextClick);
                         } else {
                             if (isNextClick) {
-                                if (response.message() != null && !response.message().equals("")) {
+                                String message = "";
+                                try {
+                                    JSONObject jObjError = new JSONObject(response.errorBody().string());
+                                    message = jObjError.getString("message");
                                     showAlert("", response.message());
+                                } catch (Exception e) {
+                                    message = "";
+                                    e.printStackTrace();
+                                }
+                                if (!message.equals("")) {
+                                    showAlert("", message);
                                 } else {
                                     showAlert("", "Invalid Password.");
                                 }

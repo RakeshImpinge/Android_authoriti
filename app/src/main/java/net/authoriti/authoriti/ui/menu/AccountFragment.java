@@ -43,6 +43,7 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
+import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
@@ -218,8 +219,17 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                 if (response.code() == 200 && response.body() != null) {
                     addAccount(name, id, setDefault);
                 } else {
-                    if (response.message() != null && !response.message().equals("")) {
+                    String message = "";
+                    try {
+                        JSONObject jObjError = new JSONObject(response.errorBody().string());
+                        message = jObjError.getString("message");
                         showAlert("", response.message());
+                    } catch (Exception e) {
+                        message = "";
+                        e.printStackTrace();
+                    }
+                    if (!message.equals("")) {
+                        showAlert("", message);
                     } else {
                         showAlert("", "Account Save Failed.");
                     }
@@ -440,8 +450,17 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                 if (response.code() == 200 && response.body() != null) {
                     userInfo(response.body());
                 } else {
-                    if (response.message() != null && !response.message().equals("")) {
+                    String message = "";
+                    try {
+                        JSONObject jObjError = new JSONObject(response.errorBody().string());
+                        message = jObjError.getString("message");
                         showAlert("", response.message());
+                    } catch (Exception e) {
+                        message = "";
+                        e.printStackTrace();
+                    }
+                    if (!message.equals("")) {
+                        showAlert("", message);
                     } else {
                         showAlert("", "Failed. Please Try Again Later.");
                     }
@@ -543,8 +562,17 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                     activity.fetchSignUpInfo(response.body(), dataManager.getUser());
                     activity.checkFingerPrintAuth();
                 } else {
-                    if (response.message() != null && !response.message().equals("")) {
+                    String message = "";
+                    try {
+                        JSONObject jObjError = new JSONObject(response.errorBody().string());
+                        message = jObjError.getString("message");
                         showAlert("", response.message());
+                    } catch (Exception e) {
+                        message = "";
+                        e.printStackTrace();
+                    }
+                    if (!message.equals("")) {
+                        showAlert("", message);
                     } else {
                         showAlert("", "Sign Up Failed. Try Again Later.");
                     }
