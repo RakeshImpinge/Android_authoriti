@@ -200,6 +200,7 @@ public class CodeGenerateActivity extends BaseActivity {
                 payloadGenerator = crypto.init(hashMap.get("value"), schemaIndex, privateKey);
                 userIndentifier = hashMap.get("value");
             } else if (key_root.equals(PICKER_TIME)) {
+                Log.i("CodeGenerateActivity", hashMap.get("key") + ": " + hashMap.get("value"));
                 Calendar newCalendar = timeFormat(hashMap.get("value"));
                 try {
                     payloadGenerator.addTime(newCalendar.getTime().getTime());
@@ -234,6 +235,7 @@ public class CodeGenerateActivity extends BaseActivity {
     }
 
     private Calendar timeFormat(String value) {
+        Log.i("CodeGenerateActivity", value);
         Calendar newCalendar = Calendar.getInstance();
         newCalendar.setTimeZone(TimeZone.getTimeZone("UTC"));
 
@@ -277,7 +279,7 @@ public class CodeGenerateActivity extends BaseActivity {
             case TIME_CUSTOM_TIME:
 
                 minutes = Long.parseLong(value);
-
+                Log.i("CodeGenerateActivity", "minutes: " + minutes);
                 day = (int) (minutes / (24 * 60));
                 hour = (int) (minutes % (24 * 60) / 60);
                 minute = (int) (minutes % (24 * 60) % 60);
@@ -300,6 +302,11 @@ public class CodeGenerateActivity extends BaseActivity {
                         newCalendar.get(Calendar.DAY_OF_MONTH) + day, newCalendar.get(Calendar
                                 .HOUR_OF_DAY) + hour, newCalendar.get(Calendar.MINUTE) + minute);
 
+                break;
+            default:
+                newCalendar.set(newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH),
+                        newCalendar.get(Calendar.DAY_OF_MONTH), newCalendar.get(Calendar
+                                .HOUR_OF_DAY), newCalendar.get(Calendar.MINUTE) + Integer.parseInt(value));
                 break;
 
         }
@@ -357,11 +364,10 @@ public class CodeGenerateActivity extends BaseActivity {
                 case TelephonyManager.CALL_STATE_RINGING:
                     isConnected = false;
                     break;
-                case TelephonyManager.CALL_STATE_OFFHOOK:
-                    isConnected = true;
-                    Log.e("callAuthorization", "CALL_STATE_OFFHOOK");
-                    callAuthorizationAPI();
-                    break;
+//                case TelephonyManager.CALL_STATE_OFFHOOK:
+//                    isConnected = true;
+//                    callAuthorizationAPI();
+//                    break;
                 case TelephonyManager.CALL_STATE_IDLE:
                     isConnected = false;
                     if (isCallAuthorizationRequestSent) {
@@ -374,26 +380,34 @@ public class CodeGenerateActivity extends BaseActivity {
         }
     };
 
-    android.os.Handler handler;
-
     private void callAuthorizationAPI() {
-        if (handler == null) {
-            handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (isConnected && !isCallAuthorizationRequestSent) {
-                        Log.e("callAuthorization", "Is Call established : " + isConnected);
-                        isCallAuthorizationRequestSent = true;
-                        callAuthorizationRequest(userIndentifier, permissionCode);
-                    }
-                    handler = null;
-                }
-            }, 2000);
+        callAuthorizationRequest(userIndentifier, permissionCode);
+    }
+
+    private void makePhoneCall() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
+                == PackageManager.PERMISSION_GRANTED) {
+            Intent callIntent = new Intent(Intent.ACTION_CALL);
+            callIntent.setData(Uri.parse("tel:" + Constants.AUTHORIZE_CALL_NUMBER));
+            startActivity(callIntent);
+
+            if (tm == null) {
+                tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+                tm.listen(listener, PhoneStateListener.LISTEN_CALL_STATE);
+            }
+
+        } else if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
+                == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CALL_PHONE, Manifest.permission.READ_PHONE_STATE},
+                    PERMISSIONS_REQUEST_CALL);
+        } else {
+            Toast.makeText(mContext, "Please allow call permission from setting", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void callAuthorizationRequest(String accountID, String permissionCode) {
+        displayProgressDialog("");
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("cid", accountID);
         hashMap.put("permissionCode", permissionCode);
@@ -412,16 +426,13 @@ public class CodeGenerateActivity extends BaseActivity {
                                            Response<ResponseCallAuthentication>
                                                    response) {
                         Log.e("callAuthorization", "" + response.isSuccessful());
-
-                        if (response.isSuccessful()) {
-
-                        } else {
-
-                        }
+                        dismissProgressDialog();
+                        makePhoneCall();
                     }
 
                     @Override
                     public void onFailure(Call<ResponseCallAuthentication> call, Throwable t) {
+                        dismissProgressDialog();
                         Log.e("callAuthorization", "" + t.getMessage());
                     }
                 });
