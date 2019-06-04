@@ -36,6 +36,7 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -213,8 +214,16 @@ public class AccountConfirmActivity extends SecurityActivity implements Security
                         showAlert("", "Failed to confirm your account number. Try again later.");
                     }
                 } else {
-                    if (response.message() != null && !response.message().equals("")) {
-                        showAlert("", response.message());
+                    String message = "";
+                    try {
+                        JSONObject jObjError = new JSONObject(response.errorBody().string());
+                        message = jObjError.getString("message");
+                    } catch (Exception e) {
+                        message = "";
+                        e.printStackTrace();
+                    }
+                    if (!message.equals("")) {
+                        showAlert("", message);
                     } else {
                         showAlert("", "Failed to confirm your account number. Try again later.");
                     }
