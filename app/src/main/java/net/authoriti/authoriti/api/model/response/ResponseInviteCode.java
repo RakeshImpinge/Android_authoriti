@@ -20,6 +20,12 @@ public class ResponseInviteCode {
     @SerializedName("ignoreAcuant")
     private boolean ignoreAcuant;
 
+    @SerializedName("callAuth")
+    private boolean callAuth;
+
+    @SerializedName("callAuthNumber")
+    private String callAuthNumber;
+
     public boolean isValid() {
         return valid;
     }
@@ -46,5 +52,29 @@ public class ResponseInviteCode {
 
     public void setSkipDLV(boolean skipDLV) {
         this.skipDLV = skipDLV;
+    }
+
+    public boolean isIgnoreAcuant() {
+        return ignoreAcuant;
+    }
+
+    public void setIgnoreAcuant(boolean ignoreAcuant) {
+        this.ignoreAcuant = ignoreAcuant;
+    }
+
+    public boolean isCallAuth() {
+        return callAuth;
+    }
+
+    public void setCallAuth(boolean callAuth) {
+        this.callAuth = callAuth;
+    }
+
+    public String getCallAuthNumber() {
+        return callAuthNumber;
+    }
+
+    public void setCallAuthNumber(String callAuthNumber) {
+        this.callAuthNumber = callAuthNumber;
     }
 }

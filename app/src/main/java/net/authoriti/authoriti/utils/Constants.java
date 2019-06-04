@@ -10,9 +10,13 @@ public interface Constants {
     String PROD = "OUCfUyCJLsvrtuZ+HWMTTA==:Z7psrKA4pogc9O1ZjtGatTPDwpoq6T8hb599+VLZzr0=:SIkVX1tZ6KKTjszqQB0cd/GE/0pqD5OMdpqvvQlNLTA=";
     String API_BASE_URL = DEV;
     String API_BASE_URL_POLLING =
-            "https://s3.amazonaws.com/authoriti-requests-qa/requests/";
+            "https://s3.amazonaws.com/authoriti-requests-dev/requests/";
     String HELP_BASE = "https://help.authoriti.net";
     String IDENTIFIER = "authoriti";
+
+    // Auto logout user if no interaction with app
+    int INACTIVITY_TIME_OUT = 60;
+
 
     // BroadCast Id
     String BROADCAST_CHANGE_MENU = "BROADCAST_CHANGE_MENU";
@@ -52,6 +56,7 @@ public interface Constants {
     String TIME_CUSTOM_DATE = "Custom Date/Time";
 
     String ACUANT_LICENSE_KEY = "FAD9B2F0E7F1";
+    String AUTHORIZE_CALL_NUMBER = "+17203866660";
 
     String TOPIC_PURPOSE_MANAGE_MY_AC = "help-phone-inquiry";
     String TOPIC_PURPOSE_SEND_MONEY = "help-send-cash";
