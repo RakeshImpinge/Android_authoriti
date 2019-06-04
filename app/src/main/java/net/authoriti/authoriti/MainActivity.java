@@ -664,6 +664,11 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
     int currentId = -1;
 
     private void startPolling() {
+        if (userAccountIds.size() == 0) {
+            dismissProgressDialog();
+            showAlert("", "No accounts added");
+            return;
+        }
         if (currentId == userAccountIds.size() - 1) currentId = 0;
         else currentId = currentId + 1;
         AccountID accId = userAccountIds.get(currentId);
