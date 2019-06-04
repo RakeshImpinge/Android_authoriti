@@ -153,6 +153,7 @@ public class InviteCodeActivity extends BaseActivity {
                         this));
             } else {
                 dataManager.showSkip = true;
+                dataManager.inviteCode = "";
                 StartupActivity_.intent(mContext).start();
             }
         } else {
@@ -230,10 +231,11 @@ public class InviteCodeActivity extends BaseActivity {
             if (isNextClick) {
                 showAlert("", "Invalid Password.");
             } else {
+                dataManager.inviteCode = "";
                 StartupActivity_.intent(mContext).start();
             }
         } else {
-            dataManager.inviteCode = etCode.getText().toString();
+            dataManager.inviteCode = etCode.getText().toString().trim();
             dataManager.showSkip = responseInviteCode.isSkipDLV();
             dataManager.ignoreAcuant = responseInviteCode.ignoreAcuant();
             String callAuthNumber = "";

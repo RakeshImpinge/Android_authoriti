@@ -333,6 +333,7 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
         }
     }
 
+
     @Click(R.id.ivAdd)
     void addButtonClicked() {
         LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(BROADCAST_ADD_BUTTON_CLICKED));
@@ -568,9 +569,13 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
                     if (picker.getPicker().equals(PICKER_TIME)) {
                         defValue = new DefaultValue(TIME_15_MINS, TIME_15_MINS, false);
                     } else if (picker.getPicker().equals(PICKER_ACCOUNT)) {
-                        defValue = new DefaultValue(dataManager.getUser().getAccountIDs().get(0)
-                                .getType(), dataManager.getUser().getAccountIDs().get(0)
-                                .getIdentifier(), false);
+                        if (dataManager.getUser().getAccountIDs().size() > 0) {
+                            defValue = new DefaultValue(dataManager.getUser().getAccountIDs().get(0)
+                                    .getType(), dataManager.getUser().getAccountIDs().get(0)
+                                    .getIdentifier(), false);
+                        } else {
+                            defValue = new DefaultValue("", "", false);
+                        }
                     } else if (picker.getPicker().equals(PICKER_DATA_TYPE)) {
                         if (defaultValuesHashMap.containsKey(PICKER_REQUEST)) {
                             List<Value> list = dataManager.getValuesFromDataType(defaultValuesHashMap.get(PICKER_REQUEST).getValue());
@@ -616,7 +621,7 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
                 defaultSelectedList = new HashMap<>();
             }
             for (String key : keyList) {
-                if (defaultSelectedList.containsKey(key)) {
+                if (defaultSelectedList.containsKey(key) && !defaultSelectedList.get(key.trim()).get(PICKER_ACCOUNT).getValue().equals("")) {
                     continue;
                 }
                 List<Picker> pickers = schemaHashList.get(key);
@@ -627,9 +632,13 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
                     if (picker.getPicker().equals(PICKER_TIME)) {
                         defValue = new DefaultValue(TIME_15_MINS, TIME_15_MINS, false);
                     } else if (picker.getPicker().equals(PICKER_ACCOUNT)) {
-                        defValue = new DefaultValue(dataManager.getUser().getAccountIDs().get(0)
-                                .getType(), dataManager.getUser().getAccountIDs().get(0)
-                                .getIdentifier(), false);
+                        if (dataManager.getUser().getAccountIDs().size() > 0) {
+                            defValue = new DefaultValue(dataManager.getUser().getAccountIDs().get(0)
+                                    .getType(), dataManager.getUser().getAccountIDs().get(0)
+                                    .getIdentifier(), false);
+                        } else {
+                            defValue = new DefaultValue("", "", false);
+                        }
                     } else if (picker.getPicker().equals(PICKER_DATA_TYPE)) {
                         if (defaultValuesHashMap.containsKey(PICKER_REQUEST)) {
                             List<Value> list = dataManager.getValuesFromDataType(defaultValuesHashMap.get(PICKER_REQUEST).getValue());
@@ -670,7 +679,7 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
     private void startPolling() {
         if (userAccountIds.size() == 0) {
             dismissProgressDialog();
-            showAlert("", "No accounts added");
+            showAlert("", "No Account/ID added");
             return;
         }
         if (currentId == userAccountIds.size() - 1) currentId = 0;

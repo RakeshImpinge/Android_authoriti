@@ -422,6 +422,11 @@ public class CodePermissionActivity extends BaseActivity {
                     }
                     hashMap.put("value", timeValue);
                 } else {
+                    if (adapterPicker.getPicker().equals(PICKER_ACCOUNT) && defaultPickerMap.get(adapterPicker.getPicker())
+                            .getValue().equals("")) {
+                        showAlert("", "No Account/ID Selected");
+                        return;
+                    }
                     hashMap.put("value", defaultPickerMap.get(adapterPicker.getPicker())
                             .getValue());
                 }
