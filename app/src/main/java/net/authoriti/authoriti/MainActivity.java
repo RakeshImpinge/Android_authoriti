@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
@@ -22,6 +23,7 @@ import net.authoriti.authoriti.api.model.request.RequestComplete;
 import net.authoriti.authoriti.api.model.request.RequestSync;
 import net.authoriti.authoriti.api.model.response.ResponseComplete;
 import net.authoriti.authoriti.api.model.response.ResponseSync;
+import net.authoriti.authoriti.core.SecurityActivity;
 import net.authoriti.authoriti.ui.menu.AccountFragment;
 import net.authoriti.authoriti.ui.menu.SettingFragment_;
 import net.authoriti.authoriti.utils.Log;
@@ -79,7 +81,8 @@ import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 @EActivity(R.layout.activity_main)
-public class MainActivity extends BaseActivity {
+public class MainActivity extends SecurityActivity implements SecurityActivity
+        .TouchIDEnableAlertListener {
 
     private static String TAG = "Authoriti/" + MainActivity.class.getName();
 
@@ -149,7 +152,6 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Foreground.get(getApplication()).addListener(listener);
-
     }
 
     @Override
@@ -331,6 +333,7 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+
     @Click(R.id.ivAdd)
     void addButtonClicked() {
         LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(BROADCAST_ADD_BUTTON_CLICKED));
@@ -372,6 +375,10 @@ public class MainActivity extends BaseActivity {
                             boolean isContained = false;
                             newAccountIDs.get(i).setCustomer(responseSync.getCustomerName());
                             newAccountIDs.get(i).setCustomer_ID(responseSync.getUserId());
+                            if (responseSync.isCallAuth() && responseSync.getCallAuthNumber() != null && !responseSync.getCallAuthNumber().equals("")) {
+                                newAccountIDs.get(i).setCallAuthNumber(responseSync.getCallAuthNumber());
+                            }
+
                             for (int k = 0; k < savedAccountIDs.size(); k++) {
                                 if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
                                         .getIdentifier())
@@ -432,6 +439,15 @@ public class MainActivity extends BaseActivity {
         loadPurposes();
         loadScheme();
         checkVersion();
+
+        if (dataManager.getUser().getFingerPrintAuthStatus().equals(TOUCH_NOT_CONFIGURED) && !dataManager.getUser().isFingerPrintAuthEnabled()) {
+            if (isBelowMarshmallow || fingerPrintHardwareNotDetected) {
+
+            } else {
+                setListener(this);
+                showTouchIDEnableAlert();
+            }
+        }
     }
 
 
@@ -553,9 +569,13 @@ public class MainActivity extends BaseActivity {
                     if (picker.getPicker().equals(PICKER_TIME)) {
                         defValue = new DefaultValue(TIME_15_MINS, TIME_15_MINS, false);
                     } else if (picker.getPicker().equals(PICKER_ACCOUNT)) {
-                        defValue = new DefaultValue(dataManager.getUser().getAccountIDs().get(0)
-                                .getType(), dataManager.getUser().getAccountIDs().get(0)
-                                .getIdentifier(), false);
+                        if (dataManager.getUser().getAccountIDs().size() > 0) {
+                            defValue = new DefaultValue(dataManager.getUser().getAccountIDs().get(0)
+                                    .getType(), dataManager.getUser().getAccountIDs().get(0)
+                                    .getIdentifier(), false);
+                        } else {
+                            defValue = new DefaultValue("", "", false);
+                        }
                     } else if (picker.getPicker().equals(PICKER_DATA_TYPE)) {
                         if (defaultValuesHashMap.containsKey(PICKER_REQUEST)) {
                             List<Value> list = dataManager.getValuesFromDataType(defaultValuesHashMap.get(PICKER_REQUEST).getValue());
@@ -601,7 +621,7 @@ public class MainActivity extends BaseActivity {
                 defaultSelectedList = new HashMap<>();
             }
             for (String key : keyList) {
-                if (defaultSelectedList.containsKey(key)) {
+                if (defaultSelectedList.containsKey(key) && !defaultSelectedList.get(key.trim()).get(PICKER_ACCOUNT).getValue().equals("")) {
                     continue;
                 }
                 List<Picker> pickers = schemaHashList.get(key);
@@ -612,15 +632,18 @@ public class MainActivity extends BaseActivity {
                     if (picker.getPicker().equals(PICKER_TIME)) {
                         defValue = new DefaultValue(TIME_15_MINS, TIME_15_MINS, false);
                     } else if (picker.getPicker().equals(PICKER_ACCOUNT)) {
-                        defValue = new DefaultValue(dataManager.getUser().getAccountIDs().get(0)
-                                .getType(), dataManager.getUser().getAccountIDs().get(0)
-                                .getIdentifier(), false);
+                        if (dataManager.getUser().getAccountIDs().size() > 0) {
+                            defValue = new DefaultValue(dataManager.getUser().getAccountIDs().get(0)
+                                    .getType(), dataManager.getUser().getAccountIDs().get(0)
+                                    .getIdentifier(), false);
+                        } else {
+                            defValue = new DefaultValue("", "", false);
+                        }
                     } else if (picker.getPicker().equals(PICKER_DATA_TYPE)) {
                         if (defaultValuesHashMap.containsKey(PICKER_REQUEST)) {
                             List<Value> list = dataManager.getValuesFromDataType(defaultValuesHashMap.get(PICKER_REQUEST).getValue());
                             if (list.size() == 0) {
                                 defValue = new DefaultValue("", "", false);
-
                             } else {
                                 defValue = new DefaultValue(list.get(0).getTitle(), list.get(0).getValue(),
                                         false);
@@ -654,6 +677,11 @@ public class MainActivity extends BaseActivity {
     int currentId = -1;
 
     private void startPolling() {
+        if (userAccountIds.size() == 0) {
+            dismissProgressDialog();
+            showAlert("", "No Account/ID added");
+            return;
+        }
         if (currentId == userAccountIds.size() - 1) currentId = 0;
         else currentId = currentId + 1;
         AccountID accId = userAccountIds.get(currentId);
@@ -788,5 +816,27 @@ public class MainActivity extends BaseActivity {
         public void onDataSaved();
     }
 
+
+    @Override
+    public void allowButtonClicked() {
+        hideTouchIDEnabledAlert();
+        if (fingerPrintNotRegistered) {
+            Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
+            startActivity(intent);
+        } else {
+            removeListener();
+            User user = dataManager.getUser();
+            user.setFingerPrintAuthEnabled(true);
+            user.setFingerPrintAuthStatus(TOUCH_ENABLED);
+            dataManager.setUser(user);
+        }
+    }
+
+    @Override
+    public void dontAllowButtonClicked() {
+        User user = dataManager.getUser();
+        user.setFingerPrintAuthStatus(TOUCH_DISABLED);
+        dataManager.setUser(user);
+    }
 
 }

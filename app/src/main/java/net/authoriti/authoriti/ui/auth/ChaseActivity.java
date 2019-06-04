@@ -75,6 +75,9 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
     @Extra
     String customer;
 
+    @Extra
+    String callAuthNumber;
+
     @ViewById(R.id.tvTitle)
     TextView tvTitle;
 
@@ -157,7 +160,11 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
                 if (response.code() == 200 && response.body() != null) {
                     fetchSignUpInfo(response.body());
                 } else {
-                    showAlert("", "Sign Up Failed. Try Again Later.");
+                    if (response.message() != null && !response.message().equals("")) {
+                        showAlert("", response.message());
+                    } else {
+                        showAlert("", "Sign Up Failed. Try Again Later.");
+                    }
                 }
             }
 
@@ -183,7 +190,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
                 boolean isContained = false;
                 newAccountIDs.get(i).setCustomer(responseSignUpChase.getCustomerName());
                 newAccountIDs.get(i).setCustomer_ID(responseSignUpChase.getId());
-
+                newAccountIDs.get(i).setCallAuthNumber(callAuthNumber);
                 for (int k = 0; k < savedAccountIDs.size(); k++) {
                     if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
                             .getIdentifier())
@@ -216,6 +223,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
             }
             for (AccountID accountID : UserAccountsList) {
                 accountID.setCustomer(customer);
+                accountID.setCallAuthNumber(callAuthNumber);
                 accountID.setCustomer_ID(responseSignUpChase.getId());
             }
             user.setAccountIDs(UserAccountsList);
@@ -298,6 +306,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
 
             User user = dataManager.getUser();
             user.setFingerPrintAuthEnabled(true);
+            user.setFingerPrintAuthStatus(TOUCH_ENABLED);
             dataManager.setUser(user);
 
             updateLoginState();
@@ -408,11 +417,13 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
             enableFingerPrintAndGoHome();
         }
 
-
     }
 
     @Override
     public void dontAllowButtonClicked() {
+        User user = dataManager.getUser();
+        user.setFingerPrintAuthStatus(TOUCH_DISABLED);
+        dataManager.setUser(user);
 
         hideTouchIDEnabledAlert();
 

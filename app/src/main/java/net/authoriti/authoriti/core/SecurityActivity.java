@@ -132,7 +132,6 @@ public class SecurityActivity extends BaseActivity implements FingerPrintAuthCal
 
     @Override
     protected void onResume() {
-        super.onResume();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
@@ -164,6 +163,8 @@ public class SecurityActivity extends BaseActivity implements FingerPrintAuthCal
 
             isBelowMarshmallow = true;
         }
+        super.onResume();
+
     }
 
     @Override

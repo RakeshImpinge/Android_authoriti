@@ -84,6 +84,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
 
     private static final String TAG = "AccountFragment";
     public Boolean signupInProgress = false;
+    public String licenceID = "";
 
     @AfterViews
     void callAfterViewInjection() {
@@ -123,7 +124,13 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
         rvAccount.setLayoutManager(new LinearLayoutManager(mContext));
         rvAccount.setAdapter(adapter);
 
-        showAccounts();
+        if (signupInProgress && !licenceID.equals("")) {
+            String hashedLicense  = CryptoUtil.hash(licenceID.replaceFirst("^0+(?!$)", ""));
+            saveAccount("License", hashedLicense, false);
+        } else {
+            showAccounts();
+        }
+
     }
 
     @Override
@@ -211,7 +218,11 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                 if (response.code() == 200 && response.body() != null) {
                     addAccount(name, id, setDefault);
                 } else {
-                    showAlert("", "Account Save Failed.");
+                    if (response.message() != null && !response.message().equals("")) {
+                        showAlert("", response.message());
+                    } else {
+                        showAlert("", "Account Save Failed.");
+                    }
                 }
             }
 
@@ -429,7 +440,11 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                 if (response.code() == 200 && response.body() != null) {
                     userInfo(response.body());
                 } else {
-                    showAlert("", "Failed. Please Try Again Later.");
+                    if (response.message() != null && !response.message().equals("")) {
+                        showAlert("", response.message());
+                    } else {
+                        showAlert("", "Failed. Please Try Again Later.");
+                    }
                 }
             }
 
@@ -461,10 +476,16 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
 
         int sz = newAccountIDs.size();
 
+        String callAuthNumber = "";
+        if (body.isCallAuth() && body.getCallAuthNumber() != null && !body.getCallAuthNumber().equals("")) {
+            callAuthNumber = body.getCallAuthNumber();
+        }
+
         for (int i = 0; i < sz; i++) {
             boolean isContained = false;
             newAccountIDs.get(i).setCustomer(body.getCustomerName());
             newAccountIDs.get(i).setCustomer_ID(body.getId());
+            newAccountIDs.get(i).setCallAuthNumber(callAuthNumber);
             final int savedAccountsSz = savedAccountIDs.size();
             for (int k = 0; k < savedAccountsSz; k++) {
                 if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
@@ -487,7 +508,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
     }
 
     private void signupSelfRegistered() {
-        final AccountManagerActivity activity = (AccountManagerActivity)getActivity();
+        final AccountManagerActivity activity = (AccountManagerActivity) getActivity();
 
         if (dataManager.accountIDs.size() == 0) {
             activity.mFingerPrintAuthHelper.startAuth();
@@ -522,7 +543,11 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                     activity.fetchSignUpInfo(response.body(), dataManager.getUser());
                     activity.checkFingerPrintAuth();
                 } else {
-                    showAlert("", "Sign Up Failed. Try Again Later.");
+                    if (response.message() != null && !response.message().equals("")) {
+                        showAlert("", response.message());
+                    } else {
+                        showAlert("", "Sign Up Failed. Try Again Later.");
+                    }
                 }
             }
 

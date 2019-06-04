@@ -85,7 +85,7 @@ public class AccountDownloadDialog extends AppCompatDialog {
                 } else if (TextUtils.isEmpty(etPasswrd.getText())) {
                     tiUserPassword.setError(utils.getSpannableStringForEditTextError("This field is required", getContext()));
                 } else {
-                    listener.accountDownloadDialogOKButtonClicked(etInvitationCode.getText().toString(), etUsername.getText().toString(), etPasswrd.getText().toString());
+                    listener.accountDownloadDialogOKButtonClicked(etInvitationCode.getText().toString().trim(), etUsername.getText().toString().trim(), etPasswrd.getText().toString().trim());
                 }
             }
         });

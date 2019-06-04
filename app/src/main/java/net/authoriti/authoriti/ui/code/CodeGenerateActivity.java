@@ -123,7 +123,10 @@ public class CodeGenerateActivity extends BaseActivity {
             completePollingRequest(userIndentifier, permissionCode);
         }
 
-        if (callAuthorization) {
+        if (dataManager.getUser().getAccountFromID(userIndentifier) != null
+                && dataManager.getUser().getAccountFromID(userIndentifier).getCallAuthNumber() != null
+                && !dataManager.getUser().getAccountFromID(userIndentifier).getCallAuthNumber().equals("")
+                && callAuthorization) {
             ivCall.setVisibility(View.VISIBLE);
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
                     == PackageManager.PERMISSION_DENIED) {
@@ -324,8 +327,31 @@ public class CodeGenerateActivity extends BaseActivity {
 
     @Click(R.id.ivCall)
     void callButtonClicked() {
-        isConnected = true;
-        callAuthorizationAPI();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
+                == PackageManager.PERMISSION_GRANTED) {
+            Intent callIntent = new Intent(Intent.ACTION_CALL);
+//            if (dataManager.getUser().getAccountFromID(userIndentifier) != null
+//                    && dataManager.getUser().getAccountFromID(userIndentifier).getCallAuthNumber() != null
+//                    && !dataManager.getUser().getAccountFromID(userIndentifier).getCallAuthNumber().equals("")) {
+            callIntent.setData(Uri.parse("tel:" + dataManager.getUser().getAccountFromID(userIndentifier).getCallAuthNumber()));
+//            } else {
+//                callIntent.setData(Uri.parse("tel:" + Constants.AUTHORIZE_CALL_NUMBER));
+//            }
+            startActivity(callIntent);
+
+            if (tm == null) {
+                tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+                tm.listen(listener, PhoneStateListener.LISTEN_CALL_STATE);
+            }
+
+        } else if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
+                == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CALL_PHONE, Manifest.permission.READ_PHONE_STATE},
+                    PERMISSIONS_REQUEST_CALL);
+        } else {
+            Toast.makeText(mContext, "Please allow call permission from setting", Toast.LENGTH_SHORT).show();
+        }
     }
 
 

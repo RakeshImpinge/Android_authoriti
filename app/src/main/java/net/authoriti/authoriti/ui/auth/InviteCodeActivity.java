@@ -153,6 +153,7 @@ public class InviteCodeActivity extends BaseActivity {
                         this));
             } else {
                 dataManager.showSkip = true;
+                dataManager.inviteCode = "";
                 StartupActivity_.intent(mContext).start();
             }
         } else {
@@ -192,7 +193,7 @@ public class InviteCodeActivity extends BaseActivity {
         } else {
             displayProgressDialog("Please Wait");
         }
-        AuthoritiAPI.APIService().checkInviteCodeValidate(etCode.getText().toString()).enqueue
+        AuthoritiAPI.APIService().checkInviteCodeValidate(etCode.getText().toString().trim()).enqueue
                 (new Callback<ResponseInviteCode>() {
                     @Override
                     public void onResponse(Call<ResponseInviteCode> call,
@@ -206,7 +207,11 @@ public class InviteCodeActivity extends BaseActivity {
                             fetchInviteCodeResult(response.body(), isNextClick);
                         } else {
                             if (isNextClick) {
-                                showAlert("", "Invalid Password.");
+                                if (response.message() != null && !response.message().equals("")) {
+                                    showAlert("", response.message());
+                                } else {
+                                    showAlert("", "Invalid Password.");
+                                }
                             } else {
                                 StartupActivity_.intent(mContext).start();
                             }
@@ -226,15 +231,20 @@ public class InviteCodeActivity extends BaseActivity {
             if (isNextClick) {
                 showAlert("", "Invalid Password.");
             } else {
+                dataManager.inviteCode = "";
                 StartupActivity_.intent(mContext).start();
             }
         } else {
-            dataManager.inviteCode = etCode.getText().toString();
+            dataManager.inviteCode = etCode.getText().toString().trim();
             dataManager.showSkip = responseInviteCode.isSkipDLV();
             dataManager.ignoreAcuant = responseInviteCode.ignoreAcuant();
+            String callAuthNumber = "";
+            if (responseInviteCode.isCallAuth() && responseInviteCode.getCallAuthNumber() != null && !responseInviteCode.getCallAuthNumber().equals("")) {
+                callAuthNumber = responseInviteCode.getCallAuthNumber();
+            }
             if (isSyncRequired) {
                 if (responseInviteCode.getCustomer() != null) {
-                    ChaseActivity_.intent(mContext).customer(responseInviteCode.getCustomer())
+                    ChaseActivity_.intent(mContext).customer(responseInviteCode.getCustomer()).callAuthNumber(callAuthNumber)
                             .isSyncRequired(isSyncRequired).start();
                     finish();
                 } else {
@@ -242,7 +252,7 @@ public class InviteCodeActivity extends BaseActivity {
                 }
             } else {
                 if (responseInviteCode.getCustomer() != null) {
-                    ChaseActivity_.intent(mContext).customer(responseInviteCode.getCustomer())
+                    ChaseActivity_.intent(mContext).customer(responseInviteCode.getCustomer()).callAuthNumber(callAuthNumber)
                             .start();
                 } else {
                     StartupActivity_.intent(mContext).start();
