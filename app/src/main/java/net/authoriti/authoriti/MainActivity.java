@@ -1,19 +1,25 @@
 package net.authoriti.authoriti;
 
+import android.Manifest;
+import android.accounts.Account;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -25,7 +31,10 @@ import net.authoriti.authoriti.api.model.response.ResponseComplete;
 import net.authoriti.authoriti.api.model.response.ResponseSync;
 import net.authoriti.authoriti.core.SecurityActivity;
 import net.authoriti.authoriti.ui.menu.AccountFragment;
+import net.authoriti.authoriti.ui.menu.ScanPopulateFragment;
+import net.authoriti.authoriti.ui.menu.ScanPopulateFragment_;
 import net.authoriti.authoriti.ui.menu.SettingFragment_;
+import net.authoriti.authoriti.ui.share.ImportActivity;
 import net.authoriti.authoriti.utils.Log;
 
 import android.view.View;
@@ -92,6 +101,7 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
     private Fragment purposeFragment;
     private Fragment settingFragment;
     private Fragment wipeFragment;
+    private Fragment scanPopulateFragment;
 
     Fragment accountFragment;
 
@@ -120,6 +130,8 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
     long PollingStopMilliseconds = 0;
 
     public PurposeSchemaStoreInterface purposeSchemaStoreInterface;
+
+    public static final int PERMISSIONS_REQUEST_CAMERA = 0;
 
 
     Foreground.Listener listener = new Foreground.Listener() {
@@ -187,6 +199,8 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
                                 (typeface),
                         new PrimaryDrawerItem().withName(R.string.menu_polling).withIdentifier
                                 (MENU_POLLING).withSelectable(true).withTypeface(typeface),
+                        new PrimaryDrawerItem().withName(R.string.menu_scan_populate).withIdentifier
+                                (MENU_SCAN_POPULATE).withSelectable(true).withTypeface(typeface),
                         new PrimaryDrawerItem().withName(R.string.menu_account).withIdentifier
                                 (MENU_ACCOUNT).withSelectable(true).withTypeface(typeface),
                         new PrimaryDrawerItem().withName(R.string.menu_change_pwd).withIdentifier
@@ -241,6 +255,11 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
             accountFragment = AccountFragment_.builder().build();
             ((AccountFragment) accountFragment).signupInProgress = false;
             fragment = accountFragment;
+        } else if (menu_id == MENU_SCAN_POPULATE) {
+            if (scanPopulateFragment == null) {
+                scanPopulateFragment = ScanPopulateFragment_.builder().build();
+            }
+            fragment = scanPopulateFragment;
         } else if (menu_id == MENU_SETTING) {
             if (settingFragment == null) {
                 settingFragment = SettingFragment_.builder().build();
@@ -285,9 +304,26 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
                 fragmentManager.beginTransaction().replace(R.id.frame_container, fragment)
                         .commitAllowingStateLoss();
             } else {
-                fragmentManager.beginTransaction().replace(R.id.frame_container, fragment)
-                        .addToBackStack(fragment.getClass().getName())
-                        .commitAllowingStateLoss();
+                if (fragment instanceof ScanPopulateFragment) {
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                            == PackageManager.PERMISSION_GRANTED) {
+                        fragmentManager.beginTransaction().replace(R.id.frame_container, fragment)
+                                .addToBackStack(fragment.getClass().getName())
+                                .commitAllowingStateLoss();
+                    } else if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                            == PackageManager.PERMISSION_DENIED) {
+                        ActivityCompat.requestPermissions(this,
+                                new String[]{Manifest.permission.CAMERA},
+                                PERMISSIONS_REQUEST_CAMERA);
+                    } else {
+                        startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse
+                                ("package:" + BuildConfig.APPLICATION_ID)));
+                    }
+                } else {
+                    fragmentManager.beginTransaction().replace(R.id.frame_container, fragment)
+                            .addToBackStack(fragment.getClass().getName())
+                            .commitAllowingStateLoss();
+                }
             }
         }
     }
@@ -755,8 +791,9 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
                 });
     }
 
+
     // Parse polling url and redirect to next screen
-    private boolean PermissionCodeRequest(String url, String customer) {
+    public boolean PermissionCodeRequest(String url, String customer) {
         String[] splitUrl = url.split("\\?");
         if (splitUrl.length > 0) {
             String label = splitUrl[0].replace("authoriti://purpose/", "");
@@ -789,6 +826,18 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
                         hashMap.put(splitValue[0].replace("-", ""), splitValue[1].replace("-", ""));
                     }
                 }
+
+                // This is the case for auto populate to get customer name from local data
+                if (customer.equals("")) {
+                    AccountID accountID = dataManager.getUser().getAccountFromID(hashMap.get(PICKER_ACCOUNT));
+                    if (accountID == null || accountID.getCustomer().equals("")) {
+                        return false;
+                    } else {
+                        customer = accountID.getCustomer();
+                    }
+                }
+
+
                 String customer_name = "";
                 try {
                     customer_name = URLDecoder.decode(hashMap.get("origin"), "UTF-8");
@@ -837,6 +886,22 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
         User user = dataManager.getUser();
         user.setFingerPrintAuthStatus(TOUCH_DISABLED);
         dataManager.setUser(user);
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == PERMISSIONS_REQUEST_CAMERA) {
+            for (int i = 0; i < permissions.length; i++) {
+                if (permissions[i].equalsIgnoreCase(Manifest.permission.CAMERA)) {
+                    if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                        changeFragment(scanPopulateFragment);
+                    }
+                    break;
+                }
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
 }
