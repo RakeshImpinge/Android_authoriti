@@ -27,6 +27,17 @@ import java.util.Map;
 public class AuthoritiUtils implements Constants {
 
 
+    Boolean isTouchEnabled=false;
+
+
+    public Boolean getTouchEnabled() {
+        return isTouchEnabled;
+    }
+
+    public void setTouchEnabled(Boolean touchEnabled) {
+        isTouchEnabled = touchEnabled;
+    }
+
     // update default values for new value ic_add
     public void updateDefaultvalues(Context context, String picker, Value value,
                                     Boolean

@@ -15,6 +15,7 @@ import net.authoriti.authoriti.api.model.User;
 import net.authoriti.authoriti.api.model.Value;
 import net.authoriti.authoriti.api.model.response.ResponseSignUp;
 import net.authoriti.authoriti.core.AccountManagerUpdateInterfce;
+import net.authoriti.authoriti.core.BaseActivity;
 import net.authoriti.authoriti.core.SecurityActivity;
 import net.authoriti.authoriti.ui.alert.AccountAddDialog;
 import net.authoriti.authoriti.ui.items.AccountAddItem;
@@ -44,12 +45,12 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
  */
 
 @EActivity(R.layout.activity_account_manager)
-public class AccountManagerActivity extends SecurityActivity implements SecurityActivity
-        .TouchIDEnableAlertListener, AccountAddDialog.AccountAddDialogListener, AccountAddItem
+public class AccountManagerActivity extends BaseActivity implements  AccountAddDialog.AccountAddDialogListener, AccountAddItem
         .AccountAddItemListener, AccountManagerUpdateInterfce {
 
     @Bean
     AuthoritiUtils utils;
+
     @Bean
     AuthoritiData dataManager;
 
@@ -183,59 +184,23 @@ public class AccountManagerActivity extends SecurityActivity implements Security
         dataManager.setAuthLogin(logIn);
     }
 
-    public void checkFingerPrintAuth() {
-        if (isBelowMarshmallow || fingerPrintHardwareNotDetected) {
-            updateLoginState();
-            goHome();
-        } else {
-            setListener(this);
-            showTouchIDEnableAlert();
-        }
-    }
 
-    private void goHome() {
+    public void goHome() {
+        updateLoginState();
+        User user = dataManager.getUser();
+        if(utils.getTouchEnabled()){
+            user.setFingerPrintAuthEnabled(true);
+            user.setFingerPrintAuthStatus(TOUCH_ENABLED);
+        }else
+        {
+            user.setFingerPrintAuthEnabled(false);
+            user.setFingerPrintAuthStatus(TOUCH_DISABLED);
+        }
+        dataManager.setUser(user);
         dataManager.setScheme(null);
         Intent intent = new Intent(this, MainActivity_.class);
         intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
-    }
-
-    private void enableFingerPrintAndGoHome() {
-        removeListener();
-        if (dataManager != null && dataManager.getUser() != null) {
-            User user = dataManager.getUser();
-            user.setFingerPrintAuthEnabled(true);
-            user.setFingerPrintAuthStatus(TOUCH_ENABLED);
-            dataManager.setUser(user);
-
-            updateLoginState();
-            goHome();
-        }
-    }
-
-    @Override
-    public void allowButtonClicked() {
-
-
-        hideTouchIDEnabledAlert();
-        if (fingerPrintNotRegistered) {
-            Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
-            startActivity(intent);
-        } else {
-            enableFingerPrintAndGoHome();
-        }
-    }
-
-    @Override
-    public void dontAllowButtonClicked() {
-        User user = dataManager.getUser();
-        user.setFingerPrintAuthStatus(TOUCH_DISABLED);
-        dataManager.setUser(user);
-
-        hideTouchIDEnabledAlert();
-
-        updateLoginState();
-        goHome();
     }
 
     private void showAccountAddDialog() {
