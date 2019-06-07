@@ -998,7 +998,7 @@ public class ScanActivity extends BaseActivity implements WebServiceListener,
                 if (grantResults.length > 0 && grantResults[0] == PackageManager
                         .PERMISSION_GRANTED) {
 
-                    acuantAndroidMobileSdkControllerInstance.enableLocationAuthentication(this);
+//                    acuantAndroidMobileSdkControllerInstance.enableLocationAuthentication(this);
 
                 } else {
 
