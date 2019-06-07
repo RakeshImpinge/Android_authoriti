@@ -3,14 +3,17 @@ package net.authoriti.authoriti.ui.auth;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.provider.Settings;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.text.TextUtils;
 import android.widget.EditText;
 
+import net.authoriti.authoriti.MainActivity_;
 import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.core.BaseActivity;
+import net.authoriti.authoriti.core.SecurityActivity;
 import net.authoriti.authoriti.ui.help.HelpActivity_;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiData_;
@@ -28,12 +31,16 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 /**
  * Created by mac on 12/13/17.
  */
 
 @EActivity(R.layout.activity_startup)
-public class StartupActivity extends BaseActivity {
+public class StartupActivity extends SecurityActivity implements SecurityActivity
+        .TouchIDEnableAlertListener {
 
     private boolean passwordMatched;
 
@@ -151,12 +158,45 @@ public class StartupActivity extends BaseActivity {
         if (!TextUtils.isEmpty(etPassword.getText()) && !TextUtils.isEmpty(etPassword.getText())
                 && passwordMatched) {
             hideKeyboard();
-            dataManager.password = etPassword.getText().toString();
-            if (dataManager.showSkip) {
-                AccountManagerActivity_.intent(mContext).start();
-            } else {
-                ScanActivity_.intent(mContext).start();
-            }
+            checkFingerPrintAuth();
+        }
+    }
+
+    @Override
+    public void allowButtonClicked() {
+        if (fingerPrintNotRegistered) {
+            Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
+            startActivity(intent);
+        } else {
+            hideTouchIDEnabledAlert();
+            utils.setTouchEnabled(true);
+            goNext();
+        }
+
+    }
+
+    @Override
+    public void dontAllowButtonClicked() {
+        hideTouchIDEnabledAlert();
+        utils.setTouchEnabled(false);
+        goNext();
+    }
+
+    private void checkFingerPrintAuth() {
+        if (isBelowMarshmallow || fingerPrintHardwareNotDetected) {
+            goNext();
+        } else {
+            setListener(this);
+            showTouchIDEnableAlert();
+        }
+    }
+
+    private void goNext() {
+        dataManager.password = etPassword.getText().toString();
+        if (dataManager.showSkip) {
+            AccountManagerActivity_.intent(mContext).start();
+        } else {
+            ScanActivity_.intent(mContext).start();
         }
     }
 }

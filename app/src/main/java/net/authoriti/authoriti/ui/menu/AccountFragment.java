@@ -526,12 +526,6 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
 
     private void signupSelfRegistered() {
         final AccountManagerActivity activity = (AccountManagerActivity) getActivity();
-
-        if (dataManager.accountIDs.size() == 0) {
-            activity.mFingerPrintAuthHelper.startAuth();
-            activity.checkFingerPrintAuth();
-            return;
-        }
         AesCbcWithIntegrity.SecretKeys keys;
         String keyStr = dataManager.getUser().getEncryptKey();
         String privateKey = "";
@@ -555,10 +549,8 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                 dismissProgressDialog();
                 if (response.code() == 200 && response.body() != null) {
                     hideKeyboard();
-
-                    activity.mFingerPrintAuthHelper.startAuth();
                     activity.fetchSignUpInfo(response.body(), dataManager.getUser());
-                    activity.checkFingerPrintAuth();
+                    activity.goHome();
                 } else {
                     String message = "";
                     try {
