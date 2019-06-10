@@ -83,9 +83,9 @@ public class User {
         return accountIDs;
     }
 
-    public AccountID getAccountFromID(String id) {
+    public AccountID getAccountFromID(String id,String customerName) {
         for (AccountID account : accountIDs) {
-            if (account.getIdentifier().equals(id)) {
+            if (account.getIdentifier().equals(id) && account.getCustomer().equals(customerName)) {
                 return account;
             }
         }

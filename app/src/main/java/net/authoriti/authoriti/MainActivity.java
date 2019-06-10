@@ -609,6 +609,7 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
                             defValue = new DefaultValue(dataManager.getUser().getAccountIDs().get(0)
                                     .getType(), dataManager.getUser().getAccountIDs().get(0)
                                     .getIdentifier(), false);
+                            defValue.setCustomer(dataManager.getUser().getAccountIDs().get(0).getCustomer());
                         } else {
                             defValue = new DefaultValue("", "", false);
                         }
@@ -672,6 +673,7 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
                             defValue = new DefaultValue(dataManager.getUser().getAccountIDs().get(0)
                                     .getType(), dataManager.getUser().getAccountIDs().get(0)
                                     .getIdentifier(), false);
+                            defValue.setCustomer(dataManager.getUser().getAccountIDs().get(0).getCustomer());
                         } else {
                             defValue = new DefaultValue("", "", false);
                         }
@@ -827,16 +829,6 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
                     }
                 }
 
-                // This is the case for auto populate to get customer name from local data
-                if (customer.equals("")) {
-                    AccountID accountID = dataManager.getUser().getAccountFromID(hashMap.get(PICKER_ACCOUNT));
-                    if (accountID == null || accountID.getCustomer().equals("")) {
-                        return false;
-                    } else {
-                        customer = accountID.getCustomer();
-                    }
-                }
-
 
                 String customer_name = "";
                 try {
@@ -846,6 +838,16 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
                     return false;
                 }
                 if (!hashMap.isEmpty() && indexGroup != -1 && indexItem != -1) {
+                    // This is the case for auto populate to get customer name from local data
+                    if (customer.equals("")) {
+                        AccountID accountID = dataManager.getUser().getAccountFromID(hashMap.get(PICKER_ACCOUNT), customer_name);
+                        if (accountID == null || accountID.getCustomer().equals("")) {
+                            return false;
+                        } else {
+                            customer = accountID.getCustomer();
+                        }
+                    }
+
                     if (customer_name.toLowerCase().equals(customer.toLowerCase())) {
                         CodePermissionActivity_.intent(mContext).purposeIndex(indexGroup)
                                 .purposeIndexItem(indexItem).defParamFromUrl(hashMap)

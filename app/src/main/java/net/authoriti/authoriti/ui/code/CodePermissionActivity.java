@@ -224,6 +224,43 @@ public class CodePermissionActivity extends BaseActivity {
                         defaultPickerMap.put(key, new DefaultValue(titles.toString(), values.toString(), false));
                     } catch (Exception ignore) {
                     }
+                } else if (key.equals(PICKER_ACCOUNT)){
+                    if (defParamFromUrl.containsKey(key)) {
+
+                        String customerName="";
+                        ArrayList<String> title = new ArrayList<>();
+                        ArrayList<String> value = new ArrayList<>();
+                        for (int k = 0; k < pickersList.get(i).getValues().size(); k++) {
+                            if (defParamFromUrl.get(pickersList.get(i).getPicker())
+                                    .contains(pickersList.get(i).getValues().get(k).getValue())) {
+                                AccountID accountID=dataManager.getUser().getAccountFromID(pickersList.get(i).getValues().get(k).getValue()
+                                        ,defParamFromUrl.get("origin"));
+                                if(accountID!=null){
+                                    customerName=accountID.getCustomer();
+                                    String titleVal = pickersList.get(i).getValues
+                                            ().get
+                                            (k)
+                                            .getTitle();
+
+                                    String valueVal = pickersList.get(i).getValues
+                                            ().get
+                                            (k)
+                                            .getValue();
+
+                                    title.add(titleVal);
+                                    value.add(valueVal);
+                                }
+                            }
+                        }
+                        if (title.size() > 0) {
+                            DefaultValue defaultValue = new DefaultValue(title.toString().replace
+                                    ("[", "").replace("]", "")
+                                    , value.toString().replace
+                                    ("[", "").replace("]", ""), false);
+                            defaultValue.setCustomer(customerName);
+                            defaultPickerMap.put(pickersList.get(i).getPicker(), defaultValue);
+                        }
+                    }
                 } else {
                     if (defParamFromUrl.containsKey(key)) {
                         ArrayList<String> title = new ArrayList<>();
@@ -475,8 +512,12 @@ public class CodePermissionActivity extends BaseActivity {
                 }
             }
 
-            CodeGenerateActivity_.intent(mContext).schemaIndex("" + group.getSchemaIndex()).callAuthorization(group.getCallAuthorization())
-                    .finalPickersList(finalPickersList).isPollingRequest(defParamFromUrl != null)
+            String customerName=defaultPickerMap.get(PICKER_ACCOUNT).getCustomer();
+            CodeGenerateActivity_.intent(mContext).schemaIndex("" + group.getSchemaIndex())
+                    .callAuthorization(group.getCallAuthorization())
+                    .finalPickersList(finalPickersList)
+                    .customerName(customerName)
+                    .isPollingRequest(defParamFromUrl != null)
                     .startForResult(CodeGenerateActivity.CODE);
         }
     }
@@ -525,7 +566,7 @@ public class CodePermissionActivity extends BaseActivity {
         List<Picker> pickersList = dataManager.getScheme().get("" + group.getSchemaIndex());
         for (int i = 0; i < pickersList.size(); i++) {
             if (pickersList.get(i).getPicker().equals(PICKER_REQUEST)) {
-                AccountID accountID = dataManager.getUser().getAccountFromID(defaultPickerMap.get(PICKER_ACCOUNT).getValue());
+                AccountID accountID = dataManager.getUser().getAccountFromID(defaultPickerMap.get(PICKER_ACCOUNT).getValue(),defaultPickerMap.get(PICKER_ACCOUNT).getCustomer());
                 String accountCustomerName = accountID.getCustomer();
                 Value newRequestorValue = null;
                 if (accountCustomerName != null && !accountCustomerName.equals("")) {

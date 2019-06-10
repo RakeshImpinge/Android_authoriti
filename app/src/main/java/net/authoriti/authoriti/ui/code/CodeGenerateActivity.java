@@ -79,6 +79,9 @@ public class CodeGenerateActivity extends BaseActivity {
     @Bean
     AuthoritiData dataManager;
 
+    @Extra
+    String customerName;
+
     @Bean
     AuthoritiUtils utils;
 
@@ -123,9 +126,9 @@ public class CodeGenerateActivity extends BaseActivity {
             completePollingRequest(userIndentifier, permissionCode);
         }
 
-        if (dataManager.getUser().getAccountFromID(userIndentifier) != null
-                && dataManager.getUser().getAccountFromID(userIndentifier).getCallAuthNumber() != null
-                && !dataManager.getUser().getAccountFromID(userIndentifier).getCallAuthNumber().equals("")
+        if (dataManager.getUser().getAccountFromID(userIndentifier,customerName) != null
+                && dataManager.getUser().getAccountFromID(userIndentifier,customerName).getCallAuthNumber() != null
+                && !dataManager.getUser().getAccountFromID(userIndentifier,customerName).getCallAuthNumber().equals("")
                 && callAuthorization) {
             ivCall.setVisibility(View.VISIBLE);
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
@@ -333,7 +336,7 @@ public class CodeGenerateActivity extends BaseActivity {
 //            if (dataManager.getUser().getAccountFromID(userIndentifier) != null
 //                    && dataManager.getUser().getAccountFromID(userIndentifier).getCallAuthNumber() != null
 //                    && !dataManager.getUser().getAccountFromID(userIndentifier).getCallAuthNumber().equals("")) {
-            callIntent.setData(Uri.parse("tel:" + dataManager.getUser().getAccountFromID(userIndentifier).getCallAuthNumber()));
+            callIntent.setData(Uri.parse("tel:" + dataManager.getUser().getAccountFromID(userIndentifier,customerName).getCallAuthNumber()));
 //            } else {
 //                callIntent.setData(Uri.parse("tel:" + Constants.AUTHORIZE_CALL_NUMBER));
 //            }
@@ -412,8 +415,8 @@ public class CodeGenerateActivity extends BaseActivity {
         hashMap.put("cid", accountID);
         hashMap.put("permissionCode", permissionCode);
         hashMap.put("schemaVersion", schemaIndex);
-        if (dataManager.getUser().getAccountFromID(accountID) != null && dataManager.getUser().getAccountFromID(accountID).getCustomer() != null) {
-            hashMap.put("customerName", dataManager.getUser().getAccountFromID(accountID).getCustomer());
+        if (dataManager.getUser().getAccountFromID(accountID,customerName) != null && dataManager.getUser().getAccountFromID(accountID,customerName).getCustomer() != null) {
+            hashMap.put("customerName", dataManager.getUser().getAccountFromID(accountID,customerName).getCustomer());
         } else {
             hashMap.put("customerName", "");
         }

@@ -25,6 +25,7 @@ public class OptionItem extends AbstractItem<OptionItem, OptionItem.ViewHolder> 
 
     private Value value;
     private boolean checked;
+    private String headingName = "";
     private String customerName = "";
 
     public OptionItem(Value value, boolean checked) {
@@ -32,9 +33,18 @@ public class OptionItem extends AbstractItem<OptionItem, OptionItem.ViewHolder> 
         this.checked = checked;
     }
 
-    public OptionItem(Value value, boolean checked, String customerName) {
+    public OptionItem(Value value, boolean checked, String headingName,String customerName) {
         this.value = value;
         this.checked = checked;
+        this.headingName = headingName;
+        this.customerName=customerName;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
         this.customerName = customerName;
     }
 
@@ -93,9 +103,9 @@ public class OptionItem extends AbstractItem<OptionItem, OptionItem.ViewHolder> 
             holder.llDate.setVisibility(View.INVISIBLE);
         }
 
-        if (!customerName.equals("")) {
+        if (!headingName.equals("")) {
             holder.rel_header.setVisibility(View.VISIBLE);
-            holder.txt_header.setText(customerName);
+            holder.txt_header.setText(headingName);
         } else {
             holder.txt_header.setText("");
             holder.rel_header.setVisibility(View.GONE);

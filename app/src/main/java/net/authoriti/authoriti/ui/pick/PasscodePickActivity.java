@@ -112,48 +112,7 @@ public class PasscodePickActivity extends BaseActivity {
                         () - 2) {
                     showTimePicker(item, position);
                 } else {
-//                    if (picker.getPicker().equals(PICKER_DATA_TYPE)) {
-//                        List<Value> values = dataManager.getSelectedValuesForDataType(utils
-//                                .getPickerSelectedIndex(PasscodePickActivity.this,
-// PICKER_REQUEST));
-//                        if (values == null) {
-//                            values = new ArrayList<>();
-//                        }
-//                        if (item.isChecked()) {
-//                            if (values.size() > 1) {
-//
-//                                for (Value value : values) {
-//                                    if (value.getValue().equals(item.getValue().getValue()) &&
-//                                            value.getTitle().equals(item.getValue().getTitle())) {
-//                                        values.remove(value);
-//
-//                                        item.setChecked(!item.isChecked());
-//                                        optionAdapter.notifyAdapterItemChanged(position);
-//
-//                                        dataManager.setSelectedValuesForDataType(utils
-//                                                .getPickerSelectedIndex(PasscodePickActivity
-//                                                        .this, PICKER_REQUEST), values);
-//                                        utils.setIndexSelected(mContext, pickerType, true);
-//
-//                                        break;
-//                                    }
-//                                }
-//                            }
-//                        } else {
-//                            values.ic_add(item.getValue());
-//                            item.setChecked(!item.isChecked());
-//                            optionAdapter.notifyAdapterItemChanged(position);
-//                            dataManager.setSelectedValuesForDataType(utils.getPickerSelectedIndex
-//                                    (PasscodePickActivity.this, PICKER_REQUEST), values);
-//                            utils.setIndexSelected(mContext, pickerType, true);
-//                        }
-//                    } else {
-//                        utils.setSelectedPickerIndex(mContext, pickerType, position);
-//                                 utils.setIndexSelected(mContext, pickerType, true);
-
-
-//                        finish();
-//                    }
+                    boolean isPickerRequestType = false;
                     if (pickerType.equals(PICKER_DATA_TYPE)) {
                         if (value.contains(picker.getValues().get(position).getValue())) {
                             if (value.size() > 1) {
@@ -176,36 +135,40 @@ public class PasscodePickActivity extends BaseActivity {
                         defaultPickerMap.put(pickerType, defaultValue);
                         optionAdapter.notifyAdapterDataSetChanged();
 
-                    } else {
+                    } else if (pickerType.equals(PICKER_REQUEST) && defaultPickerMap.containsKey
+                            (PICKER_DATA_TYPE)) {
+                        defaultValue.setTitle(picker.getValues().get(position).getTitle());
+                        defaultValue.setDefault(false);
+                        defaultValue.setValue(picker.getValues().get(position).getValue());
+                        defaultPickerMap.put(pickerType, defaultValue);
 
-                        boolean isPickerRequestType = false;
+                        List<Value> values = dataManager.getValuesFromDataType(picker
+                                .getValues().get(position).getValue());
+                        DefaultValue defaultValueDataType = new DefaultValue(values.get(0)
+                                .getTitle(), values.get(0).getValue(), false);
+                        defaultPickerMap.put(PICKER_DATA_TYPE, defaultValueDataType);
+                        isPickerRequestType = true;
+                    } else if(pickerType.equals(PICKER_ACCOUNT) ) {
+                        defaultValue.setTitle(picker.getValues().get(position).getTitle());
+                        defaultValue.setTitle(picker.getValues().get(position).getTitle());
+                        defaultValue.setDefault(false);
+                        defaultValue.setCustomer(item.getCustomerName());
+                        defaultValue.setValue(picker.getValues().get(position).getValue());
+                        defaultPickerMap.put(pickerType, defaultValue);
+                    }else {
+                        defaultValue.setTitle(picker.getValues().get(position).getTitle());
+                        defaultValue.setDefault(false);
 
-                        if (pickerType.equals(PICKER_REQUEST) && defaultPickerMap.containsKey
-                                (PICKER_DATA_TYPE)) {
-                            defaultValue.setTitle(picker.getValues().get(position).getTitle());
-                            defaultValue.setDefault(false);
-                            defaultValue.setValue(picker.getValues().get(position).getValue());
-                            defaultPickerMap.put(pickerType, defaultValue);
-
-                            List<Value> values = dataManager.getValuesFromDataType(picker
-                                    .getValues().get(position).getValue());
-                            DefaultValue defaultValueDataType = new DefaultValue(values.get(0)
-                                    .getTitle(), values.get(0).getValue(), false);
-                            defaultPickerMap.put(PICKER_DATA_TYPE, defaultValueDataType);
-                            isPickerRequestType = true;
-                        } else {
-                            defaultValue.setTitle(picker.getValues().get(position).getTitle());
-                            defaultValue.setDefault(false);
-                            defaultValue.setValue(picker.getValues().get(position).getValue());
-                            defaultPickerMap.put(pickerType, defaultValue);
-                        }
-
-                        Intent intent = new Intent();
-                        intent.putExtra("selected_values", defaultPickerMap);
-                        intent.putExtra("isPickerRequestType", isPickerRequestType);
-                        setResult(RESULT_OK, intent);
-                        finish();
+                        defaultValue.setValue(picker.getValues().get(position).getValue());
+                        defaultPickerMap.put(pickerType, defaultValue);
                     }
+
+                    Intent intent = new Intent();
+                    intent.putExtra("selected_values", defaultPickerMap);
+                    intent.putExtra("isPickerRequestType", isPickerRequestType);
+                    setResult(RESULT_OK, intent);
+                    finish();
+
                 }
                 return true;
             }
@@ -438,25 +401,26 @@ public class PasscodePickActivity extends BaseActivity {
 
             for (int i = 0; i < accountIDS.size(); i++) {
                 int position = i;
-                String customerName = "";
+                String headingeName = "";
                 if (position == 0 || !accountIDS.get(position).getCustomer().equals(accountIDS.get(position - 1).getCustomer())) {
-                    customerName = accountIDS.get(position).getCustomer();
-                    if (customerName.equals("")) {
-                        customerName = "Self Registered ID's";
+                    headingeName = accountIDS.get(position).getCustomer();
+                    if (headingeName.equals("")) {
+                        headingeName = "Self Registered ID's";
                     } else {
-                        customerName = customerName + " ID's";
+                        headingeName = headingeName + " ID's";
                     }
                 } else {
-                    customerName = "";
+                    headingeName = "";
                 }
 
                 Value value = new Value(accountIDS.get(i).getIdentifier(), accountIDS.get(i).getType());
                 accountNewList.add(value);
+
                 if (defaultValue.getValue().equals(accountIDS.get(i).getIdentifier())
-                        && defaultValue.getTitle().equals(accountIDS.get(i).getType())) {
-                    optionAdapter.add(new OptionItem(value, true, customerName));
+                        && defaultValue.getTitle().equals(accountIDS.get(i).getType()) && defaultValue.getCustomer().equals(accountIDS.get(i).getCustomer())) {
+                    optionAdapter.add(new OptionItem(value, true, headingeName,accountIDS.get(position).getCustomer()));
                 } else {
-                    optionAdapter.add(new OptionItem(value, false, customerName));
+                    optionAdapter.add(new OptionItem(value, false, headingeName,accountIDS.get(position).getCustomer()));
                 }
             }
             picker.setValues(accountNewList);

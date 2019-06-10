@@ -508,7 +508,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                 if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
                         .getIdentifier())
                         && savedAccountIDs.get(k).getType().equals(newAccountIDs.get(i)
-                        .getType())) {
+                        .getType()) && savedAccountIDs.get(k).getCustomer().equals(body.getCustomerName())) {
                     isContained = true;
                     break;
                 }
