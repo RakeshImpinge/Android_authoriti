@@ -15,6 +15,8 @@ public class DefaultValue implements Serializable {
 
     boolean isDefault;
 
+    String customer="";
+
     public DefaultValue(String title, String value, boolean isDefault) {
         this.title = title;
         this.value = value;
@@ -44,5 +46,14 @@ public class DefaultValue implements Serializable {
 
     public void setDefault(boolean aDefault) {
         isDefault = aDefault;
+    }
+
+
+    public String getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(String customer) {
+        this.customer = customer;
     }
 }
