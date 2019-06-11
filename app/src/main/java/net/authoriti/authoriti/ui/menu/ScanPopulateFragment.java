@@ -69,7 +69,7 @@ public class ScanPopulateFragment extends BaseFragment implements ZXingScannerVi
                 public void run() {
                     if (rawResult.getText().contains("authoriti://") && ((MainActivity) getActivity()).PermissionCodeRequest(rawResult.getText(), "")) {
                     } else {
-                        Toast.makeText(mContext, "Unable to scan. Trying Again", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, "Invalid Account/ID or QR Code", Toast.LENGTH_SHORT).show();
                         mScannerView.resumeCameraPreview(ScanPopulateFragment.this);
                     }
                 }

@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.util.Log;
 
+import net.authoriti.authoriti.MainActivity_;
 import net.authoriti.authoriti.R;
 import net.authoriti.authoriti.api.AuthoritiAPI;
 import net.authoriti.authoriti.api.model.request.RequestComplete;
@@ -51,6 +52,9 @@ import java.util.TimeZone;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 /**
  * Created by mac on 12/2/17.
@@ -320,7 +324,9 @@ public class CodeGenerateActivity extends BaseActivity {
 
     @Click({R.id.ivClose, R.id.cvGotIt})
     void closeButtonClicked() {
-        finish();
+        Intent intent = new Intent(this, MainActivity_.class);
+        intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
         Log.e("GoBack", "from here");
     }
 
