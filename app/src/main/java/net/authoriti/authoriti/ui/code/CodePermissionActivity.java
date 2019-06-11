@@ -48,45 +48,34 @@ import java.util.List;
 @EActivity(R.layout.activity_code_permission)
 public class CodePermissionActivity extends BaseActivity {
 
-    private Group group;
+    public static int INTENT_REQUEST_PICK_VALUE = 1;
+    public boolean isRequestClickAvailable = false;
     FastItemAdapter<CodeItem> adapter;
     FastItemAdapter<CodeEditItem> adapter_input;
     //    private Order order;
     @Extra
     int purposeIndex;
-
     @Extra
     int purposeIndexItem;
-
     @Extra
     HashMap<String, String> defParamFromUrl;
-
     @Bean
     AuthoritiData dataManager;
-
     @Bean
     AuthoritiUtils utils;
-
     @ViewById(R.id.rvPermission)
     RecyclerView rvPermission;
-
     @ViewById(R.id.rvEditFields)
     RecyclerView rvEditFields;
-
     @ViewById(R.id.etCode)
     EditText etCode;
-
     @ViewById(R.id.tv_title)
     TextView tv_title;
-
-
     HashMap<String, DefaultValue> defaultPickerMap = new HashMap<>();
-
-    public static int INTENT_REQUEST_PICK_VALUE = 1;
-
     int schemaIndex = -1;
-
-    public boolean isRequestClickAvailable = false;
+    List<Picker> pickersList = new ArrayList<>();
+    ArrayList<Integer> uiFlaseListIndex = new ArrayList<>();
+    private Group group;
 
     @AfterViews
     void callAfterViewInjection() {
@@ -103,8 +92,6 @@ public class CodePermissionActivity extends BaseActivity {
         showSchema();
         tv_title.setText(group.getLabel());
     }
-
-    List<Picker> pickersList = new ArrayList<>();
 
     private void createPickerList() {
         pickersList = dataManager.getScheme().get("" + group.getSchemaIndex());
@@ -224,41 +211,25 @@ public class CodePermissionActivity extends BaseActivity {
                         defaultPickerMap.put(key, new DefaultValue(titles.toString(), values.toString(), false));
                     } catch (Exception ignore) {
                     }
-                } else if (key.equals(PICKER_ACCOUNT)){
-                    if (defParamFromUrl.containsKey(key)) {
-
-                        String customerName="";
-                        ArrayList<String> title = new ArrayList<>();
-                        ArrayList<String> value = new ArrayList<>();
-                        for (int k = 0; k < pickersList.get(i).getValues().size(); k++) {
-                            if (defParamFromUrl.get(pickersList.get(i).getPicker())
-                                    .contains(pickersList.get(i).getValues().get(k).getValue())) {
-                                AccountID accountID=dataManager.getUser().getAccountFromID(pickersList.get(i).getValues().get(k).getValue()
-                                        ,defParamFromUrl.get("origin"));
-                                if(accountID!=null){
-                                    customerName=accountID.getCustomer();
-                                    String titleVal = pickersList.get(i).getValues
-                                            ().get
-                                            (k)
-                                            .getTitle();
-
-                                    String valueVal = pickersList.get(i).getValues
-                                            ().get
-                                            (k)
-                                            .getValue();
-
-                                    title.add(titleVal);
-                                    value.add(valueVal);
-                                }
-                            }
-                        }
-                        if (title.size() > 0) {
-                            DefaultValue defaultValue = new DefaultValue(title.toString().replace
-                                    ("[", "").replace("]", "")
-                                    , value.toString().replace
-                                    ("[", "").replace("]", ""), false);
-                            defaultValue.setCustomer(customerName);
+                } else if (key.equals(PICKER_ACCOUNT) && defParamFromUrl.containsKey(key)) {
+                    String origin = "";
+                    try {
+                        origin = URLDecoder.decode(defParamFromUrl.get("origin"), "UTF-8");
+                    } catch (Exception e) {
+                        origin = "";
+                        e.printStackTrace();
+                    }
+                    for (int k = 0; k < dataManager.getUser().getAccountIDs().size(); k++) {
+                        if (defParamFromUrl.get(pickersList.get(i).getPicker())
+                                .equals(dataManager.getUser().getAccountIDs().get(k).getIdentifier())
+                                && origin.equals(dataManager.getUser().getAccountIDs().get(k).getCustomer())) {
+                            AccountID accountID = dataManager.getUser().getAccountIDs().get(k);
+                            DefaultValue defaultValue = new DefaultValue(accountID.getType()
+                                    , accountID.getIdentifier()
+                                    , false);
+                            defaultValue.setCustomer(accountID.getCustomer());
                             defaultPickerMap.put(pickersList.get(i).getPicker(), defaultValue);
+                            break;
                         }
                     }
                 } else {
@@ -295,9 +266,6 @@ public class CodePermissionActivity extends BaseActivity {
             }
         }
     }
-
-
-    ArrayList<Integer> uiFlaseListIndex = new ArrayList<>();
 
     private void showSchema() {
         adapter.clear();
@@ -512,7 +480,7 @@ public class CodePermissionActivity extends BaseActivity {
                 }
             }
 
-            String customerName=defaultPickerMap.get(PICKER_ACCOUNT).getCustomer();
+            String customerName = defaultPickerMap.get(PICKER_ACCOUNT).getCustomer();
             CodeGenerateActivity_.intent(mContext).schemaIndex("" + group.getSchemaIndex())
                     .callAuthorization(group.getCallAuthorization())
                     .finalPickersList(finalPickersList)
@@ -566,7 +534,7 @@ public class CodePermissionActivity extends BaseActivity {
         List<Picker> pickersList = dataManager.getScheme().get("" + group.getSchemaIndex());
         for (int i = 0; i < pickersList.size(); i++) {
             if (pickersList.get(i).getPicker().equals(PICKER_REQUEST)) {
-                AccountID accountID = dataManager.getUser().getAccountFromID(defaultPickerMap.get(PICKER_ACCOUNT).getValue(),defaultPickerMap.get(PICKER_ACCOUNT).getCustomer());
+                AccountID accountID = dataManager.getUser().getAccountFromID(defaultPickerMap.get(PICKER_ACCOUNT).getValue(), defaultPickerMap.get(PICKER_ACCOUNT).getCustomer());
                 String accountCustomerName = accountID.getCustomer();
                 Value newRequestorValue = null;
                 if (accountCustomerName != null && !accountCustomerName.equals("")) {
