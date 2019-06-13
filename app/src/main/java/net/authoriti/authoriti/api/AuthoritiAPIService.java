@@ -22,6 +22,7 @@ import java.util.Map;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -85,7 +86,7 @@ public interface AuthoritiAPIService {
                                 @Part MultipartBody.Part back);
 
     @GET("")
-    Call<ResponsePolling> getPollingUrl(@Url String url);
+    Call<ResponseBody> getPollingUrl(@Url String url);
 
     @POST("api/v1/pc-request/complete")
     Call<ResponseComplete> completePollingRequest(@Body RequestComplete requestComplete);
