@@ -75,6 +75,8 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -82,6 +84,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -712,30 +715,100 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
         }
     }
 
-    int currentId = -1;
-
     private void startPolling() {
         if (userAccountIds.size() == 0) {
             dismissProgressDialog();
             showAlert("", "No Account/ID added");
             return;
         }
-        if (currentId == userAccountIds.size() - 1) currentId = 0;
-        else currentId = currentId + 1;
-        AccountID accId = userAccountIds.get(currentId);
-        if (!accId.getCustomer().equalsIgnoreCase("")) {
-            pollingApi(accId.getIdentifier(), accId.getCustomer());
-        } else {
-            if (System.currentTimeMillis() < PollingStopMilliseconds) {
-                handler.removeCallbacks(runnable);
-                handler.postDelayed(runnable, 100);
-            } else {
-                dismissProgressDialog();
-                showAlert("", "No Pending Updates");
+        StringBuilder query = new StringBuilder("");
+        boolean first = true;
+        final HashMap<String, ArrayList<String>> accCustomerMap = new HashMap<>();
+        for (AccountID accId : userAccountIds) {
+            String customer = accId.getCustomer();
+            if (!customer.equalsIgnoreCase("")) {
+                if (first) {
+                    query.append("?");
+                    first = false;
+                } else {
+                    query.append("&");
+                }
+                String id = accId.getIdentifier();
+                query.append("accountIds[]=" + id);
+
+                if (!accCustomerMap.containsKey(id)) {
+                    accCustomerMap.put(id, new ArrayList<String>());
+                }
+
+                accCustomerMap.get(id).add(customer);
             }
         }
-    }
 
+        final String url = ConstantUtils.getBaseUrl() + "/api/v1/pc-request/poll" + query.toString();
+        AuthoritiAPI.APIService().getPollingUrl(url).enqueue
+                (new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        try {
+                            String resp = response.body().string();
+                            System.out.println("Response: " + resp);
+                            JSONObject jsonObject = new JSONObject(resp);
+                            System.out.println("Converted");
+                            boolean available = jsonObject.getBoolean("available");
+                            if (available) {
+                                JSONArray data = jsonObject.getJSONArray("data");
+                                int n = data.length();
+                                for (int i = 0; i < n; i++) {
+                                    JSONObject obj = data.getJSONObject(i);
+                                    String requestString = obj.getString("url");
+                                    String id = obj.getString(("id"));
+
+                                    boolean done = false;
+
+                                    List<String> customers = accCustomerMap.get(id);
+                                    for (String customer: customers) {
+                                        if (PermissionCodeRequest(requestString, customer)) {
+                                            removePendingRequest(id);
+                                            dismissProgressDialog();
+                                            done = true;
+                                        }
+                                    }
+
+                                    if (!done) {
+                                        pollAgain();
+                                    }
+                                }
+                            } else {
+                                pollAgain();
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable throwable) {
+                        dismissProgressDialog();
+                        showAlert("", "No Pending Updates");
+                    }
+                });
+
+
+//        if (currentId == userAccountIds.size() - 1) currentId = 0;
+//        else currentId = currentId + 1;
+//        AccountID accId = userAccountIds.get(currentId);
+//        if (!accId.getCustomer().equalsIgnoreCase("")) {
+//            pollingApi(accId.getIdentifier(), accId.getCustomer());
+//        } else {
+//            if (System.currentTimeMillis() < PollingStopMilliseconds) {
+//                handler.removeCallbacks(runnable);
+//                handler.postDelayed(runnable, 100);
+//            } else {
+//                dismissProgressDialog();
+//                showAlert("", "No Pending Updates");
+//            }
+//        }
+    }
     Handler handler = new Handler();
     private Runnable runnable = new Runnable() {
         @Override
@@ -744,37 +817,46 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
         }
     };
 
-    private void pollingApi(final String Id, final String customer) {
-        String pollingUrl = Constants.API_BASE_URL_POLLING + Id + ".json";
-        AuthoritiAPI.APIService().getPollingUrl(pollingUrl).enqueue
-                (new Callback<ResponsePolling>() {
-                    @Override
-                    public void onResponse(Call<ResponsePolling> call,
-                                           Response<ResponsePolling>
-                                                   response) {
-                        if (response.isSuccessful() && response.body().getUrl() != null &&
-                                !response.body().getUrl().equals("") &&
-                                PermissionCodeRequest(response.body().getUrl(), customer)) {
-                            removePendingRequest(Id);
-                            dismissProgressDialog();
-                        } else {
-                            if (System.currentTimeMillis() < PollingStopMilliseconds) {
-                                handler.removeCallbacks(runnable);
-                                handler.postDelayed(runnable, 100);
-                            } else {
-                                dismissProgressDialog();
-                                showAlert("", "No Pending Updates");
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<ResponsePolling> call, Throwable t) {
-                        t.printStackTrace();
-                        dismissProgressDialog();
-                    }
-                });
+    private void pollAgain() {
+        if (System.currentTimeMillis() < PollingStopMilliseconds) {
+            handler.removeCallbacks(runnable);
+            handler.postDelayed(runnable, 100);
+        } else {
+            dismissProgressDialog();
+            showAlert("", "No Pending Updates");
+        }
     }
+//    private void pollingApi(final String Id, final String customer) {
+//        String pollingUrl = Constants.API_BASE_URL_POLLING + Id + ".json";
+//        AuthoritiAPI.APIService().getPollingUrl(pollingUrl).enqueue
+//                (new Callback<ResponsePolling>() {
+//                    @Override
+//                    public void onResponse(Call<ResponsePolling> call,
+//                                           Response<ResponsePolling>
+//                                                   response) {
+//                        if (response.isSuccessful() && response.body().getUrl() != null &&
+//                                !response.body().getUrl().equals("") &&
+//                                PermissionCodeRequest(response.body().getUrl(), customer)) {
+//                            removePendingRequest(Id);
+//                            dismissProgressDialog();
+//                        } else {
+//                            if (System.currentTimeMillis() < PollingStopMilliseconds) {
+//                                handler.removeCallbacks(runnable);
+//                                handler.postDelayed(runnable, 100);
+//                            } else {
+//                                dismissProgressDialog();
+//                                showAlert("", "No Pending Updates");
+//                            }
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Call<ResponsePolling> call, Throwable t) {
+//                        t.printStackTrace();
+//                        dismissProgressDialog();
+//                    }
+//                });
+//    }
 
     private void removePendingRequest(String accountID) {
         RequestComplete requestComplete = new RequestComplete(accountID, "");
