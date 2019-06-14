@@ -60,6 +60,7 @@ import net.authoriti.authoriti.ui.menu.WipeFragment_;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.ConstantUtils;
 import net.authoriti.authoriti.utils.Constants;
+import net.authoriti.authoriti.utils.crypto.CryptoUtil;
 
 import com.google.gson.JsonObject;
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -491,7 +492,7 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
 
 
     private void loadPurposes() {
-        AuthoritiAPI.APIService().getPurposes(ConstantUtils.isBuildFlavorVnb() ? "vnb" : "").enqueue(new Callback<List<Purpose>>() {
+        AuthoritiAPI.APIService().getPurposes(ConstantUtils.isBuildFlavorVnb() ? "vnb" : "", CryptoUtil.hash(dataManager.getUser().getInviteCode().replaceAll("\\s",""))).enqueue(new Callback<List<Purpose>>() {
             @Override
             public void onResponse(Call<List<Purpose>> call, Response<List<Purpose>> response) {
                 dismissProgressDialog();

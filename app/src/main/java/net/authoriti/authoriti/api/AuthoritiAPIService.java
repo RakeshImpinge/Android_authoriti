@@ -52,7 +52,7 @@ public interface AuthoritiAPIService {
     Call<JsonObject> getMinimuVersion();
 
     @GET("api/v1/purpose")
-    Call<List<Purpose>> getPurposes(@Query("client") String client);
+    Call<List<Purpose>> getPurposes(@Query("client") String client, @Query("code") String code);
 
     @FormUrlEncoded
     @POST("api/v1/invite")
