@@ -492,7 +492,8 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
 
 
     private void loadPurposes() {
-        AuthoritiAPI.APIService().getPurposes(ConstantUtils.isBuildFlavorVnb() ? "vnb" : "", CryptoUtil.hash(dataManager.getUser().getInviteCode().replaceAll("\\s",""))).enqueue(new Callback<List<Purpose>>() {
+        String inviteCode = dataManager.getUser().getInviteCode().equals("") ? "" : CryptoUtil.hash(dataManager.getUser().getInviteCode().replaceAll("\\s", ""));
+        AuthoritiAPI.APIService().getPurposes(ConstantUtils.isBuildFlavorVnb() ? "vnb" : "", inviteCode).enqueue(new Callback<List<Purpose>>() {
             @Override
             public void onResponse(Call<List<Purpose>> call, Response<List<Purpose>> response) {
                 dismissProgressDialog();
@@ -767,7 +768,7 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
                                     boolean done = false;
 
                                     List<String> customers = accCustomerMap.get(id);
-                                    for (String customer: customers) {
+                                    for (String customer : customers) {
                                         if (PermissionCodeRequest(requestString, customer)) {
                                             removePendingRequest(id);
                                             dismissProgressDialog();
@@ -810,6 +811,7 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
 //            }
 //        }
     }
+
     Handler handler = new Handler();
     private Runnable runnable = new Runnable() {
         @Override
