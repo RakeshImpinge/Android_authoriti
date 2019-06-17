@@ -552,11 +552,12 @@ public class AuthoritiData {
     }
 
     public void wipeSetting(Context context) {
-
         setUser(null);
-
         setScheme(null);
-
+        setPurposes(null);
+        setDefaultValues(null);
+        setDataTypeKeys(null);
+        setDataType(null);
         setAccountPicker(null);
         setIndustryPicker(null);
         setLocationPicker(null);
@@ -568,11 +569,9 @@ public class AuthoritiData {
         setDataTypePicker(null);
         inviteCode = null;
         password = "";
-
         accountIDs = null;
         defaultAccountSelected = false;
         defaultAccountIndex = 0;
-
         setSelectedAccountIndex(0);
         setSelectedIndustryIndex(0);
         setSelectedCountryIndex(0);
@@ -580,7 +579,6 @@ public class AuthoritiData {
         setSelectedGeoIndex(0);
         setSelectedRequestIndex(0);
         setSelectedDataTypeIndex(0);
-
         setAccountIndexSelected(false);
         setIndustryIndexSelected(false);
         setCountryIndexSelected(false);

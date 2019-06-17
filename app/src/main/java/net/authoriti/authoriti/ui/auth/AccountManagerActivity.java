@@ -2,7 +2,6 @@ package net.authoriti.authoriti.ui.auth;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.provider.Settings;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.tozny.crypto.android.AesCbcWithIntegrity;
@@ -16,7 +15,6 @@ import net.authoriti.authoriti.api.model.Value;
 import net.authoriti.authoriti.api.model.response.ResponseSignUp;
 import net.authoriti.authoriti.core.AccountManagerUpdateInterfce;
 import net.authoriti.authoriti.core.BaseActivity;
-import net.authoriti.authoriti.core.SecurityActivity;
 import net.authoriti.authoriti.ui.alert.AccountAddDialog;
 import net.authoriti.authoriti.ui.items.AccountAddItem;
 import net.authoriti.authoriti.ui.menu.AccountFragment;
@@ -101,8 +99,9 @@ public class AccountManagerActivity extends BaseActivity implements  AccountAddD
         user.setEncryptPrivateKey(currentUser.getEncryptPrivateKey());
 
         user.setPassword(currentUser.getPassword());
-
-        user.setInviteCode(dataManager.inviteCode);
+        // To update existing added invite code
+        user.setInvite(dataManager.getUser().getInviteCode());
+        user.setInviteCodeComma(dataManager.inviteCode);
 
         try {
             int szUserAccounts = user.getAccountIDs().size();

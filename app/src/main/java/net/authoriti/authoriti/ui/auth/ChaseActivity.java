@@ -10,12 +10,10 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.text.TextUtils;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.tozny.crypto.android.AesCbcWithIntegrity;
 
@@ -29,7 +27,6 @@ import net.authoriti.authoriti.api.model.User;
 import net.authoriti.authoriti.api.model.request.RequestSignUpChase;
 import net.authoriti.authoriti.api.model.response.ResponseSignUpChase;
 import net.authoriti.authoriti.core.SecurityActivity;
-import net.authoriti.authoriti.ui.help.HelpActivity_;
 import net.authoriti.authoriti.ui.share.ImportActivity;
 import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiUtils;
@@ -223,9 +220,8 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
             User user = new User();
             user.setUserId(responseSignUpChase.getId());
             user.setToken(responseSignUpChase.getToken());
-            user.setInviteCode(dataManager.inviteCode);
+            user.setInviteCodeComma(dataManager.inviteCode);
             user.setChaseType(true);
-
             List<AccountID> UserAccountsList = responseSignUpChase.getAccounts();
             final int sz = UserAccountsList.size();
             for (int i = 0; i < sz; i++) {
