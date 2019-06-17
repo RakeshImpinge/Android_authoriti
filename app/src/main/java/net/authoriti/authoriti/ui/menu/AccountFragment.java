@@ -8,9 +8,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.widget.ImageButton;
-import android.widget.Toast;
 
 import net.authoriti.authoriti.MainActivity;
 import net.authoriti.authoriti.R;
@@ -35,7 +32,6 @@ import net.authoriti.authoriti.utils.Constants;
 import net.authoriti.authoriti.utils.crypto.CryptoUtil;
 import net.authoriti.authoriti.utils.crypto.EcDSA;
 
-import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 import com.tozny.crypto.android.AesCbcWithIntegrity;
 
 import org.androidannotations.annotations.AfterViews;
@@ -46,10 +42,8 @@ import org.androidannotations.annotations.ViewById;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -416,7 +410,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
         }
     }
 
-    private void signUp(String inviteCode, final String userName, String password) {
+    private void signUp(final String inviteCode, final String userName, String password) {
         AccountID accountID = new AccountID("", userName, false);
         List<AccountID> accountIDs = new ArrayList<>();
         accountIDs.add(accountID);
@@ -447,7 +441,8 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
                     response) {
                 dismissProgressDialog();
                 if (response.code() == 200 && response.body() != null) {
-                    userInfo(response.body());
+                    userInfo(response.body(),inviteCode);
+                    ((MainActivity) getActivity()).loadData();
                 } else {
                     String message = "";
                     try {
@@ -473,7 +468,13 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
         });
     }
 
-    private void userInfo(ResponseSignUpChase body) {
+    private void userInfo(ResponseSignUpChase body, String inviteCode) {
+
+        dataManager.setDataType(null);
+        dataManager.setDefaultValues(null);
+        dataManager.setScheme(null);
+        dataManager.setPurposes(null);
+
         User user = dataManager.getUser();
         user.setToken(body.getToken());
 
@@ -519,6 +520,7 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
         }
         savedAccountIDs.addAll(newIds);
         user.setAccountIDs(savedAccountIDs);
+        user.setInviteCodeComma(inviteCode);
         dataManager.setUser(user);
 
         showAccounts();

@@ -470,6 +470,10 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
     @Override
     protected void onResume() {
         super.onResume();
+        loadData();
+    }
+
+    public void loadData() {
         if ((dataManager.getPurposes() == null || dataManager.getScheme() == null)) {
             isAllDataLoaded = 0;
         } else {
@@ -492,7 +496,7 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
 
 
     private void loadPurposes() {
-        String inviteCode = dataManager.getUser().getInviteCode().equals("") ? "" : CryptoUtil.hash(dataManager.getUser().getInviteCode().replaceAll("\\s", ""));
+        String inviteCode = dataManager.getUser().getInviteCode();
         AuthoritiAPI.APIService().getPurposes(ConstantUtils.isBuildFlavorVnb() ? "vnb" : "", inviteCode).enqueue(new Callback<List<Purpose>>() {
             @Override
             public void onResponse(Call<List<Purpose>> call, Response<List<Purpose>> response) {

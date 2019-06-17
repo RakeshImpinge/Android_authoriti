@@ -2,6 +2,8 @@ package net.authoriti.authoriti.api.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import net.authoriti.authoriti.utils.crypto.CryptoUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,8 +77,23 @@ public class User {
         return inviteCode;
     }
 
-    public void setInviteCode(String inviteCode) {
-        this.inviteCode = inviteCode;
+    public void setInvite(String inviteCode) {
+        this.inviteCode= inviteCode;
+        System.out.println("------inviteCode-----"+inviteCode);
+    }
+
+
+    public void setInviteCodeComma(String inviteCode) {
+        if(inviteCode==null || inviteCode.equals("")) return;
+        inviteCode= CryptoUtil.hash(inviteCode);
+        if(this.inviteCode==null || this.inviteCode.equals("")){
+            this.inviteCode = inviteCode;
+        }else{
+            if(!this.inviteCode.contains(inviteCode)){
+                this.inviteCode = this.inviteCode+","+inviteCode;
+            }
+        }
+        System.out.println("------inviteCode-----"+this.inviteCode);
     }
 
     public List<AccountID> getAccountIDs() {
