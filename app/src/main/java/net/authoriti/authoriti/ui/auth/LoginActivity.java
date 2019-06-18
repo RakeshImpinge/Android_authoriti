@@ -230,6 +230,7 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
 
     private void goHome() {
         Intent intent = new Intent(this, MainActivity_.class);
+        intent.putExtra("refreshAccountData",true);
         intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
