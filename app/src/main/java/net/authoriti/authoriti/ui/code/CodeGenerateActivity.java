@@ -373,10 +373,11 @@ public class CodeGenerateActivity extends BaseActivity {
                 case TelephonyManager.CALL_STATE_RINGING:
                     isConnected = false;
                     break;
-//                case TelephonyManager.CALL_STATE_OFFHOOK:
-//                    isConnected = true;
-//                    callAuthorizationAPI();
-//                    break;
+                case TelephonyManager.CALL_STATE_OFFHOOK:
+                    isConnected = true;
+                    System.out.println("Making API Call");
+                    callAuthorizationAPI();
+                    break;
                 case TelephonyManager.CALL_STATE_IDLE:
                     isConnected = false;
                     if (isCallAuthorizationRequestSent) {
