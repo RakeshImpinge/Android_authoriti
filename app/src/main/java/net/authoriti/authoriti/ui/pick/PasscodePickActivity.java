@@ -94,9 +94,6 @@ public class PasscodePickActivity extends BaseActivity {
         defaultValue = defaultPickerMap.get(pickerType);
         tvTitle.setText(picker.getTitle());
 
-
-        addValuesToPicker();
-
         optionAdapter = new FastItemAdapter<OptionItem>();
         optionAdapter.withSelectable(true);
         rvOptions.setLayoutManager(new LinearLayoutManager(mContext));
@@ -135,47 +132,45 @@ public class PasscodePickActivity extends BaseActivity {
                         defaultPickerMap.put(pickerType, defaultValue);
                         optionAdapter.notifyAdapterDataSetChanged();
 
-                    } else if (pickerType.equals(PICKER_REQUEST) && defaultPickerMap.containsKey
-                            (PICKER_DATA_TYPE)) {
-                        defaultValue.setTitle(picker.getValues().get(position).getTitle());
-                        defaultValue.setDefault(false);
-                        defaultValue.setValue(picker.getValues().get(position).getValue());
-                        defaultPickerMap.put(pickerType, defaultValue);
+                    } else{
+                        if (pickerType.equals(PICKER_REQUEST) && defaultPickerMap.containsKey
+                                (PICKER_DATA_TYPE)) {
+                            defaultValue.setTitle(picker.getValues().get(position).getTitle());
+                            defaultValue.setDefault(false);
+                            defaultValue.setValue(picker.getValues().get(position).getValue());
+                            defaultPickerMap.put(pickerType, defaultValue);
 
-                        List<Value> values = dataManager.getValuesFromDataType(picker
-                                .getValues().get(position).getValue());
-                        DefaultValue defaultValueDataType = new DefaultValue(values.get(0)
-                                .getTitle(), values.get(0).getValue(), false);
-                        defaultPickerMap.put(PICKER_DATA_TYPE, defaultValueDataType);
-                        isPickerRequestType = true;
-                    } else if(pickerType.equals(PICKER_ACCOUNT) ) {
-                        defaultValue.setTitle(picker.getValues().get(position).getTitle());
-                        defaultValue.setTitle(picker.getValues().get(position).getTitle());
-                        defaultValue.setDefault(false);
-                        defaultValue.setCustomer(item.getCustomerName());
-                        defaultValue.setValue(picker.getValues().get(position).getValue());
-                        defaultPickerMap.put(pickerType, defaultValue);
-                    }else {
-                        defaultValue.setTitle(picker.getValues().get(position).getTitle());
-                        defaultValue.setDefault(false);
+                            List<Value> values = dataManager.getValuesFromDataType(picker
+                                    .getValues().get(position).getValue());
+                            DefaultValue defaultValueDataType = new DefaultValue(values.get(0)
+                                    .getTitle(), values.get(0).getValue(), false);
+                            defaultPickerMap.put(PICKER_DATA_TYPE, defaultValueDataType);
+                            isPickerRequestType = true;
+                        } else if(pickerType.equals(PICKER_ACCOUNT) ) {
+                            defaultValue.setTitle(picker.getValues().get(position).getTitle());
+                            defaultValue.setTitle(picker.getValues().get(position).getTitle());
+                            defaultValue.setDefault(false);
+                            defaultValue.setCustomer(item.getCustomerName());
+                            defaultValue.setValue(picker.getValues().get(position).getValue());
+                            defaultPickerMap.put(pickerType, defaultValue);
+                        }else {
+                            defaultValue.setTitle(picker.getValues().get(position).getTitle());
+                            defaultValue.setDefault(false);
 
-                        defaultValue.setValue(picker.getValues().get(position).getValue());
-                        defaultPickerMap.put(pickerType, defaultValue);
+                            defaultValue.setValue(picker.getValues().get(position).getValue());
+                            defaultPickerMap.put(pickerType, defaultValue);
+                        }
+                        Intent intent = new Intent();
+                        intent.putExtra("selected_values", defaultPickerMap);
+                        intent.putExtra("isPickerRequestType", isPickerRequestType);
+                        setResult(RESULT_OK, intent);
+                        finish();
                     }
-
-                    Intent intent = new Intent();
-                    intent.putExtra("selected_values", defaultPickerMap);
-                    intent.putExtra("isPickerRequestType", isPickerRequestType);
-                    setResult(RESULT_OK, intent);
-                    finish();
-
                 }
                 return true;
             }
         });
-
         showOptions();
-
         tv_title.setText(getHeaderTitle(picker.getPicker()));
     }
 
@@ -196,29 +191,6 @@ public class PasscodePickActivity extends BaseActivity {
         }
     }
 
-    private void addValuesToPicker() {
-//        // Adding default values of Picker is of Time
-//        if (pickerType.equals(PICKER_TIME)) {
-//            picker = utils.getDefaultTimePicker(picker);
-//        } else if (pickerType.equals(PICKER_ACCOUNT)) {
-//            List<Value> values = new ArrayList<>();
-//            for (AccountID accountID : dataManager.getUser().getAccountIDs()) {
-//                Value value = new Value(accountID.getIdentifier(), accountID
-//                        .getType());
-//                values.ic_add(value);
-//            }
-//            picker.setValues(values);
-//        } else if (pickerType.equals(PICKER_DATA_TYPE)) {
-//            List<Value> values;
-//            if (defaultPickerMap.containsKey(PICKER_REQUEST)) {
-//                values = dataManager.getValuesFromDataType(Integer.valueOf(defaultPickerMap.get
-//                        (PICKER_REQUEST).getValue().toString()));
-//            } else {
-//                values = dataManager.getValuesFromDataType(schemaIndex);
-//            }
-//            picker.setValues(values);
-//        }
-    }
 
     private void showDatePicker(final OptionItem item, final int position) {
         final Calendar newCalendar = Calendar.getInstance();
@@ -284,25 +256,6 @@ public class PasscodePickActivity extends BaseActivity {
 
                         } else {
                             Log.e("Diff - ", String.valueOf(TimeUnit.MILLISECONDS.toMinutes(diff)));
-//                            Value value = item.getValue();
-//                            value.setCustomDate(true);
-//                            value.setValue(String.valueOf(TimeUnit.MILLISECONDS.toMinutes(diff) +
-//                                    initialMinutes));
-//
-//                            item.setChecked(true);
-//                            item.setValue(value);
-//                            optionAdapter.notifyAdapterItemChanged(position);
-//
-//                            updateTimePicker(position, value);
-//
-//                            OptionItem prevItem = optionAdapter.getAdapterItem(selectedIndex);
-//                            prevItem.setChecked(false);
-//                            optionAdapter.notifyAdapterItemChanged(selectedIndex);
-//
-//                            utils.setSelectedPickerIndex(mContext, pickerType, position);
-//                            utils.setIndexSelected(mContext, pickerType, true);
-//
-//                            finish();
                             defaultValue.setTitle(String.valueOf(TimeUnit.MILLISECONDS.toMinutes
                                     (diff) + initialMinutes));
                             defaultValue.setDefault(false);
@@ -331,19 +284,6 @@ public class PasscodePickActivity extends BaseActivity {
                         if (hourOfDay == 0 && minute == 0) {
                             showAlert("", "You should choose at least 1 minute.");
                         } else {
-//                            Value value = item.getValue();
-//                            value.setCustomDate(true);
-//                            value.setValue(String.valueOf(hourOfDay * 60 + minute));
-//                            item.setChecked(true);
-//                            item.setValue(value);
-//                            optionAdapter.notifyAdapterItemChanged(position);
-//                            updateTimePicker(position, value);
-//                            OptionItem prevItem = optionAdapter.getAdapterItem(selectedIndex);
-//                            prevItem.setChecked(false);
-//                            optionAdapter.notifyAdapterItemChanged(selectedIndex);
-//                            utils.setSelectedPickerIndex(mContext, pickerType, position);
-//                            utils.setIndexSelected(mContext, pickerType, true);
-//                            finish();
                             defaultValue.setTitle(String.valueOf(hourOfDay * 60 + minute));
                             defaultValue.setDefault(false);
                             defaultValue.setValue(TIME_CUSTOM_TIME);
@@ -361,13 +301,6 @@ public class PasscodePickActivity extends BaseActivity {
 
     }
 
-    private void updateTimePicker(int position, Value value) {
-
-        picker.getValues().set(position, value);
-
-        dataManager.setTimePicker(picker);
-
-    }
 
     private void showOptions() {
         value = new ArrayList<String>(Arrays.asList(defaultValue.getValue().split("\\s*,\\s*")));
@@ -438,7 +371,13 @@ public class PasscodePickActivity extends BaseActivity {
                     } else {
                         optionAdapter.add(new OptionItem(picker.getValues().get(i), false));
                     }
-                } else {
+                } else if (pickerType.equals(PICKER_GEO)) {
+                    if (defaultValue.getValue().equals(picker.getValues().get(i).getValue()) &&  defaultValue.getTitle().equals(picker.getValues().get(i).getTitle())) {
+                        optionAdapter.add(new OptionItem(picker.getValues().get(i), true));
+                    } else {
+                        optionAdapter.add(new OptionItem(picker.getValues().get(i), false));
+                    }
+                }else {
                     if (defaultValue.getValue().equals(picker.getValues().get(i).getValue())) {
                         optionAdapter.add(new OptionItem(picker.getValues().get(i), true));
                     } else {
@@ -460,7 +399,6 @@ public class PasscodePickActivity extends BaseActivity {
 
     @Click(R.id.ivHelp)
     void helpButtonClicked() {
-
         String endPoint = "";
         if (pickerType.equalsIgnoreCase(PICKER_ACCOUNT)) {
             endPoint = TOPIC_PICKER_ACCOUNT_ID;
@@ -483,6 +421,5 @@ public class PasscodePickActivity extends BaseActivity {
                 (endPoint)));
         startActivity(browserIntent);
     }
-
 
 }

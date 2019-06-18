@@ -75,6 +75,7 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -127,6 +128,9 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
     @ViewById(R.id.ivHelp)
     ImageButton ivHelp;
 
+    boolean refreshAccountData;
+
+
     long SELECTED_MENU_ID;
 
     ArrayList<AccountID> userAccountIds = new ArrayList<>();
@@ -168,6 +172,9 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Foreground.get(getApplication()).addListener(listener);
+        if(getIntent().hasExtra("refreshAccountData")){
+            refreshAccountData=getIntent().getExtras().getBoolean("refreshAccountData");
+        }
     }
 
     @Override
@@ -483,6 +490,9 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
         loadPurposes();
         loadScheme();
         checkVersion();
+        if (refreshAccountData) {
+            refreshCallAuthentication();
+        }
 
         if (dataManager.getUser().getFingerPrintAuthStatus().equals(TOUCH_NOT_CONFIGURED) && !dataManager.getUser().isFingerPrintAuthEnabled()) {
             if (isBelowMarshmallow || fingerPrintHardwareNotDetected) {
@@ -492,6 +502,7 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
                 showTouchIDEnableAlert();
             }
         }
+
     }
 
 
@@ -750,7 +761,7 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
             }
         }
 
-        final String url = ConstantUtils.getBaseUrl() + "/api/v1/pc-request/poll" + query.toString();
+        final String url = "https://kwhhlke7m3.execute-api.us-east-1.amazonaws.com/qa/poll" + query.toString();
         AuthoritiAPI.APIService().getPollingUrl(url).enqueue
                 (new Callback<ResponseBody>() {
                     @Override
@@ -799,21 +810,6 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
                     }
                 });
 
-
-//        if (currentId == userAccountIds.size() - 1) currentId = 0;
-//        else currentId = currentId + 1;
-//        AccountID accId = userAccountIds.get(currentId);
-//        if (!accId.getCustomer().equalsIgnoreCase("")) {
-//            pollingApi(accId.getIdentifier(), accId.getCustomer());
-//        } else {
-//            if (System.currentTimeMillis() < PollingStopMilliseconds) {
-//                handler.removeCallbacks(runnable);
-//                handler.postDelayed(runnable, 100);
-//            } else {
-//                dismissProgressDialog();
-//                showAlert("", "No Pending Updates");
-//            }
-//        }
     }
 
     Handler handler = new Handler();
@@ -833,37 +829,6 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
             showAlert("", "No Pending Updates");
         }
     }
-//    private void pollingApi(final String Id, final String customer) {
-//        String pollingUrl = Constants.API_BASE_URL_POLLING + Id + ".json";
-//        AuthoritiAPI.APIService().getPollingUrl(pollingUrl).enqueue
-//                (new Callback<ResponsePolling>() {
-//                    @Override
-//                    public void onResponse(Call<ResponsePolling> call,
-//                                           Response<ResponsePolling>
-//                                                   response) {
-//                        if (response.isSuccessful() && response.body().getUrl() != null &&
-//                                !response.body().getUrl().equals("") &&
-//                                PermissionCodeRequest(response.body().getUrl(), customer)) {
-//                            removePendingRequest(Id);
-//                            dismissProgressDialog();
-//                        } else {
-//                            if (System.currentTimeMillis() < PollingStopMilliseconds) {
-//                                handler.removeCallbacks(runnable);
-//                                handler.postDelayed(runnable, 100);
-//                            } else {
-//                                dismissProgressDialog();
-//                                showAlert("", "No Pending Updates");
-//                            }
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onFailure(Call<ResponsePolling> call, Throwable t) {
-//                        t.printStackTrace();
-//                        dismissProgressDialog();
-//                    }
-//                });
-//    }
 
     private void removePendingRequest(String accountID) {
         RequestComplete requestComplete = new RequestComplete(accountID, "");
@@ -993,6 +958,69 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
             }
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    // Refresh Saved AccountID's callAuthentication Status
+    public void refreshCallAuthentication() {
+        RequestSync sycnew = new RequestSync();
+        List<AccountID> downloadIdList = dataManager.getUser().getAccountIDs();
+        List<String> customerIDList = new ArrayList<>();
+        for (AccountID accountID : downloadIdList) {
+            if (!accountID.getCustomer_ID().equals("") && !customerIDList.contains(accountID.getCustomer_ID())) {
+                customerIDList.add(accountID.getCustomer_ID());
+            }
+        }
+        if (customerIDList.size() == 0) {
+            refreshAccountData = false;
+            return;
+        }
+        sycnew.setUserId(customerIDList);
+        AuthoritiAPI.APIService().sync("Bearer " + dataManager.getUser().getToken(), sycnew).enqueue(new Callback<ResponseSync>() {
+            @Override
+            public void onResponse(Call<ResponseSync> call, Response<ResponseSync> response) {
+                if (response.isSuccessful()) {
+                    User user = dataManager.getUser();
+                    List<AccountID> savedAccountIDs = user.getAccountIDs();
+                    List<AccountID> newIds = new ArrayList<>();
+                    for (ResponseSync.Sync responseSync : response.body().getUpdates()) {
+                        List<AccountID> newAccountIDs = responseSync.getAccounts();
+                        final int newAccounts = newAccountIDs.size();
+                        Log.e("Sync", "Total number of accounts: " + newAccounts);
+                        for (int i = 0; i < newAccounts; i++) {
+                            Log.e("Loop", "" + i);
+                            boolean isContained = false;
+                            newAccountIDs.get(i).setCustomer(responseSync.getCustomerName());
+                            newAccountIDs.get(i).setCustomer_ID(responseSync.getUserId());
+                            if (responseSync.isCallAuth() && responseSync.getCallAuthNumber() != null && !responseSync.getCallAuthNumber().equals("")) {
+                                newAccountIDs.get(i).setCallAuthNumber(responseSync.getCallAuthNumber());
+                            }
+
+                            for (int k = 0; k < savedAccountIDs.size(); k++) {
+                                if (savedAccountIDs.get(k).getIdentifier().equals(newAccountIDs.get(i)
+                                        .getIdentifier())
+                                        && savedAccountIDs.get(k).getType().equals(newAccountIDs.get(i)
+                                        .getType())) {
+                                    isContained = true;
+                                    break;
+                                }
+                            }
+                            if (isContained) {
+                                newIds.add(newAccountIDs.get(i));
+                            }
+                        }
+                    }
+                    user.setAccountIDs(newIds);
+                    dataManager.setUser(user);
+                } else {
+                }
+                refreshAccountData = false;
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSync> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
     }
 
 }
