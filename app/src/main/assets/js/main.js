@@ -27,6 +27,7 @@ var json_schema = SObject([
             ["confirmed", SBoolean()],
             ["hashed", SBoolean()],
             ["value", SHex(32, "lower")],
+            ["callAuthNumber", SString()],
             ["type", SString()]
         ])
     )],

@@ -490,7 +490,7 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
         loadPurposes();
         loadScheme();
         checkVersion();
-        if (refreshAccountData) {
+        if (refreshAccountData && dataManager.getPurposes()!=null) {
             refreshCallAuthentication();
         }
 

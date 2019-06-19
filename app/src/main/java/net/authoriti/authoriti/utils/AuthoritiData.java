@@ -586,6 +586,7 @@ public class AuthoritiData {
         setGeoIndexSelected(false);
         setRequestIndexSelected(false);
         setDataTypeIndexSelected(false);
+        setDefaultAccountID(null);
 
         SharedPreferences preferences = context.getSharedPreferences("Authoriti", Context
                 .MODE_PRIVATE);

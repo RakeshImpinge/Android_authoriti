@@ -158,6 +158,7 @@ public class ExportActivity extends BaseActivity implements WebAppInterface.Data
             JSONObject jsonObject = new JSONObject(gson.toJson(user));
             jsonObject.remove("encryptPassword");
             jsonObject.put("identifier", encrypted_id);
+            jsonObject.put("invite_code", dataManager.getUser().getInviteCode()==null?"":dataManager.getUser().getInviteCode());
             return jsonObject.toString();
         } catch (JSONException e) {
             e.printStackTrace();

@@ -469,10 +469,9 @@ public class AccountFragment extends BaseFragment implements AccountAddItem
     }
 
     private void userInfo(ResponseSignUpChase body, String inviteCode) {
-
-        dataManager.setDataType(null);
-        dataManager.setDefaultValues(null);
-        dataManager.setScheme(null);
+//        dataManager.setDataType(null);
+//        dataManager.setDefaultValues(null);
+//        dataManager.setScheme(null);
         dataManager.setPurposes(null);
 
         User user = dataManager.getUser();
