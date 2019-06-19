@@ -62,6 +62,10 @@ public class CryptoUtil {
         return result.charAt(0);
     }
 
+    public static String level1(String str) {
+        return str.replaceAll(" ","");
+    }
+
     public static String cleanup(String str, int length) {
         str = str.replaceFirst("^0+(?!$)", "");
         StringBuilder result = new StringBuilder("");
