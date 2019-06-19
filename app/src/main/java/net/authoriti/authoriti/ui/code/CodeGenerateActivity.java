@@ -339,20 +339,14 @@ public class CodeGenerateActivity extends BaseActivity {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
                 == PackageManager.PERMISSION_GRANTED) {
             Intent callIntent = new Intent(Intent.ACTION_CALL);
-//            if (dataManager.getUser().getAccountFromID(userIndentifier) != null
-//                    && dataManager.getUser().getAccountFromID(userIndentifier).getCallAuthNumber() != null
-//                    && !dataManager.getUser().getAccountFromID(userIndentifier).getCallAuthNumber().equals("")) {
             callIntent.setData(Uri.parse("tel:" + dataManager.getUser().getAccountFromID(userIndentifier,customerName).getCallAuthNumber()));
-//            } else {
-//                callIntent.setData(Uri.parse("tel:" + Constants.AUTHORIZE_CALL_NUMBER));
-//            }
+
             startActivity(callIntent);
 
             if (tm == null) {
                 tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
                 tm.listen(listener, PhoneStateListener.LISTEN_CALL_STATE);
             }
-
         } else if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
                 == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions(this,
@@ -395,6 +389,7 @@ public class CodeGenerateActivity extends BaseActivity {
     }
 
     private void makePhoneCall() {
+        System.out.println("Making Phone Call");
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)
                 == PackageManager.PERMISSION_GRANTED) {
             Intent callIntent = new Intent(Intent.ACTION_CALL);
@@ -417,7 +412,7 @@ public class CodeGenerateActivity extends BaseActivity {
     }
 
     private void callAuthorizationRequest(String accountID, String permissionCode) {
-        displayProgressDialog("");
+//        displayProgressDialog("");
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("cid", accountID);
         hashMap.put("permissionCode", permissionCode);
@@ -436,13 +431,12 @@ public class CodeGenerateActivity extends BaseActivity {
                                            Response<ResponseCallAuthentication>
                                                    response) {
                         Log.e("callAuthorization", "" + response.isSuccessful());
-                        dismissProgressDialog();
-                        makePhoneCall();
+//                        dismissProgressDialog();
                     }
 
                     @Override
                     public void onFailure(Call<ResponseCallAuthentication> call, Throwable t) {
-                        dismissProgressDialog();
+//                        dismissProgressDialog();
                         Log.e("callAuthorization", "" + t.getMessage());
                     }
                 });
