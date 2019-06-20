@@ -161,8 +161,8 @@ public class ChangePasswordActivity extends SecurityActivity implements PopupWin
             }
         }
 
-        if (!etNewPassword.getText().toString().equals(etConfirmPassword
-                .getText().toString())) {
+        if (!CryptoUtil.level1(etNewPassword.getText().toString()).equals(CryptoUtil.level1(etConfirmPassword
+                .getText().toString()))) {
             tiNewPassword.setError(utils.getSpannableStringForEditTextError
                     ("New password doesn't match", this));
             tiConfirmPassword.setError(utils
@@ -196,7 +196,7 @@ public class ChangePasswordActivity extends SecurityActivity implements PopupWin
                     AesCbcWithIntegrity.CipherTextIvMac civ = new AesCbcWithIntegrity
                             .CipherTextIvMac(dataManager.getUser().getEncryptPassword());
                     password = AesCbcWithIntegrity.decryptString(civ, keys);
-                    if (password.equals(etCurrentPassword.getText().toString()) || checkboxFingerPrint.isChecked()) {
+                    if (password.equals(CryptoUtil.level1(etCurrentPassword.getText().toString())) || checkboxFingerPrint.isChecked()) {
                         user.setEncryptPassword(AesCbcWithIntegrity.encrypt(CryptoUtil.level1(etNewPassword.getText().toString()), keys).toString());
                         dataManager.setUser(user);
                         Toast.makeText(this, "Password Changed Successfully", Toast
@@ -220,21 +220,42 @@ public class ChangePasswordActivity extends SecurityActivity implements PopupWin
     @AfterTextChange(R.id.etCurrentPassword)
     void currentPasswordChanged() {
         if (!TextUtils.isEmpty(etCurrentPassword.getText())) {
-            tiCurrentPassword.setError(null);
+            if(etCurrentPassword.getText().toString().trim().equals("")){
+                tiCurrentPassword.setError(utils.getSpannableStringForEditTextError("Please don’t begin or end your password with blank space.", this));
+            }else{
+                tiCurrentPassword.setError(null);
+            }
+        }else {
+            tiCurrentPassword.setError(utils.getSpannableStringForEditTextError("This field is " +
+                    "required", this));
         }
     }
 
     @AfterTextChange(R.id.etNewPassword)
     void newPasswordChanged() {
         if (!TextUtils.isEmpty(etNewPassword.getText())) {
-            tiNewPassword.setError(null);
+            if(etNewPassword.getText().toString().trim().equals("")){
+                tiNewPassword.setError(utils.getSpannableStringForEditTextError("Please don’t begin or end your password with blank space.", this));
+            }else{
+                tiNewPassword.setError(null);
+            }
+        }else {
+            tiNewPassword.setError(utils.getSpannableStringForEditTextError("This field is " +
+                    "required", this));
         }
     }
 
     @AfterTextChange(R.id.etConfirmPassword)
     void confirmPasswordChanged() {
         if (!TextUtils.isEmpty(etConfirmPassword.getText())) {
-            tiConfirmPassword.setError(null);
+            if(etConfirmPassword.getText().toString().trim().equals("")){
+                tiConfirmPassword.setError(utils.getSpannableStringForEditTextError("Please don’t begin or end your password with blank space.", this));
+            }else{
+                tiConfirmPassword.setError(null);
+            }
+        }else {
+            tiConfirmPassword.setError(utils.getSpannableStringForEditTextError("This field is " +
+                    "required", this));
         }
     }
 

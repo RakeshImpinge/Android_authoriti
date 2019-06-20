@@ -21,6 +21,7 @@ import net.authoriti.authoriti.utils.AuthoritiUtils;
 import net.authoriti.authoriti.utils.ConstantUtils;
 import net.authoriti.authoriti.utils.ViewUtils;
 
+import net.authoriti.authoriti.utils.crypto.CryptoUtil;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
@@ -88,13 +89,14 @@ public class StartupActivity extends SecurityActivity implements SecurityActivit
 
     @AfterTextChange(R.id.etPassword)
     void passwordChanged() {
-
         if (!TextUtils.isEmpty(etPassword.getText())) {
-
-            tiPassword.setError(null);
-
+            if(etPassword.getText().toString().trim().equals("")){
+                passwordMatched = false;
+                tiPassword.setError(utils.getSpannableStringForEditTextError("Please don’t begin or end your password with blank space.", this));
+            }else{
+                tiPassword.setError(null);
+            }
         } else {
-
             tiPassword.setError(utils.getSpannableStringForEditTextError("This field is " +
                     "required", this));
 
@@ -105,23 +107,24 @@ public class StartupActivity extends SecurityActivity implements SecurityActivit
     void passwordConfirmChanged() {
 
         if (TextUtils.isEmpty(etPasswordConfirm.getText())) {
-
             tiPasswordConfirm.setError(utils.getSpannableStringForEditTextError("This field is " +
                     "required", this));
             passwordMatched = false;
 
         } else {
-
-            if (!etPassword.getText().toString().equals(etPasswordConfirm.getText().toString())) {
-
-                tiPasswordConfirm.setError(utils.getSpannableStringForEditTextError("This field " +
-                        "does not match", this));
+            if(etPasswordConfirm.getText().toString().trim().equals("")){
                 passwordMatched = false;
+                tiPasswordConfirm.setError(utils.getSpannableStringForEditTextError("Please don’t begin or end your password with blank space.", this));
+            }else{
+                if (!CryptoUtil.level1(etPassword.getText().toString()).equals(CryptoUtil.level1(etPasswordConfirm.getText().toString()))) {
+                    tiPasswordConfirm.setError(utils.getSpannableStringForEditTextError("This field " +
+                            "does not match", this));
+                    passwordMatched = false;
 
-            } else {
-
-                tiPasswordConfirm.setError(null);
-                passwordMatched = true;
+                } else {
+                    tiPasswordConfirm.setError(null);
+                    passwordMatched = true;
+                }
             }
         }
     }
@@ -192,7 +195,7 @@ public class StartupActivity extends SecurityActivity implements SecurityActivit
     }
 
     private void goNext() {
-        dataManager.password = etPassword.getText().toString();
+        dataManager.password = CryptoUtil.level1(etPassword.getText().toString());
         if (dataManager.showSkip) {
             AccountManagerActivity_.intent(mContext).start();
         } else {
