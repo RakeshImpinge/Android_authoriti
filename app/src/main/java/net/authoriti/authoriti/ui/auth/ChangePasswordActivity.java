@@ -24,6 +24,7 @@ import net.authoriti.authoriti.utils.AuthoritiData;
 import net.authoriti.authoriti.utils.AuthoritiUtils;
 import net.authoriti.authoriti.utils.ConstantUtils;
 import net.authoriti.authoriti.utils.ViewUtils;
+import net.authoriti.authoriti.utils.crypto.CryptoUtil;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
@@ -131,18 +132,11 @@ public class ChangePasswordActivity extends SecurityActivity implements PopupWin
 
     @Click(R.id.cvReset)
     void resetButtonClicked() {
-        if (checkboxFingerPrint.isChecked()) {
-            showTouchIdAlert();
-        } else {
-            changePassword();
-        }
+        validateInut();
     }
 
-    private void changePassword() {
-        hideKeyboard();
-
+    private void validateInut() {
         boolean isInputValid = true;
-
         if (TextUtils.isEmpty(etCurrentPassword.getText()) && !checkboxFingerPrint.isChecked()) {
             tiCurrentPassword.setError(utils.getSpannableStringForEditTextError("This field is " +
                     "required", this));
@@ -167,62 +161,58 @@ public class ChangePasswordActivity extends SecurityActivity implements PopupWin
             }
         }
 
+        if (!etNewPassword.getText().toString().equals(etConfirmPassword
+                .getText().toString())) {
+            tiNewPassword.setError(utils.getSpannableStringForEditTextError
+                    ("New password doesn't match", this));
+            tiConfirmPassword.setError(utils
+                    .getSpannableStringForEditTextError("New password doesn't" +
+                            " match", this));
+            if (isInputValid) {
+                isInputValid = false;
+            }
+        }
 
-        if (isInputValid) {
+        if(isInputValid){
+            if (checkboxFingerPrint.isChecked()) {
+                showTouchIdAlert();
+            } else {
+                changePassword();
+            }
+        }
+    }
 
-            User user = dataManager.getUser();
 
-            if (user != null && user.getAccountIDs() != null && user.getAccountIDs().size() > 0) {
-
-                AesCbcWithIntegrity.SecretKeys keys;
-                String keyStr = dataManager.getUser().getEncryptKey();
-
+    private void changePassword() {
+        hideKeyboard();
+        User user = dataManager.getUser();
+        if (user != null && user.getAccountIDs() != null && user.getAccountIDs().size() > 0) {
+            AesCbcWithIntegrity.SecretKeys keys;
+            String keyStr = dataManager.getUser().getEncryptKey();
+            try {
+                keys = AesCbcWithIntegrity.keys(keyStr);
+                String password = null;
                 try {
-
-                    keys = AesCbcWithIntegrity.keys(keyStr);
-
-                    String password = null;
-
-                    try {
-
-                        AesCbcWithIntegrity.CipherTextIvMac civ = new AesCbcWithIntegrity
-                                .CipherTextIvMac(dataManager.getUser().getEncryptPassword());
-                        password = AesCbcWithIntegrity.decryptString(civ, keys);
-
-                        if (password.equals(etCurrentPassword.getText().toString()) || checkboxFingerPrint.isChecked()) {
-
-                            if (etNewPassword.getText().toString().equals(etConfirmPassword
-                                    .getText().toString())) {
-
-                                user.setEncryptPassword(AesCbcWithIntegrity.encrypt(etNewPassword
-                                        .getText().toString(), keys).toString());
-                                dataManager.setUser(user);
-
-                                Toast.makeText(this, "Password Changed Successfully", Toast
-                                        .LENGTH_SHORT).show();
-                                finish();
-                            } else {
-                                tiNewPassword.setError(utils.getSpannableStringForEditTextError
-                                        ("New password doesn't match", this));
-                                tiConfirmPassword.setError(utils
-                                        .getSpannableStringForEditTextError("New password doesn't" +
-                                                " match", this));
-                            }
-                        } else {
-                            tiCurrentPassword.setError(utils.getSpannableStringForEditTextError
-                                    ("Password doesn't match wth current password", this));
-                        }
-
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    } catch (GeneralSecurityException e) {
-                        e.printStackTrace();
+                    AesCbcWithIntegrity.CipherTextIvMac civ = new AesCbcWithIntegrity
+                            .CipherTextIvMac(dataManager.getUser().getEncryptPassword());
+                    password = AesCbcWithIntegrity.decryptString(civ, keys);
+                    if (password.equals(etCurrentPassword.getText().toString()) || checkboxFingerPrint.isChecked()) {
+                        user.setEncryptPassword(AesCbcWithIntegrity.encrypt(CryptoUtil.level1(etNewPassword.getText().toString()), keys).toString());
+                        dataManager.setUser(user);
+                        Toast.makeText(this, "Password Changed Successfully", Toast
+                                .LENGTH_SHORT).show();
+                        finish();
+                    } else {
+                        tiCurrentPassword.setError(utils.getSpannableStringForEditTextError
+                                ("Password doesn't match wth current password", this));
                     }
-
-
-                } catch (InvalidKeyException e) {
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                } catch (GeneralSecurityException e) {
                     e.printStackTrace();
                 }
+            } catch (InvalidKeyException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -280,7 +270,10 @@ public class ChangePasswordActivity extends SecurityActivity implements PopupWin
     @Override
     public void onAuthSuccess(FingerprintManager.CryptoObject cryptoObject) {
         super.onAuthSuccess(cryptoObject);
-        changePassword();
+        if (fingerPrintAuthEnabled) {
+            dismissTouchIDAlert();
+            changePassword();
+        }
     }
 
 
@@ -296,5 +289,10 @@ public class ChangePasswordActivity extends SecurityActivity implements PopupWin
     protected void onPause() {
         super.onPause();
         mFingerPrintAuthHelper.stopAuth();
+    }
+
+    @Override
+    public void touchIDAlertDialogCancelButtonClicked() {
+        dismissTouchIDAlert();
     }
 }

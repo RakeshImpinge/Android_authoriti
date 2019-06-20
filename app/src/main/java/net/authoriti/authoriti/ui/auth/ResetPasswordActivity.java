@@ -20,6 +20,7 @@ import net.authoriti.authoriti.utils.ConstantUtils;
 import net.authoriti.authoriti.utils.ViewUtils;
 import com.tozny.crypto.android.AesCbcWithIntegrity;
 
+import net.authoriti.authoriti.utils.crypto.CryptoUtil;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
@@ -153,13 +154,13 @@ public class ResetPasswordActivity extends BaseActivity {
                                 .CipherTextIvMac(dataManager.getUser().getEncryptPassword());
                         password = AesCbcWithIntegrity.decryptString(civ, keys);
 
-                        if (password.equals(etCurrentPassword.getText().toString())) {
+                        if (CryptoUtil.level1(password).equals(CryptoUtil.level1(etCurrentPassword.getText().toString()))) {
 
                             if (etNewPassword.getText().toString().equals(etConfirmPassword
                                     .getText().toString())) {
 
-                                user.setEncryptPassword(AesCbcWithIntegrity.encrypt(etNewPassword
-                                        .getText().toString(), keys).toString());
+                                user.setEncryptPassword(AesCbcWithIntegrity.encrypt(CryptoUtil.level1(etNewPassword
+                                        .getText().toString()), keys).toString());
                                 dataManager.setUser(user);
 
                                 Toast.makeText(this, "Reset Password Successfully", Toast

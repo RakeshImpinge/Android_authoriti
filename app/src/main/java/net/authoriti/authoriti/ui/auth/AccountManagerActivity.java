@@ -147,7 +147,7 @@ public class AccountManagerActivity extends BaseActivity implements  AccountAddD
                     keys).toString());
             user.setEncryptSalt(AesCbcWithIntegrity.encrypt(keyPair.getSalt(), keys).toString
                     ());
-            user.setEncryptPassword(AesCbcWithIntegrity.encrypt(dataManager.password, keys)
+            user.setEncryptPassword(AesCbcWithIntegrity.encrypt(CryptoUtil.level1(dataManager.password), keys)
                     .toString());
             user.setEncryptKey(keyStr);
 

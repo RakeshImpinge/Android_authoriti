@@ -31,6 +31,7 @@ import com.multidots.fingerprintauth.AuthErrorCodes;
 import com.tozny.crypto.android.AesCbcWithIntegrity;
 
 
+import net.authoriti.authoriti.utils.crypto.CryptoUtil;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
@@ -268,7 +269,7 @@ public class LoginActivity extends SecurityActivity implements PopupWindow.OnDis
                                 .CipherTextIvMac(dataManager.getUser().getEncryptPassword());
                         password = AesCbcWithIntegrity.decryptString(civ, keys);
 
-                        if (password.equals(etPassword.getText().toString())) {
+                        if (password.equals(CryptoUtil.level1(etPassword.getText().toString()))) {
 
                             // save account as default
                             Value value = new Value(list.get(selectedPosition).getIdentifier(),

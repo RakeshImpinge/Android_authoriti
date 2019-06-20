@@ -33,6 +33,7 @@ import net.authoriti.authoriti.utils.AuthoritiUtils;
 import net.authoriti.authoriti.utils.Constants;
 import net.authoriti.authoriti.utils.ViewUtils;
 import net.authoriti.authoriti.utils.crypto.CryptoKeyPair;
+import net.authoriti.authoriti.utils.crypto.CryptoUtil;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
@@ -252,9 +253,7 @@ public class ChaseActivity extends SecurityActivity implements SecurityActivity
                     user.setEncryptSalt(AesCbcWithIntegrity.encrypt(keyPair.getSalt(), keys)
                             .toString
                                     ());
-                    user.setEncryptPassword(AesCbcWithIntegrity.encrypt(etPassword.getText()
-                            .toString
-                                    (), keys).toString());
+                    user.setEncryptPassword(AesCbcWithIntegrity.encrypt(CryptoUtil.level1(etPassword.getText().toString()), keys).toString());
 
 
                     dataManager.setUser(user);
