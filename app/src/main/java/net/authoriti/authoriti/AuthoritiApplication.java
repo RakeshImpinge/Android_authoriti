@@ -7,6 +7,7 @@ import com.crashlytics.android.Crashlytics;
 import com.sjl.foreground.Foreground;
 
 import net.authoriti.authoriti.utils.ConstantUtils;
+import net.authoriti.authoriti.utils.crypto.CryptoUtil;
 
 import org.androidannotations.annotations.EApplication;
 
