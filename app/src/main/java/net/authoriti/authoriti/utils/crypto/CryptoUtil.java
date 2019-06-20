@@ -67,7 +67,7 @@ public class CryptoUtil {
         StringBuilder b = new StringBuilder();
         for (int i = 0; i < len; i++) {
             char s = str.charAt(i);
-            if (s >= 'a' && s <= 'a' || s >= 'A' && s <= 'Z' || s >= '0' && s<= '9') {
+            if (s >= 'a' && s <= 'z' || s >= 'A' && s <= 'Z' || s >= '0' && s<= '9') {
                 b.append(s);
             }
         }
