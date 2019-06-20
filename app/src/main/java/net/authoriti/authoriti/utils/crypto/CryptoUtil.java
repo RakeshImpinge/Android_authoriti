@@ -63,7 +63,15 @@ public class CryptoUtil {
     }
 
     public static String level1(String str) {
-        return str.replaceAll(" ","");
+        int len = str.length();
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; i < len; i++) {
+            char s = str.charAt(i);
+            if (s >= 'a' && s <= 'a' || s >= 'A' && s <= 'Z' || s >= '0' && s<= '9') {
+                b.append(s);
+            }
+        }
+        return b.toString();
     }
 
     public static String cleanup(String str, int length) {
