@@ -43,8 +43,7 @@ public class Crypto {
         private String[] SCHEMA2 = {ALPHANUM, ALPHANUM, BASE22, BASE22, BASE22, BASE22, BASE22};
         private String[] SCHEMA3 = {ALPHANUM, ALPHANUM, BASE22, BASE22, BASE22, BASE22, BASE22};
         private String[] SCHEMA4 = {ALPHANUM, ALPHANUM, BASE22, BASE22, BASE22, BASE22, BASE22};
-        private String[] SCHEMA5 = {new String(DECANUM), new String(DECANUM), new String(DECANUM)
-                , new String(DECANUM), new String(DECANUM), BASE14, BASE14, BASE14, BASE14, BASE14};
+        private String[] SCHEMA5 = {ALPHANUM, ALPHANUM, BASE22, BASE22, BASE22, BASE22, BASE22};
         private String[] SCHEMA6 = {BASE22, BASE22, BASE22, BASE22, BASE22, ALPHANUM, ALPHANUM};
 
         private String[][] SCHEMA_RANGES = {SCHEMA1, SCHEMA2, SCHEMA3, SCHEMA4, SCHEMA5, SCHEMA6};
@@ -90,28 +89,28 @@ public class Crypto {
             long minutes = TimeUnit.MINUTES.convert(difference, TimeUnit.MILLISECONDS);
 
             String encodedTime = "";
-            if (schemaVersion.equalsIgnoreCase("5")) {
-                encodedTime = intToBase14(new BigInteger(minutes + ""), 5);
-                if (encodedTime.length() > 5) {
-                    encodedTime = "ddddd";
-                }
-            } else {
-                encodedTime = intToBase22(new BigInteger(minutes + ""), 5);
-                if (encodedTime.length() > 5) {
-                    encodedTime = "lllll";
-                }
+//            if (schemaVersion.equalsIgnoreCase("5")) {
+//                encodedTime = intToBase14(new BigInteger(minutes + ""), 5);
+//                if (encodedTime.length() > 5) {
+//                    encodedTime = "ddddd";
+//                }
+//            } else {
+            encodedTime = intToBase22(new BigInteger(minutes + ""), 5);
+            if (encodedTime.length() > 5) {
+                encodedTime = "lllll";
             }
+//            }
             System.out.println("Adding time: " + encodedTime);
             payload = encodedTime + payload;
         }
 
         public void addInput(String inputType, String value) {
             if (schemaVersion.equalsIgnoreCase("5") && inputType.equalsIgnoreCase("amount")) {
-                while (value.length() < 5) {
-                    value = "0" + value;
-                }
-                extraInput = payload.substring(5) + extraInput;
-                payload = value + payload.substring(0, 5);
+//                while (value.length() < 5) {
+//                    value = "0" + value;
+//                }
+                extraInput = value + extraInput;
+                payload = payload.substring(5) + payload.substring(0, 5);
             } else {
                 String trimmed = CryptoUtil.cleanup(value, value.length());
                 if (inputType.equalsIgnoreCase("secret")) {
@@ -184,6 +183,7 @@ public class Crypto {
                     extra = extra + extraInput;
                     break;
                 case "5":
+                    System.out.println("Payload: " + payload + ". Extra: " + extra);
                     encodedPayload = encodePayload(payload, 5);
                     extra = extra + extraInput;
                     break;
@@ -205,8 +205,6 @@ public class Crypto {
             return encodePayload(payload, payloadRanges);
         }
 
-        // 2b208512a404d8c25a38c1c480db54cadb589830078853a925dac8005c6b8dec1d996e033d612d9af2b44b70061ee0e868bfd14c2dd90b129e1edeb7953e798599y
-        // 2b208512a404d8c25a38c1c480db54cadb589830078853a925dac8005c6b8dec1d996e033d612d9af2b44b70061ee0e868bfd14c2dd90b129e1edeb7953e798599y
         private String encodePayload(String payload, String[] ranges) {
             BigInteger total = new BigInteger("0");
             BigInteger mult = new BigInteger("1");
@@ -272,7 +270,7 @@ public class Crypto {
 
         private String addDataToCode(String data, String code) {
             final String _data = CryptoUtil.cleanup(CryptoUtil.hash(data), 8);
-
+            System.out.println("Added hashed data: " + _data);
             BigInteger a = CryptoUtil.base62ToInt(_data);
             BigInteger b = CryptoUtil.base62ToInt(code);
 
