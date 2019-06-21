@@ -120,8 +120,6 @@ public class ChangePasswordActivity extends SecurityActivity implements PopupWin
 
         if (dataManager != null && dataManager.getUser() != null && dataManager.getUser()
                 .isFingerPrintAuthEnabled()) {
-            mFingerPrintAuthHelper.startAuth();
-            fingerPrintAuthEnabled = true;
             linCheckBox.setVisibility(View.VISIBLE);
         } else {
             linCheckBox.setVisibility(View.GONE);
@@ -176,6 +174,8 @@ public class ChangePasswordActivity extends SecurityActivity implements PopupWin
         if(isInputValid){
             if (checkboxFingerPrint.isChecked()) {
                 showTouchIdAlert();
+                mFingerPrintAuthHelper.startAuth();
+                fingerPrintAuthEnabled = true;
             } else {
                 changePassword();
             }
@@ -292,6 +292,8 @@ public class ChangePasswordActivity extends SecurityActivity implements PopupWin
     public void onAuthSuccess(FingerprintManager.CryptoObject cryptoObject) {
         super.onAuthSuccess(cryptoObject);
         if (fingerPrintAuthEnabled) {
+            mFingerPrintAuthHelper.stopAuth();
+            fingerPrintAuthEnabled = false;
             dismissTouchIDAlert();
             changePassword();
         }
@@ -299,21 +301,9 @@ public class ChangePasswordActivity extends SecurityActivity implements PopupWin
 
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (fingerPrintAuthEnabled) {
-            mFingerPrintAuthHelper.startAuth();
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mFingerPrintAuthHelper.stopAuth();
-    }
-
-    @Override
     public void touchIDAlertDialogCancelButtonClicked() {
         dismissTouchIDAlert();
+        mFingerPrintAuthHelper.stopAuth();
+        fingerPrintAuthEnabled = false;
     }
 }
