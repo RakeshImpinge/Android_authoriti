@@ -162,7 +162,12 @@ public class CodePermissionActivity extends BaseActivity {
                     key = pickersList.get(i).getInput();
                     String value_decoded = "";
                     try {
-                        value_decoded = URLDecoder.decode(defParamFromUrl.get(key), "UTF-8");
+                        if (key.equalsIgnoreCase("amount") && defParamFromUrl.get("schemaVersion").equalsIgnoreCase("5")) {
+                            value_decoded = URLDecoder.decode(defParamFromUrl.get("withdrawAmount"), "UTF-8");
+                        }
+                        else {
+                            value_decoded = URLDecoder.decode(defParamFromUrl.get(key), "UTF-8");
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
