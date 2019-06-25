@@ -981,14 +981,11 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
                 if (response.isSuccessful()) {
                     User user = dataManager.getUser();
                     List<AccountID> savedAccountIDs = user.getAccountIDs();
-                    List<AccountID> newIds = new ArrayList<>();
                     for (ResponseSync.Sync responseSync : response.body().getUpdates()) {
                         List<AccountID> newAccountIDs = responseSync.getAccounts();
-                        final int newAccounts = newAccountIDs.size();
-                        Log.e("Sync", "Total number of accounts: " + newAccounts);
-                        for (int i = 0; i < newAccounts; i++) {
+                        Log.e("Sync", "Total number of accounts: " + newAccountIDs.size());
+                        for (int i = 0; i < newAccountIDs.size(); i++) {
                             Log.e("Loop", "" + i);
-                            boolean isContained = false;
                             newAccountIDs.get(i).setCustomer(responseSync.getCustomerName());
                             newAccountIDs.get(i).setCustomer_ID(responseSync.getUserId());
                             if (responseSync.isCallAuth() && responseSync.getCallAuthNumber() != null && !responseSync.getCallAuthNumber().equals("")) {
@@ -1000,16 +997,12 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
                                         .getIdentifier())
                                         && savedAccountIDs.get(k).getType().equals(newAccountIDs.get(i)
                                         .getType())) {
-                                    isContained = true;
-                                    break;
+                                    savedAccountIDs.get(k).setCallAuthNumber(newAccountIDs.get(i).getCallAuthNumber());
                                 }
-                            }
-                            if (isContained) {
-                                newIds.add(newAccountIDs.get(i));
                             }
                         }
                     }
-                    user.setAccountIDs(newIds);
+                    user.setAccountIDs(savedAccountIDs);
                     dataManager.setUser(user);
                 } else {
                 }
