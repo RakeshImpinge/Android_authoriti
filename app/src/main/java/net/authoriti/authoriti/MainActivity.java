@@ -761,7 +761,7 @@ public class MainActivity extends SecurityActivity implements SecurityActivity
             }
         }
 
-        final String url = "https://kwhhlke7m3.execute-api.us-east-1.amazonaws.com/qa/poll" + query.toString();
+        final String url = "https://kwhhlke7m3.execute-api.us-east-1.amazonaws.com/dev/poll" + query.toString();
         AuthoritiAPI.APIService().getPollingUrl(url).enqueue
                 (new Callback<ResponseBody>() {
                     @Override
